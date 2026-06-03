@@ -1,0 +1,13 @@
+packages:
+  - '.'
+
+# Hardening de supply chain (Reporte_Stack_Frontend.pdf sección 4.7).
+# Solo estas dependencias pueden ejecutar scripts de construccion.
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+
+# En versiones nuevas de pnpm la opcion preferida es:
+# allowBuilds:
+#   - esbuild
+#   - sharp
