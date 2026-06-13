@@ -1,0 +1,10 @@
+<div [ngClass]="containerClasses" data-testid="loading-timeout-wrapper">
+  @if (timeout) {
+    <div
+      class="loading-timeout-wrapper__progress"
+      [ngStyle]="progressStyle"
+      aria-hidden="true"
+    ></div>
+  }
+  <ng-content></ng-content>
+</div>

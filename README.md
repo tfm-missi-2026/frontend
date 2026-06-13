@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 # Frontend — Angular 21 + TailAdmin + pnpm
 
 ## Bootstrap inicial (una sola vez)
@@ -134,3 +135,5 @@ Frontend/
 - **CVE-2025-69262 / 69263 / 69264** (pnpm < 10.27.0) → pnpm 10.33.0 las cubre.
 - `pnpm-workspace.yaml` declara `onlyBuiltDependencies: [esbuild, sharp]`
   como hardening de supply chain.
+=======
+>>>>>>> Stashed changes

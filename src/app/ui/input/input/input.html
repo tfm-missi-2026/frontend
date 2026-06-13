@@ -1,0 +1,127 @@
+<!--
+  Template del Input.
+  Estructura:
+    <outer>           → StyledControlContainer (col + gap[1] + flex/width)
+      <FormLabel>     → solo si hay `labelText`
+      <container>     → StyledInputContainer (frame con borde, focus, error)
+        <leftIcon>    → ngComponentOutlet si `leftIcon`
+        <Flex>        → prefix | <input> | sufix
+        <errorIcon>   → ValidationErrorIcon si `errorMessage`
+        <rightIcon>   → ngComponentOutlet si `rightIcon`
+      </container>
+      <Flex footer>   → legend | charCount (si hay `legend` o `maxLength`)
+    </outer>
+-->
+
+<div
+  [class]="outerClasses"
+  [ngStyle]="outerStyles"
+  data-testid="input-wrapper"
+>
+  @if (labelText) {
+    <FormLabel
+      [labelText]="labelText"
+      [labelFor]="id || ''"
+      [required]="required"
+      [disabled]="disabled"
+      [readOnly]="readOnly"
+      [tooltip]="tooltip"
+    ></FormLabel>
+  }
+
+  <div
+    [class]="containerClasses"
+    [ngStyle]="containerStyles"
+    data-testid="input-container"
+  >
+    @if (leftIcon) {
+      <span
+        class="inline-flex items-center justify-center shrink-0"
+        [style.color]="iconColor"
+      >
+        <ng-container
+          *ngComponentOutlet="leftIcon; inputs: leftIconInputs"
+        ></ng-container>
+      </span>
+    }
+
+    <Flex [gap]="'4px'" [flex]="'1'">
+      @if (prefix) {
+        <Label
+          type="bodyS"
+          as="span"
+          color="textAction"
+          [text]="prefix"
+        ></Label>
+      }
+
+      <input
+        #inputEl
+        [class]="inputClasses"
+        [id]="id || null"
+        [name]="name || null"
+        [type]="type"
+        [placeholder]="placeholder || null"
+        [disabled]="disabled"
+        [readonly]="readOnly"
+        [attr.autocomplete]="autocomplete || null"
+        [attr.maxlength]="maxLength || null"
+        [value]="internalValue"
+        (input)="onInput($event)"
+        (keydown)="onKeyDownHandler($event)"
+        (focus)="onFocusHandler()"
+        (blur)="onBlurHandler()"
+        data-testid="input"
+      />
+
+      @if (sufix) {
+        <Label
+          type="bodyS"
+          as="span"
+          color="textAction"
+          [text]="sufix"
+        ></Label>
+      }
+    </Flex>
+
+    @if (hasError) {
+      <ValidationErrorIcon
+        [errorMessage]="errorMessage!"
+      ></ValidationErrorIcon>
+    }
+
+    @if (rightIcon) {
+      <span
+        class="inline-flex items-center justify-center shrink-0"
+        [style.color]="iconColor"
+      >
+        <ng-container
+          *ngComponentOutlet="rightIcon; inputs: rightIconInputs"
+        ></ng-container>
+      </span>
+    }
+  </div>
+
+  @if (legend || maxLength) {
+    <Flex [justifyContent]="footerJustifyContent">
+      @if (legend) {
+        <Label
+          type="bodyXxs"
+          color="textWeakest"
+          [text]="legend"
+          [weight]="legendWeight"
+        ></Label>
+      }
+      @if (maxLength) {
+        <span class="self-end">
+          <Label
+            type="bodyXxs"
+            [color]="charCountColor"
+            [text]="charCountText"
+            [weight]="charCountWeight"
+          ></Label>
+        </span>
+      }
+    </Flex>
+  }
+</div>
