@@ -1,27 +1,6 @@
-<<<<<<< Updated upstream
-packages:
-  - '.'
-
-# Hardening de supply chain (Reporte_Stack_Frontend.pdf sección 4.7).
-# Solo estas dependencias pueden ejecutar scripts de construccion.
-onlyBuiltDependencies:
-  - esbuild
-  - sharp
-
-# Defensa adicional contra supply-chain attacks (ej. compromiso TanStack/Mistral 2026):
-# rechazar versiones publicadas hace menos de 1440 min (24h). Da tiempo a que
-# la comunidad detecte y bajen del registro publicaciones maliciosas.
-minimumReleaseAge: 1440
-
-# En versiones nuevas de pnpm la opcion preferida es:
-# allowBuilds:
-#   - esbuild
-#   - sharp
-=======
 allowBuilds:
-  '@compodoc/compodoc': true
-  '@parcel/watcher': false
+  "@compodoc/compodoc": true
+  "@parcel/watcher": false
   esbuild: false
   lmdb: false
   msgpackr-extract: false
->>>>>>> Stashed changes

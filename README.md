@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 # Frontend — Angular 21 + TailAdmin + pnpm
 
 ## Bootstrap inicial (una sola vez)
@@ -15,10 +14,10 @@ el usuario manualmente para mantener el control del flujo de Git.
 
 **Versiones requeridas (fijadas por `Reporte_Stack_Frontend.pdf`):**
 
-| Herramienta | Versión          | Notas                                                                                          |
-|-------------|------------------|------------------------------------------------------------------------------------------------|
-| Node.js     | **20.19.x LTS**  | Soporte LTS hasta abril 2026. No usar Node 22 ni 24 — fuera del stack declarado del TFM.       |
-| pnpm        | **10.33.0**      | Cubre CVE-2025-69262 / 69263 / 69264.                                                          |
+| Herramienta | Versión         | Notas                                                                                    |
+| ----------- | --------------- | ---------------------------------------------------------------------------------------- |
+| Node.js     | **20.19.x LTS** | Soporte LTS hasta abril 2026. No usar Node 22 ni 24 — fuera del stack declarado del TFM. |
+| pnpm        | **10.33.0**     | Cubre CVE-2025-69262 / 69263 / 69264.                                                    |
 
 ```powershell
 node -v      # debe imprimir v20.19.x
@@ -135,5 +134,3 @@ Frontend/
 - **CVE-2025-69262 / 69263 / 69264** (pnpm < 10.27.0) → pnpm 10.33.0 las cubre.
 - `pnpm-workspace.yaml` declara `onlyBuiltDependencies: [esbuild, sharp]`
   como hardening de supply chain.
-=======
->>>>>>> Stashed changes

@@ -16,9 +16,6 @@
     "moduleResolution": "bundler",
     "importHelpers": true,
     "target": "ES2022",
-<<<<<<< Updated upstream
-    "module": "ES2022"
-=======
     "module": "preserve",
     "paths": {
       "@core/*": ["./src/app/core/*"],
@@ -30,13 +27,11 @@
       "@utils/*": ["./src/app/utils/*"],
       "@env/*": ["./src/environments/*"]
     }
->>>>>>> Stashed changes
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
-    "strictTemplates": true,
-    "enableControlFlow": true
+    "strictTemplates": true
   }
 }
