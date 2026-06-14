@@ -1,71 +1,71 @@
 <!--
-  Template del Input.
+  Template del UiInput.
   Estructura:
     <outer>           → StyledControlContainer (col + gap[1] + flex/width)
-      <FormLabel>     → solo si hay `labelText`
+      <UiFormLabel>   → solo si hay `labelText`
       <container>     → StyledInputContainer (frame con borde, focus, error)
         <leftIcon>    → ngComponentOutlet si `leftIcon`
-        <Flex>        → prefix | <input> | sufix
+        <UiFlex>      → prefix | <input> | sufix
         <errorIcon>   → ValidationErrorIcon si `errorMessage`
         <rightIcon>   → ngComponentOutlet si `rightIcon`
       </container>
-      <Flex footer>   → legend | charCount (si hay `legend` o `maxLength`)
+      <UiFlex footer> → legend | charCount (si hay `legend` o `maxLength`)
     </outer>
 -->
 
 <div
-  [class]="outerClasses"
-  [ngStyle]="outerStyles"
+  [class]="outerClasses()"
+  [style]="outerStyles()"
   data-testid="input-wrapper"
 >
-  @if (labelText) {
-    <FormLabel
-      [labelText]="labelText"
-      [labelFor]="id || ''"
-      [required]="required"
-      [disabled]="disabled"
-      [readOnly]="readOnly"
-      [tooltip]="tooltip"
-    ></FormLabel>
+  @if (labelText(); as lt) {
+    <UiFormLabel
+      [labelText]="lt"
+      [labelFor]="id() || ''"
+      [required]="required()"
+      [disabled]="isDisabled()"
+      [readOnly]="readOnly()"
+      [tooltip]="tooltip()"
+    ></UiFormLabel>
   }
 
   <div
-    [class]="containerClasses"
-    [ngStyle]="containerStyles"
+    [class]="containerClasses()"
+    [style]="containerStyles()"
     data-testid="input-container"
   >
-    @if (leftIcon) {
+    @if (leftIcon()) {
       <span
         class="inline-flex items-center justify-center shrink-0"
-        [style.color]="iconColor"
+        [style.color]="iconColor()"
       >
         <ng-container
-          *ngComponentOutlet="leftIcon; inputs: leftIconInputs"
+          *ngComponentOutlet="leftIcon(); inputs: leftIconInputs()"
         ></ng-container>
       </span>
     }
 
-    <Flex [gap]="'4px'" [flex]="'1'">
-      @if (prefix) {
-        <Label
+    <UiFlex [gap]="'4px'" [flex]="'1'">
+      @if (prefix(); as pfx) {
+        <UiLabel
           type="bodyS"
           as="span"
           color="textAction"
-          [text]="prefix"
-        ></Label>
+          [text]="pfx"
+        ></UiLabel>
       }
 
       <input
         #inputEl
-        [class]="inputClasses"
-        [id]="id || null"
-        [name]="name || null"
-        [type]="type"
-        [placeholder]="placeholder || null"
-        [disabled]="disabled"
-        [readonly]="readOnly"
-        [attr.autocomplete]="autocomplete || null"
-        [attr.maxlength]="maxLength || null"
+        [class]="inputClasses()"
+        [id]="id() || null"
+        [name]="name() || null"
+        [type]="type()"
+        [placeholder]="placeholder() || null"
+        [disabled]="isDisabled()"
+        [readonly]="readOnly()"
+        [attr.autocomplete]="autocomplete() || null"
+        [attr.maxlength]="maxLength() || null"
         [value]="internalValue"
         (input)="onInput($event)"
         (keydown)="onKeyDownHandler($event)"
@@ -74,54 +74,54 @@
         data-testid="input"
       />
 
-      @if (sufix) {
-        <Label
+      @if (sufix(); as sfx) {
+        <UiLabel
           type="bodyS"
           as="span"
           color="textAction"
-          [text]="sufix"
-        ></Label>
+          [text]="sfx"
+        ></UiLabel>
       }
-    </Flex>
+    </UiFlex>
 
-    @if (hasError) {
+    @if (hasError()) {
       <ValidationErrorIcon
-        [errorMessage]="errorMessage!"
+        [errorMessage]="errorMessage()!"
       ></ValidationErrorIcon>
     }
 
-    @if (rightIcon) {
+    @if (rightIcon()) {
       <span
         class="inline-flex items-center justify-center shrink-0"
-        [style.color]="iconColor"
+        [style.color]="iconColor()"
       >
         <ng-container
-          *ngComponentOutlet="rightIcon; inputs: rightIconInputs"
+          *ngComponentOutlet="rightIcon(); inputs: rightIconInputs()"
         ></ng-container>
       </span>
     }
   </div>
 
-  @if (legend || maxLength) {
-    <Flex [justifyContent]="footerJustifyContent">
-      @if (legend) {
-        <Label
+  @if (legend() || maxLength()) {
+    <UiFlex [justifyContent]="footerJustifyContent()">
+      @if (legend(); as lgd) {
+        <UiLabel
           type="bodyXxs"
           color="textWeakest"
-          [text]="legend"
+          [text]="lgd"
           [weight]="legendWeight"
-        ></Label>
+        ></UiLabel>
       }
-      @if (maxLength) {
+      @if (maxLength()) {
         <span class="self-end">
-          <Label
+          <UiLabel
             type="bodyXxs"
-            [color]="charCountColor"
-            [text]="charCountText"
+            [color]="charCountColor()"
+            [text]="charCountText()"
             [weight]="charCountWeight"
-          ></Label>
+          ></UiLabel>
         </span>
       }
-    </Flex>
+    </UiFlex>
   }
 </div>

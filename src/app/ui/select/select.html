@@ -1,24 +1,24 @@
 <div
   #rootRef
   class="relative flex flex-col gap-1.5 w-full font-outfit"
-  [ngClass]="className"
-  [style.width]="width || null"
-  [style.minWidth]="minWidth || null"
+  [class]="className()"
+  [style.width]="width() || null"
+  [style.minWidth]="minWidth() || null"
 >
   <!-- LABEL -->
-  @if (labelText) {
+  @if (labelText()) {
     <label
       class="inline-flex items-center gap-1 text-sm font-medium text-gray-700 dark:text-gray-400"
-      [attr.for]="inputId || null"
+      [attr.for]="inputId() || null"
     >
-      <span>{{ labelText }}</span>
-      @if (required) {
+      <span>{{ labelText() }}</span>
+      @if (required()) {
         <span class="text-error-500" aria-hidden="true">*</span>
       }
-      @if (tooltip) {
+      @if (tooltip()) {
         <span
           class="inline-flex items-center justify-center w-3.5 h-3.5 text-[10px] rounded-full bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 cursor-help"
-          [title]="tooltip"
+          [title]="tooltip()"
         >?</span>
       }
     </label>
@@ -27,45 +27,45 @@
   <!-- CONTROL -->
   <div
     class="flex items-center gap-1.5 min-h-11 w-full py-1 px-3 rounded-lg border bg-white border-gray-300 cursor-pointer transition-colors dark:bg-gray-900 dark:border-gray-700"
-    [class.flex-wrap]="isMulti"
-    [class.py-1.5]="isMulti"
-    [class.border-brand-500]="isOpen && !errorMessage"
-    [class.outline]="isOpen && !errorMessage"
-    [class.outline-2]="isOpen && !errorMessage"
-    [class.outline-brand-500]="isOpen && !errorMessage"
-    [class.outline-offset-[-1px]]="isOpen && !errorMessage"
-    [class.border-error-500]="errorMessage"
-    [class.opacity-60]="isDisabled"
-    [class.cursor-not-allowed]="isDisabled"
-    [class.bg-gray-50]="isDisabled"
-    [class.dark:bg-gray-950]="isDisabled"
-    [class.cursor-default]="readOnly"
+    [class.flex-wrap]="isMulti()"
+    [class.py-1.5]="isMulti()"
+    [class.border-brand-500]="isOpen() && !errorMessage()"
+    [class.outline]="isOpen() && !errorMessage()"
+    [class.outline-2]="isOpen() && !errorMessage()"
+    [class.outline-brand-500]="isOpen() && !errorMessage()"
+    [class.outline-offset-[-1px]]="isOpen() && !errorMessage()"
+    [class.border-error-500]="errorMessage()"
+    [class.opacity-60]="effectiveIsDisabled()"
+    [class.cursor-not-allowed]="effectiveIsDisabled()"
+    [class.bg-gray-50]="effectiveIsDisabled()"
+    [class.dark:bg-gray-950]="effectiveIsDisabled()"
+    [class.cursor-default]="readOnly()"
     (click)="onControlClick()"
   >
     <div
       class="flex flex-1 flex-wrap items-center gap-1.5 min-w-0"
-      [class.is-multi]="isMulti"
+      [class.is-multi]="isMulti()"
     >
-      @if (!isMulti) {
-        @if (displayLabel) {
+      @if (!isMulti()) {
+        @if (displayLabel()) {
           <span class="text-sm text-gray-800 dark:text-white truncate">
-            {{ displayLabel }}
+            {{ displayLabel() }}
           </span>
         } @else {
           <span class="text-sm text-gray-400 dark:text-gray-500 m-0">
-            {{ placeholder }}
+            {{ placeholder() }}
           </span>
         }
       }
 
-      @if (isMulti) {
-        @for (opt of selectedOptions; track trackByValue($index, opt)) {
+      @if (isMulti()) {
+        @for (opt of selectedOptions(); track trackByValue($index, opt)) {
           <span
             class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-md py-0.5 px-2 text-xs text-gray-800 dark:text-gray-200 max-w-full"
-            [class.opacity-70]="isDisabled || readOnly"
+            [class.opacity-70]="effectiveIsDisabled() || readOnly()"
           >
             <span class="truncate max-w-50">{{ opt.label }}</span>
-            @if (!isDisabled && !readOnly) {
+            @if (!effectiveIsDisabled() && !readOnly()) {
               <button
                 type="button"
                 class="inline-flex items-center justify-center bg-transparent border-0 p-0 cursor-pointer rounded text-gray-500 hover:text-error-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
@@ -89,20 +89,20 @@
             }
           </span>
         }
-        @if (selectedOptions.length === 0) {
+        @if (selectedOptions().length === 0) {
           <span class="text-sm text-gray-400 dark:text-gray-500 m-0">
-            {{ placeholder }}
+            {{ placeholder() }}
           </span>
         }
       }
 
-      @if (searchable && !isDisabled && !readOnly) {
+      @if (searchable() && !effectiveIsDisabled() && !readOnly()) {
         <input
           #searchInputRef
           type="text"
           class="flex-1 min-w-7.5 border-0 outline-0 bg-transparent text-sm text-gray-800 dark:text-white p-0 m-0 placeholder:text-gray-400"
-          [attr.id]="inputId || null"
-          [attr.name]="name || null"
+          [attr.id]="inputId() || null"
+          [attr.name]="name() || null"
           [attr.autocomplete]="'off'"
           [attr.tabindex]="0"
           [(ngModel)]="searchInput"
@@ -116,10 +116,10 @@
 
     <!-- INDICATORS -->
     <div class="inline-flex items-center gap-2 shrink-0 text-gray-400">
-      @if (errorMessage) {
+      @if (errorMessage()) {
         <span
           class="inline-flex text-error-500"
-          [title]="errorMessage"
+          [title]="errorMessage()"
           aria-label="Error"
         >
           <svg
@@ -140,7 +140,7 @@
         </span>
       }
 
-      @if (isClearable && hasValue && !isDisabled && !readOnly) {
+      @if (isClearable() && hasValue() && !effectiveIsDisabled() && !readOnly()) {
         <button
           type="button"
           class="inline-flex items-center justify-center w-4.5 h-4.5 bg-transparent border-0 p-0 cursor-pointer rounded text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:hover:text-white dark:hover:bg-gray-800 transition-colors"
@@ -165,9 +165,9 @@
 
       <span
         class="inline-flex items-center justify-center transition-transform duration-150 text-gray-400"
-        [class.rotate-180]="isOpen"
-        [class.text-gray-600]="isOpen"
-        [class.dark:text-gray-300]="isOpen"
+        [class.rotate-180]="isOpen()"
+        [class.text-gray-600]="isOpen()"
+        [class.dark:text-gray-300]="isOpen()"
         aria-hidden="true"
       >
         <svg
@@ -189,19 +189,19 @@
   </div>
 
   <!-- MENU -->
-  @if (isOpen) {
+  @if (isOpen()) {
     <div
       class="absolute left-0 right-0 top-[calc(100%+4px)] z-9999 bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-lg shadow-theme-lg p-1 max-h-65 overflow-y-auto"
-      [class.fixed]="menuPosition === 'fixed'"
+      [class.fixed]="menuPosition() === 'fixed'"
     >
-      @if (showLoading) {
+      @if (showLoading()) {
         <div class="py-3 px-4 text-sm text-center text-gray-500 dark:text-gray-400">
-          {{ resolveMessage(loadingMessage) }}
+          {{ resolveMessage(loadingMessage()) }}
         </div>
-      } @else if (filteredOptions.length === 0) {
+      } @else if (filteredOptions().length === 0) {
         <div class="py-3 px-4 text-sm text-center text-gray-500 dark:text-gray-400 flex flex-col items-center gap-2">
-          <span>{{ resolveMessage(noOptionsMessage) }}</span>
-          @if (creatable && searchInput.trim()) {
+          <span>{{ resolveMessage(noOptionsMessage()) }}</span>
+          @if (creatable() && searchInput.trim()) {
             <button
               type="button"
               class="text-[13px] text-brand-500 bg-transparent border border-dashed border-brand-300 rounded-md py-1.5 px-3 cursor-pointer hover:bg-brand-50 dark:hover:bg-brand-500/10 transition-colors"
@@ -213,7 +213,7 @@
         </div>
       } @else {
         @for (
-          opt of filteredOptions;
+          opt of filteredOptions();
           track trackByValue($index, opt);
           let i = $index
         ) {
@@ -255,9 +255,9 @@
     </div>
   }
 
-  @if (errorMessage) {
+  @if (errorMessage()) {
     <span class="text-xs text-error-500 leading-4">
-      {{ errorMessage }}
+      {{ errorMessage() }}
     </span>
   }
 </div>

@@ -2,142 +2,129 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  computed,
   ElementRef,
-  EventEmitter,
   forwardRef,
   inject,
-  Input,
+  input,
   OnDestroy,
   OnInit,
-  Output,
+  output,
+  signal,
   Type,
-  ViewChild,
-} from '@angular/core';
-import { CommonModule } from '@angular/common';
-import {
-  ControlValueAccessor,
-  NG_VALUE_ACCESSOR,
-} from '@angular/forms';
+  viewChild,
+} from "@angular/core";
+import { NgComponentOutlet } from "@angular/common";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 
-import { FlexComponent } from '@ui/flex/flex';
-import { FormLabelComponent } from '@ui/form-label/form-label';
-import { LabelComponent } from '@ui/label/label';
-import { ColorType } from '@styles/types/colors';
-import { FontWeightType } from '@styles/types/typography';
-import { getFocusStyling } from '@utils/styling';
+import { UiLabelComponent } from "@ui/label/label";
+import { ColorType } from "@styles/types/colors";
+import { FontWeightType } from "@styles/types/typography";
+import { getFocusStyling } from "@utils/styling";
 
-import { ValidationErrorIconComponent } from './validation-error-icon';
-import {
-  horizontalPaddingNumber,
-  inputHeight,
-} from './common';
+import { ValidationErrorIconComponent } from "./validation-error-icon";
+import { horizontalPaddingNumber, inputHeight } from "./common";
+import { UiFlexComponent } from "@ui/flex/flex";
+import { UiFormLabelComponent } from "@ui/form-label/form-label";
 
 /**
- * `Input`
- * -------
+ * `UiInput`
+ * --------
  * Input de texto con label, iconos, prefix/sufix, error y contador.
- * Réplica Angular del `Input` del proyecto React (styled-components).
  *
  * Capacidades:
- *  - Label integrable vía `<FormLabel>` (asterisco `*` automático).
+ *  - Label integrable vía `<UiFormLabel>` (asterisco `*` automático).
  *  - Tooltip junto al label.
  *  - Iconos izquierda/derecha como **componentes Angular** (`Type<unknown>`)
  *    que se renderizan con `*ngComponentOutlet`.
- *  - Prefix / sufix en línea (`Label` con `color="textAction"`).
+ *  - Prefix / sufix en línea (`UiLabel` con `color="textAction"`).
  *  - Estado de error: borde rojo + `<ValidationErrorIcon>` a la derecha.
  *  - Estado `disabled` / `readOnly`: cambio de color de fondo y borde.
  *  - Contador `N/maxLength` debajo del input, alineado según `legend`.
  *  - `ControlValueAccessor` para integración con `ngModel` / `formControl`.
  *  - Debounce opcional en `valueChange` cuando el input es no-controlado.
- *  - Método público `focus()` para exponer el `focus` del `<input>`.
+ *  - Método público `focusInput()` para exponer el `focus` del `<input>`.
  *
- * Convención de outputs (Angular):
- *  - `onChange` (React)  → `valueChange`
- *  - `onEnterKey` (React) → `enterKey`
- *  - `onKeyDown` (React)  → `keyDown`
+ * API signal-based (Angular 17.1+).
  */
 @Component({
-  selector: 'Input',
+  selector: "UiInput",
   standalone: true,
   imports: [
-    CommonModule,
-    FlexComponent,
-    FormLabelComponent,
-    LabelComponent,
+    NgComponentOutlet,
+    UiFlexComponent,
+    UiFormLabelComponent,
+    UiLabelComponent,
     ValidationErrorIconComponent,
   ],
-  templateUrl: './input.html',
+  templateUrl: "./input.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => InputComponent),
+      useExisting: forwardRef(() => UiInputComponent),
       multi: true,
     },
   ],
 })
-export class InputComponent
+export class UiInputComponent
   implements ControlValueAccessor, OnInit, OnDestroy
 {
-  // ---------------------------------------------------------------------------
-  // Inputs
-  // ---------------------------------------------------------------------------
-
-  @Input() id?: string;
-  @Input() name?: string;
-  @Input() labelText?: string;
-  @Input() required = false;
-  @Input() disabled = false;
-  @Input() tooltip?: string;
-  @Input() errorMessage?: string;
-  @Input() readOnly = false;
-  @Input() placeholder?: string;
-  @Input() leftIcon?: Type<unknown>;
-  @Input() rightIcon?: Type<unknown>;
-  @Input() prefix?: string;
-  @Input() sufix?: string;
-  @Input() flex?: string;
-  @Input() maxLength?: number;
-  @Input() debounceTime?: number;
-  @Input() width?: string;
-  @Input() legend?: string;
-  @Input() type = 'text';
-  @Input() autocomplete?: string;
-  @Input() className = '';
-
+  readonly id = input<string | undefined>(undefined);
+  readonly name = input<string | undefined>(undefined);
+  readonly labelText = input<string | undefined>(undefined);
+  readonly required = input<boolean>(false);
+  readonly disabled = input<boolean>(false);
+  readonly tooltip = input<string | undefined>(undefined);
+  readonly errorMessage = input<string | undefined>(undefined);
+  readonly readOnly = input<boolean>(false);
+  readonly placeholder = input<string | undefined>(undefined);
+  readonly leftIcon = input<Type<unknown> | undefined>(undefined);
+  readonly rightIcon = input<Type<unknown> | undefined>(undefined);
+  readonly prefix = input<string | undefined>(undefined);
+  readonly sufix = input<string | undefined>(undefined);
+  readonly flex = input<string | undefined>(undefined);
+  readonly maxLength = input<number | undefined>(undefined);
+  readonly debounceTime = input<number | undefined>(undefined);
+  readonly width = input<string | undefined>(undefined);
+  readonly legend = input<string | undefined>(undefined);
+  readonly type = input<string>("text");
+  readonly autocomplete = input<string | undefined>(undefined);
+  readonly className = input<string>("");
   /** Valor controlado. Se sincroniza vía `ControlValueAccessor`. */
-  @Input() value?: string | number;
+  readonly value = input<string | number | undefined>(undefined);
 
-  // ---------------------------------------------------------------------------
-  // Outputs
-  // ---------------------------------------------------------------------------
+  readonly valueChange = output<string>();
+  readonly enterKey = output<KeyboardEvent>();
+  readonly keyDown = output<KeyboardEvent>();
+  readonly blurEvt = output<void>();
+  readonly focusEvt = output<void>();
 
-  @Output() valueChange = new EventEmitter<string>();
-  @Output() enterKey = new EventEmitter<KeyboardEvent>();
-  @Output() keyDown = new EventEmitter<KeyboardEvent>();
-  @Output() blurEvt = new EventEmitter<void>();
-  @Output() focusEvt = new EventEmitter<void>();
-
-  // ---------------------------------------------------------------------------
-  // ViewChild / estado interno
-  // ---------------------------------------------------------------------------
-
-  @ViewChild('inputEl', { static: true }) inputEl!: ElementRef<HTMLInputElement>;
+  readonly inputEl =
+    viewChild.required<ElementRef<HTMLInputElement>>("inputEl");
 
   /** Valor interno (lo que ve el `<input>`). Se sincroniza con `value`. */
-  internalValue = '';
+  internalValue = "";
 
   /** Contador de caracteres actual (para `maxLength`). */
   charCount = 0;
+
+  /**
+   * Estado `disabled` que llega desde el `FormControl` (vía
+   * `setDisabledState`). No se puede escribir al `disabled` input signal
+   * (es read-only), así que se combina con él en un `computed`.
+   */
+  private _formDisabled = signal(false);
+
+  /** `disabled` efectivo: combina el input y el estado del form. */
+  readonly isDisabled = computed<boolean>(
+    () => this.disabled() || this._formDisabled(),
+  );
 
   private timer?: ReturnType<typeof setTimeout>;
   private cdr = inject(ChangeDetectorRef);
   private onChangeFn: (value: string) => void = () => {};
   private onTouchedFn: () => void = () => {};
-
-  // ---------------------------------------------------------------------------
-  // Lifecycle
-  // ---------------------------------------------------------------------------
 
   ngOnInit(): void {
     this.syncFromValue();
@@ -147,25 +134,17 @@ export class InputComponent
     if (this.timer) clearTimeout(this.timer);
   }
 
-  // ---------------------------------------------------------------------------
-  // API pública
-  // ---------------------------------------------------------------------------
-
   /**
    * Foco programático en el `<input>`.
    * (Se llama `focusInput` para no chocar con el `Output() focusEvt`.)
    */
   focusInput(): void {
-    this.inputEl?.nativeElement.focus();
+    this.inputEl()?.nativeElement.focus();
   }
 
-  // ---------------------------------------------------------------------------
-  // ControlValueAccessor
-  // ---------------------------------------------------------------------------
-
   writeValue(value: string | number | null | undefined): void {
-    this.value = value ?? '';
-    this.syncFromValue();
+    this.internalValue = (value ?? "").toString();
+    this.charCount = this.internalValue.length;
     this.cdr.markForCheck();
   }
 
@@ -178,13 +157,9 @@ export class InputComponent
   }
 
   setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    this._formDisabled.set(isDisabled);
     this.cdr.markForCheck();
   }
-
-  // ---------------------------------------------------------------------------
-  // Event handlers
-  // ---------------------------------------------------------------------------
 
   onInput(event: Event): void {
     const target = event.target as HTMLInputElement;
@@ -192,23 +167,22 @@ export class InputComponent
     this.internalValue = next;
     this.charCount = next.length;
 
-    if (this.debounceTime && this.debounceTime > 0) {
+    const debounce = this.debounceTime();
+    if (debounce && debounce > 0) {
       if (this.timer) clearTimeout(this.timer);
       this.timer = setTimeout(() => {
-        this.value = next;
-        this.valueChange.emit(next);
         this.onChangeFn(next);
-      }, this.debounceTime);
+        this.valueChange.emit(next);
+      }, debounce);
     } else {
-      this.value = next;
-      this.valueChange.emit(next);
       this.onChangeFn(next);
+      this.valueChange.emit(next);
     }
   }
 
   onKeyDownHandler(event: KeyboardEvent): void {
     this.keyDown.emit(event);
-    if (event.key === 'Enter' || event.keyCode === 13) {
+    if (event.key === "Enter" || event.keyCode === 13) {
       this.enterKey.emit(event);
     }
   }
@@ -222,125 +196,102 @@ export class InputComponent
     this.blurEvt.emit();
   }
 
-  // ---------------------------------------------------------------------------
-  // Helpers privados
-  // ---------------------------------------------------------------------------
-
   private syncFromValue(): void {
-    this.internalValue = this.value?.toString() ?? '';
+    const v = this.value();
+    this.internalValue = v?.toString() ?? "";
     this.charCount = this.internalValue.length;
   }
 
-  // ---------------------------------------------------------------------------
-  // Getters de presentación
-  // ---------------------------------------------------------------------------
-
-  get hasLeftIcon(): boolean {
-    return !!this.leftIcon;
-  }
-
-  get hasRightIcon(): boolean {
-    return !!this.rightIcon;
-  }
-
-  get hasError(): boolean {
-    return !!this.errorMessage;
-  }
-
-  get isEffectivelyDisabled(): boolean {
-    return this.disabled;
-  }
+  readonly hasLeftIcon = computed<boolean>(() => !!this.leftIcon());
+  readonly hasRightIcon = computed<boolean>(() => !!this.rightIcon());
+  readonly hasError = computed<boolean>(() => !!this.errorMessage());
+  readonly isEffectivelyDisabled = computed<boolean>(() => this.disabled());
 
   /** Clases del contenedor exterior (`StyledControlContainer`). */
-  get outerClasses(): string {
-    return [
-      'flex flex-col gap-1 w-full font-outfit',
-      this.className,
-    ]
+  readonly outerClasses = computed<string>(() =>
+    ["flex flex-col gap-1 w-full font-outfit", this.className()]
       .filter(Boolean)
-      .join(' ');
-  }
+      .join(" "),
+  );
 
-  get outerStyles(): Record<string, string> {
-    return {
-      flex: this.flex ?? '',
-      width: this.width ?? '',
-    };
-  }
+  readonly outerStyles = computed<Record<string, string>>(() => ({
+    flex: this.flex() ?? "",
+    width: this.width() ?? "",
+  }));
 
   /** Clases del `StyledInputContainer` (el "frame" del input). */
-  get containerClasses(): string {
+  readonly containerClasses = computed<string>(() => {
     const baseLayout = [
-      'flex items-center gap-2 w-full rounded-lg border border-solid',
-      'bg-white dark:bg-gray-900',
-      this.isEffectivelyDisabled || this.readOnly
-        ? 'bg-gray-50 border-gray-300'
-        : this.hasError
-          ? 'border-error-500'
-          : 'border-gray-300',
-      getFocusStyling('within'),
+      "flex items-center gap-2 w-full rounded-lg border border-solid",
+      "bg-white dark:bg-gray-900",
+      this.isEffectivelyDisabled() || this.readOnly()
+        ? "bg-gray-50 border-gray-300"
+        : this.hasError()
+          ? "border-error-500"
+          : "border-gray-300",
+      getFocusStyling("within"),
     ];
-    return baseLayout.join(' ');
-  }
+    return baseLayout.join(" ");
+  });
 
-  get containerStyles(): Record<string, string> {
-    return {
-      height: inputHeight,
-      'font-size': `var(--text-theme-sm)` /* fallback */,
-      'padding-left': this.hasLeftIcon ? '0' : `${horizontalPaddingNumber}px`,
-      'padding-right': this.hasRightIcon ? '0' : `${horizontalPaddingNumber}px`,
-    };
-  }
+  readonly containerStyles = computed<Record<string, string>>(() => ({
+    height: inputHeight,
+    "font-size": `var(--text-theme-sm)` /* fallback */,
+    "padding-left": this.hasLeftIcon() ? "0" : `${horizontalPaddingNumber}px`,
+    "padding-right": this.hasRightIcon() ? "0" : `${horizontalPaddingNumber}px`,
+  }));
 
   /** Clases del `<input>` real (`StyledInput`). */
-  get inputClasses(): string {
-    return [
-      'flex-1 w-full border-0 outline-0 bg-transparent',
-      'text-sm text-gray-800 dark:text-white',
-      'font-normal leading-5',
-      'placeholder:text-gray-400 dark:placeholder:text-gray-500',
-      'read-only:text-gray-500',
-      'disabled:text-gray-300',
-    ].join(' ');
-  }
+  readonly inputClasses = computed<string>(() =>
+    [
+      "flex-1 w-full border-0 outline-0 bg-transparent",
+      "text-sm text-gray-800 dark:text-white",
+      "font-normal leading-5",
+      "placeholder:text-gray-400 dark:placeholder:text-gray-500",
+      "read-only:text-gray-500",
+      "disabled:text-gray-300",
+    ].join(" "),
+  );
 
   /** Color efectivo de los iconos en función del estado. */
-  get iconColor(): string {
-    if (this.hasError) return 'var(--color-error-500)';
-    if (this.isEffectivelyDisabled || this.readOnly) return 'var(--color-gray-300)';
-    return 'var(--color-gray-500)';
-  }
+  readonly iconColor = computed<string>(() => {
+    if (this.hasError()) return "var(--color-error-500)";
+    if (this.isEffectivelyDisabled() || this.readOnly())
+      return "var(--color-gray-300)";
+    return "var(--color-gray-500)";
+  });
 
   /** Inputs por defecto para los iconos (componente externo). */
-  get leftIconInputs(): Record<string, unknown> {
-    return { color: this.iconColor, size: 16 };
-  }
+  readonly leftIconInputs = computed<Record<string, unknown>>(() => ({
+    color: this.iconColor(),
+    size: 16,
+  }));
 
-  get rightIconInputs(): Record<string, unknown> {
-    return this.leftIconInputs;
-  }
+  readonly rightIconInputs = computed<Record<string, unknown>>(() =>
+    this.leftIconInputs(),
+  );
 
   /** Color del contador `N/maxLength` (cambia a `textAction` al alcanzar el límite). */
-  get charCountColor(): ColorType {
-    const limit = this.maxLength ?? Infinity;
-    return this.charCount < limit ? 'textWeakest' : 'textAction';
-  }
+  readonly charCountColor = computed<ColorType>(() => {
+    const limit = this.maxLength() ?? Infinity;
+    return this.charCount < limit ? "textWeakest" : "textAction";
+  });
 
   /** Texto del contador. */
-  get charCountText(): string {
-    return `${this.charCount}/${this.maxLength ?? 0}`;
-  }
+  readonly charCountText = computed<string>(
+    () => `${this.charCount}/${this.maxLength() ?? 0}`,
+  );
 
   /** Pesos para `legend` y char count (alineado con la convención de typography). */
-  readonly charCountWeight: FontWeightType = 'regular';
-  readonly legendWeight: FontWeightType = 'regular';
+  readonly charCountWeight: FontWeightType = "regular";
+  readonly legendWeight: FontWeightType = "regular";
 
   /** Justify del footer según la combinación `legend` + `maxLength`. */
-  get footerJustifyContent(): string {
-    const hasLegend = !!this.legend;
-    const hasMax = !!this.maxLength;
-    if (hasLegend && hasMax) return 'space-between';
-    if (hasLegend) return 'flex-start';
-    return 'flex-end';
-  }
+  readonly footerJustifyContent = computed<string>(() => {
+    const hasLegend = !!this.legend();
+    const hasMax = !!this.maxLength();
+    if (hasLegend && hasMax) return "space-between";
+    if (hasLegend) return "flex-start";
+    return "flex-end";
+  });
 }

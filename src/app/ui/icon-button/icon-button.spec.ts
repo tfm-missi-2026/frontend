@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { IconButtonComponent } from './icon-button';
+import { UiIconButtonComponent } from './icon-button';
 
 @Component({
   selector: 'IconStub',
@@ -16,22 +16,39 @@ class IconStubComponent {
   @Input() className?: string;
 }
 
-describe('IconButtonComponent', () => {
+/**
+ * Aplica inputs signal-based con `componentRef.setInput`. Signal-based
+ * inputs son `InputSignal<T>` y no admiten asignación directa.
+ */
+function applyInputs<T>(
+  fixture: ComponentFixture<T>,
+  opts: Record<string, unknown>,
+): void {
+  const ref = fixture.componentRef as unknown as {
+    setInput: (name: string, value: unknown) => void;
+  };
+  for (const [k, v] of Object.entries(opts)) {
+    ref.setInput(k, v);
+  }
+}
+
+describe('UiIconButtonComponent', () => {
   function buildFixture(
-    opts: Partial<IconButtonComponent> = {},
-  ): ComponentFixture<IconButtonComponent> {
-    const fixture = TestBed.createComponent(IconButtonComponent);
-    const instance = fixture.componentInstance;
-    instance.Icon = IconStubComponent;
-    instance.labelText = 'iconic';
-    Object.assign(instance, opts);
+    opts: Record<string, unknown> = {},
+  ): ComponentFixture<UiIconButtonComponent> {
+    const fixture = TestBed.createComponent(UiIconButtonComponent);
+    applyInputs(fixture, {
+      Icon: IconStubComponent,
+      labelText: 'iconic',
+      ...opts,
+    });
     fixture.detectChanges();
     return fixture;
   }
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [IconButtonComponent],
+      imports: [UiIconButtonComponent],
     }).compileComponents();
   });
 

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/angular';
-import { FlexComponent } from '@ui/flex/flex';
+import { UiFlexComponent } from '@ui/flex/flex';
 
-const meta: Meta<FlexComponent> = {
+const meta: Meta<UiFlexComponent> = {
   title: 'Shared/Flex',
-  component: FlexComponent,
+  component: UiFlexComponent,
 
   tags: ['autodocs'],
 
@@ -55,7 +55,7 @@ const meta: Meta<FlexComponent> = {
 
 export default meta;
 
-type Story = StoryObj<FlexComponent>;
+type Story = StoryObj<UiFlexComponent>;
 
 export const Default: Story = {
   args: {
@@ -67,7 +67,7 @@ export const Default: Story = {
     props: args,
 
     template: `
-      <Flex
+      <UiFlex
         [direction]="direction"
         [justifyContent]="justifyContent"
         [alignItems]="alignItems"
@@ -88,7 +88,7 @@ export const Default: Story = {
         <div class="bg-green-500 text-white p-4 rounded-xl">
           Item 3
         </div>
-      </Flex>
+      </UiFlex>
     `,
   }),
 };
@@ -103,7 +103,7 @@ export const Column: Story = {
     props: args,
 
     template: `
-      <Flex
+      <UiFlex
         [direction]="direction"
         [gap]="gap"
       >
@@ -118,7 +118,7 @@ export const Column: Story = {
         <div class="bg-orange-500 text-white p-4 rounded-xl">
           Tres
         </div>
-      </Flex>
+      </UiFlex>
     `,
   }),
 };
@@ -135,7 +135,7 @@ export const Centered: Story = {
 
     template: `
       <div class="h-64 border rounded-xl">
-        <Flex
+        <UiFlex
           class="h-full"
           [justifyContent]="justifyContent"
           [alignItems]="alignItems"
@@ -148,7 +148,7 @@ export const Centered: Story = {
           <div class="bg-emerald-500 text-white p-4 rounded-xl">
             B
           </div>
-        </Flex>
+        </UiFlex>
       </div>
     `,
   }),
@@ -166,7 +166,7 @@ export const NoWrap: Story = {
 
     template: `
       <div class="w-80 border rounded-xl p-2">
-        <Flex
+        <UiFlex
           [noWrap]="noWrap"
           [overflow]="overflow"
           [gap]="gap"
@@ -186,7 +186,7 @@ export const NoWrap: Story = {
           <div class="min-w-40 bg-purple-500 text-white p-4 rounded-xl">
             Item largo
           </div>
-        </Flex>
+        </UiFlex>
       </div>
     `,
   }),
@@ -204,7 +204,7 @@ export const Shrinkable: Story = {
 
     template: `
       <div class="w-96 border rounded-xl p-4">
-        <Flex
+        <UiFlex
           [direction]="direction"
           [shrinkable]="shrinkable"
           [gap]="gap"
@@ -216,7 +216,7 @@ export const Shrinkable: Story = {
           <div class="bg-rose-500 text-white p-4 rounded-xl">
             Item
           </div>
-        </Flex>
+        </UiFlex>
       </div>
     `,
   }),

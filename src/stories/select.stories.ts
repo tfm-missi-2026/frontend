@@ -5,7 +5,7 @@ import { moduleMetadata } from '@storybook/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup } from '@angular/forms';
 
-import { SelectComponent } from '@ui/select/select';
+import { UiSelectComponent } from '@ui/select/select';
 import { SelectOption, LoadOptionsFn } from '@ui/select/select.interface';
 
 const options: SelectOption[] = [
@@ -17,12 +17,12 @@ const options: SelectOption[] = [
   { label: 'NuxtJS', value: 'nuxtjs' },
 ];
 
-const meta: Meta<SelectComponent> = {
+const meta: Meta<UiSelectComponent> = {
   title: 'Shared/Select',
-  component: SelectComponent,
+  component: UiSelectComponent,
   decorators: [
     moduleMetadata({
-      imports: [CommonModule, FormsModule, ReactiveFormsModule, SelectComponent],
+      imports: [CommonModule, FormsModule, ReactiveFormsModule, UiSelectComponent],
     }),
   ],
   parameters: { layout: 'centered' },
@@ -72,7 +72,7 @@ const meta: Meta<SelectComponent> = {
     props: args,
     template: `
       <div class="w-87.5 p-6 overflow-visible">
-        <SelectAsync
+        <UiSelect
           [options]="options"
           [placeholder]="placeholder"
           [labelText]="labelText"
@@ -103,7 +103,7 @@ const meta: Meta<SelectComponent> = {
 
 export default meta;
 
-type Story = StoryObj<SelectComponent>;
+type Story = StoryObj<UiSelectComponent>;
 
 // ---------------------------------------------------------------------------
 // Variantes
@@ -137,7 +137,7 @@ export const Disabled: Story = {
     props: args,
     template: `
       <div class="w-87.5 p-6 overflow-visible">
-        <SelectAsync
+        <UiSelect
           [options]="options"
           [isDisabled]="isDisabled"
           [value]="'angular'"
@@ -153,7 +153,7 @@ export const ReadOnly: Story = {
     props: args,
     template: `
       <div class="w-87.5 p-6 overflow-visible">
-        <SelectAsync
+        <UiSelect
           [options]="options"
           [readOnly]="readOnly"
           [value]="'react'"
@@ -170,7 +170,7 @@ export const Loading: Story = {
     props: args,
     template: `
       <div class="w-87.5 p-6 overflow-visible">
-        <SelectAsync
+        <UiSelect
           [options]="options"
           [isLoading]="true"
           [searchable]="true"
@@ -198,7 +198,7 @@ export const Creatable: Story = {
     props: args,
     template: `
       <div class="w-87.5 p-6 overflow-visible">
-        <SelectAsync
+        <UiSelect
           [options]="options"
           [creatable]="true"
           [searchable]="true"
@@ -253,7 +253,7 @@ export const Async: Story = {
       props: asyncProps,
       template: `
         <div class="w-87.5 p-6 overflow-visible">
-          <SelectAsync
+          <UiSelect
             [options]="options"
             [async]="async"
             [loadOptions]="loadOptions"
@@ -285,7 +285,7 @@ export const AsyncCreatable: Story = {
       props: asyncProps,
       template: `
         <div class="w-87.5 p-6 overflow-visible">
-          <SelectAsync
+          <UiSelect
             [options]="options"
             [async]="async"
             [creatable]="creatable"
@@ -310,7 +310,7 @@ export const WithDefaultValue: Story = {
     props: args,
     template: `
       <div class="w-87.5 p-6 overflow-visible">
-        <SelectAsync
+        <UiSelect
           [options]="options"
           [value]="'angular'"
         />
@@ -324,7 +324,7 @@ export const MultiDefaultValues: Story = {
     props: args,
     template: `
       <div class="w-87.5 p-6 overflow-visible">
-        <SelectAsync
+        <UiSelect
           [options]="options"
           [isMulti]="true"
           [isClearable]="true"
@@ -349,7 +349,7 @@ export const ReactiveFormExample: Story = {
       template: `
         <div class="w-100 p-6 overflow-visible">
           <form [formGroup]="form">
-            <SelectAsync
+            <UiSelect
               formControlName="technology"
               [options]="options"
               [isMulti]="true"
@@ -377,7 +377,7 @@ export const ReactiveFormSingle: Story = {
       props: { control, options },
       template: `
         <div class="w-100 p-6 overflow-visible">
-          <SelectAsync
+          <UiSelect
             [formControl]="control"
             [options]="options"
             [isClearable]="true"
@@ -406,7 +406,7 @@ export const MobileView: Story = {
     props: args,
     template: `
       <div class="w-full p-4 overflow-visible">
-        <SelectAsync
+        <UiSelect
           [options]="options"
           [isMulti]="isMulti"
           [searchable]="searchable"
@@ -428,7 +428,7 @@ export const ManyOptions: Story = {
     },
     template: `
       <div class="w-87.5 h-150 p-6 overflow-visible">
-        <SelectAsync
+        <UiSelect
           [options]="options"
           [isMulti]="true"
           [searchable]="true"
@@ -446,7 +446,7 @@ export const DarkMode: Story = {
     props: args,
     template: `
       <div class="dark bg-gray-900 p-6 rounded-lg w-100">
-        <SelectAsync
+        <UiSelect
           [options]="options"
           [isMulti]="isMulti"
           [isClearable]="isClearable"

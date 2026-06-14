@@ -2,17 +2,17 @@ import {
   Directive,
   ElementRef,
   HostListener,
-  Input,
+  inject,
+  input,
   OnDestroy,
   Renderer2,
-  inject,
 } from '@angular/core';
 import {
+  autoUpdate,
   computePosition,
   flip,
   offset,
   shift,
-  autoUpdate,
   type Placement,
 } from '@floating-ui/dom';
 
@@ -37,8 +37,8 @@ const VARIANT_CLASSES: Record<TooltipDirectiveVariant, string> = {
 };
 
 /**
- * `appTooltip`
- * -----------
+ * `[uiTooltip]`
+ * ------------
  * Directiva que muestra un tooltip al hacer hover/focus sobre el elemento
  * al que se aplica. Equivalente en Angular al patrón de Radix UI:
  *
@@ -53,26 +53,26 @@ const VARIANT_CLASSES: Record<TooltipDirectiveVariant, string> = {
  *
  * Uso:
  * ```html
- * <button appTooltip="Guardar" tooltipSide="right">Guardar</button>
+ * <button uiTooltip="Guardar" tooltipSide="right">Guardar</button>
  * ```
  */
 @Directive({
-  selector: '[appTooltip]',
+  selector: '[uiTooltip]',
   standalone: true,
 })
 export class TooltipDirective implements OnDestroy {
   /** Contenido del tooltip. Si es vacío/undefined, no se muestra. */
-  @Input('appTooltip') content?: string;
+  readonly uiTooltip = input<string | undefined>(undefined, { alias: 'uiTooltip' });
   /** Lado preferido. Si no cabe, Floating UI hace flip a otro lado. */
-  @Input() tooltipSide: TooltipDirectiveSide = 'right';
+  readonly tooltipSide = input<TooltipDirectiveSide>('right');
   /** Offset (px) entre el trigger y la burbuja. */
-  @Input() tooltipSideOffset = 8;
+  readonly tooltipSideOffset = input<number>(8);
   /** Delay (ms) antes de mostrar. */
-  @Input() tooltipDelay = 200;
+  readonly tooltipDelay = input<number>(200);
   /** Delay (ms) antes de ocultar. */
-  @Input() tooltipCloseDelay = 100;
+  readonly tooltipCloseDelay = input<number>(100);
   /** Variante visual. */
-  @Input() tooltipVariant: TooltipDirectiveVariant = 'dark';
+  readonly tooltipVariant = input<TooltipDirectiveVariant>('dark');
 
   private host = inject<ElementRef<HTMLElement>>(ElementRef);
   private renderer = inject(Renderer2);
@@ -87,40 +87,41 @@ export class TooltipDirective implements OnDestroy {
   @HostListener('mouseenter')
   onMouseEnter(): void {
     this.cancelHide();
-    this.showTimer = setTimeout(() => this.show(), this.tooltipDelay);
+    this.showTimer = setTimeout(() => this.show(), this.tooltipDelay());
   }
 
   @HostListener('mouseleave')
   onMouseLeave(): void {
     this.cancelShow();
-    this.hideTimer = setTimeout(() => this.hide(), this.tooltipCloseDelay);
+    this.hideTimer = setTimeout(() => this.hide(), this.tooltipCloseDelay());
   }
 
   @HostListener('focusin')
   onFocusIn(): void {
     this.cancelHide();
-    this.showTimer = setTimeout(() => this.show(), this.tooltipDelay);
+    this.showTimer = setTimeout(() => this.show(), this.tooltipDelay());
   }
 
   @HostListener('focusout')
   onFocusOut(): void {
     this.cancelShow();
-    this.hideTimer = setTimeout(() => this.hide(), this.tooltipCloseDelay);
+    this.hideTimer = setTimeout(() => this.hide(), this.tooltipCloseDelay());
   }
 
   // ----- Show / hide -----
 
   show(): void {
     if (this.tooltipEl) return;
-    if (!this.content) return;
+    const content = this.uiTooltip();
+    if (!content) return;
 
     const el = this.renderer.createElement('span') as HTMLElement;
     el.setAttribute('role', 'tooltip');
     el.className =
       'pointer-events-none fixed top-0 left-0 z-9999 max-w-[500px] whitespace-normal ' +
       'rounded-md shadow-tooltip ' +
-      VARIANT_CLASSES[this.tooltipVariant];
-    el.textContent = this.content ?? '';
+      VARIANT_CLASSES[this.tooltipVariant()];
+    el.textContent = content;
     // Móvil: max-width 50vw
     el.style.maxWidth = window.innerWidth < 768 ? '50vw' : '500px';
 
@@ -128,7 +129,7 @@ export class TooltipDirective implements OnDestroy {
     this.tooltipEl = el;
 
     const trigger = this.host.nativeElement;
-    const placement: Placement = this.tooltipSide;
+    const placement: Placement = this.tooltipSide();
 
     // autoUpdate: reposiciona en scroll y resize, y limpia al llamar
     // al cleanup.
@@ -137,7 +138,7 @@ export class TooltipDirective implements OnDestroy {
         placement,
         strategy: 'fixed',
         middleware: [
-          offset(this.tooltipSideOffset),
+          offset(this.tooltipSideOffset()),
           flip({ padding: 8 }),
           shift({ padding: 8 }),
         ],

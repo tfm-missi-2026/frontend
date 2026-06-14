@@ -1,25 +1,41 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ButtonComponent } from './button';
+import { UiButtonComponent } from './button';
 
 /**
- * Crea un fixture fresco del `ButtonComponent` con los inputs
- * deseados. Esto evita los problemas de `OnPush` + asignación
- * directa de `@Input` (la cual no dispara CD sin `setInput`).
+ * Aplica un set de inputs a un `ComponentRef` de Angular. Signal-based
+ * inputs son `InputSignal<T>` y no admiten asignación directa — hay
+ * que usar `componentRef.setInput(name, value)`. Este helper itera
+ * las keys del objeto `opts` y llama `setInput` para cada una.
+ */
+function applyInputs<T>(
+  fixture: ComponentFixture<T>,
+  opts: Record<string, unknown>,
+): void {
+  const ref = fixture.componentRef as unknown as {
+    setInput: (name: string, value: unknown) => void;
+  };
+  for (const [k, v] of Object.entries(opts)) {
+    ref.setInput(k, v);
+  }
+}
+
+/**
+ * Crea un fixture fresco del `UiButtonComponent` con los inputs
+ * deseados. Centraliza el patrón `createComponent → setInputs →
+ * detectChanges` que es la única forma correcta de pasar inputs
+ * signal-based en tests.
  */
 function buildFixture(
-  opts: Partial<ButtonComponent> & { label?: string } = {},
-): ComponentFixture<ButtonComponent> {
-  const fixture = TestBed.createComponent(ButtonComponent);
-  const instance = fixture.componentInstance;
-  // Aplicar defaults razonables si no se pasan
-  instance.label = opts.label ?? 'Click me';
-  Object.assign(instance, opts);
+  opts: Record<string, unknown> = {},
+): ComponentFixture<UiButtonComponent> {
+  const fixture = TestBed.createComponent(UiButtonComponent);
+  applyInputs(fixture, { label: 'Click me', ...opts });
   fixture.detectChanges();
   return fixture;
 }
 
-describe('ButtonComponent', () => {
+describe('UiButtonComponent', () => {
   it('should create', () => {
     const fixture = buildFixture();
     expect(fixture.componentInstance).toBeTruthy();
@@ -152,7 +168,10 @@ describe('ButtonComponent', () => {
   });
 
   it('keeps the button clickable while runningTimeout when disableOnTimeout is false', () => {
-    const fixture = buildFixture({ timeout: 5000, disableOnTimeout: false });
+    const fixture = buildFixture({
+      timeout: 5000,
+      disableOnTimeout: false,
+    });
     const btn = fixture.nativeElement.querySelector(
       '[data-testid="button"]',
     ) as HTMLButtonElement;

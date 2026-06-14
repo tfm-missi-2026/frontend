@@ -1,105 +1,86 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Input,
-  TemplateRef,
-  ViewChild,
-} from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
+  computed,
+  input,
+} from "@angular/core";
+import { NgTemplateOutlet } from "@angular/common";
 
-import { FlexComponent } from '@ui/flex/flex';
-import { LabelComponent } from '@ui/label/label';
-import { FontWeightType } from '@styles/types/typography';
-import { InfoIconWithTooltipComponent } from '@ui/info-icon-with-tooltip/info-icon-with-tooltip';
+import { UiFlexComponent } from "@ui/flex/flex";
+import { UiLabelComponent } from "@ui/label/label";
+import { FontWeightType } from "@styles/types/typography";
+import { UiInfoIconWithTooltipComponent } from "@ui/info-icon-with-tooltip/info-icon-with-tooltip";
 
 /**
- * `FormLabel`
- * -----------
+ * `UiFormLabel`
+ * -------------
  * Etiqueta semántica asociada a un input por su `id` (atributo `for`).
- * Réplica Angular del `FormLabel` del proyecto React (styled-components).
  *
  * Capacidades:
- *  - Texto del label vía `<Label type="bodyS">`.
+ *  - Texto del label vía `<UiLabel type="bodyS">`.
  *  - Asterisco `*` obligatorio cuando `required` y no `disabled`/`readOnly`.
- *  - Tooltip opcional vía `<InfoIconWithTooltip>`.
- *  - `gap` interno = `designConstants.spacing[1]` (4px) entre el label y `*`.
- *  - `gap` externo (cuando hay tooltip) = `designConstants.spacing[1]` (4px)
- *    entre el bloque label y el icono de tooltip.
+ *  - Tooltip opcional vía `<UiInfoIconWithTooltip>`.
+ *  - `gap` interno = 4px entre el label y `*`.
+ *  - `gap` externo (cuando hay tooltip) = 4px entre el bloque label y
+ *    el icono de tooltip.
  */
 @Component({
-  selector: 'FormLabel',
+  selector: "UiFormLabel",
   standalone: true,
   imports: [
     NgTemplateOutlet,
-    FlexComponent,
-    LabelComponent,
-    InfoIconWithTooltipComponent,
+    UiFlexComponent,
+    UiLabelComponent,
+    UiInfoIconWithTooltipComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (tooltip) {
-      <Flex [alignItems]="'center'" [gap]="'4px'">
+    @if (tooltip(); as t) {
+      <UiFlex [alignItems]="'center'" [gap]="'4px'">
         <ng-container *ngTemplateOutlet="labelTpl"></ng-container>
-        <InfoIconWithTooltip [tooltip]="tooltip"></InfoIconWithTooltip>
-      </Flex>
+        <InfoIconWithTooltip [tooltip]="t"></InfoIconWithTooltip>
+      </UiFlex>
     } @else {
       <ng-container *ngTemplateOutlet="labelTpl"></ng-container>
     }
 
     <ng-template #labelTpl>
       <label
-        [attr.for]="labelFor"
+        [attr.for]="labelFor()"
         class="form-label inline-flex items-center gap-1"
       >
-        <Label
+        <UiLabel
           type="bodyS"
-          [text]="labelText"
-          [weight]="weight ?? 'medium'"
-          [wrapText]="wrapText"
-        ></Label>
-        @if (showRequired) {
+          [text]="labelText()"
+          [weight]="weight() ?? 'medium'"
+          [wrapText]="wrapText()"
+        ></UiLabel>
+        @if (showRequired()) {
           <span aria-hidden="true">*</span>
         }
       </label>
     </ng-template>
   `,
 })
-export class FormLabelComponent {
-  // -------------------------------------------------------------------------
-  // Inputs
-  // -------------------------------------------------------------------------
-
+export class UiFormLabelComponent {
   /** Texto del label. */
-  @Input() labelText = '';
+  readonly labelText = input<string>("");
   /** `id` del input al que se asocia (atributo `for` del HTML). */
-  @Input() labelFor = '';
-
+  readonly labelFor = input<string>("");
   /** Muestra el asterisco `*`. Se oculta si `disabled` o `readOnly`. */
-  @Input() required = false;
+  readonly required = input<boolean>(false);
   /** Estado disabled — oculta el asterisco. */
-  @Input() disabled = false;
+  readonly disabled = input<boolean>(false);
   /** Estado readOnly — oculta el asterisco. */
-  @Input() readOnly = false;
-
+  readonly readOnly = input<boolean>(false);
   /** `font-weight` del texto. Default: `'medium'`. */
-  @Input() weight?: FontWeightType;
+  readonly weight = input<FontWeightType | undefined>(undefined);
   /** Si `true`, el texto puede hacer wrap. */
-  @Input() wrapText = false;
-
+  readonly wrapText = input<boolean>(false);
   /** Tooltip opcional. Si se define, se renderiza el icono de ayuda. */
-  @Input() tooltip?: string;
+  readonly tooltip = input<string | undefined>(undefined);
 
-  // -------------------------------------------------------------------------
-  // ViewChild
-  // -------------------------------------------------------------------------
-
-  @ViewChild('labelTpl', { static: true }) labelTpl!: TemplateRef<unknown>;
-
-  // -------------------------------------------------------------------------
-  // Getters
-  // -------------------------------------------------------------------------
-
-  get showRequired(): boolean {
-    return this.required && !this.disabled && !this.readOnly;
-  }
+  readonly showRequired = computed<boolean>(
+    () => this.required() && !this.disabled() && !this.readOnly(),
+  );
 }

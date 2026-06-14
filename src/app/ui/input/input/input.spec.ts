@@ -1,24 +1,24 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SimpleChange } from '@angular/core';
 
-import { InputComponent } from './input';
+import { UiInputComponent } from './input';
 
 /**
- * Crea un fixture fresco del `InputComponent` con los inputs
+ * Crea un fixture fresco del `UiInputComponent` con los inputs
  * deseados. Esto evita los problemas de `OnPush` + asignación
  * directa de `@Input` (la cual no dispara CD sin `setInput`).
  */
 function buildFixture(
-  opts: Partial<InputComponent> = {},
-): ComponentFixture<InputComponent> {
-  const fixture = TestBed.createComponent(InputComponent);
+  opts: Partial<UiInputComponent> = {},
+): ComponentFixture<UiInputComponent> {
+  const fixture = TestBed.createComponent(UiInputComponent);
   const instance = fixture.componentInstance;
   Object.assign(instance, opts);
   fixture.detectChanges();
   return fixture;
 }
 
-describe('InputComponent', () => {
+describe('UiInputComponent', () => {
   it('should create', () => {
     const fixture = buildFixture();
     expect(fixture.componentInstance).toBeTruthy();

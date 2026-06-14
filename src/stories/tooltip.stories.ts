@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/angular';
 import { moduleMetadata } from '@storybook/angular';
 import { CommonModule } from '@angular/common';
 
-import { TooltipComponent } from '@ui/tooltip/tooltip';
+import { UiTooltipComponent } from '@ui/tooltip/tooltip';
 import {
   TooltipVariantType,
   TooltipSide,
@@ -23,12 +23,12 @@ const variants: TooltipVariantType[] = [
 const sides: TooltipSide[] = ['top', 'right', 'bottom', 'left'];
 const aligns: TooltipAlign[] = ['start', 'center', 'end'];
 
-const meta: Meta<TooltipComponent> = {
+const meta: Meta<UiTooltipComponent> = {
   title: 'Shared/Tooltip',
-  component: TooltipComponent,
+  component: UiTooltipComponent,
   decorators: [
     moduleMetadata({
-      imports: [CommonModule, TooltipComponent],
+      imports: [CommonModule, UiTooltipComponent],
     }),
   ],
   tags: ['autodocs'],
@@ -55,7 +55,7 @@ const meta: Meta<TooltipComponent> = {
 
 export default meta;
 
-type Story = StoryObj<TooltipComponent>;
+type Story = StoryObj<UiTooltipComponent>;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -76,7 +76,7 @@ export const Default: Story = {
     props: args,
     template: `
       <div class="flex h-40 items-center justify-center">
-        <Tooltip
+        <UiTooltip
           [content]="content"
           [variant]="variant"
           [side]="side"
@@ -86,7 +86,7 @@ export const Default: Story = {
           [className]="className"
         >
           ${trigger()}
-        </Tooltip>
+        </UiTooltip>
       </div>
     `,
   }),
@@ -102,9 +102,9 @@ export const Dark: Story = {
     props: args,
     template: `
       <div class="flex h-40 items-center justify-center">
-        <Tooltip [content]="content" [variant]="variant">
+        <UiTooltip [content]="content" [variant]="variant">
           ${trigger('Hover (dark)')}
-        </Tooltip>
+        </UiTooltip>
       </div>
     `,
   }),
@@ -116,9 +116,9 @@ export const Info: Story = {
     props: args,
     template: `
       <div class="flex h-40 items-center justify-center">
-        <Tooltip [content]="content" [variant]="variant">
+        <UiTooltip [content]="content" [variant]="variant">
           ${trigger('Hover (info)')}
-        </Tooltip>
+        </UiTooltip>
       </div>
     `,
   }),
@@ -130,9 +130,9 @@ export const Success: Story = {
     props: args,
     template: `
       <div class="flex h-40 items-center justify-center">
-        <Tooltip [content]="content" [variant]="variant">
+        <UiTooltip [content]="content" [variant]="variant">
           ${trigger('Hover (success)')}
-        </Tooltip>
+        </UiTooltip>
       </div>
     `,
   }),
@@ -144,9 +144,9 @@ export const Warning: Story = {
     props: args,
     template: `
       <div class="flex h-40 items-center justify-center">
-        <Tooltip [content]="content" [variant]="variant">
+        <UiTooltip [content]="content" [variant]="variant">
           ${trigger('Hover (warning)')}
-        </Tooltip>
+        </UiTooltip>
       </div>
     `,
   }),
@@ -158,9 +158,9 @@ export const Error: Story = {
     props: args,
     template: `
       <div class="flex h-40 items-center justify-center">
-        <Tooltip [content]="content" [variant]="variant">
+        <UiTooltip [content]="content" [variant]="variant">
           ${trigger('Hover (error)')}
-        </Tooltip>
+        </UiTooltip>
       </div>
     `,
   }),
@@ -170,12 +170,12 @@ export const AllVariants: Story = {
   render: () => ({
     template: `
       <div class="flex flex-wrap items-center gap-6 p-6">
-        <Tooltip variant="light" content="Variant light">${trigger('light')}</Tooltip>
-        <Tooltip variant="dark" content="Variant dark">${trigger('dark')}</Tooltip>
-        <Tooltip variant="info" content="Variant info">${trigger('info')}</Tooltip>
-        <Tooltip variant="success" content="Variant success">${trigger('success')}</Tooltip>
-        <Tooltip variant="warning" content="Variant warning">${trigger('warning')}</Tooltip>
-        <Tooltip variant="error" content="Variant error">${trigger('error')}</Tooltip>
+        <UiTooltip variant="light" content="Variant light">${trigger('light')}</UiTooltip>
+        <UiTooltip variant="dark" content="Variant dark">${trigger('dark')}</UiTooltip>
+        <UiTooltip variant="info" content="Variant info">${trigger('info')}</UiTooltip>
+        <UiTooltip variant="success" content="Variant success">${trigger('success')}</UiTooltip>
+        <UiTooltip variant="warning" content="Variant warning">${trigger('warning')}</UiTooltip>
+        <UiTooltip variant="error" content="Variant error">${trigger('error')}</UiTooltip>
       </div>
     `,
   }),
@@ -190,23 +190,23 @@ export const AllSides: Story = {
     template: `
       <div class="grid h-72 grid-cols-3 grid-rows-3 items-center justify-items-center gap-4 p-6">
         <div></div>
-        <Tooltip side="top" content="Aparece desde arriba (slide-down + fade)">
+        <UiTooltip side="top" content="Aparece desde arriba (slide-down + fade)">
           ${trigger('top')}
-        </Tooltip>
+        </UiTooltip>
         <div></div>
 
-        <Tooltip side="left" content="Aparece desde la izquierda (slide-right + fade)">
+        <UiTooltip side="left" content="Aparece desde la izquierda (slide-right + fade)">
           ${trigger('left')}
-        </Tooltip>
+        </UiTooltip>
         <div class="text-xs text-gray-500">center</div>
-        <Tooltip side="right" content="Aparece desde la derecha (slide-left + fade)">
+        <UiTooltip side="right" content="Aparece desde la derecha (slide-left + fade)">
           ${trigger('right')}
-        </Tooltip>
+        </UiTooltip>
 
         <div></div>
-        <Tooltip side="bottom" content="Aparece desde abajo (slide-up + fade)">
+        <UiTooltip side="bottom" content="Aparece desde abajo (slide-up + fade)">
           ${trigger('bottom')}
-        </Tooltip>
+        </UiTooltip>
         <div></div>
       </div>
     `,
@@ -223,13 +223,13 @@ export const WithDelay: Story = {
     props: args,
     template: `
       <div class="flex h-40 items-center justify-center">
-        <Tooltip
+        <UiTooltip
           [content]="content"
           [variant]="variant"
           [delayDuration]="delayDuration"
         >
           ${trigger('Hover y espera')}
-        </Tooltip>
+        </UiTooltip>
       </div>
     `,
   }),
@@ -248,9 +248,9 @@ export const WithLongContent: Story = {
     props: args,
     template: `
       <div class="flex h-40 items-center justify-center">
-        <Tooltip [content]="content" [variant]="variant">
+        <UiTooltip [content]="content" [variant]="variant">
           ${trigger('Hover para ver el wrap')}
-        </Tooltip>
+        </UiTooltip>
       </div>
     `,
   }),
@@ -264,15 +264,15 @@ export const Alignment: Story = {
   render: () => ({
     template: `
       <div class="flex flex-col items-start gap-8 p-6">
-        <Tooltip align="start" content="Alineado al inicio del trigger">
+        <UiTooltip align="start" content="Alineado al inicio del trigger">
           ${trigger('align="start"')}
-        </Tooltip>
-        <Tooltip align="center" content="Centrado respecto al trigger">
+        </UiTooltip>
+        <UiTooltip align="center" content="Centrado respecto al trigger">
           ${trigger('align="center"')}
-        </Tooltip>
-        <Tooltip align="end" content="Alineado al final del trigger">
+        </UiTooltip>
+        <UiTooltip align="end" content="Alineado al final del trigger">
           ${trigger('align="end"')}
-        </Tooltip>
+        </UiTooltip>
       </div>
     `,
   }),
@@ -287,24 +287,24 @@ export const DarkMode: Story = {
     template: `
       <div class="dark bg-gray-900 rounded-lg p-6">
         <div class="grid grid-cols-3 gap-4">
-          <Tooltip variant="light" content="Variant light">
+          <UiTooltip variant="light" content="Variant light">
             ${trigger('light')}
-          </Tooltip>
-          <Tooltip variant="dark" content="Variant dark">
+          </UiTooltip>
+          <UiTooltip variant="dark" content="Variant dark">
             ${trigger('dark')}
-          </Tooltip>
-          <Tooltip variant="info" content="Variant info">
+          </UiTooltip>
+          <UiTooltip variant="info" content="Variant info">
             ${trigger('info')}
-          </Tooltip>
-          <Tooltip variant="success" content="Variant success">
+          </UiTooltip>
+          <UiTooltip variant="success" content="Variant success">
             ${trigger('success')}
-          </Tooltip>
-          <Tooltip variant="warning" content="Variant warning">
+          </UiTooltip>
+          <UiTooltip variant="warning" content="Variant warning">
             ${trigger('warning')}
-          </Tooltip>
-          <Tooltip variant="error" content="Variant error">
+          </UiTooltip>
+          <UiTooltip variant="error" content="Variant error">
             ${trigger('error')}
-          </Tooltip>
+          </UiTooltip>
         </div>
       </div>
     `,

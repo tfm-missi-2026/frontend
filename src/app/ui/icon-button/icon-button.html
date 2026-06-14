@@ -36,7 +36,7 @@
 </ng-template>
 
 @if (showWrapper) {
-  <LoadingTimeoutWrapper
+  <UiLoadingTimeoutWrapper
     [variant]="variant"
     [styleType]="styleType"
     [transparent]="transparent"
@@ -45,25 +45,25 @@
     [className]="className"
   >
     @if (tooltip !== undefined && tooltip !== null) {
-      <Tooltip
+      <UiTooltip
         [content]="tooltip"
         [variant]="tooltipVariant"
         [side]="tooltipSide"
       >
         <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
-      </Tooltip>
+      </UiTooltip>
     } @else {
       <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
     }
-  </LoadingTimeoutWrapper>
+  </UiLoadingTimeoutWrapper>
 } @else if (tooltip !== undefined && tooltip !== null) {
-  <Tooltip
+  <UiTooltip
     [content]="tooltip"
     [variant]="tooltipVariant"
     [side]="tooltipSide"
   >
     <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
-  </Tooltip>
+  </UiTooltip>
 } @else {
   <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
 }

@@ -2,17 +2,13 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  EventEmitter,
+  computed,
   inject,
-  Input,
-  OnChanges,
+  input,
   OnDestroy,
-  OnInit,
-  Output,
-  SimpleChanges,
+  output,
+  signal,
   Type,
-  ViewChild,
-  TemplateRef,
 } from '@angular/core';
 import { NgComponentOutlet, NgTemplateOutlet } from '@angular/common';
 
@@ -20,11 +16,11 @@ import { IconProps } from '@ui/icon/icon.interface';
 import { TypographyType } from '@styles/types/typography';
 import designConstants from '@styles/constants';
 import {
-  TooltipComponent,
+  UiTooltipComponent,
   TooltipSide,
   TooltipVariantType,
 } from '@ui/tooltip/tooltip';
-import { LoadingTimeoutWrapperComponent } from '@ui/loading-timeout-wrapper/loading-timeout-wrapper';
+import { UiLoadingTimeoutWrapperComponent } from '@ui/loading-timeout-wrapper/loading-timeout-wrapper';
 import { getFocusStyling } from '@utils/styling';
 
 import {
@@ -32,115 +28,151 @@ import {
   ButtonStyleType,
   ButtonTooltip,
   ButtonVariant,
-  IconButtonProps,
 } from '@ui/button/types';
 import { getVariantClasses } from '@ui/button/variants';
 
 /**
- * `IconButton`
- * ------------
+ * `UiIconButton`
+ * --------------
  * Botón cuadrado (aspect-ratio 1:1) que contiene un único ícono.
- * Réplica Angular del `IconButton` del proyecto React.
  *
- * Mismas capacidades que `Button` (variants, styleTypes, loading
+ * Mismas capacidades que `UiButton` (variants, styleTypes, loading
  * wrapper, tooltip, `asLink`) salvo que no tiene label.
+ *
+ * API signal-based (Angular 17.1+).
  */
 @Component({
-  selector: 'IconButton',
+  selector: 'UiIconButton',
   standalone: true,
   imports: [
-    NgTemplateOutlet,
     NgComponentOutlet,
-    TooltipComponent,
-    LoadingTimeoutWrapperComponent,
+    NgTemplateOutlet,
+    UiTooltipComponent,
+    UiLoadingTimeoutWrapperComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './icon-button.html',
-})
-export class IconButtonComponent
-  implements OnInit, OnChanges, OnDestroy, IconButtonProps
-{
-  // -------------------------------------------------------------------------
-  // Inputs
-  // -------------------------------------------------------------------------
+  template: `
+    <ng-template #buttonTpl>
+      @if (asLink()) {
+        <a
+          [class]="buttonClasses()"
+          [attr.href]="linkProps()?.href || null"
+          [attr.target]="linkProps()?.target || null"
+          [attr.download]="linkProps()?.download || null"
+          [attr.rel]="computedRel()"
+          [attr.aria-label]="labelText() || null"
+          (click)="onClick($event)"
+          data-testid="icon-button"
+        >
+          <ng-container
+            *ngComponentOutlet="Icon(); inputs: iconInputs()"
+          ></ng-container>
+        </a>
+      } @else {
+        <button
+          [class]="buttonClasses()"
+          [type]="isSubmit() ? 'submit' : 'button'"
+          [disabled]="isEffectivelyDisabled()"
+          [attr.aria-label]="labelText() || null"
+          (click)="onClick($event)"
+          data-testid="icon-button"
+        >
+          <ng-container
+            *ngComponentOutlet="Icon(); inputs: iconInputs()"
+          ></ng-container>
+        </button>
+      }
+    </ng-template>
 
-  @Input() variant: ButtonVariant = 'primary';
-  @Input() styleType: ButtonStyleType = 'default';
-  @Input() transparent = false;
-  @Input() compact = false;
-  @Input() disabled = false;
-  @Input() isLoading = false;
-  @Input() isSubmit = false;
-  @Input() fontSize: TypographyType = 'bodyS';
+    @if (showWrapper()) {
+      <UiLoadingTimeoutWrapper
+        [variant]="variant()"
+        [styleType]="styleType()"
+        [transparent]="transparent()"
+        [fullWidth]="false"
+        [timeout]="hasActiveTimeout() ? timeout() : undefined"
+        [className]="className()"
+      >
+        @if (tooltip() !== undefined && tooltip() !== null) {
+          <UiTooltip
+            [content]="tooltip()!"
+            [variant]="tooltipVariant()"
+            [side]="tooltipSide()"
+          >
+            <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
+          </UiTooltip>
+        } @else {
+          <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
+        }
+      </UiLoadingTimeoutWrapper>
+    } @else if (tooltip() !== undefined && tooltip() !== null) {
+      <UiTooltip
+        [content]="tooltip()!"
+        [variant]="tooltipVariant()"
+        [side]="tooltipSide()"
+      >
+        <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
+      </UiTooltip>
+    } @else {
+      <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
+    }
+  `,
+})
+export class UiIconButtonComponent implements OnDestroy {
+  readonly variant = input<ButtonVariant>('primary');
+  readonly styleType = input<ButtonStyleType>('default');
+  readonly transparent = input<boolean>(false);
+  readonly compact = input<boolean>(false);
+  readonly disabled = input<boolean>(false);
+  readonly isLoading = input<boolean>(false);
+  readonly isSubmit = input<boolean>(false);
+  readonly fontSize = input<TypographyType>('bodyS');
 
   /** Componente Angular que se renderiza dentro del botón. */
-  @Input({ required: true }) Icon!: Type<unknown>;
-  @Input() iconProps: IconProps = {};
+  readonly Icon = input.required<Type<unknown>>();
+  readonly iconProps = input<IconProps>({});
 
   /** Ancho explícito del botón. Si se omite, usa aspect-ratio 1:1. */
-  @Input() width?: string;
+  readonly width = input<string | undefined>(undefined);
 
-  @Input() tooltip?: ButtonTooltip;
-  @Input() tooltipSide: TooltipSide = 'bottom';
-  @Input() tooltipVariant: TooltipVariantType = 'dark';
-  @Input() labelText?: string;
-  @Input() timeout?: number;
-  @Input() disableOnTimeout = true;
-  @Input() asLink = false;
-  @Input() linkProps?: ButtonLinkProps;
-  @Input() className = '';
+  readonly tooltip = input<ButtonTooltip | undefined>(undefined);
+  readonly tooltipSide = input<TooltipSide>('bottom');
+  readonly tooltipVariant = input<TooltipVariantType>('dark');
+  readonly labelText = input<string | undefined>(undefined);
+  readonly timeout = input<number | undefined>(undefined);
+  readonly disableOnTimeout = input<boolean>(true);
+  readonly asLink = input<boolean>(false);
+  readonly linkProps = input<ButtonLinkProps | undefined>(undefined);
+  readonly className = input<string>('');
 
-  // -------------------------------------------------------------------------
-  // Outputs
-  // -------------------------------------------------------------------------
-
-  @Output() click = new EventEmitter<MouseEvent>();
-
-  // -------------------------------------------------------------------------
-  // Estado interno
-  // -------------------------------------------------------------------------
-
-  @ViewChild('buttonTpl', { static: true }) buttonTpl!: TemplateRef<unknown>;
+  readonly click = output<MouseEvent>();
 
   private cdr = inject(ChangeDetectorRef);
   private timeoutId?: ReturnType<typeof setTimeout>;
-  runningTimeout = false;
-
-  // -------------------------------------------------------------------------
-  // Lifecycle
-  // -------------------------------------------------------------------------
+  private readonly _runningTimeout = signal(false);
 
   ngOnInit(): void {
-    if (this.timeout) this.startTimeout();
+    if (this.timeout() !== undefined) this.startTimeout();
   }
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['timeout']) {
-      if (this.timeout) this.startTimeout();
-      else this.clearTimeout();
-    }
-  }
+
   ngOnDestroy(): void {
     this.clearTimeout();
   }
 
-  // -------------------------------------------------------------------------
-  // API pública
-  // -------------------------------------------------------------------------
-
   resetTimeout = (): void => {
     this.clearTimeout();
-    if (this.timeout) {
-      this.runningTimeout = true;
+    if (this.timeout() !== undefined) {
+      this._runningTimeout.set(true);
       this.cdr.markForCheck();
       this.timeoutId = setTimeout(() => {
-        this.runningTimeout = false;
+        this._runningTimeout.set(false);
         this.cdr.markForCheck();
-      }, this.timeout);
+      }, this.timeout()!);
     }
   };
 
   onClick(event: MouseEvent): void {
-    if (this.isEffectivelyDisabled) {
+    if (this.isEffectivelyDisabled()) {
       event.preventDefault();
       event.stopPropagation();
       return;
@@ -148,39 +180,35 @@ export class IconButtonComponent
     this.click.emit(event);
   }
 
-  // -------------------------------------------------------------------------
-  // Getters
-  // -------------------------------------------------------------------------
+  readonly isEffectivelyDisabled = computed<boolean>(
+    () =>
+      this.disabled() ||
+      this.isLoading() ||
+      (this._runningTimeout() && this.disableOnTimeout()),
+  );
 
-  get isEffectivelyDisabled(): boolean {
-    return (
-      this.disabled ||
-      this.isLoading ||
-      (this.runningTimeout && this.disableOnTimeout)
-    );
-  }
+  readonly showWrapper = computed<boolean>(
+    () => this.isLoading() || this._runningTimeout(),
+  );
 
-  get showWrapper(): boolean {
-    return this.isLoading || this.runningTimeout;
-  }
+  readonly hasActiveTimeout = computed<boolean>(
+    () => this.timeout() !== undefined && this._runningTimeout(),
+  );
 
-  get hasActiveTimeout(): boolean {
-    return !!this.timeout && this.runningTimeout;
-  }
-
-  get buttonClasses(): string {
-    const aspect = this.width ? '' : 'aspect-square';
+  readonly buttonClasses = computed<string>(() => {
+    const width = this.width();
+    const aspect = width ? '' : 'aspect-square';
     const layout = [
       'inline-flex items-center justify-center',
       'rounded-lg',
       'cursor-pointer select-none',
       'border border-solid',
-      this.compact ? 'p-1' : 'p-2',
-      this.width ? `w-[${this.width}]` : '',
+      this.compact() ? 'p-1' : 'p-2',
+      width ? `w-[${width}]` : '',
       aspect,
     ];
 
-    if (this.showWrapper) {
+    if (this.showWrapper()) {
       return [
         ...layout,
         'bg-transparent border-transparent',
@@ -190,39 +218,35 @@ export class IconButtonComponent
     }
     return [
       ...layout,
-      getVariantClasses(this.variant, this.styleType, this.transparent),
+      getVariantClasses(this.variant(), this.styleType(), this.transparent()),
       this.getFocusClasses(),
     ].join(' ');
-  }
+  });
 
-  get iconInputs(): Record<string, unknown> {
-    const props: Record<string, unknown> = { ...this.iconProps };
+  readonly iconInputs = computed<Record<string, unknown>>(() => {
+    const props: Record<string, unknown> = { ...this.iconProps() };
     if (props['size'] === undefined) {
-      props['size'] = designConstants.typography.fontSize[this.fontSize];
+      props['size'] = designConstants.typography.fontSize[this.fontSize()];
     }
     return props;
-  }
+  });
 
-  get computedRel(): string | null {
-    if (!this.asLink) return null;
-    const explicit = this.linkProps?.rel;
+  readonly computedRel = computed<string | null>(() => {
+    if (!this.asLink()) return null;
+    const explicit = this.linkProps()?.rel;
     if (explicit) return explicit;
-    if (this.linkProps?.target === '_blank') return 'noopener noreferrer';
+    if (this.linkProps()?.target === '_blank') return 'noopener noreferrer';
     return null;
-  }
-
-  // -------------------------------------------------------------------------
-  // Privados
-  // -------------------------------------------------------------------------
+  });
 
   private startTimeout(): void {
     this.clearTimeout();
-    this.runningTimeout = true;
+    this._runningTimeout.set(true);
     this.cdr.markForCheck();
     this.timeoutId = setTimeout(() => {
-      this.runningTimeout = false;
+      this._runningTimeout.set(false);
       this.cdr.markForCheck();
-    }, this.timeout);
+    }, this.timeout()!);
   }
 
   private clearTimeout(): void {

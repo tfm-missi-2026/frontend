@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { LabelComponent } from './label';
+import { UiLabelComponent } from './label';
 
 describe('Label', () => {
-  let component: LabelComponent;
-  let fixture: ComponentFixture<LabelComponent>;
+  let component: UiLabelComponent;
+  let fixture: ComponentFixture<UiLabelComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LabelComponent],
+      imports: [UiLabelComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(LabelComponent);
+    fixture = TestBed.createComponent(UiLabelComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

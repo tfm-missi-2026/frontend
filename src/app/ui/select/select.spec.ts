@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { SelectComponent } from './select';
+import { UiSelectComponent } from './select';
 
 describe('Select', () => {
-  let component: SelectComponent;
-  let fixture: ComponentFixture<SelectComponent>;
+  let component: UiSelectComponent;
+  let fixture: ComponentFixture<UiSelectComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SelectComponent],
+      imports: [UiSelectComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(SelectComponent);
+    fixture = TestBed.createComponent(UiSelectComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

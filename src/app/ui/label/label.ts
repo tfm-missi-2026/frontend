@@ -1,20 +1,25 @@
 import {
-  Component,
-  Input,
-  ElementRef,
-  ViewChild,
   AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  input,
   OnChanges,
   OnDestroy,
   SimpleChanges,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  inject,
+  viewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 
-import designConstants, { TypographyType, FontWeightType, ColorType } from '@styles/constants';
-import { TooltipComponent } from '@ui/tooltip/tooltip';
+import designConstants, {
+  ColorType,
+  FontWeightType,
+  TypographyType,
+} from '@styles/constants';
+import { UiTooltipComponent } from '@ui/tooltip/tooltip';
 import { TooltipSide } from '@ui/tooltip/tooltip.types';
 
 /** Elementos HTML válidos para el slot principal. */
@@ -35,82 +40,64 @@ const TYPE_TO_HTML_ELEMENT: Record<TypographyType, string> = {
 };
 
 /**
- * `Label`
- * -------
+ * `UiLabel`
+ * --------
  * Aplica tipografía (tamaño, line-height, peso) desde `designConstants`
  * y, opcionalmente, detecta overflow para envolver el texto en un
- * `Tooltip` con el contenido completo.
+ * `UiTooltip` con el contenido completo.
  *
  * Estructura: si `showTooltip` es `true`, el `<span>` se monta dentro de un
- * `<Tooltip variant="light" align="start" [content]="...">`. En caso contrario
- * se renderiza directamente.
+ * `<UiTooltip variant="light" align="start" [content]="...">`. En caso
+ * contrario se renderiza directamente.
+ *
+ * API signal-based (Angular 17.1+).
  */
 @Component({
-  selector: 'Label',
+  selector: 'UiLabel',
   standalone: true,
-  imports: [CommonModule, TooltipComponent],
+  imports: [NgTemplateOutlet, UiTooltipComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (showTooltip) {
-      <Tooltip
+    @if (showTooltip()) {
+      <UiTooltip
         variant="light"
         align="start"
-        [content]="resolvedText"
-        [side]="tooltipSide"
+        [content]="resolvedText()"
+        [side]="tooltipSide()"
       >
-        <span
-          #container
-          class="label wrap-break-word"
-          [ngClass]="className"
-          [ngStyle]="containerStyles"
-          [attr.for]="for || null"
-          [style.color]="resolvedColor"
-          [style.font-weight]="resolvedWeight"
-          [style.font-style]="italic ? 'italic' : null"
-          [style.text-align]="align || null"
-          [style.white-space]="!wrapText ? 'nowrap' : null"
-          [style.overflow]="!wrapText || wrapMaxLines ? 'hidden' : null"
-          [style.text-overflow]="!wrapText || wrapMaxLines ? 'ellipsis' : null"
-          [style.display]="wrapText && wrapMaxLines ? '-webkit-box' : null"
-          [style.-webkit-box-orient]="wrapText && wrapMaxLines ? 'vertical' : null"
-          [style.-webkit-line-clamp]="wrapText && wrapMaxLines ? wrapMaxLines.toString() : null"
-        >
-          <span #textEl class="label__text">
-            @if (text) {
-              {{ text }}
-            } @else {
-              <ng-content></ng-content>
-            }
-          </span>
-        </span>
-      </Tooltip>
+        <ng-container *ngTemplateOutlet="labelTpl"></ng-container>
+      </UiTooltip>
     } @else {
+      <ng-container *ngTemplateOutlet="labelTpl"></ng-container>
+    }
+
+    <ng-template #labelTpl>
       <span
         #container
         class="label wrap-break-word"
-        [ngClass]="className"
-        [ngStyle]="containerStyles"
-        [attr.for]="for || null"
-        [style.color]="resolvedColor"
-        [style.font-weight]="resolvedWeight"
-        [style.font-style]="italic ? 'italic' : null"
-        [style.text-align]="align || null"
-        [style.white-space]="!wrapText ? 'nowrap' : null"
-        [style.overflow]="!wrapText || wrapMaxLines ? 'hidden' : null"
-        [style.text-overflow]="!wrapText || wrapMaxLines ? 'ellipsis' : null"
-        [style.display]="wrapText && wrapMaxLines ? '-webkit-box' : null"
-        [style.-webkit-box-orient]="wrapText && wrapMaxLines ? 'vertical' : null"
-        [style.-webkit-line-clamp]="wrapText && wrapMaxLines ? wrapMaxLines.toString() : null"
+        [class]="className()"
+        [style]="containerStyles()"
+        [attr.for]="for() || null"
+        [style.color]="resolvedColor()"
+        [style.font-weight]="resolvedWeight()"
+        [style.font-style]="italic() ? 'italic' : null"
+        [style.text-align]="align() || null"
+        [style.white-space]="!wrapText() ? 'nowrap' : null"
+        [style.overflow]="!wrapText() || wrapMaxLines() ? 'hidden' : null"
+        [style.text-overflow]="!wrapText() || wrapMaxLines() ? 'ellipsis' : null"
+        [style.display]="wrapText() && wrapMaxLines() ? '-webkit-box' : null"
+        [style.-webkit-box-orient]="wrapText() && wrapMaxLines() ? 'vertical' : null"
+        [style.-webkit-line-clamp]="wrapText() && wrapMaxLines() ? wrapMaxLines()?.toString() : null"
       >
         <span #textEl class="label__text">
-          @if (text) {
-            {{ text }}
+          @if (text()) {
+            {{ text() }}
           } @else {
             <ng-content></ng-content>
           }
         </span>
       </span>
-    }
+    </ng-template>
   `,
   styles: [
     `
@@ -121,38 +108,38 @@ const TYPE_TO_HTML_ELEMENT: Record<TypographyType, string> = {
     `,
   ],
 })
-export class LabelComponent implements AfterViewInit, OnChanges, OnDestroy {
+export class UiLabelComponent implements AfterViewInit, OnChanges, OnDestroy {
   /** Tag HTML concreto. Si se omite, se infiere por `type`. */
-  @Input() as?: LabelAs;
+  readonly as = input<LabelAs | undefined>(undefined);
   /** Asocia el label a un input por su `id` (atributo `for` del HTML). */
-  @Input() for?: string;
+  readonly for = input<string | undefined>(undefined);
   /** Texto a mostrar (alternativa al slot). */
-  @Input() text?: string;
+  readonly text = input<string | undefined>(undefined);
   /** Tipografía. */
-  @Input() type: TypographyType = 'bodyXs';
+  readonly type = input<TypographyType>('bodyXs');
   /** `font-weight` (si se omite, usa el de `fontWeightByTypographyType[type]`). */
-  @Input() weight?: FontWeightType;
+  readonly weight = input<FontWeightType | undefined>(undefined);
   /** Color semántico. */
-  @Input() color?: ColorType;
+  readonly color = input<ColorType | undefined>(undefined);
   /** Si `false`, el texto no hace wrap (default). */
-  @Input() wrapText = false;
+  readonly wrapText = input<boolean>(false);
   /** Máx. de líneas cuando `wrapText` es `true`. Activa line-clamp. */
-  @Input() wrapMaxLines?: number;
+  readonly wrapMaxLines = input<number | undefined>(undefined);
   /** Offset (px) para restar al espacio disponible al detectar overflow. */
-  @Input() availableSpaceOffset = 0;
+  readonly availableSpaceOffset = input<number>(0);
   /** Aplica `font-style: italic`. */
-  @Input() italic = false;
+  readonly italic = input<boolean>(false);
   /** Re-comprueba el overflow tras el primer render. */
-  @Input() refreshOnLoad = false;
+  readonly refreshOnLoad = input<boolean>(false);
   /** `text-align` (CSS). */
-  @Input() align?: 'left' | 'right' | 'center' | 'justify';
+  readonly align = input<'left' | 'right' | 'center' | 'justify' | undefined>(undefined);
   /** Clases extra para el contenedor. */
-  @Input() className = '';
+  readonly className = input<string>('');
   /** Lado del tooltip. */
-  @Input() tooltipSide: TooltipSide = 'bottom';
+  readonly tooltipSide = input<TooltipSide>('bottom');
 
-  @ViewChild('container') containerRef?: ElementRef<HTMLElement>;
-  @ViewChild('textEl') textRef?: ElementRef<HTMLElement>;
+  readonly containerRef = viewChild<ElementRef<HTMLElement>>('container');
+  readonly textRef = viewChild<ElementRef<HTMLElement>>('textEl');
 
   isOverflowing = false;
 
@@ -160,38 +147,34 @@ export class LabelComponent implements AfterViewInit, OnChanges, OnDestroy {
   private overflowTimeout?: ReturnType<typeof setTimeout>;
 
   // -------------------------------------------------------------------------
-  // Getters
+  // Getters (computed)
   // -------------------------------------------------------------------------
 
-  get resolvedText(): string {
-    return this.text ?? '';
-  }
+  readonly resolvedText = computed<string>(() => this.text() ?? '');
 
-  get resolvedColor(): string {
-    if (!this.color) return 'currentColor';
-    return designConstants.colors[this.color] ?? 'currentColor';
-  }
+  readonly resolvedColor = computed<string>(() => {
+    const c = this.color();
+    if (!c) return 'currentColor';
+    return designConstants.colors[c] ?? 'currentColor';
+  });
 
-  get resolvedWeight(): string {
-    const w =
-      this.weight ?? designConstants.typography.fontWeightByTypographyType[this.type];
+  readonly resolvedWeight = computed<string>(() => {
+    const w = this.weight() ?? designConstants.typography.fontWeightByTypographyType[this.type()];
     return designConstants.typography.fontWeight[w].toString();
-  }
+  });
 
-  get resolvedHtmlElement(): string {
-    return this.as ?? TYPE_TO_HTML_ELEMENT[this.type];
-  }
+  readonly resolvedHtmlElement = computed<string>(
+    () => this.as() ?? TYPE_TO_HTML_ELEMENT[this.type()],
+  );
 
-  get containerStyles(): Record<string, string> {
-    return {
-      'font-size': designConstants.typography.fontSize[this.type],
-      'line-height': designConstants.typography.lineHeight[this.type],
-    };
-  }
+  readonly containerStyles = computed<Record<string, string>>(() => ({
+    'font-size': designConstants.typography.fontSize[this.type()],
+    'line-height': designConstants.typography.lineHeight[this.type()],
+  }));
 
-  get showTooltip(): boolean {
-    return this.isOverflowing && (!this.wrapText || !!this.wrapMaxLines);
-  }
+  readonly showTooltip = computed<boolean>(
+    () => this.isOverflowing && (!this.wrapText() || !!this.wrapMaxLines()),
+  );
 
   // -------------------------------------------------------------------------
   // Lifecycle
@@ -227,16 +210,16 @@ export class LabelComponent implements AfterViewInit, OnChanges, OnDestroy {
   }
 
   private checkOverflow(): void {
-    const container = this.containerRef?.nativeElement;
-    const text = this.textRef?.nativeElement;
+    const container = this.containerRef()?.nativeElement;
+    const text = this.textRef()?.nativeElement;
     if (!container || !text) return;
 
-    const axis: 'offsetHeight' | 'offsetWidth' = this.wrapText
+    const axis: 'offsetHeight' | 'offsetWidth' = this.wrapText()
       ? 'offsetHeight'
       : 'offsetWidth';
     const containerSize = container[axis] as number;
     const textSize = text[axis] as number;
-    const available = containerSize - this.availableSpaceOffset;
+    const available = containerSize - this.availableSpaceOffset();
 
     this.isOverflowing = textSize > available;
     this.cdr.markForCheck();

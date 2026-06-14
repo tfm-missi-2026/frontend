@@ -104,7 +104,7 @@ importers:
         version: 0.2102.12(chokidar@5.0.0)
       '@angular-devkit/build-angular':
         specifier: 21.2.12
-        version: 21.2.12(@angular/compiler-cli@21.2.14(@angular/compiler@21.2.14)(typescript@5.9.3))(@angular/compiler@21.2.14)(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@21.2.14(@angular/animations@21.2.14(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@21.2.14(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2)))(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.9.1)(chokidar@5.0.0)(html-webpack-plugin@5.6.7(webpack@5.107.1(esbuild@0.27.3)(lightningcss@1.32.0)(postcss@8.5.15)))(jiti@2.7.0)(lightningcss@1.32.0)(tailwindcss@4.3.0)(typescript@5.9.3)(vitest@4.1.7(@types/node@25.9.1)(jsdom@28.1.0(@noble/hashes@1.8.0))(vite@7.3.2(@types/node@25.9.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.48.0)))
+        version: 21.2.12(@angular/compiler-cli@21.2.14(@angular/compiler@21.2.14)(typescript@5.9.3))(@angular/compiler@21.2.14)(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@21.2.14(@angular/animations@21.2.14(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@21.2.14(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2)))(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.9.1)(chokidar@5.0.0)(html-webpack-plugin@5.6.7(webpack@5.107.1(esbuild@0.27.3)(lightningcss@1.32.0)(postcss@8.5.15)))(jest@@types+jest)(jiti@2.7.0)(lightningcss@1.32.0)(tailwindcss@4.3.0)(typescript@5.9.3)(vitest@4.1.7(@types/node@25.9.1)(jsdom@28.1.0(@noble/hashes@1.8.0))(vite@7.3.2(@types/node@25.9.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.48.0)))
       '@angular-devkit/core':
         specifier: 21.2.12
         version: 21.2.12(chokidar@5.0.0)
@@ -131,7 +131,10 @@ importers:
         version: 10.4.1(storybook@10.4.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.8.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))
       '@storybook/angular':
         specifier: ^10.4.1
-        version: 10.4.1(e9d7bb0e22d0e5a99feead313bc9a1b9)
+        version: 10.4.1(d5e938de3d130a329be2070f3ccdc06a)
+      '@types/jasmine':
+        specifier: ^5.1.4
+        version: 5.1.15
       '@types/node':
         specifier: ^25.9.1
         version: 25.9.1
@@ -144,6 +147,9 @@ importers:
       husky:
         specifier: ^9.1.7
         version: 9.1.7
+      jest:
+        specifier: link:@types\jest
+        version: link:@types/jest
       jsdom:
         specifier: ^28.1.0
         version: 28.1.0(@noble/hashes@1.8.0)
@@ -2926,6 +2932,9 @@ packages:
 
   '@types/http-proxy@1.17.17':
     resolution: {integrity: sha512-ED6LB+Z1AVylNTu7hdzuBqOgMnvG/ld6wGCG8wFnAzKX5uyW2K3WD52v0gnLCTK/VLpXtKckgWuyScYK6cSPaw==}
+
+  '@types/jasmine@5.1.15':
+    resolution: {integrity: sha512-ZAC8KjmV2MJxbNTrwXFN+HKeajpXQZp6KpPiR6Aa4XvaEnjP6qh23lL/Rqb7AYzlp3h/rcwDrQ7Gg7q28cQTQg==}
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -6965,7 +6974,7 @@ snapshots:
     transitivePeerDependencies:
       - chokidar
 
-  '@angular-devkit/build-angular@21.2.12(@angular/compiler-cli@21.2.14(@angular/compiler@21.2.14)(typescript@5.9.3))(@angular/compiler@21.2.14)(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@21.2.14(@angular/animations@21.2.14(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@21.2.14(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2)))(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.9.1)(chokidar@5.0.0)(html-webpack-plugin@5.6.7(webpack@5.107.1(esbuild@0.27.3)(lightningcss@1.32.0)(postcss@8.5.15)))(jiti@2.7.0)(lightningcss@1.32.0)(tailwindcss@4.3.0)(typescript@5.9.3)(vitest@4.1.7(@types/node@25.9.1)(jsdom@28.1.0(@noble/hashes@1.8.0))(vite@7.3.2(@types/node@25.9.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.48.0)))':
+  '@angular-devkit/build-angular@21.2.12(@angular/compiler-cli@21.2.14(@angular/compiler@21.2.14)(typescript@5.9.3))(@angular/compiler@21.2.14)(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@21.2.14(@angular/animations@21.2.14(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@21.2.14(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2)))(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.9.1)(chokidar@5.0.0)(html-webpack-plugin@5.6.7(webpack@5.107.1(esbuild@0.27.3)(lightningcss@1.32.0)(postcss@8.5.15)))(jest@@types+jest)(jiti@2.7.0)(lightningcss@1.32.0)(tailwindcss@4.3.0)(typescript@5.9.3)(vitest@4.1.7(@types/node@25.9.1)(jsdom@28.1.0(@noble/hashes@1.8.0))(vite@7.3.2(@types/node@25.9.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.48.0)))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular-devkit/architect': 0.2102.12(chokidar@5.0.0)
@@ -7027,6 +7036,7 @@ snapshots:
       '@angular/core': 21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2)
       '@angular/platform-browser': 21.2.14(@angular/animations@21.2.14(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@21.2.14(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2))
       esbuild: 0.27.3
+      jest: link:@types/jest
       tailwindcss: 4.3.0
     transitivePeerDependencies:
       - '@angular/compiler'
@@ -9894,10 +9904,10 @@ snapshots:
     dependencies:
       storybook: 10.4.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.8.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
 
-  '@storybook/angular@10.4.1(e9d7bb0e22d0e5a99feead313bc9a1b9)':
+  '@storybook/angular@10.4.1(d5e938de3d130a329be2070f3ccdc06a)':
     dependencies:
       '@angular-devkit/architect': 0.2102.12(chokidar@5.0.0)
-      '@angular-devkit/build-angular': 21.2.12(@angular/compiler-cli@21.2.14(@angular/compiler@21.2.14)(typescript@5.9.3))(@angular/compiler@21.2.14)(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@21.2.14(@angular/animations@21.2.14(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@21.2.14(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2)))(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.9.1)(chokidar@5.0.0)(html-webpack-plugin@5.6.7(webpack@5.107.1(esbuild@0.27.3)(lightningcss@1.32.0)(postcss@8.5.15)))(jiti@2.7.0)(lightningcss@1.32.0)(tailwindcss@4.3.0)(typescript@5.9.3)(vitest@4.1.7(@types/node@25.9.1)(jsdom@28.1.0(@noble/hashes@1.8.0))(vite@7.3.2(@types/node@25.9.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.48.0)))
+      '@angular-devkit/build-angular': 21.2.12(@angular/compiler-cli@21.2.14(@angular/compiler@21.2.14)(typescript@5.9.3))(@angular/compiler@21.2.14)(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@21.2.14(@angular/animations@21.2.14(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@21.2.14(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2)))(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.9.1)(chokidar@5.0.0)(html-webpack-plugin@5.6.7(webpack@5.107.1(esbuild@0.27.3)(lightningcss@1.32.0)(postcss@8.5.15)))(jest@@types+jest)(jiti@2.7.0)(lightningcss@1.32.0)(tailwindcss@4.3.0)(typescript@5.9.3)(vitest@4.1.7(@types/node@25.9.1)(jsdom@28.1.0(@noble/hashes@1.8.0))(vite@7.3.2(@types/node@25.9.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.48.0)))
       '@angular-devkit/core': 21.2.12(chokidar@5.0.0)
       '@angular/common': 21.2.14(@angular/core@21.2.14(@angular/compiler@21.2.14)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
       '@angular/compiler': 21.2.14
@@ -10318,6 +10328,8 @@ snapshots:
   '@types/http-proxy@1.17.17':
     dependencies:
       '@types/node': 25.9.1
+
+  '@types/jasmine@5.1.15': {}
 
   '@types/json-schema@7.0.15': {}
 

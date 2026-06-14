@@ -1,84 +1,83 @@
 import {
-  Component,
-  Input,
   ChangeDetectionStrategy,
-} from '@angular/core';
-import { CommonModule } from '@angular/common';
+  Component,
+  computed,
+  input,
+} from "@angular/core";
 
-import { CircleInfoIconLightComponent } from '@ui/icon/circle-info-icon-light';
-import { TooltipComponent } from '@ui/tooltip/tooltip';
+import { IconCircleInfoLightComponent } from "@ui/icon/circle-info-icon-light";
+import { UiTooltipComponent } from "@ui/tooltip/tooltip";
 
 /**
- * `InfoIconWithTooltip`
- * --------------------
- * Muestra un `IconCircleInfoLight` con un tooltip al hacer hover.
+ * `UiInfoIconWithTooltip`
+ * -----------------------
+ * Muestra un `UiIconCircleInfoLight` con un tooltip al hacer hover.
  *
  * Comportamiento:
  *  - El `tooltip` puede ser un texto plano.
  *  - Se controla con `color` (cualquier valor CSS o `currentColor`).
  *  - Detiene la propagación del click para no interferir con el padre.
  *
- * Usa el componente `Tooltip` del design system.
+ * Usa el componente `UiTooltip` del design system.
  */
 @Component({
-  selector: 'InfoIconWithTooltip',
+  selector: "InfoIconWithTooltip",
   standalone: true,
-  imports: [CommonModule, CircleInfoIconLightComponent, TooltipComponent],
+  imports: [UiTooltipComponent, IconCircleInfoLightComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <Tooltip
-      [content]="tooltip"
-      [variant]="variant"
-      [side]="side"
-      [sideOffset]="sideOffset"
-      [align]="align"
-      [delayDuration]="delayDuration"
-      [className]="tooltipClassName"
+    <UiTooltip
+      [content]="tooltip()"
+      [variant]="variant()"
+      [side]="side()"
+      [sideOffset]="sideOffset()"
+      [align]="align()"
+      [delayDuration]="delayDuration()"
+      [className]="tooltipClassName()"
     >
       <button
         type="button"
         class="inline-flex items-center justify-center bg-transparent border-0 p-0 cursor-pointer"
-        [ngClass]="triggerClassName"
+        [class]="triggerClassName()"
         (click)="stopPropagation($event)"
-        [attr.aria-label]="tooltip || null"
+        [attr.aria-label]="tooltip() || null"
       >
         <IconCircleInfoLight
-          [size]="size"
-          [color]="color"
-          [dataTestId]="dataTestId"
+          [size]="size()"
+          [color]="color()"
+          [dataTestId]="dataTestId()"
         />
       </button>
-    </Tooltip>
+    </UiTooltip>
   `,
 })
-export class InfoIconWithTooltipComponent {
+export class UiInfoIconWithTooltipComponent {
   /** Texto del tooltip. */
-  @Input() tooltip = '';
+  readonly tooltip = input<string>("");
   /** Color del icono (CSS color). Por defecto `currentColor`. */
-  @Input() color = 'currentColor';
+  readonly color = input<string>("currentColor");
   /** Tamaño del icono. */
-  @Input() size: number | string = 12;
+  readonly size = input<number | string>(12);
   /** `data-testid` que se delega al icono. */
-  @Input() dataTestId?: string;
+  readonly dataTestId = input<string | undefined>(undefined);
   /** Clases extra para el contenedor exterior. */
-  @Input() className = '';
+  readonly className = input<string>("");
   /** Clases para el botón disparador. */
-  @Input() triggerClassName =
-    'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200';
+  readonly triggerClassName = input<string>(
+    "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200",
+  );
   /** Variante del tooltip. */
-  @Input() variant: 'light' | 'dark' = 'light';
+  readonly variant = input<"light" | "dark">("light");
   /** Lado del tooltip. */
-  @Input() side: 'top' | 'right' | 'bottom' | 'left' = 'bottom';
+  readonly side = input<"top" | "right" | "bottom" | "left">("bottom");
   /** Distancia (px) entre el tooltip y el icono. */
-  @Input() sideOffset = 8;
+  readonly sideOffset = input<number>(8);
   /** Alineación del tooltip. */
-  @Input() align: 'start' | 'center' | 'end' = 'start';
+  readonly align = input<"start" | "center" | "end">("start");
   /** Retraso (ms) para mostrar el tooltip. */
-  @Input() delayDuration = 200;
+  readonly delayDuration = input<number>(200);
 
-  get tooltipClassName(): string {
-    return this.className;
-  }
+  readonly tooltipClassName = computed<string>(() => this.className());
 
   stopPropagation(event: MouseEvent): void {
     event.stopPropagation();

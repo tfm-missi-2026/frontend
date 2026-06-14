@@ -10,7 +10,7 @@ import {
   FormGroup,
 } from '@angular/forms';
 
-import { InputComponent } from '@ui/input/input/input';
+import { UiInputComponent } from '@ui/input/input/input';
 import { IconProps } from '@ui/icon/icon.interface';
 import { Component } from '@angular/core';
 
@@ -74,16 +74,16 @@ class EyeIconComponent {
   color?: string;
 }
 
-const meta: Meta<InputComponent> = {
+const meta: Meta<UiInputComponent> = {
   title: 'Shared/Input',
-  component: InputComponent,
+  component: UiInputComponent,
   decorators: [
     moduleMetadata({
       imports: [
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
-        InputComponent,
+        UiInputComponent,
         SearchIconComponent,
         EyeIconComponent,
       ],
@@ -127,7 +127,7 @@ const meta: Meta<InputComponent> = {
 
 export default meta;
 
-type Story = StoryObj<InputComponent>;
+type Story = StoryObj<UiInputComponent>;
 
 // ---------------------------------------------------------------------------
 // Default
@@ -282,19 +282,19 @@ export const ReactiveFormExample: Story = {
       props: { form },
       template: `
         <form [formGroup]="form" class="space-y-3 max-w-sm">
-          <Input
+          <UiInput
             formControlName="email"
             labelText="Email"
             type="email"
             placeholder="tu@correo.com"
             [required]="true"
-          ></Input>
-          <Input
+          ></UiInput>
+          <UiInput
             formControlName="password"
             labelText="Contraseña"
             type="password"
             placeholder="••••••••"
-          ></Input>
+          ></UiInput>
           <pre class="text-xs">{{ form.value | json }}</pre>
         </form>
       `,
@@ -311,11 +311,11 @@ export const NgModelExample: Story = {
     props: { value: 'two-way bound' },
     template: `
       <div class="space-y-2 max-w-sm">
-        <Input
+        <UiInput
           [(value)]="value"
           labelText="Two-way binding"
           placeholder="Escribe algo"
-        ></Input>
+        ></UiInput>
         <pre class="text-xs">value = "{{ value }}"</pre>
       </div>
     `,

@@ -1,184 +1,129 @@
 import {
-  Component,
-  Input,
-  Output,
-  EventEmitter,
-  forwardRef,
-  HostListener,
-  ElementRef,
-  ViewChild,
-  OnInit,
-  OnChanges,
-  SimpleChanges,
-  OnDestroy,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
+  Component,
+  computed,
+  ElementRef,
+  forwardRef,
+  HostListener,
   inject,
+  input,
+  OnDestroy,
+  OnInit,
+  output,
+  signal,
+  viewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgClass } from '@angular/common';
 import {
   ControlValueAccessor,
-  NG_VALUE_ACCESSOR,
   FormsModule,
+  NG_VALUE_ACCESSOR,
 } from '@angular/forms';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import {
-  SelectOption,
-  SelectValue,
   LoadOptionsFn,
   MessageFn,
+  SelectOption,
+  SelectValue,
 } from './select.interface';
 
 /**
- * `SelectAsync`
- * --------------
+ * `UiSelect`
+ * ----------
  * Select con búsqueda, async, creatable, clearable, single/multi, error,
  * disabled/readOnly, required, etc.
  *
  * Implementa `ControlValueAccessor` por lo que se puede usar con
  * `[(ngModel)]`, `formControl` y `formControlName`.
+ *
+ * API signal-based (Angular 17.1+).
  */
 @Component({
-  selector: 'SelectAsync',
+  selector: 'UiSelect',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [NgClass, FormsModule],
   templateUrl: './select.html',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => SelectComponent),
+      useExisting: forwardRef(() => UiSelectComponent),
       multi: true,
     },
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SelectComponent
-  implements ControlValueAccessor, OnInit, OnChanges, OnDestroy
+export class UiSelectComponent
+  implements ControlValueAccessor, OnInit, OnDestroy
 {
   // ---------------------------------------------------------------------------
   // Inputs
   // ---------------------------------------------------------------------------
 
-  /** Lista de opciones a renderizar. */
-  @Input() options: SelectOption[] = [];
-  /** Texto mostrado cuando no hay selección. */
-  @Input() placeholder = 'Seleccionar';
-  /** Marca el campo como requerido (asterisco en el label). */
-  @Input() required = false;
-  /** Nombre del input para formularios nativos. */
-  @Input() name?: string;
-  /** Habilita selección múltiple. */
-  @Input() isMulti = false;
-  /** ID del input (útil para asociar label/htmlFor). */
-  @Input() inputId?: string;
-  /** Habilita el botón para limpiar el valor. */
-  @Input() isClearable = false;
-  /** Deshabilita el control. */
-  @Input() isDisabled = false;
-  /** Marca el control como solo lectura. */
-  @Input() readOnly = false;
-  /** Habilita input de búsqueda dentro del control. */
-  @Input() searchable = true;
-  /** Estado de carga externo (ej. controlado por el padre). */
-  @Input() isLoading = false;
-  /** Mensaje mostrado cuando `isLoading` es `true`. */
-  @Input() loadingMessage: MessageFn | string = () => 'Cargando...';
-  /** Mensaje mostrado cuando no hay opciones disponibles. */
-  @Input() noOptionsMessage: MessageFn | string = () => 'Sin resultados';
-  /** Función que decide si una opción está deshabilitada. */
-  @Input() isOptionDisabled?: (option: SelectOption) => boolean;
-  /** Posición CSS del menú. */
-  @Input() menuPosition: 'absolute' | 'fixed' = 'absolute';
-  /** Estado controlado del menú (si se define, anula el interno). */
-  @Input() menuIsOpen?: boolean;
-  /** Clases extra para el contenedor raíz. */
-  @Input() className = '';
-  /** Si `true`, presionar `Tab` selecciona la opción enfocada. */
-  @Input() tabSelectsValue = true;
-  /** Habilita creación de nuevas opciones. */
-  @Input() creatable = false;
-  /** Habilita el modo asíncrono (requiere `loadOptions`). */
-  @Input() async = false;
-  /** Función para cargar opciones en modo asíncrono. */
-  @Input() loadOptions?: LoadOptionsFn;
-  /** Ancho del contenedor (`width` CSS). */
-  @Input() width?: string;
-  /** Ancho mínimo del contenedor. */
-  @Input() minWidth?: string;
-  /** Cierra el menú al seleccionar (en single). */
-  @Input() closeOnSelect = true;
-  /** Opciones por defecto para el modo async (true = cargar al montar). */
-  @Input() defaultOptions?: SelectOption[] | boolean;
-
-  // ---------------------------------------------------------------------------
-  // Inputs — extensiones del design system
-  // ---------------------------------------------------------------------------
+  readonly options = input<SelectOption[]>([]);
+  readonly placeholder = input<string>('Seleccionar');
+  readonly required = input<boolean>(false);
+  readonly name = input<string | undefined>(undefined);
+  readonly isMulti = input<boolean>(false);
+  readonly inputId = input<string | undefined>(undefined);
+  readonly isClearable = input<boolean>(false);
+  readonly isDisabled = input<boolean>(false);
+  readonly readOnly = input<boolean>(false);
+  readonly searchable = input<boolean>(true);
+  readonly isLoading = input<boolean>(false);
+  readonly loadingMessage = input<MessageFn | string>(() => 'Cargando...');
+  readonly noOptionsMessage = input<MessageFn | string>(() => 'Sin resultados');
+  readonly isOptionDisabled = input<
+    ((option: SelectOption) => boolean) | undefined
+  >(undefined);
+  readonly menuPosition = input<'absolute' | 'fixed'>('absolute');
+  readonly menuIsOpen = input<boolean | undefined>(undefined);
+  readonly className = input<string>('');
+  readonly tabSelectsValue = input<boolean>(true);
+  readonly creatable = input<boolean>(false);
+  readonly async = input<boolean>(false);
+  readonly loadOptions = input<LoadOptionsFn | undefined>(undefined);
+  readonly width = input<string | undefined>(undefined);
+  readonly minWidth = input<string | undefined>(undefined);
+  readonly closeOnSelect = input<boolean>(true);
+  readonly defaultOptions = input<SelectOption[] | boolean | undefined>(
+    undefined,
+  );
 
   /** Texto del label. */
-  @Input() labelText = '';
+  readonly labelText = input<string>('');
   /** Tooltip mostrado al lado del label. */
-  @Input() tooltip?: string;
+  readonly tooltip = input<string | undefined>(undefined);
   /** Mensaje de error (colorea el borde y muestra un ícono). */
-  @Input() errorMessage?: string;
+  readonly errorMessage = input<string | undefined>(undefined);
   /** Si `true`, el menú se abre con focus automático en el input. */
-  @Input() autoFocus = false;
+  readonly autoFocus = input<boolean>(false);
   /** Tiempo de debounce para el modo async (ms). */
-  @Input() debounceMs = 300;
-
-  // ---------------------------------------------------------------------------
-  // Aliases retro-compatibles (estilo Angular clásico)
-  // ---------------------------------------------------------------------------
-
-  @Input() set multiple(v: boolean) {
-    this.isMulti = v;
-  }
-  get multiple(): boolean {
-    return this.isMulti;
-  }
-
-  @Input() set disabled(v: boolean) {
-    this.isDisabled = v;
-  }
-  get disabled(): boolean {
-    return this.isDisabled;
-  }
-
-  @Input() set loading(v: boolean) {
-    this.isLoading = v;
-  }
-  get loading(): boolean {
-    return this.isLoading;
-  }
-
-  @Input() set label(v: string) {
-    this.labelText = v;
-  }
-  get label(): string {
-    return this.labelText;
-  }
+  readonly debounceMs = input<number>(300);
 
   // ---------------------------------------------------------------------------
   // Outputs
   // ---------------------------------------------------------------------------
 
-  @Output() selectionChange = new EventEmitter<any>();
-  @Output() menuOpenChange = new EventEmitter<boolean>();
-  @Output() searchChange = new EventEmitter<string>();
-  @Output() createOption = new EventEmitter<SelectOption>();
-  @Output() blur = new EventEmitter<void>();
-  @Output() focus = new EventEmitter<void>();
+  readonly selectionChange = output<unknown>();
+  readonly menuOpenChange = output<boolean>();
+  readonly searchChange = output<string>();
+  readonly createOption = output<SelectOption>();
+  readonly blur = output<void>();
+  readonly focus = output<void>();
 
   // ---------------------------------------------------------------------------
   // Estado interno
   // ---------------------------------------------------------------------------
 
-  @ViewChild('searchInputRef') searchInputRef?: ElementRef<HTMLInputElement>;
-  @ViewChild('rootRef') rootRef?: ElementRef<HTMLElement>;
+  readonly searchInputRef =
+    viewChild<ElementRef<HTMLInputElement>>('searchInputRef');
+  readonly rootRef = viewChild<ElementRef<HTMLElement>>('rootRef');
 
   /** Valor crudo (puede ser primitivo, array u objeto opción). */
-  value: any = null;
+  value: unknown = null;
 
   /** Texto de búsqueda inmediato (lo que ve el input). */
   searchInput = '';
@@ -187,13 +132,25 @@ export class SelectComponent
   search = '';
 
   /** Estado interno del menú (cuando no se controla con `menuIsOpen`). */
-  internalOpen = false;
+  private readonly _internalOpen = signal(false);
 
   /** Estado interno de carga (para `loadOptions` async). */
   internalLoading = false;
 
   /** Índice de la opción enfocada en el menú. */
   focusedIndex = -1;
+
+  /**
+   * Override interno de `options()` (para `createFromInput` y async load).
+   * Si está definido, se usa en lugar del input. El input se ignora.
+   */
+  private readonly _optionsOverride = signal<SelectOption[] | null>(null);
+
+  /**
+   * Override interno de `isDisabled()` (para `setDisabledState`).
+   * Si está definido, se usa en lugar del input.
+   */
+  private readonly _isDisabledOverride = signal<boolean | null>(null);
 
   private searchSubject = new Subject<string>();
   private searchSub?: Subscription;
@@ -203,37 +160,23 @@ export class SelectComponent
   // ControlValueAccessor
   // ---------------------------------------------------------------------------
 
-  private onChangeFn: (value: any) => void = () => {};
+  private onChangeFn: (value: unknown) => void = () => {};
   private onTouchedFn: () => void = () => {};
-
-  // ===========================================================================
-  // Lifecycle
-  // ===========================================================================
 
   ngOnInit(): void {
     this.searchSub = this.searchSubject
-      .pipe(
-        debounceTime(this.debounceMs),
-        distinctUntilChanged(),
-      )
+      .pipe(debounceTime(this.debounceMs()), distinctUntilChanged())
       .subscribe((term) => {
         this.search = term;
         this.searchChange.emit(term);
-        if (this.async && this.loadOptions) {
+        if (this.async() && this.loadOptions()) {
           void this.runLoadOptions(term);
         }
         this.cdr.markForCheck();
       });
 
-    // Cargar opciones por defecto en modo async
-    if (this.async && this.loadOptions && this.defaultOptions === true) {
+    if (this.async() && this.loadOptions() && this.defaultOptions() === true) {
       void this.runLoadOptions('');
-    }
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['options']) {
-      this.focusedIndex = this.filteredOptions.length > 0 ? 0 : -1;
     }
   }
 
@@ -241,88 +184,81 @@ export class SelectComponent
     this.searchSub?.unsubscribe();
   }
 
-  // ===========================================================================
-  // View bindings
-  // ===========================================================================
+  // ---------------------------------------------------------------------------
+  // View bindings (computed)
+  // ---------------------------------------------------------------------------
 
-  /** Estado del menú (controlado o interno). */
-  get isOpen(): boolean {
-    return this.menuIsOpen !== undefined ? !!this.menuIsOpen : this.internalOpen;
-  }
+  /** `options` efectivo (override del CVA si está, sino el input). */
+  readonly effectiveOptions = computed<SelectOption[]>(
+    () => this._optionsOverride() ?? this.options(),
+  );
 
-  set isOpen(v: boolean) {
-    if (this.menuIsOpen !== undefined) return; // controlado, no hacer nada
-    this.internalOpen = v;
-    this.menuOpenChange.emit(v);
-  }
+  /** `isDisabled` efectivo (override del CVA si está, sino el input). */
+  readonly effectiveIsDisabled = computed<boolean>(
+    () => this._isDisabledOverride() ?? this.isDisabled(),
+  );
 
-  /** Estado de carga efectivo. */
-  get showLoading(): boolean {
-    return this.isLoading || this.internalLoading;
-  }
+  readonly isOpen = computed<boolean>(() =>
+    this.menuIsOpen() !== undefined ? !!this.menuIsOpen() : this._internalOpen(),
+  );
 
-  /** Opciones filtradas por la búsqueda actual. */
-  get filteredOptions(): SelectOption[] {
-    if (this.async) return this.options;
+  readonly showLoading = computed<boolean>(
+    () => this.isLoading() || this.internalLoading,
+  );
+
+  readonly filteredOptions = computed<SelectOption[]>(() => {
+    if (this.async()) return this.effectiveOptions();
     const term = this.searchInput?.trim().toLowerCase() ?? '';
-    if (!term) return this.options;
-    return this.options.filter((opt) =>
+    if (!term) return this.effectiveOptions();
+    return this.effectiveOptions().filter((opt) =>
       opt.label.toLowerCase().includes(term),
     );
-  }
+  });
 
-  /** Opciones seleccionadas como objetos (modo multi). */
-  get selectedOptions(): SelectOption[] {
-    if (!this.isMulti) return [];
+  readonly selectedOptions = computed<SelectOption[]>(() => {
+    if (!this.isMulti()) return [];
     const arr = Array.isArray(this.value) ? this.value : [];
-    return this.options.filter((o) =>
+    return this.effectiveOptions().filter((o) =>
       (arr as (string | number)[]).includes(o.value as string | number),
     );
-  }
+  });
 
-  /** Opción seleccionada (modo single). */
-  get selectedOption(): SelectOption | null {
-    if (this.isMulti) return null;
-    if (this.value && typeof this.value === 'object' && 'label' in this.value) {
+  readonly selectedOption = computed<SelectOption | null>(() => {
+    if (this.isMulti()) return null;
+    if (this.value && typeof this.value === 'object' && 'label' in (this.value as object)) {
       return this.value as SelectOption;
     }
-    return (
-      this.options.find((o) => o.value === this.value) ?? null
-    );
-  }
+    return this.effectiveOptions().find((o) => o.value === this.value) ?? null;
+  });
 
-  /** Label visible en modo single. */
-  get displayLabel(): string {
-    return this.selectedOption?.label ?? '';
-  }
+  readonly displayLabel = computed<string>(
+    () => this.selectedOption()?.label ?? '',
+  );
 
-  /** Determina si hay valor (single o multi). */
-  get hasValue(): boolean {
-    if (this.isMulti) return Array.isArray(this.value) && this.value.length > 0;
+  readonly hasValue = computed<boolean>(() => {
+    if (this.isMulti()) return Array.isArray(this.value) && this.value.length > 0;
     return this.value !== null && this.value !== undefined && this.value !== '';
-  }
+  });
 
-  /** Sincroniza el alias de salida `onChange` con la API del `ControlValueAccessor`. */
-  onChange(value: any) {
+  onChange(value: unknown): void {
     this.onChangeFn(value);
   }
 
-  /** Sincroniza el alias de salida `onTouched` con la API del `ControlValueAccessor`. */
-  onTouched() {
+  onTouched(): void {
     this.onTouchedFn();
   }
 
-  // ===========================================================================
+  // ---------------------------------------------------------------------------
   // Helpers de UI
-  // ===========================================================================
+  // ---------------------------------------------------------------------------
 
   resolveMessage(msg: MessageFn | string | undefined): string {
     if (!msg) return '';
-    return typeof msg === 'function' ? msg() : msg;
+    return typeof msg === 'function' ? (msg as MessageFn)() : (msg as string);
   }
 
   isSelected(option: SelectOption): boolean {
-    if (this.isMulti) {
+    if (this.isMulti()) {
       const arr = Array.isArray(this.value) ? this.value : [];
       return (arr as (string | number)[]).includes(option.value as string | number);
     }
@@ -334,9 +270,10 @@ export class SelectComponent
 
   isOptionDisabledFn(option: SelectOption): boolean {
     if (option.disabled) return true;
-    if (this.isOptionDisabled) {
+    const fn = this.isOptionDisabled();
+    if (fn) {
       try {
-        return !!this.isOptionDisabled(option);
+        return !!fn(option);
       } catch {
         return false;
       }
@@ -344,17 +281,17 @@ export class SelectComponent
     return false;
   }
 
-  trackByValue = (_: number, opt: SelectOption) => opt.value;
+  trackByValue = (_: number, opt: SelectOption): unknown => opt.value;
 
-  // ===========================================================================
+  // ---------------------------------------------------------------------------
   // Interacción
-  // ===========================================================================
+  // ---------------------------------------------------------------------------
 
   onControlClick(): void {
-    if (this.isDisabled || this.readOnly) return;
-    this.isOpen = !this.isOpen;
-    if (this.isOpen) {
-      queueMicrotask(() => this.searchInputRef?.nativeElement.focus());
+    if (this.effectiveIsDisabled() || this.readOnly()) return;
+    this.setOpen(!this.isOpen());
+    if (this.isOpen()) {
+      queueMicrotask(() => this.searchInputRef()?.nativeElement.focus());
     }
   }
 
@@ -363,38 +300,47 @@ export class SelectComponent
   }
 
   onInputBlur(): void {
-    // El cierre del menú se hace en el HostListener del document.
     this.onTouchedFn();
     this.blur.emit();
   }
 
   onSearchInput(value: string): void {
     this.searchInput = value;
-    if (!this.isOpen) this.isOpen = true;
+    if (!this.isOpen()) this.setOpen(true);
     this.searchSubject.next(value);
   }
 
+  setOpen(v: boolean): void {
+    if (this.menuIsOpen() !== undefined) return;
+    this._internalOpen.set(v);
+    this.menuOpenChange.emit(v);
+  }
+
   onKeyDown(event: KeyboardEvent): void {
-    if (this.isDisabled || this.readOnly) return;
+    if (this.effectiveIsDisabled() || this.readOnly()) return;
 
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault();
-        this.isOpen = true;
+        this.setOpen(true);
         this.moveFocus(1);
         break;
       case 'ArrowUp':
         event.preventDefault();
-        this.isOpen = true;
+        this.setOpen(true);
         this.moveFocus(-1);
         break;
       case 'Enter': {
         event.preventDefault();
-        if (this.creatable && this.searchInput.trim() && this.filteredOptions.length === 0) {
+        if (
+          this.creatable() &&
+          this.searchInput.trim() &&
+          this.filteredOptions().length === 0
+        ) {
           this.createFromInput();
           return;
         }
-        const opt = this.filteredOptions[this.focusedIndex];
+        const opt = this.filteredOptions()[this.focusedIndex];
         if (opt && !this.isOptionDisabledFn(opt)) {
           this.selectOption(opt);
         }
@@ -402,24 +348,24 @@ export class SelectComponent
       }
       case 'Escape':
         event.preventDefault();
-        this.isOpen = false;
+        this.setOpen(false);
         break;
       case 'Tab':
-        if (this.tabSelectsValue && this.isOpen) {
-          const opt = this.filteredOptions[this.focusedIndex];
+        if (this.tabSelectsValue() && this.isOpen()) {
+          const opt = this.filteredOptions()[this.focusedIndex];
           if (opt && !this.isOptionDisabledFn(opt)) {
             event.preventDefault();
             this.selectOption(opt);
           } else {
-            this.isOpen = false;
+            this.setOpen(false);
           }
         } else {
-          this.isOpen = false;
+          this.setOpen(false);
         }
         break;
       case 'Backspace':
         if (
-          this.isMulti &&
+          this.isMulti() &&
           !this.searchInput &&
           Array.isArray(this.value) &&
           this.value.length > 0
@@ -431,7 +377,7 @@ export class SelectComponent
   }
 
   moveFocus(direction: 1 | -1): void {
-    const list = this.filteredOptions;
+    const list = this.filteredOptions();
     if (!list.length) {
       this.focusedIndex = -1;
       return;
@@ -461,7 +407,7 @@ export class SelectComponent
     if (event) event.stopPropagation();
     if (this.isOptionDisabledFn(option)) return;
 
-    if (this.isMulti) {
+    if (this.isMulti()) {
       const arr = Array.isArray(this.value) ? [...this.value] : [];
       const idx = (arr as (string | number)[]).indexOf(
         option.value as string | number,
@@ -477,7 +423,6 @@ export class SelectComponent
       this.searchInput = '';
       this.search = '';
       this.searchSubject.next('');
-      // Mantener el menú abierto en multi
     } else {
       this.value = option.value;
       this.onChangeFn(this.value);
@@ -485,7 +430,7 @@ export class SelectComponent
       this.searchInput = '';
       this.search = '';
       this.searchSubject.next('');
-      if (this.closeOnSelect) this.isOpen = false;
+      if (this.closeOnSelect()) this.setOpen(false);
     }
   }
 
@@ -504,8 +449,8 @@ export class SelectComponent
       event.stopPropagation();
       event.preventDefault();
     }
-    if (this.isDisabled || this.readOnly) return;
-    this.value = this.isMulti ? [] : null;
+    if (this.effectiveIsDisabled() || this.readOnly()) return;
+    this.value = this.isMulti() ? [] : null;
     this.searchInput = '';
     this.search = '';
     this.searchSubject.next('');
@@ -516,11 +461,8 @@ export class SelectComponent
   createFromInput(): void {
     const label = this.searchInput.trim();
     if (!label) return;
-    const newOption: SelectOption = {
-      value: label,
-      label,
-    };
-    this.options = [...this.options, newOption];
+    const newOption: SelectOption = { value: label, label };
+    this._optionsOverride.set([...this.effectiveOptions(), newOption]);
     this.createOption.emit(newOption);
     this.selectOption(newOption);
   }
@@ -530,30 +472,30 @@ export class SelectComponent
   // ---------------------------------------------------------------------------
 
   private async runLoadOptions(term: string): Promise<void> {
-    if (!this.loadOptions) return;
+    const fn = this.loadOptions();
+    if (!fn) return;
     this.internalLoading = true;
     this.cdr.markForCheck();
     try {
-      const result = await this.loadOptions(term);
-      this.options = result ?? [];
-      this.focusedIndex = this.options.length > 0 ? 0 : -1;
+      const result = await fn(term);
+      this._optionsOverride.set(result ?? []);
+      this.focusedIndex = (result ?? []).length > 0 ? 0 : -1;
     } catch {
-      this.options = [];
+      this._optionsOverride.set([]);
     } finally {
       this.internalLoading = false;
       this.cdr.markForCheck();
     }
   }
 
-  // ===========================================================================
+  // ---------------------------------------------------------------------------
   // ControlValueAccessor
-  // ===========================================================================
+  // ---------------------------------------------------------------------------
 
   writeValue(value: SelectValue): void {
-    if (this.isMulti) {
+    if (this.isMulti()) {
       this.value = Array.isArray(value) ? value : [];
     } else if (value && typeof value === 'object' && !Array.isArray(value)) {
-      // Si llega un objeto-option, lo aceptamos y normalizamos a primitivo
       this.value = (value as SelectOption).value;
     } else {
       this.value = value ?? null;
@@ -561,7 +503,7 @@ export class SelectComponent
     this.cdr.markForCheck();
   }
 
-  registerOnChange(fn: (value: any) => void): void {
+  registerOnChange(fn: (value: unknown) => void): void {
     this.onChangeFn = fn;
   }
 
@@ -570,7 +512,7 @@ export class SelectComponent
   }
 
   setDisabledState(isDisabled: boolean): void {
-    this.isDisabled = isDisabled;
+    this._isDisabledOverride.set(isDisabled);
     this.cdr.markForCheck();
   }
 
@@ -580,10 +522,10 @@ export class SelectComponent
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    const root = this.rootRef?.nativeElement;
+    const root = this.rootRef()?.nativeElement;
     if (!root) return;
     if (!root.contains(event.target as Node)) {
-      this.isOpen = false;
+      this.setOpen(false);
     }
   }
 }

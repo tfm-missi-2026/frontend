@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/angular';
-import { CheckboxComponent } from '@ui/input/checkbox/checkbox';
+import { UiCheckboxComponent } from '@ui/input/checkbox/checkbox';
 
-const meta: Meta<CheckboxComponent> = {
+const meta: Meta<UiCheckboxComponent> = {
   title: 'Shared/Checkbox',
-  component: CheckboxComponent,
+  component: UiCheckboxComponent,
   tags: ['autodocs'],
 
   argTypes: {
@@ -18,7 +18,7 @@ const meta: Meta<CheckboxComponent> = {
 
 export default meta;
 
-type Story = StoryObj<CheckboxComponent>;
+type Story = StoryObj<UiCheckboxComponent>;
 
 export const Default: Story = {
   args: {
@@ -31,7 +31,7 @@ export const Default: Story = {
     props: args,
     template: `
       <div class="p-6">
-        <Checkbox
+        <UiCheckbox
           [label]="label"
           [checked]="checked"
           [disabled]="disabled"
@@ -47,8 +47,8 @@ export const CheckedStates: Story = {
   render: () => ({
     template: `
       <div class="p-6 space-y-4">
-        <Checkbox label="Unchecked" [checked]="false" id="c1" />
-        <Checkbox label="Checked" [checked]="true" id="c2" />
+        <UiCheckbox label="Unchecked" [checked]="false" id="c1" />
+        <UiCheckbox label="Checked" [checked]="true" id="c2" />
       </div>
     `,
   }),
@@ -58,8 +58,8 @@ export const DisabledStates: Story = {
   render: () => ({
     template: `
       <div class="p-6 space-y-4">
-        <Checkbox label="Disabled unchecked" [disabled]="true" />
-        <Checkbox label="Disabled checked" [disabled]="true" [checked]="true" />
+        <UiCheckbox label="Disabled unchecked" [disabled]="true" />
+        <UiCheckbox label="Disabled checked" [disabled]="true" [checked]="true" />
       </div>
     `,
   }),
@@ -71,9 +71,9 @@ export const Group: Story = {
       <div class="p-6 space-y-3">
         <p class="text-sm font-semibold">Select options</p>
 
-        <Checkbox label="Email notifications" id="g1" />
-        <Checkbox label="Push notifications" id="g2" />
-        <Checkbox label="SMS notifications" id="g3" />
+        <UiCheckbox label="Email notifications" id="g1" />
+        <UiCheckbox label="Push notifications" id="g2" />
+        <UiCheckbox label="SMS notifications" id="g3" />
       </div>
     `,
   }),
@@ -83,7 +83,7 @@ export const Interactive: Story = {
   render: () => ({
     template: `
       <div class="p-6 space-y-3">
-        <Checkbox
+        <UiCheckbox
           label="Interactive checkbox"
           [checked]="checked"
           (checkedChange)="checked = $event"
@@ -101,9 +101,9 @@ export const DarkMode: Story = {
   render: () => ({
     template: `
       <div class="p-6 space-y-4 bg-gray-900 text-white rounded-lg">
-        <Checkbox label="Dark mode checkbox" />
-        <Checkbox label="Checked dark mode" [checked]="true" />
-        <Checkbox label="Disabled dark mode" [disabled]="true" />
+        <UiCheckbox label="Dark mode checkbox" />
+        <UiCheckbox label="Checked dark mode" [checked]="true" />
+        <UiCheckbox label="Disabled dark mode" [disabled]="true" />
       </div>
     `,
   }),

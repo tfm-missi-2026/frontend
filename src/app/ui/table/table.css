@@ -1,0 +1,18 @@
+/* Estilos del Table.
+ * Lo mínimo posible — casi todo se resuelve con utility classes de
+ * Tailwind en `table.html`. Estos estilos complementan lo que no es
+ * práctico de expresar inline (hover de filas + alineación de
+ * checkbox de select-all).
+ */
+
+.table-row {
+  transition: background-color 120ms ease-out;
+}
+
+.table-row:hover {
+  background-color: var(--color-gray-50, rgb(249 250 251));
+}
+
+:host-context(.dark) .table-row:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}

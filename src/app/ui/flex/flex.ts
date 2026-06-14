@@ -1,5 +1,9 @@
-import { Component, Input } from '@angular/core';
-import { NgClass, NgStyle } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 
 /**
  * Tipo equivalente a `CSSProperties['flexDirection']`.
@@ -17,58 +21,64 @@ export type FlexDirection =
   | 'unset';
 
 /**
- * `Flex`
- * ------
+ * `UiFlex`
+ * --------
  * Contenedor `display: flex` parametrizable.
- * Las "custom props" no se filtran al DOM porque en Angular los `@Input`
- * no se reenvían como atributos HTML.
+ * Las "custom props" no se filtran al DOM porque en Angular los
+ * `input()` signals no se reenvían como atributos HTML.
+ *
+ * API signal-based (Angular 17.1+).
  */
 @Component({
-  selector: 'Flex',
+  selector: 'UiFlex',
   standalone: true,
-  imports: [NgClass, NgStyle],
-  templateUrl: './flex.html',
-  styleUrls: ['./flex.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <div [class]="classes()" [style]="styles()">
+      <ng-content />
+    </div>
+  `,
 })
-export class FlexComponent {
+export class UiFlexComponent {
   /** Dirección del eje principal. */
-  @Input() direction: FlexDirection = 'row';
+  readonly direction = input<FlexDirection>('row');
   /** `justify-content` (CSS). */
-  @Input() justifyContent?: string;
+  readonly justifyContent = input<string | undefined>(undefined);
   /** `align-items` (CSS). */
-  @Input() alignItems?: string;
+  readonly alignItems = input<string | undefined>(undefined);
   /** `gap` (CSS). */
-  @Input() gap?: string;
+  readonly gap = input<string | undefined>(undefined);
   /** `flex` shorthand (CSS). */
-  @Input() flex?: string;
+  readonly flex = input<string | undefined>(undefined);
   /** `overflow` (CSS). */
-  @Input() overflow?: string;
+  readonly overflow = input<string | undefined>(undefined);
   /** Si `true`, `flex-wrap: nowrap` (por defecto `wrap`). */
-  @Input() noWrap = false;
+  readonly noWrap = input<boolean>(false);
   /** Si `true`, añade `min-width: 0` (row) o `min-height: 0` (column). */
-  @Input() shrinkable = false;
+  readonly shrinkable = input<boolean>(false);
   /** Clases extra para el contenedor. */
-  @Input() className = '';
+  readonly className = input<string>('');
 
-  get classes(): string {
-    return `flex ${this.className}`.trim();
-  }
+  /** Clases del contenedor (`flex` + extras del consumidor). */
+  readonly classes = computed<string>(() => `flex ${this.className()}`.trim());
 
-  get styles(): Record<string, string> {
+  /** Estilos inline del contenedor. */
+  readonly styles = computed<Record<string, string>>(() => {
+    const dir = this.direction();
     return {
       display: 'flex',
-      'flex-direction': this.direction,
-      'flex-wrap': this.noWrap ? 'nowrap' : 'wrap',
-      overflow: this.overflow ?? '',
-      flex: this.flex ?? '',
-      gap: this.gap ?? '',
-      'justify-content': this.justifyContent ?? '',
-      'align-items': this.alignItems ?? '',
-      ...(this.shrinkable
-        ? this.direction === 'row'
+      'flex-direction': dir,
+      'flex-wrap': this.noWrap() ? 'nowrap' : 'wrap',
+      overflow: this.overflow() ?? '',
+      flex: this.flex() ?? '',
+      gap: this.gap() ?? '',
+      'justify-content': this.justifyContent() ?? '',
+      'align-items': this.alignItems() ?? '',
+      ...(this.shrinkable()
+        ? dir === 'row'
           ? { 'min-width': '0' }
           : { 'min-height': '0' }
         : {}),
     };
-  }
+  });
 }

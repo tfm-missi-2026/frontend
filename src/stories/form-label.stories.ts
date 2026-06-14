@@ -1,37 +1,37 @@
 // form-label.stories.ts — FormLabel del design system
 
-import type { Meta, StoryObj } from '@storybook/angular';
-import { moduleMetadata } from '@storybook/angular';
-import { CommonModule } from '@angular/common';
+import type { Meta, StoryObj } from "@storybook/angular";
+import { moduleMetadata } from "@storybook/angular";
+import { CommonModule } from "@angular/common";
 
-import { FormLabelComponent } from '@ui/form-label/form-label';
-import { FontWeightType } from '@styles/types/typography';
+import { UiFormLabelComponent } from "@ui/form-label/form-label";
+import { FontWeightType } from "@styles/types/typography";
 
-const fontWeights: FontWeightType[] = ['regular', 'medium', 'semibold', 'bold'];
+const fontWeights: FontWeightType[] = ["regular", "medium", "semibold", "bold"];
 
-const meta: Meta<FormLabelComponent> = {
-  title: 'Shared/FormLabel',
-  component: FormLabelComponent,
+const meta: Meta<UiFormLabelComponent> = {
+  title: "Shared/FormLabel",
+  component: UiFormLabelComponent,
   decorators: [
     moduleMetadata({
-      imports: [CommonModule, FormLabelComponent],
+      imports: [CommonModule, UiFormLabelComponent],
     }),
   ],
-  tags: ['autodocs'],
-  parameters: { layout: 'padded' },
+  tags: ["autodocs"],
+  parameters: { layout: "padded" },
   argTypes: {
-    labelText: { control: 'text' },
-    labelFor: { control: 'text' },
-    required: { control: 'boolean' },
-    disabled: { control: 'boolean' },
-    readOnly: { control: 'boolean' },
-    weight: { control: 'select', options: [...fontWeights, null] },
-    wrapText: { control: 'boolean' },
-    tooltip: { control: 'text' },
+    labelText: { control: "text" },
+    labelFor: { control: "text" },
+    required: { control: "boolean" },
+    disabled: { control: "boolean" },
+    readOnly: { control: "boolean" },
+    weight: { control: "select", options: [...fontWeights, null] },
+    wrapText: { control: "boolean" },
+    tooltip: { control: "text" },
   },
   args: {
-    labelText: 'Email',
-    labelFor: 'email',
+    labelText: "Email",
+    labelFor: "email",
     required: false,
     disabled: false,
     readOnly: false,
@@ -41,7 +41,7 @@ const meta: Meta<FormLabelComponent> = {
 
 export default meta;
 
-type Story = StoryObj<FormLabelComponent>;
+type Story = StoryObj<UiFormLabelComponent>;
 
 // ---------------------------------------------------------------------------
 // Default
@@ -59,11 +59,11 @@ export const Required: Story = {
     props: args,
     template: `
       <div class="space-y-1">
-        <FormLabel
+        <UiFormLabel
           [labelText]="labelText"
           [labelFor]="labelFor"
           [required]="required"
-        ></FormLabel>
+        ></UiFormLabel>
         <input
           id="{{ labelFor }}"
           type="email"
@@ -93,7 +93,7 @@ export const ReadOnly: Story = {
 
 export const WithTooltip: Story = {
   args: {
-    tooltip: 'Este correo se usará para enviarte notificaciones importantes.',
+    tooltip: "Este correo se usará para enviarte notificaciones importantes.",
   },
 };
 
@@ -104,7 +104,7 @@ export const WithTooltip: Story = {
 export const RequiredWithTooltip: Story = {
   args: {
     required: true,
-    tooltip: 'Tu contraseña debe tener al menos 8 caracteres.',
+    tooltip: "Tu contraseña debe tener al menos 8 caracteres.",
   },
 };
 
@@ -119,7 +119,7 @@ export const FontWeights: Story = {
         @for (w of weights; track w) {
           <div class="flex items-baseline gap-4">
             <span class="w-24 text-xs text-gray-500">{{ w }}</span>
-            <FormLabel labelText="The quick brown fox" labelFor="fw" [weight]="w"></FormLabel>
+            <UiFormLabel labelText="The quick brown fox" labelFor="fw" [weight]="w"></UiFormLabel>
           </div>
         }
       </div>
@@ -135,19 +135,19 @@ export const FontWeights: Story = {
 export const WrapText: Story = {
   args: {
     labelText:
-      'Etiqueta muy larga que demuestra el comportamiento de wrapText cuando el contenedor padre tiene un ancho limitado.',
-    labelFor: 'wrap',
+      "Etiqueta muy larga que demuestra el comportamiento de wrapText cuando el contenedor padre tiene un ancho limitado.",
+    labelFor: "wrap",
     wrapText: true,
   },
   render: (args) => ({
     props: args,
     template: `
       <div class="max-w-xs border rounded-lg p-3">
-        <FormLabel
+        <UiFormLabel
           [labelText]="labelText"
           [labelFor]="labelFor"
           [wrapText]="wrapText"
-        ></FormLabel>
+        ></UiFormLabel>
       </div>
     `,
   }),

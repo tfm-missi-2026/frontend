@@ -26,7 +26,7 @@
       @if (labelRender) {
         <ng-container *ngTemplateOutlet="labelRender"></ng-container>
       } @else if (label) {
-        <Label [type]="fontSize" [text]="label" weight="medium"></Label>
+        <UiLabel [type]="fontSize" [text]="label" weight="medium"></UiLabel>
       } @else {
         <ng-content></ng-content>
       }
@@ -55,7 +55,7 @@
       @if (labelRender) {
         <ng-container *ngTemplateOutlet="labelRender"></ng-container>
       } @else if (label) {
-        <Label [type]="fontSize" [text]="label" weight="medium"></Label>
+        <UiLabel [type]="fontSize" [text]="label" weight="medium"></UiLabel>
       } @else {
         <ng-content></ng-content>
       }
@@ -71,7 +71,7 @@
 
 <!-- Render condicional: Wrapper > Tooltip > button -->
 @if (showWrapper) {
-  <LoadingTimeoutWrapper
+  <UiLoadingTimeoutWrapper
     [variant]="variant"
     [styleType]="styleType"
     [fullWidth]="fullWidth"
@@ -80,25 +80,25 @@
     [className]="className"
   >
     @if (tooltip !== undefined && tooltip !== null) {
-      <Tooltip
+      <UiTooltip
         [content]="tooltip"
         [variant]="tooltipVariant"
         [side]="tooltipSide"
       >
         <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
-      </Tooltip>
+      </UiTooltip>
     } @else {
       <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
     }
-  </LoadingTimeoutWrapper>
+  </UiLoadingTimeoutWrapper>
 } @else if (tooltip !== undefined && tooltip !== null) {
-  <Tooltip
+  <UiTooltip
     [content]="tooltip"
     [variant]="tooltipVariant"
     [side]="tooltipSide"
   >
     <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
-  </Tooltip>
+  </UiTooltip>
 } @else {
   <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
 }

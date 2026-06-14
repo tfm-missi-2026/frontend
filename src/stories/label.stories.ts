@@ -4,8 +4,8 @@ import type { Meta, StoryObj } from '@storybook/angular';
 import { moduleMetadata } from '@storybook/angular';
 import { CommonModule } from '@angular/common';
 
-import { LabelComponent } from '@ui/label/label';
-import { TooltipComponent } from '@ui/tooltip/tooltip';
+import { UiLabelComponent } from '@ui/label/label';
+import { UiTooltipComponent } from '@ui/tooltip/tooltip';
 import { ColorType } from '@styles/types/colors';
 import { FontWeightType, TypographyType } from '@styles/types/typography';
 
@@ -36,12 +36,12 @@ const colors: ColorType[] = [
   'textWarning',
 ];
 
-const meta: Meta<LabelComponent> = {
+const meta: Meta<UiLabelComponent> = {
   title: 'Shared/Label',
-  component: LabelComponent,
+  component: UiLabelComponent,
   decorators: [
     moduleMetadata({
-      imports: [CommonModule, LabelComponent, TooltipComponent],
+      imports: [CommonModule, UiLabelComponent, UiTooltipComponent],
     }),
   ],
   tags: ['autodocs'],
@@ -89,7 +89,7 @@ const meta: Meta<LabelComponent> = {
 
 export default meta;
 
-type Story = StoryObj<LabelComponent>;
+type Story = StoryObj<UiLabelComponent>;
 
 // ---------------------------------------------------------------------------
 // Tipografía
@@ -102,7 +102,7 @@ export const TypographyTypes: Story = {
         @for (t of types; track t) {
           <div class="flex items-baseline gap-4">
             <span class="w-32 text-xs text-gray-500">{{ t }}</span>
-            <Label [type]="t" [text]="'The quick brown fox'" ></Label>
+            <UiLabel [type]="t" [text]="'The quick brown fox'" ></UiLabel>
           </div>
         }
       </div>
@@ -115,13 +115,13 @@ export const Headings: Story = {
   render: () => ({
     template: `
       <div class="p-6 space-y-2">
-        <Label type="HeadingTV" text="Heading TV" ></Label>
-        <Label type="HeadingXxl" text="Heading XXL" ></Label>
-        <Label type="HeadingXl" text="Heading XL" ></Label>
-        <Label type="HeadingL" text="Heading L" ></Label>
-        <Label type="HeadingM" text="Heading M" ></Label>
-        <Label type="HeadingS" text="Heading S" ></Label>
-        <Label type="HeadingXs" text="Heading XS" ></Label>
+        <UiLabel type="HeadingTV" text="Heading TV" ></UiLabel>
+        <UiLabel type="HeadingXxl" text="Heading XXL" ></UiLabel>
+        <UiLabel type="HeadingXl" text="Heading XL" ></UiLabel>
+        <UiLabel type="HeadingL" text="Heading L" ></UiLabel>
+        <UiLabel type="HeadingM" text="Heading M" ></UiLabel>
+        <UiLabel type="HeadingS" text="Heading S" ></UiLabel>
+        <UiLabel type="HeadingXs" text="Heading XS" ></UiLabel>
       </div>
     `,
   }),
@@ -138,7 +138,7 @@ export const FontWeights: Story = {
         @for (w of weights; track w) {
           <div class="flex items-baseline gap-4">
             <span class="w-24 text-xs text-gray-500">{{ w }}</span>
-            <Label type="HeadingM" [weight]="w" text="The quick brown fox" ></Label>
+            <UiLabel type="HeadingM" [weight]="w" text="The quick brown fox" ></UiLabel>
           </div>
         }
       </div>
@@ -158,7 +158,7 @@ export const Colors: Story = {
         @for (c of colors; track c) {
           <div class="flex items-baseline gap-4">
             <span class="w-32 text-xs text-gray-500">{{ c }}</span>
-            <Label [color]="c" text="The quick brown fox" ></Label>
+            <UiLabel [color]="c" text="The quick brown fox" ></UiLabel>
           </div>
         }
       </div>
@@ -177,7 +177,7 @@ export const Italic: Story = {
     props: args,
     template: `
       <div class="p-6">
-        <Label [text]="text" [italic]="italic" ></Label>
+        <UiLabel [text]="text" [italic]="italic" ></UiLabel>
       </div>
     `,
   }),
@@ -187,10 +187,10 @@ export const Alignment: Story = {
   render: () => ({
     template: `
       <div class="p-6 space-y-3 max-w-md border rounded-lg">
-        <Label align="left" text="Left aligned" ></Label>
-        <Label align="center" text="Center aligned" ></Label>
-        <Label align="right" text="Right aligned" ></Label>
-        <Label align="justify" text="Justified text spans multiple lines so you can see how the spacing is distributed between words when justify is applied." ></Label>
+        <UiLabel align="left" text="Left aligned" ></UiLabel>
+        <UiLabel align="center" text="Center aligned" ></UiLabel>
+        <UiLabel align="right" text="Right aligned" ></UiLabel>
+        <UiLabel align="justify" text="Justified text spans multiple lines so you can see how the spacing is distributed between words when justify is applied." ></UiLabel>
       </div>
     `,
   }),
@@ -209,11 +209,11 @@ export const NoWrap: Story = {
     props: args,
     template: `
       <div class="p-6 max-w-xs border rounded-lg">
-        <Label
+        <UiLabel
           [text]="text"
           [type]="type"
           [wrapText]="false"
-        ></Label>
+        ></UiLabel>
       </div>
     `,
   }),
@@ -228,11 +228,11 @@ export const WrapMultiLine: Story = {
     props: args,
     template: `
       <div class="p-6 max-w-xs border rounded-lg">
-        <Label
+        <UiLabel
           [text]="text"
           [type]="type"
           [wrapText]="true"
-        ></Label>
+        ></UiLabel>
       </div>
     `,
   }),
@@ -249,12 +249,12 @@ export const LineClamp: Story = {
     props: args,
     template: `
       <div class="p-6 max-w-xs border rounded-lg">
-        <Label
+        <UiLabel
           [text]="text"
           [type]="type"
           [wrapText]="wrapText"
           [wrapMaxLines]="wrapMaxLines"
-        ></Label>
+        ></UiLabel>
       </div>
     `,
   }),
@@ -271,12 +271,12 @@ export const LineClamp3: Story = {
     props: args,
     template: `
       <div class="p-6 max-w-md border rounded-lg">
-        <Label
+        <UiLabel
           [text]="text"
           [type]="type"
           [wrapText]="wrapText"
           [wrapMaxLines]="wrapMaxLines"
-        ></Label>
+        ></UiLabel>
       </div>
     `,
   }),
@@ -298,11 +298,11 @@ export const WithTooltipOnOverflow: Story = {
     props: args,
     template: `
       <div class="p-6 max-w-50 border rounded-lg">
-        <Label
+        <UiLabel
           [text]="text"
           [type]="type"
           [tooltipSide]="'top'"
-        ></Label>
+        ></UiLabel>
       </div>
     `,
   }),
@@ -319,12 +319,12 @@ export const WithTooltipClamped: Story = {
     props: args,
     template: `
       <div class="p-6 max-w-xs border rounded-lg">
-        <Label
+        <UiLabel
           [text]="text"
           [type]="type"
           [wrapText]="wrapText"
           [wrapMaxLines]="wrapMaxLines"
-        ></Label>
+        ></UiLabel>
       </div>
     `,
   }),
@@ -336,11 +336,11 @@ export const WithTooltipTop: Story = {
     props: args,
     template: `
       <div class="p-12 max-w-50 border rounded-lg">
-        <Label
+        <UiLabel
           [text]="text"
           [type]="type"
           [tooltipSide]="tooltipSide"
-        ></Label>
+        ></UiLabel>
       </div>
     `,
   }),
@@ -352,11 +352,11 @@ export const WithTooltipRight: Story = {
     props: args,
     template: `
       <div class="p-12 max-w-50 border rounded-lg">
-        <Label
+        <UiLabel
           [text]="text"
           [type]="type"
           [tooltipSide]="tooltipSide"
-        ></Label>
+        ></UiLabel>
       </div>
     `,
   }),
@@ -368,11 +368,11 @@ export const WithTooltipBottom: Story = {
     props: args,
     template: `
       <div class="p-12 max-w-50 border rounded-lg">
-        <Label
+        <UiLabel
           [text]="text"
           [type]="type"
           [tooltipSide]="tooltipSide"
-        ></Label>
+        ></UiLabel>
       </div>
     `,
   }),
@@ -384,11 +384,11 @@ export const WithTooltipLeft: Story = {
     props: args,
     template: `
       <div class="p-12 max-w-50 border rounded-lg">
-        <Label
+        <UiLabel
           [text]="text"
           [type]="type"
           [tooltipSide]="tooltipSide"
-        ></Label>
+        ></UiLabel>
       </div>
     `,
   }),
@@ -399,31 +399,31 @@ export const WithTooltipAllSides: Story = {
     template: `
       <div class="grid h-80 grid-cols-3 grid-rows-3 items-center justify-items-center gap-4 p-6">
         <div></div>
-        <Label
+        <UiLabel
           type="bodyS"
           text="${LONG_TEXT_FOR_TOOLTIP}"
           tooltipSide="top"
-        ></Label>
+        ></UiLabel>
         <div></div>
 
-        <Label
+        <UiLabel
           type="bodyS"
           text="${LONG_TEXT_FOR_TOOLTIP}"
           tooltipSide="left"
-        ></Label>
+        ></UiLabel>
         <div class="text-xs text-gray-500">center</div>
-        <Label
+        <UiLabel
           type="bodyS"
           text="${LONG_TEXT_FOR_TOOLTIP}"
           tooltipSide="right"
-        ></Label>
+        ></UiLabel>
 
         <div></div>
-        <Label
+        <UiLabel
           type="bodyS"
           text="${LONG_TEXT_FOR_TOOLTIP}"
           tooltipSide="bottom"
-        ></Label>
+        ></UiLabel>
         <div></div>
       </div>
     `,
@@ -436,12 +436,12 @@ export const WithTooltipDark: Story = {
     props: args,
     template: `
       <div class="dark bg-gray-900 p-12 max-w-50 rounded-lg">
-        <Label
+        <UiLabel
           [text]="text"
           [type]="type"
           [tooltipSide]="tooltipSide"
           color="textStrong"
-        ></Label>
+        ></UiLabel>
       </div>
     `,
   }),
@@ -457,10 +457,10 @@ export const RequiredField: Story = {
     props: args,
     template: `
       <div class="p-4 space-y-2 max-w-sm">
-        <Label [for]="for" [type]="type" [weight]="weight" [color]="'textStrong'">
+        <UiLabel [for]="for" [type]="type" [weight]="weight" [color]="'textStrong'">
           Email
           <span class="text-error-500">*</span>
-        </Label>
+        </UiLabel>
         <input
           id="{{ for }}"
           type="email"
@@ -476,13 +476,13 @@ export const DarkMode: Story = {
   render: () => ({
     template: `
       <div class="dark bg-gray-900 p-6 rounded-lg space-y-3">
-        <Label color="textStrong" text="Strong text" ></Label>
-        <Label color="textWeak" text="Weak text" ></Label>
-        <Label color="textWeakest" text="Weakest text" ></Label>
-        <Label color="textAction" text="Action / brand text" ></Label>
-        <Label color="textError" text="Error text" ></Label>
-        <Label color="textSuccess" text="Success text" ></Label>
-        <Label color="textWarning" text="Warning text" ></Label>
+        <UiLabel color="textStrong" text="Strong text" ></UiLabel>
+        <UiLabel color="textWeak" text="Weak text" ></UiLabel>
+        <UiLabel color="textWeakest" text="Weakest text" ></UiLabel>
+        <UiLabel color="textAction" text="Action / brand text" ></UiLabel>
+        <UiLabel color="textError" text="Error text" ></UiLabel>
+        <UiLabel color="textSuccess" text="Success text" ></UiLabel>
+        <UiLabel color="textWarning" text="Warning text" ></UiLabel>
       </div>
     `,
   }),
@@ -492,10 +492,10 @@ export const AsOverride: Story = {
   render: () => ({
     template: `
       <div class="p-6 space-y-2">
-        <Label as="span" type="bodyXs" text="Rendered as span" ></Label>
-        <Label as="p" type="bodyXs" text="Rendered as paragraph" ></Label>
-        <Label as="small" type="bodyXs" text="Rendered as small" ></Label>
-        <Label as="strong" type="bodyXs" text="Rendered as strong" ></Label>
+        <UiLabel as="span" type="bodyXs" text="Rendered as span" ></UiLabel>
+        <UiLabel as="p" type="bodyXs" text="Rendered as paragraph" ></UiLabel>
+        <UiLabel as="small" type="bodyXs" text="Rendered as small" ></UiLabel>
+        <UiLabel as="strong" type="bodyXs" text="Rendered as strong" ></UiLabel>
       </div>
     `,
   }),

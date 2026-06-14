@@ -1,22 +1,31 @@
-import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  output,
+} from '@angular/core';
 
+/**
+ * `UiCheckbox`
+ * ------------
+ * Checkbox accesible del design system. Standalone + OnPush + signal APIs.
+ */
 @Component({
-  selector: 'Checkbox',
+  selector: 'UiCheckbox',
   standalone: true,
-  imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './checkbox.html',
 })
-export class CheckboxComponent {
-  @Input() label?: string;
-  @Input() checked = false;
-  @Input() className = '';
-  @Input() id?: string;
-  @Input() disabled = false;
+export class UiCheckboxComponent {
+  readonly label = input<string | undefined>(undefined);
+  readonly checked = input<boolean>(false);
+  readonly className = input<string>('');
+  readonly id = input<string | undefined>(undefined);
+  readonly disabled = input<boolean>(false);
 
-  @Output() checkedChange = new EventEmitter<boolean>();
+  readonly checkedChange = output<boolean>();
 
-  onChange(event: Event) {
+  onChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.checkedChange.emit(input.checked);
   }

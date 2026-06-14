@@ -1,18 +1,19 @@
 import {
-  Component,
-  Input,
-  TemplateRef,
-  ViewChild,
-  ElementRef,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
+  Component,
+  computed,
+  ElementRef,
   HostListener,
-  OnDestroy,
   inject,
+  input,
+  OnDestroy,
+  TemplateRef,
+  viewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 
-import { TooltipVariantType, TooltipSide, TooltipAlign } from './tooltip.types';
+import { TooltipAlign, TooltipSide, TooltipVariantType } from './tooltip.types';
 
 // Re-exports para retro-compatibilidad con consumidores que importaban
 // el nombre antiguo.
@@ -26,8 +27,8 @@ export type TooltipVariant = TooltipVariantType;
  * añadir una variante sea una sola línea.
  */
 const VARIANT_CLASSES: Record<TooltipVariantType, string> = {
-  light: 'bg-white text-gray-800 border border-gray-200 ' + 'px-3 py-3 text-sm leading-5', // bodyS + spacing[3]
-  dark: 'bg-gray-900 text-white ' + 'px-2 py-1 text-xs leading-4.5', // bodyXxs + spacing[1]/[2]
+  light: 'bg-white text-gray-800 border border-gray-200 ' + 'px-3 py-3 text-sm leading-5',
+  dark: 'bg-gray-900 text-white ' + 'px-2 py-1 text-xs leading-4.5',
   info:
     'bg-blue-light-50 text-blue-light-900 border border-blue-light-200 ' +
     'px-2 py-1 text-xs leading-4.5',
@@ -58,8 +59,8 @@ const SIDE_ANIMATION_CLASS: Record<TooltipSide, string> = {
 const SIDE_PRIORITY: TooltipSide[] = ['top', 'right', 'bottom', 'left'];
 
 /**
- * `Tooltip`
- * ---------
+ * `UiTooltip`
+ * -----------
  * Tooltip con 6 variantes visuales (`light`, `dark`, `info`, `success`,
  * `warning`, `error`), 4 keyframes de slide+fade por lado, padding y
  * tipografía diferenciados para `light`, `max-width` responsive (móvil
@@ -71,9 +72,8 @@ const SIDE_PRIORITY: TooltipSide[] = ['top', 'right', 'bottom', 'left'];
  * quepa sin salirse del viewport. `side` actúa como lado preferido.
  */
 @Component({
-  selector: 'Tooltip',
+  selector: 'UiTooltip',
   standalone: true,
-  imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <span
@@ -89,17 +89,17 @@ const SIDE_PRIORITY: TooltipSide[] = ['top', 'right', 'bottom', 'left'];
         <span
           #tooltipBody
           class="tooltip__content pointer-events-auto whitespace-normal rounded-md text-xs leading-4.5 shadow-tooltip"
-          [ngClass]="[variantClass, sideAnimationClass, className]"
-          [ngStyle]="contentStyles"
+          [class]="[variantClass(), sideAnimationClass(), className()]"
+          [style]="contentStyles()"
           role="tooltip"
           (mouseenter)="cancelHide()"
           (mouseleave)="scheduleHide()"
         >
-          @if (isStringContent) {
-            {{ content }}
+          @if (isStringContent()) {
+            {{ content() }}
           } @else {
             <ng-container
-              *ngTemplateOutlet="$any(content); context: $any(contentContext)"
+              *ngTemplateOutlet="$any(content()); context: $any(contentContext)"
             ></ng-container>
           }
         </span>
@@ -175,81 +175,78 @@ const SIDE_PRIORITY: TooltipSide[] = ['top', 'right', 'bottom', 'left'];
       }
     `,
   ],
+  imports: [NgTemplateOutlet],
 })
-export class TooltipComponent implements OnDestroy {
+export class UiTooltipComponent implements OnDestroy {
   /** Contenido a mostrar dentro del tooltip. */
-  @Input() content: string | TemplateRef<unknown> = '';
+  readonly content = input<string | TemplateRef<unknown>>('');
   /** Variante visual. */
-  @Input() variant: TooltipVariantType = 'light';
+  readonly variant = input<TooltipVariantType>('light');
   /** Delay (ms) antes de mostrar el tooltip al entrar al trigger. */
-  @Input() delayDuration = 200;
+  readonly delayDuration = input<number>(200);
   /**
    * Lado preferido. Si `autoPosition` es `true` (default), se usa como
    * punto de partida y se ajusta automáticamente al lado que tenga
    * espacio disponible en el viewport.
    */
-  @Input() side: TooltipSide = 'right';
+  readonly side = input<TooltipSide>('right');
   /**
    * Si `true` (default), al abrir se recalcula el lado en función del
    * espacio disponible en el viewport. Si `false`, se respeta `side`
    * de forma estricta.
    */
-  @Input() autoPosition = true;
+  readonly autoPosition = input<boolean>(true);
   /** Distancia (px) entre el trigger y el tooltip. */
-  @Input() sideOffset = 10;
+  readonly sideOffset = input<number>(10);
   /** Alineación respecto al trigger. */
-  @Input() align: TooltipAlign = 'center';
+  readonly align = input<TooltipAlign>('center');
   /** Clases extra para la burbuja. */
-  @Input() className = '';
+  readonly className = input<string>('');
   /** Delay (ms) antes de ocultar al salir del trigger. */
-  @Input() closeDelay = 100;
+  readonly closeDelay = input<number>(100);
 
   isOpen = false;
 
   /** Lado efectivo tras el auto-posicionamiento. */
   private _computedSide: TooltipSide = 'top';
 
-  @ViewChild('tooltipBody') contentRef?: ElementRef<HTMLElement>;
+  readonly contentRef = viewChild<ElementRef<HTMLElement>>('tooltipBody');
 
   private showTimer?: ReturnType<typeof setTimeout>;
   private hideTimer?: ReturnType<typeof setTimeout>;
   private cdr = inject(ChangeDetectorRef);
   private host = inject(ElementRef<HTMLElement>);
 
-  get isStringContent(): boolean {
-    return typeof this.content === 'string';
-  }
-  get contentContext(): unknown {
-    return undefined;
-  }
+  /** ¿El `content` es un string? */
+  readonly isStringContent = computed<boolean>(
+    () => typeof this.content() === 'string',
+  );
 
   /** Clases Tailwind de la variante actual. */
-  get variantClass(): string {
-    return VARIANT_CLASSES[this.variant];
-  }
+  readonly variantClass = computed<string>(() => VARIANT_CLASSES[this.variant()]);
 
   /**
    * Lado que se aplica al render actual. Si `autoPosition` es `false`,
    * devuelve el `side` configurado. Si es `true`, devuelve el lado
    * recalculado en función del viewport.
    */
-  get effectiveSide(): TooltipSide {
-    return this.autoPosition ? this._computedSide : this.side;
-  }
+  readonly effectiveSide = computed<TooltipSide>(() =>
+    this.autoPosition() ? this._computedSide : this.side(),
+  );
 
   /** Clases Tailwind de la animación direccional. */
-  get sideAnimationClass(): string {
-    return SIDE_ANIMATION_CLASS[this.effectiveSide];
-  }
+  readonly sideAnimationClass = computed<string>(
+    () => SIDE_ANIMATION_CLASS[this.effectiveSide()],
+  );
 
   /**
    * Posición absoluta calculada a partir de `side`/`align`/`sideOffset`.
    * El `max-width: 500px` / `50vw` se aplica desde los `styles: []`
    * con `.tooltip__content` (más específico que inline style).
    */
-  get contentStyles(): Record<string, string> {
-    const offset = `${this.sideOffset}px`;
-    const side = this.effectiveSide;
+  readonly contentStyles = computed<Record<string, string>>(() => {
+    const offset = `${this.sideOffset()}px`;
+    const side = this.effectiveSide();
     const styles: Record<string, string> = {
       position: 'absolute',
       zIndex: '9999',
@@ -257,27 +254,29 @@ export class TooltipComponent implements OnDestroy {
     const isHorizontal = side === 'top' || side === 'bottom';
     if (isHorizontal) {
       styles[side === 'top' ? 'bottom' : 'top'] = `calc(100% + ${offset})`;
-      if (this.align === 'center') {
+      if (this.align() === 'center') {
         styles['left'] = '50%';
         styles['transform'] = 'translateX(-50%)';
-      } else if (this.align === 'start') {
+      } else if (this.align() === 'start') {
         styles['left'] = '0';
       } else {
         styles['right'] = '0';
       }
     } else {
       styles[side === 'left' ? 'right' : 'left'] = `calc(100% + ${offset})`;
-      if (this.align === 'center') {
+      if (this.align() === 'center') {
         styles['top'] = '50%';
         styles['transform'] = 'translateY(-50%)';
-      } else if (this.align === 'start') {
+      } else if (this.align() === 'start') {
         styles['top'] = '0';
       } else {
         styles['bottom'] = '0';
       }
     }
     return styles;
-  }
+  });
+
+  contentContext: unknown = undefined;
 
   // ----- Lifecycle -----
 
@@ -291,10 +290,10 @@ export class TooltipComponent implements OnDestroy {
     this.clearTimers();
     this.showTimer = setTimeout(() => {
       this.isOpen = true;
-      this._computedSide = this.side;
+      this._computedSide = this.side();
       this.cdr.markForCheck();
       this.recomputePosition();
-    }, this.delayDuration);
+    }, this.delayDuration());
   }
 
   onTriggerLeave(): void {
@@ -308,7 +307,7 @@ export class TooltipComponent implements OnDestroy {
     this.hideTimer = setTimeout(() => {
       this.isOpen = false;
       this.cdr.markForCheck();
-    }, this.closeDelay);
+    }, this.closeDelay());
   }
 
   cancelHide(): void {
@@ -318,7 +317,7 @@ export class TooltipComponent implements OnDestroy {
   show(): void {
     this.cancelHide();
     this.isOpen = true;
-    this._computedSide = this.side;
+    this._computedSide = this.side();
     this.cdr.markForCheck();
     this.recomputePosition();
   }
@@ -338,8 +337,8 @@ export class TooltipComponent implements OnDestroy {
    * viewport. Si ninguno cabe, se queda con el lado preferido.
    */
   private recomputePosition(): void {
-    if (!this.autoPosition) {
-      this._computedSide = this.side;
+    if (!this.autoPosition()) {
+      this._computedSide = this.side();
       this.cdr.markForCheck();
       return;
     }
@@ -348,9 +347,9 @@ export class TooltipComponent implements OnDestroy {
     requestAnimationFrame(() => {
       if (!this.isOpen) return;
       const trigger = this.host.nativeElement;
-      const tooltip = this.contentRef?.nativeElement;
+      const tooltip = this.contentRef()?.nativeElement;
       if (!trigger || !tooltip) {
-        this._computedSide = this.side;
+        this._computedSide = this.side();
         this.cdr.markForCheck();
         return;
       }
@@ -359,7 +358,7 @@ export class TooltipComponent implements OnDestroy {
       const pRect = tooltip.getBoundingClientRect();
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const gap = this.sideOffset;
+      const gap = this.sideOffset();
 
       // Espacio disponible en cada lado (px hasta el borde del viewport).
       const available: Record<TooltipSide, number> = {
@@ -378,10 +377,10 @@ export class TooltipComponent implements OnDestroy {
 
       // Reordenamos las prioridades empezando por el `side` preferido.
       const preferredOrder: TooltipSide[] = [
-        this.side,
-        ...SIDE_PRIORITY.filter((s) => s !== this.side),
+        this.side(),
+        ...SIDE_PRIORITY.filter((s) => s !== this.side()),
       ];
-      let best: TooltipSide = this.side;
+      let best: TooltipSide = this.side();
       for (const s of preferredOrder) {
         if (available[s] >= required[s]) {
           best = s;

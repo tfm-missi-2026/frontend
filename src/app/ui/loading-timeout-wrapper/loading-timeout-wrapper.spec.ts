@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { LoadingTimeoutWrapperComponent } from './loading-timeout-wrapper';
+import { UiLoadingTimeoutWrapperComponent } from './loading-timeout-wrapper';
 
 describe('LoadingTimeoutWrapper', () => {
-  let component: LoadingTimeoutWrapperComponent;
-  let fixture: ComponentFixture<LoadingTimeoutWrapperComponent>;
+  let component: UiLoadingTimeoutWrapperComponent;
+  let fixture: ComponentFixture<UiLoadingTimeoutWrapperComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LoadingTimeoutWrapperComponent],
+      imports: [UiLoadingTimeoutWrapperComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(LoadingTimeoutWrapperComponent);
+    fixture = TestBed.createComponent(UiLoadingTimeoutWrapperComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
