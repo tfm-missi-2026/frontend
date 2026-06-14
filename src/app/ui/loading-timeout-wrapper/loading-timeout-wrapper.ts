@@ -73,9 +73,12 @@ export class UiLoadingTimeoutWrapperComponent {
    * vía variable CSS (Tailwind no tiene una utility para esto).
    */
   readonly progressStyle = computed<Record<string, string>>(() => {
+    const style: Record<string, string> = {};
     if (this.timeout()) {
-      return { animationDuration: `${this.timeout()}ms` };
+      style['animationDuration'] = `${this.timeout()}ms`;
+    } else {
+      style['display'] = 'none';
     }
-    return { display: 'none' };
+    return style;
   });
 }

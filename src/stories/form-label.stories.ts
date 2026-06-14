@@ -1,5 +1,3 @@
-// form-label.stories.ts — FormLabel del design system
-
 import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 import { CommonModule } from "@angular/common";
@@ -43,16 +41,10 @@ export default meta;
 
 type Story = StoryObj<UiFormLabelComponent>;
 
-// ---------------------------------------------------------------------------
 // Default
-// ---------------------------------------------------------------------------
-
 export const Default: Story = {};
 
-// ---------------------------------------------------------------------------
-// Required
-// ---------------------------------------------------------------------------
-
+// Estados
 export const Required: Story = {
   args: { required: true },
   render: (args) => ({
@@ -75,10 +67,6 @@ export const Required: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Disabled / readOnly ocultan el asterisco
-// ---------------------------------------------------------------------------
-
 export const Disabled: Story = {
   args: { required: true, disabled: true },
 };
@@ -87,19 +75,12 @@ export const ReadOnly: Story = {
   args: { required: true, readOnly: true },
 };
 
-// ---------------------------------------------------------------------------
-// Con tooltip
-// ---------------------------------------------------------------------------
-
+// Tooltip
 export const WithTooltip: Story = {
   args: {
     tooltip: "Este correo se usará para enviarte notificaciones importantes.",
   },
 };
-
-// ---------------------------------------------------------------------------
-// Required + tooltip
-// ---------------------------------------------------------------------------
 
 export const RequiredWithTooltip: Story = {
   args: {
@@ -108,10 +89,7 @@ export const RequiredWithTooltip: Story = {
   },
 };
 
-// ---------------------------------------------------------------------------
 // Pesos
-// ---------------------------------------------------------------------------
-
 export const FontWeights: Story = {
   render: () => ({
     template: `
@@ -128,10 +106,7 @@ export const FontWeights: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Wrap text
-// ---------------------------------------------------------------------------
-
+// Wrap
 export const WrapText: Story = {
   args: {
     labelText:

@@ -1,5 +1,3 @@
-// select.stories.ts — SelectAsync (estilo react-select para Angular)
-
 import type { Meta, StoryObj } from '@storybook/angular';
 import { moduleMetadata } from '@storybook/angular';
 import { CommonModule } from '@angular/common';
@@ -105,10 +103,7 @@ export default meta;
 
 type Story = StoryObj<UiSelectComponent>;
 
-// ---------------------------------------------------------------------------
 // Variantes
-// ---------------------------------------------------------------------------
-
 export const Default: Story = {};
 
 export const SingleSelect: Story = {
@@ -209,10 +204,6 @@ export const Creatable: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Async (loadOptions)
-// ---------------------------------------------------------------------------
-
 const allCountries: SelectOption[] = [
   { label: 'Argentina', value: 'ar' },
   { label: 'Brasil', value: 'br' },
@@ -236,6 +227,7 @@ const loadCountries: LoadOptionsFn = (search: string) => {
   });
 };
 
+// Async
 export const Async: Story = {
   render: () => {
     const asyncProps = {
@@ -301,10 +293,7 @@ export const AsyncCreatable: Story = {
   },
 };
 
-// ---------------------------------------------------------------------------
 // Valores por defecto
-// ---------------------------------------------------------------------------
-
 export const WithDefaultValue: Story = {
   render: (args: any) => ({
     props: args,
@@ -335,10 +324,7 @@ export const MultiDefaultValues: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
 // Reactive forms
-// ---------------------------------------------------------------------------
-
 export const ReactiveFormExample: Story = {
   render: () => {
     const form = new FormGroup({
@@ -395,10 +381,7 @@ export const ReactiveFormSingle: Story = {
   },
 };
 
-// ---------------------------------------------------------------------------
 // Mobile / Many options
-// ---------------------------------------------------------------------------
-
 export const MobileView: Story = {
   parameters: { viewport: { defaultViewport: 'mobile1' } },
   args: { isMulti: true, searchable: true, isClearable: true },

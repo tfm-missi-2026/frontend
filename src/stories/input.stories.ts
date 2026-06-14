@@ -1,5 +1,3 @@
-// input.stories.ts — Input del design system
-
 import type { Meta, StoryObj } from '@storybook/angular';
 import { moduleMetadata } from '@storybook/angular';
 import { CommonModule } from '@angular/common';
@@ -11,68 +9,8 @@ import {
 } from '@angular/forms';
 
 import { UiInputComponent } from '@ui/input/input/input';
-import { IconProps } from '@ui/icon/icon.interface';
-import { Component } from '@angular/core';
-
-/**
- * Icono "search" minimalista para los stories de `leftIcon`/`rightIcon`.
- * Implementa la `IconProps` básica (color + size) que `Input` le pasa
- * vía `*ngComponentOutlet`.
- */
-@Component({
-  selector: 'SearchIcon',
-  standalone: true,
-  template: `
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      [attr.width]="size || 16"
-      [attr.height]="size || 16"
-      viewBox="0 0 16 16"
-      fill="none"
-      [style.color]="color || 'currentColor'"
-      aria-hidden="true"
-    >
-      <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5" />
-      <path
-        d="M11 11L14 14"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-      />
-    </svg>
-  `,
-})
-class SearchIconComponent {
-  size?: number | string;
-  color?: string;
-}
-
-@Component({
-  selector: 'EyeIcon',
-  standalone: true,
-  template: `
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      [attr.width]="size || 16"
-      [attr.height]="size || 16"
-      viewBox="0 0 16 16"
-      fill="none"
-      [style.color]="color || 'currentColor'"
-      aria-hidden="true"
-    >
-      <path
-        d="M1 8C2.5 4.5 5 2.5 8 2.5C11 2.5 13.5 4.5 15 8C13.5 11.5 11 13.5 8 13.5C5 13.5 2.5 11.5 1 8Z"
-        stroke="currentColor"
-        stroke-width="1.5"
-      />
-      <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.5" />
-    </svg>
-  `,
-})
-class EyeIconComponent {
-  size?: number | string;
-  color?: string;
-}
+import { IconSearchComponent } from '@ui/icon/search-icon';
+import { IconEyeComponent } from '@ui/icon/eye-icon';
 
 const meta: Meta<UiInputComponent> = {
   title: 'Shared/Input',
@@ -84,8 +22,8 @@ const meta: Meta<UiInputComponent> = {
         FormsModule,
         ReactiveFormsModule,
         UiInputComponent,
-        SearchIconComponent,
-        EyeIconComponent,
+        IconSearchComponent,
+        IconEyeComponent,
       ],
     }),
   ],
@@ -129,15 +67,8 @@ export default meta;
 
 type Story = StoryObj<UiInputComponent>;
 
-// ---------------------------------------------------------------------------
 // Default
-// ---------------------------------------------------------------------------
-
 export const Default: Story = {};
-
-// ---------------------------------------------------------------------------
-// Variantes de estado
-// ---------------------------------------------------------------------------
 
 export const Required: Story = {
   args: { required: true },
@@ -151,6 +82,7 @@ export const ReadOnly: Story = {
   args: { readOnly: true, value: 'Solo lectura' },
 };
 
+// Validaciones
 export const WithError: Story = {
   args: {
     errorMessage: 'Este correo no es válido',
@@ -158,21 +90,19 @@ export const WithError: Story = {
   },
 };
 
+// Tooltip
 export const WithTooltip: Story = {
   args: {
     tooltip: 'Nunca compartiremos tu correo con terceros.',
   },
 };
 
+// Helpers
 export const WithLegend: Story = {
   args: {
     legend: 'Te enviaremos un código de verificación.',
   },
 };
-
-// ---------------------------------------------------------------------------
-// Prefix / sufix
-// ---------------------------------------------------------------------------
 
 export const WithPrefixSufix: Story = {
   args: {
@@ -182,10 +112,6 @@ export const WithPrefixSufix: Story = {
     placeholder: '0.00',
   },
 };
-
-// ---------------------------------------------------------------------------
-// Max length / contador
-// ---------------------------------------------------------------------------
 
 export const WithMaxLength: Story = {
   args: {
@@ -203,15 +129,12 @@ export const MaxLengthReached: Story = {
   },
 };
 
-// ---------------------------------------------------------------------------
 // Iconos
-// ---------------------------------------------------------------------------
-
 export const WithLeftIcon: Story = {
   args: {
     labelText: 'Buscar',
     placeholder: '¿Qué buscas?',
-    leftIcon: SearchIconComponent,
+    leftIcon: IconSearchComponent,
   },
 };
 
@@ -220,7 +143,7 @@ export const WithRightIcon: Story = {
     labelText: 'Contraseña',
     type: 'password',
     placeholder: '••••••••',
-    rightIcon: EyeIconComponent,
+    rightIcon: IconEyeComponent,
   },
 };
 
@@ -228,8 +151,8 @@ export const WithBothIcons: Story = {
   args: {
     labelText: 'Búsqueda avanzada',
     placeholder: 'Buscar…',
-    leftIcon: SearchIconComponent,
-    rightIcon: EyeIconComponent,
+    leftIcon: IconSearchComponent,
+    rightIcon: IconEyeComponent,
   },
 };
 
@@ -237,15 +160,12 @@ export const WithIconAndError: Story = {
   args: {
     labelText: 'Búsqueda',
     placeholder: 'Buscar…',
-    leftIcon: SearchIconComponent,
+    leftIcon: IconSearchComponent,
     errorMessage: 'Sin resultados',
   },
 };
 
-// ---------------------------------------------------------------------------
-// Flex / width
-// ---------------------------------------------------------------------------
-
+// Width
 export const FixedWidth: Story = {
   args: {
     labelText: 'Código postal',
@@ -255,23 +175,17 @@ export const FixedWidth: Story = {
   },
 };
 
-// ---------------------------------------------------------------------------
 // Debounce
-// ---------------------------------------------------------------------------
-
 export const WithDebounce: Story = {
   args: {
     labelText: 'Búsqueda con debounce',
     debounceTime: 500,
-    leftIcon: SearchIconComponent,
+    leftIcon: IconSearchComponent,
     placeholder: 'Escribe para buscar…',
   },
 };
 
-// ---------------------------------------------------------------------------
-// Reactive forms
-// ---------------------------------------------------------------------------
-
+// Forms
 export const ReactiveFormExample: Story = {
   render: () => {
     const form = new FormGroup({
@@ -302,10 +216,6 @@ export const ReactiveFormExample: Story = {
   },
 };
 
-// ---------------------------------------------------------------------------
-// NgModel
-// ---------------------------------------------------------------------------
-
 export const NgModelExample: Story = {
   render: () => ({
     props: { value: 'two-way bound' },
@@ -322,10 +232,7 @@ export const NgModelExample: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// All together
-// ---------------------------------------------------------------------------
-
+// Full example
 export const FullExample: Story = {
   args: {
     id: 'full',

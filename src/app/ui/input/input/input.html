@@ -40,7 +40,7 @@
         [style.color]="iconColor()"
       >
         <ng-container
-          *ngComponentOutlet="leftIcon(); inputs: leftIconInputs()"
+          *ngComponentOutlet="leftIcon() ?? null; inputs: leftIconInputs()"
         ></ng-container>
       </span>
     }
@@ -96,7 +96,7 @@
         [style.color]="iconColor()"
       >
         <ng-container
-          *ngComponentOutlet="rightIcon(); inputs: rightIconInputs()"
+          *ngComponentOutlet="rightIcon() ?? null; inputs: rightIconInputs()"
         ></ng-container>
       </span>
     }

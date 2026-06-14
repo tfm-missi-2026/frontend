@@ -1,7 +1,24 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { SimpleChange } from '@angular/core';
 
 import { UiInputComponent } from './input';
+
+/**
+ * Aplica un set de inputs a un `ComponentRef` de Angular. Signal-based
+ * inputs son `InputSignal<T>` y no admiten asignación directa — hay
+ * que usar `componentRef.setInput(name, value)`. Este helper itera
+ * las keys del objeto `opts` y llama `setInput` para cada una.
+ */
+function applyInputs<T>(
+  fixture: ComponentFixture<T>,
+  opts: Record<string, unknown>,
+): void {
+  const ref = fixture.componentRef as unknown as {
+    setInput: (name: string, value: unknown) => void;
+  };
+  for (const [k, v] of Object.entries(opts)) {
+    ref.setInput(k, v);
+  }
+}
 
 /**
  * Crea un fixture fresco del `UiInputComponent` con los inputs
@@ -9,11 +26,10 @@ import { UiInputComponent } from './input';
  * directa de `@Input` (la cual no dispara CD sin `setInput`).
  */
 function buildFixture(
-  opts: Partial<UiInputComponent> = {},
+  opts: Record<string, unknown> = {},
 ): ComponentFixture<UiInputComponent> {
   const fixture = TestBed.createComponent(UiInputComponent);
-  const instance = fixture.componentInstance;
-  Object.assign(instance, opts);
+  applyInputs(fixture, opts);
   fixture.detectChanges();
   return fixture;
 }
@@ -168,12 +184,10 @@ describe('UiInputComponent', () => {
 
   it('focusInput() focuses the <input>', () => {
     const fixture = buildFixture();
-    const focusSpy = vi
-      .spyOn(
-        fixture.componentInstance.inputEl.nativeElement,
-        'focus',
-      )
-      .mockImplementation(() => {});
+    const focusSpy = spyOn(
+      fixture.componentInstance.inputEl().nativeElement,
+      'focus',
+    ).and.callFake(() => {});
     fixture.componentInstance.focusInput();
     expect(focusSpy).toHaveBeenCalled();
   });

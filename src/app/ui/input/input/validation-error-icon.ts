@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Input,
+  input,
 } from '@angular/core';
 
 /**
@@ -20,12 +20,13 @@ import {
   template: `
     <span
       class="inline-flex items-center text-error-500 shrink-0"
-      [attr.title]="errorMessage || null"
+      [attr.title]="errorMessage() || null"
       aria-label="Error"
       data-testid="input-error-icon"
     >
       <svg
-        class="w-3.5 h-3.5"
+        [attr.width]="size()"
+        [attr.height]="size()"
         viewBox="0 0 14 14"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -51,5 +52,7 @@ import {
 })
 export class ValidationErrorIconComponent {
   /** Mensaje de error a mostrar en el tooltip nativo. */
-  @Input() errorMessage = '';
+  readonly errorMessage = input<string>('');
+  /** Tamaño del icono (en px). Por defecto `14`. */
+  readonly size = input<number | string>(14);
 }

@@ -97,15 +97,15 @@ describe('Table', () => {
 
     it('toggles a single row in and out of selectedRows', () => {
       const row = SAMPLE_DATA[0];
-      component.onRowToggle(row, true);
+      component['onRowToggle'](row, true);
       expect(component['selectedRows']()).toContain(row);
-      component.onRowToggle(row, false);
+      component['onRowToggle'](row, false);
       expect(component['selectedRows']()).not.toContain(row);
     });
 
     it('emits rowSelect with rows and keys', () => {
       const spy = spyOn(component.rowSelect, 'emit');
-      component.onRowToggle(SAMPLE_DATA[0], true);
+      component['onRowToggle'](SAMPLE_DATA[0], true);
       expect(spy).toHaveBeenCalledWith({
         rows: [SAMPLE_DATA[0]],
         keys: [1],
@@ -114,14 +114,14 @@ describe('Table', () => {
 
     it('select-all adds every visible row to selection', () => {
       const spy = spyOn(component.rowSelect, 'emit');
-      component.onSelectAllToggle(true);
+      component['onSelectAllToggle'](true);
       expect(component['selectedRows']().length).toBe(SAMPLE_DATA.length);
       expect(spy).toHaveBeenCalled();
     });
 
     it('select-all removes only the visible rows', () => {
       component['selectedRows'].set([...SAMPLE_DATA]);
-      component.onSelectAllToggle(false);
+      component['onSelectAllToggle'](false);
       expect(component['selectedRows']().length).toBe(0);
     });
   });
@@ -141,7 +141,7 @@ describe('Table', () => {
     it('moves to next page and emits pageChange', () => {
       fixture.detectChanges();
       const spy = spyOn(component.pageChange, 'emit');
-      component.onNextPage();
+      component['onNextPage']();
       expect(component['currentPage']()).toBe(2);
       expect(spy).toHaveBeenCalledWith({ page: 2, pageSize: 2 });
     });
@@ -149,7 +149,7 @@ describe('Table', () => {
     it('does not go below page 1', () => {
       fixture.detectChanges();
       const spy = spyOn(component.pageChange, 'emit');
-      component.onPrevPage();
+      component['onPrevPage']();
       expect(component['currentPage']()).toBe(1);
       expect(spy).not.toHaveBeenCalled();
     });
@@ -158,7 +158,7 @@ describe('Table', () => {
       fixture.detectChanges();
       component['currentPage'].set(2);
       const spy = spyOn(component.pageChange, 'emit');
-      component.onNextPage();
+      component['onNextPage']();
       expect(component['currentPage']()).toBe(2);
       expect(spy).not.toHaveBeenCalled();
     });
@@ -173,29 +173,29 @@ describe('Table', () => {
 
   describe('cell rendering', () => {
     it('getCellValue returns string for known key', () => {
-      expect(component.getCellValue(SAMPLE_DATA[0], 'name')).toBe(
+      expect(component['getCellValue'](SAMPLE_DATA[0], 'name')).toBe(
         'Ada Lovelace',
       );
     });
 
     it('getCellValue returns "" for null/undefined value', () => {
-      expect(component.getCellValue(SAMPLE_DATA[0], 'missing')).toBe('');
+      expect(component['getCellValue'](SAMPLE_DATA[0], 'missing')).toBe('');
     });
 
     it('getCellValue returns "" for null row', () => {
-      expect(component.getCellValue(null, 'name')).toBe('');
+      expect(component['getCellValue'](null, 'name')).toBe('');
     });
   });
 
   describe('trackBy', () => {
     it('uses the configured trackByKey by default', () => {
       component.trackByKey = 'id';
-      expect(component.trackByRow(0, SAMPLE_DATA[0])).toBe(1);
+      expect(component['trackByRow'](0, SAMPLE_DATA[0])).toBe(1);
     });
 
     it('falls back to row reference when trackByKey is not in row', () => {
       component.trackByKey = 'unknown';
-      expect(component.trackByRow(0, SAMPLE_DATA[0])).toBe(SAMPLE_DATA[0]);
+      expect(component['trackByRow'](0, SAMPLE_DATA[0])).toBe(SAMPLE_DATA[0]);
     });
   });
 

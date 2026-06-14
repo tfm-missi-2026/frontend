@@ -1,86 +1,11 @@
-// button.stories.ts — Button del design system
-
 import type { Meta, StoryObj } from '@storybook/angular';
 import { moduleMetadata } from '@storybook/angular';
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
 
 import { UiButtonComponent } from '@ui/button/button';
 import { UiTooltipComponent } from '@ui/tooltip/tooltip';
-import { IconProps } from '@ui/icon/icon.interface';
-
-// ---------------------------------------------------------------------------
-// Iconos stub (solo para Storybook — los íconos reales del DS se crean aparte).
-// Cada stub respeta `IconProps` y renderiza un SVG simple.
-// ---------------------------------------------------------------------------
-
-@Component({
-  selector: 'FloppyDiskIconLight',
-  standalone: true,
-  template: `
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      [attr.width]="computedWidth"
-      [attr.height]="computedHeight"
-      viewBox="0 0 16 16"
-      fill="currentColor"
-      [style.color]="color"
-      style="display: inline-block; flex-shrink: 0;"
-    >
-      <path d="M3 1h8l4 4v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1Zm6 1H3v3h6V2Zm0 5H5v6h4V7Z" />
-    </svg>
-  `,
-})
-class FloppyDiskIconLightStubComponent implements IconProps {
-  @Input() size: number | string = 16;
-  @Input() width?: number | string;
-  @Input() height?: number | string;
-  @Input() color = 'currentColor';
-  @Input() className?: string;
-  @Input() dataTestId?: string;
-  get computedWidth() {
-    return this.width ?? this.size;
-  }
-  get computedHeight() {
-    return this.height ?? this.size;
-  }
-}
-
-@Component({
-  selector: 'UploadIconLight',
-  standalone: true,
-  template: `
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      [attr.width]="computedWidth"
-      [attr.height]="computedHeight"
-      viewBox="0 0 16 16"
-      fill="currentColor"
-      [style.color]="color"
-      style="display: inline-block; flex-shrink: 0;"
-    >
-      <path d="M8 1l4 4h-3v6H7V5H4l4-4Zm-6 12h12v2H2v-2Z" />
-    </svg>
-  `,
-})
-class UploadIconLightStubComponent implements IconProps {
-  @Input() size: number | string = 16;
-  @Input() width?: number | string;
-  @Input() height?: number | string;
-  @Input() color = 'currentColor';
-  @Input() className?: string;
-  @Input() dataTestId?: string;
-  get computedWidth() {
-    return this.width ?? this.size;
-  }
-  get computedHeight() {
-    return this.height ?? this.size;
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Meta
-// ---------------------------------------------------------------------------
+import { IconFloppyDiskLightComponent } from '@ui/icon/floppy-disk-icon-light';
+import { IconUploadLightComponent } from '@ui/icon/upload-icon-light';
 
 const meta: Meta<UiButtonComponent> = {
   title: 'Shared/Button',
@@ -91,8 +16,8 @@ const meta: Meta<UiButtonComponent> = {
         CommonModule,
         UiButtonComponent,
         UiTooltipComponent,
-        FloppyDiskIconLightStubComponent,
-        UploadIconLightStubComponent,
+        IconFloppyDiskLightComponent,
+        IconUploadLightComponent,
       ],
     }),
   ],
@@ -159,10 +84,7 @@ export default meta;
 
 type Story = StoryObj<UiButtonComponent>;
 
-// ---------------------------------------------------------------------------
 // Default
-// ---------------------------------------------------------------------------
-
 export const Default: Story = {
   render: (args) => ({
     props: args,
@@ -193,10 +115,7 @@ export const Default: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Variants × StyleTypes (15 combinaciones)
-// ---------------------------------------------------------------------------
-
+// Variantes
 export const AllVariants: Story = {
   render: () => ({
     template: `
@@ -236,10 +155,7 @@ export const AllVariants: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Compact
-// ---------------------------------------------------------------------------
-
+// Estados
 export const Compact: Story = {
   render: () => ({
     template: `
@@ -250,10 +166,6 @@ export const Compact: Story = {
     `,
   }),
 };
-
-// ---------------------------------------------------------------------------
-// Disabled
-// ---------------------------------------------------------------------------
 
 export const Disabled: Story = {
   render: () => ({
@@ -267,10 +179,6 @@ export const Disabled: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Loading
-// ---------------------------------------------------------------------------
-
 export const Loading: Story = {
   render: () => ({
     template: `
@@ -283,10 +191,7 @@ export const Loading: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// With timeout (progress bar)
-// ---------------------------------------------------------------------------
-
+// Timeout
 export const WithTimeout: Story = {
   args: {
     variant: 'primary',
@@ -330,10 +235,7 @@ export const WithTimeoutEnabledInteraction: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// With icons (Angular component classes)
-// ---------------------------------------------------------------------------
-
+// Iconos
 export const WithLeftIcon: Story = {
   render: () => ({
     template: `
@@ -350,7 +252,7 @@ export const WithLeftIcon: Story = {
         ></UiButton>
       </div>
     `,
-    props: { floppy: FloppyDiskIconLightStubComponent },
+    props: { floppy: IconFloppyDiskLightComponent },
   }),
 };
 
@@ -365,7 +267,7 @@ export const WithRightIcon: Story = {
         ></UiButton>
       </div>
     `,
-    props: { upload: UploadIconLightStubComponent },
+    props: { upload: IconUploadLightComponent },
   }),
 };
 
@@ -382,16 +284,13 @@ export const WithBothIcons: Story = {
       </div>
     `,
     props: {
-      floppy: FloppyDiskIconLightStubComponent,
-      upload: UploadIconLightStubComponent,
+      floppy: IconFloppyDiskLightComponent,
+      upload: IconUploadLightComponent,
     },
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Sizes (fontSize)
-// ---------------------------------------------------------------------------
-
+// Tamaños
 export const Sizes: Story = {
   render: () => ({
     template: `
@@ -406,10 +305,7 @@ export const Sizes: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Full width
-// ---------------------------------------------------------------------------
-
+// Layout
 export const FullWidth: Story = {
   render: () => ({
     template: `
@@ -422,10 +318,7 @@ export const FullWidth: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
 // Transparent
-// ---------------------------------------------------------------------------
-
 export const Transparent: Story = {
   render: () => ({
     template: `
@@ -437,10 +330,7 @@ export const Transparent: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
 // As link
-// ---------------------------------------------------------------------------
-
 export const AsLink: Story = {
   render: () => ({
     template: `
@@ -455,10 +345,7 @@ export const AsLink: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
 // Tooltip
-// ---------------------------------------------------------------------------
-
 export const WithTooltip: Story = {
   args: { tooltip: 'Guardar los cambios del formulario' },
   render: (args) => ({

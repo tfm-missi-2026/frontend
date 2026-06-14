@@ -1,55 +1,10 @@
-// icon-button.stories.ts — IconButton del design system
-
 import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 import { CommonModule } from "@angular/common";
-import { Component, Input } from "@angular/core";
 
 import { UiIconButtonComponent } from "@ui/icon-button/icon-button";
 import { UiTooltipComponent } from "@ui/tooltip/tooltip";
-import { IconProps } from "@ui/icon/icon.interface";
-
-// ---------------------------------------------------------------------------
-// Icon stub (replica del usado en button.stories)
-// ---------------------------------------------------------------------------
-
-@Component({
-  selector: "InfoIcon",
-  standalone: true,
-  template: `
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      [attr.width]="computedWidth"
-      [attr.height]="computedHeight"
-      viewBox="0 0 16 16"
-      fill="currentColor"
-      [style.color]="color"
-      style="display: inline-block; flex-shrink: 0;"
-    >
-      <path
-        d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1Zm0 13A6 6 0 1 1 8 2a6 6 0 0 1 0 12Zm-1-2h2v-5H7v5Zm1-6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
-      />
-    </svg>
-  `,
-})
-class InfoIconStubComponent implements IconProps {
-  @Input() size: number | string = 16;
-  @Input() width?: number | string;
-  @Input() height?: number | string;
-  @Input() color = "currentColor";
-  @Input() className?: string;
-  @Input() dataTestId?: string;
-  get computedWidth() {
-    return this.width ?? this.size;
-  }
-  get computedHeight() {
-    return this.height ?? this.size;
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Meta
-// ---------------------------------------------------------------------------
+import { IconInfoComponent } from "@ui/icon/info-icon";
 
 const meta: Meta<UiIconButtonComponent> = {
   title: "Shared/IconButton",
@@ -60,7 +15,7 @@ const meta: Meta<UiIconButtonComponent> = {
         CommonModule,
         UiIconButtonComponent,
         UiTooltipComponent,
-        InfoIconStubComponent,
+        IconInfoComponent,
       ],
     }),
   ],
@@ -109,13 +64,10 @@ export default meta;
 
 type Story = StoryObj<UiIconButtonComponent>;
 
-// ---------------------------------------------------------------------------
 // Default
-// ---------------------------------------------------------------------------
-
 export const Default: Story = {
   render: (args) => ({
-    props: { ...args, icon: InfoIconStubComponent },
+    props: { ...args, icon: IconInfoComponent },
     template: `
       <div class="p-4">
         <UiIconButton
@@ -139,13 +91,10 @@ export const Default: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Variants × StyleTypes
-// ---------------------------------------------------------------------------
-
+// Variantes
 export const AllVariants: Story = {
   render: () => ({
-    props: { icon: InfoIconStubComponent },
+    props: { icon: IconInfoComponent },
     template: `
       <div class="space-y-4 p-4">
         <div>
@@ -183,13 +132,10 @@ export const AllVariants: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Sizes (fontSize)
-// ---------------------------------------------------------------------------
-
+// Tamaños
 export const Sizes: Story = {
   render: () => ({
-    props: { icon: InfoIconStubComponent },
+    props: { icon: IconInfoComponent },
     template: `
       <div class="flex flex-wrap items-center gap-2 p-4">
         <UiIconButton fontSize="bodyXxs" [Icon]="icon" labelText="bodyXxs"></UiIconButton>
@@ -200,13 +146,10 @@ export const Sizes: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Compact
-// ---------------------------------------------------------------------------
-
+// Estados
 export const Compact: Story = {
   render: () => ({
-    props: { icon: InfoIconStubComponent },
+    props: { icon: IconInfoComponent },
     template: `
       <div class="flex flex-wrap items-center gap-2 p-4">
         <UiIconButton compact="true" [Icon]="icon" labelText="compact"></UiIconButton>
@@ -216,13 +159,9 @@ export const Compact: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Disabled
-// ---------------------------------------------------------------------------
-
 export const Disabled: Story = {
   render: () => ({
-    props: { icon: InfoIconStubComponent },
+    props: { icon: IconInfoComponent },
     template: `
       <div class="flex flex-wrap gap-2 p-4">
         <UiIconButton disabled="true" [Icon]="icon" labelText="primary"></UiIconButton>
@@ -233,13 +172,9 @@ export const Disabled: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Loading
-// ---------------------------------------------------------------------------
-
 export const Loading: Story = {
   render: () => ({
-    props: { icon: InfoIconStubComponent },
+    props: { icon: IconInfoComponent },
     template: `
       <div class="flex flex-wrap gap-2 p-4">
         <UiIconButton isLoading="true" [Icon]="icon" labelText="primary"></UiIconButton>
@@ -250,14 +185,11 @@ export const Loading: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// With timeout
-// ---------------------------------------------------------------------------
-
+// Timeout
 export const WithTimeout: Story = {
   args: { timeout: 5000 },
   render: (args) => ({
-    props: { ...args, icon: InfoIconStubComponent },
+    props: { ...args, icon: IconInfoComponent },
     template: `
       <div class="p-4">
         <UiIconButton
@@ -271,14 +203,11 @@ export const WithTimeout: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// With tooltip
-// ---------------------------------------------------------------------------
-
+// Tooltip
 export const WithTooltip: Story = {
   args: { tooltip: "Más información" },
   render: (args) => ({
-    props: { ...args, icon: InfoIconStubComponent },
+    props: { ...args, icon: IconInfoComponent },
     template: `
       <div class="p-12 flex items-center justify-center">
         <UiIconButton
@@ -294,7 +223,7 @@ export const WithTooltip: Story = {
 
 export const TooltipAllSides: Story = {
   render: () => ({
-    props: { icon: InfoIconStubComponent },
+    props: { icon: IconInfoComponent },
     template: `
       <div class="grid grid-cols-3 grid-rows-3 items-center justify-items-center gap-4 p-6 h-80">
         <div></div>
@@ -311,13 +240,10 @@ export const TooltipAllSides: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// With explicit width
-// ---------------------------------------------------------------------------
-
+// Width
 export const WithExplicitWidth: Story = {
   render: () => ({
-    props: { icon: InfoIconStubComponent },
+    props: { icon: IconInfoComponent },
     template: `
       <div class="flex flex-wrap items-center gap-2 p-4">
         <UiIconButton width="48px" [Icon]="icon" labelText="48px"></UiIconButton>
@@ -328,13 +254,10 @@ export const WithExplicitWidth: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
 // As link
-// ---------------------------------------------------------------------------
-
 export const AsLink: Story = {
   render: () => ({
-    props: { icon: InfoIconStubComponent },
+    props: { icon: IconInfoComponent },
     template: `
       <div class="p-4">
         <UiIconButton

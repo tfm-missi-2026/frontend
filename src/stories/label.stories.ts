@@ -1,5 +1,3 @@
-// label.stories.ts — Label del design system
-
 import type { Meta, StoryObj } from '@storybook/angular';
 import { moduleMetadata } from '@storybook/angular';
 import { CommonModule } from '@angular/common';
@@ -91,10 +89,7 @@ export default meta;
 
 type Story = StoryObj<UiLabelComponent>;
 
-// ---------------------------------------------------------------------------
 // Tipografía
-// ---------------------------------------------------------------------------
-
 export const TypographyTypes: Story = {
   render: () => ({
     template: `
@@ -127,10 +122,7 @@ export const Headings: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
 // Pesos
-// ---------------------------------------------------------------------------
-
 export const FontWeights: Story = {
   render: () => ({
     template: `
@@ -147,10 +139,7 @@ export const FontWeights: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
 // Colores
-// ---------------------------------------------------------------------------
-
 export const Colors: Story = {
   render: () => ({
     template: `
@@ -167,10 +156,7 @@ export const Colors: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Estilo
-// ---------------------------------------------------------------------------
-
+// Estilos
 export const Italic: Story = {
   args: { italic: true, text: 'Italic text' },
   render: (args) => ({
@@ -196,10 +182,7 @@ export const Alignment: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Wrap / line-clamp
-// ---------------------------------------------------------------------------
-
+// Wrap
 export const NoWrap: Story = {
   args: {
     type: 'bodyS',
@@ -282,13 +265,10 @@ export const LineClamp3: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Overflow → Tooltip
-// ---------------------------------------------------------------------------
-
 const LONG_TEXT_FOR_TOOLTIP =
   'Este texto es intencionalmente largo para que desborde el contenedor padre y dispare el tooltip con el contenido completo al hacer hover.';
 
+// Tooltip
 export const WithTooltipOnOverflow: Story = {
   args: {
     type: 'bodyS',
@@ -447,10 +427,7 @@ export const WithTooltipDark: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Required / dark / as
-// ---------------------------------------------------------------------------
-
+// Requerido
 export const RequiredField: Story = {
   args: { for: 'email', type: 'bodyS', weight: 'medium' },
   render: (args) => ({
@@ -472,6 +449,7 @@ export const RequiredField: Story = {
   }),
 };
 
+// Dark mode
 export const DarkMode: Story = {
   render: () => ({
     template: `
@@ -488,6 +466,7 @@ export const DarkMode: Story = {
   }),
 };
 
+// As override
 export const AsOverride: Story = {
   render: () => ({
     template: `

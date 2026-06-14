@@ -1,5 +1,3 @@
-// tooltip.stories.ts — Tooltip del design system
-
 import type { Meta, StoryObj } from '@storybook/angular';
 import { moduleMetadata } from '@storybook/angular';
 import { CommonModule } from '@angular/common';
@@ -57,17 +55,10 @@ export default meta;
 
 type Story = StoryObj<UiTooltipComponent>;
 
-// ---------------------------------------------------------------------------
 // Helpers
-// ---------------------------------------------------------------------------
-
-/** Trigger estándar: un botón con `tabindex` y `focus` para el story. */
 const trigger = (label = 'Hover me') => `<button type="button" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm text-gray-800 hover:bg-gray-50">${label}</button>`;
 
-// ---------------------------------------------------------------------------
 // Default
-// ---------------------------------------------------------------------------
-
 export const Default: Story = {
   args: {
     content: 'Tooltip por defecto (variant="light", side="bottom")',
@@ -92,10 +83,7 @@ export const Default: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
 // Variantes
-// ---------------------------------------------------------------------------
-
 export const Dark: Story = {
   args: { variant: 'dark', content: 'Tooltip dark con texto blanco' },
   render: (args) => ({
@@ -181,10 +169,7 @@ export const AllVariants: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Lados (4 direcciones de animación)
-// ---------------------------------------------------------------------------
-
+// Lados
 export const AllSides: Story = {
   render: () => ({
     template: `
@@ -213,10 +198,7 @@ export const AllSides: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
 // Delay
-// ---------------------------------------------------------------------------
-
 export const WithDelay: Story = {
   args: { delayDuration: 1000, content: 'Aparece 1s después del hover' },
   render: (args) => ({
@@ -235,10 +217,7 @@ export const WithDelay: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Contenido largo (white-space normal + max-width)
-// ---------------------------------------------------------------------------
-
+// Contenido largo
 export const WithLongContent: Story = {
   args: {
     content:
@@ -256,10 +235,7 @@ export const WithLongContent: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
 // Alineación
-// ---------------------------------------------------------------------------
-
 export const Alignment: Story = {
   render: () => ({
     template: `
@@ -278,10 +254,7 @@ export const Alignment: Story = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Dark mode (validar contraste sobre fondo oscuro)
-// ---------------------------------------------------------------------------
-
+// Dark mode
 export const DarkMode: Story = {
   render: () => ({
     template: `

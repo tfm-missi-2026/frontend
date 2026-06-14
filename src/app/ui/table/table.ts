@@ -1,23 +1,24 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Component as NgComponent,
   computed,
   EventEmitter,
   Input,
-  Input as NgInput,
   OnInit,
   Output,
   signal,
   TemplateRef,
   Type,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 
 import { UiFlexComponent } from '@ui/flex/flex';
 import { UiLabelComponent } from '@ui/label/label';
 import { UiCheckboxComponent } from '@ui/input/checkbox/checkbox';
 import { UiInputComponent } from '@ui/input/input/input';
 import { UiIconButtonComponent } from '@ui/icon-button/icon-button';
+import { IconChevronLeftComponent } from '@ui/icon/chevron-left-icon';
+import { IconChevronRightComponent } from '@ui/icon/chevron-right-icon';
 import {
   TableAction,
   TableCellContext,
@@ -51,6 +52,7 @@ import {
     UiCheckboxComponent,
     UiInputComponent,
     UiIconButtonComponent,
+    NgTemplateOutlet,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './table.html',
@@ -320,62 +322,12 @@ export class UiTableComponent {
 }
 
 // ---------------------------------------------------------------------------
-// Iconos stub internos
+// Iconos de paginación por defecto (re-exportados desde `@ui/icon`).
+// Se exponen como `Type<unknown>` para que encajen en `prevIcon`/`nextIcon`
+// sin necesidad de cast en el consumer.
 // ---------------------------------------------------------------------------
 
-@NgComponent({
-  selector: 'UiChevronLeftIcon',
-  standalone: true,
-  template: `
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      [attr.width]="size"
-      [attr.height]="size"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      [style.color]="color"
-      style="display: inline-block; flex-shrink: 0;"
-    >
-      <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
-        d="M12.7071 4.29289C13.0976 4.68342 13.0976 5.31658 12.7071 5.70711L8.41421 10L12.7071 14.2929C13.0976 14.6834 13.0976 15.3166 12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L6.29289 10.7071C5.90237 10.3166 5.90237 9.68342 6.29289 9.29289L11.2929 4.29289C11.6834 3.90237 12.3166 3.90237 12.7071 4.29289Z"
-      />
-    </svg>
-  `,
-})
-class ChevronLeftIconClass {
-  @NgInput() size: number | string = 16;
-  @NgInput() color = 'currentColor';
-}
-
-@NgComponent({
-  selector: 'UiChevronRightIcon',
-  standalone: true,
-  template: `
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      [attr.width]="size"
-      [attr.height]="size"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      [style.color]="color"
-      style="display: inline-block; flex-shrink: 0;"
-    >
-      <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
-        d="M7.29289 4.29289C6.90237 4.68342 6.90237 5.31658 7.29289 5.70711L11.5858 10L7.29289 14.2929C6.90237 14.6834 6.90237 15.3166 7.29289 15.7071C7.68342 16.0976 8.31658 16.0976 8.70711 15.7071L13.7071 10.7071C14.0976 10.3166 14.0976 9.68342 13.7071 9.29289L8.70711 4.29289C8.31658 3.90237 7.68342 3.90237 7.29289 4.29289Z"
-      />
-    </svg>
-  `,
-})
-class ChevronRightIconClass {
-  @NgInput() size: number | string = 16;
-  @NgInput() color = 'currentColor';
-}
-
-// Wrapper constante para cumplir con `Type<unknown>` sin instanciar por
-// referencia. UiIconButton hace `*ngComponentOutlet` con la clase.
-export const ChevronLeftIcon = ChevronLeftIconClass as unknown as Type<unknown>;
-export const ChevronRightIcon = ChevronRightIconClass as unknown as Type<unknown>;
+export const ChevronLeftIcon =
+  IconChevronLeftComponent as unknown as Type<unknown>;
+export const ChevronRightIcon =
+  IconChevronRightComponent as unknown as Type<unknown>;

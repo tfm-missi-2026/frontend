@@ -61,7 +61,7 @@
             </th>
           }
           @for (col of columns; track col.key) {
-            <th [class]="thClass(col)" [ngStyle]="thStyle(col)">
+            <th [class]="thClass(col)" [style]="thStyle(col)">
               <UiFlex
                 [justifyContent]="col.align === 'end' ? 'flex-end' : col.align === 'center' ? 'center' : 'flex-start'"
                 [alignItems]="'center'"
@@ -94,7 +94,7 @@
               </td>
             }
             @for (col of columns; track col.key) {
-              <td [class]="tdClass(col)" [ngStyle]="thStyle(col)">
+              <td [class]="tdClass(col)" [style]="thStyle(col)">
                 @if (col.cell) {
                   <ng-container
                     *ngTemplateOutlet="col.cell; context: cellContext(col, row, rowIndex)"
