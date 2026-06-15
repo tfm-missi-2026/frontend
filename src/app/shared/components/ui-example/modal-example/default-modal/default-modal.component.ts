@@ -1,22 +1,21 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { ModalComponent } from '../../../ui/modal/modal.component';
-import { ComponentCardComponent } from '../../../common/component-card/component-card.component';
-import { ButtonComponent } from '../../../ui/button/button.component';
+import { CommonModule } from "@angular/common";
+import { Component } from "@angular/core";
+import { UiModalComponent } from "@shared/ui/modal";
+import { ComponentCardComponent } from "../../../common/component-card/component-card.component";
+import { ButtonComponent } from "../../../ui/button/button.component";
 
 @Component({
-  selector: 'app-default-modal',
+  selector: "app-default-modal",
   imports: [
     CommonModule,
-    ModalComponent,
+    UiModalComponent,
     ComponentCardComponent,
     ButtonComponent,
   ],
-  templateUrl: './default-modal.component.html',
-  styles: ``
+  templateUrl: "./default-modal.component.html",
+  styles: ``,
 })
 export class DefaultModalComponent {
-
   isOpen = false;
 
   openModal() {
@@ -28,7 +27,7 @@ export class DefaultModalComponent {
   }
 
   handleSave() {
-    console.log('Saving changes...');
+    console.log("Saving changes...");
     this.closeModal();
   }
 }

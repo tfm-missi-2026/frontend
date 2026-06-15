@@ -1,6 +1,6 @@
 <app-component-card title="Full Screen Modal">
   <app-button size="sm" (btnClick)="openModal()"> Open Modal </app-button>
-  <app-modal
+  <UiModal
     [isOpen]="isOpen"
     (close)="closeModal()"
     [isFullscreen]="true"
@@ -40,5 +40,5 @@
         <app-button size="sm" (btnClick)="handleSave()"> Save Changes </app-button>
       </div>
     </div>
-  </app-modal>
+  </UiModal>
 </app-component-card>

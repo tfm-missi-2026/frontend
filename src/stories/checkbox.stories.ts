@@ -1,18 +1,18 @@
-import type { Meta, StoryObj } from '@storybook/angular';
-import { UiCheckboxComponent } from '@ui/input/checkbox/checkbox';
+import type { Meta, StoryObj } from "@storybook/angular";
+import { UiCheckboxComponent } from "@shared/ui/input/checkbox/checkbox";
 
 const meta: Meta<UiCheckboxComponent> = {
-  title: 'Shared/Checkbox',
+  title: "Shared/Checkbox",
   component: UiCheckboxComponent,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
 
   argTypes: {
-    label: { control: 'text' },
-    checked: { control: 'boolean' },
-    disabled: { control: 'boolean' },
-    className: { control: 'text' },
-    id: { control: 'text' },
-    checkedChange: { action: 'checkedChange' },
+    label: { control: "text" },
+    checked: { control: "boolean" },
+    disabled: { control: "boolean" },
+    className: { control: "text" },
+    id: { control: "text" },
+    checkedChange: { action: "checkedChange" },
   },
 };
 
@@ -22,10 +22,10 @@ type Story = StoryObj<UiCheckboxComponent>;
 
 export const Default: Story = {
   args: {
-    label: 'Accept terms and conditions',
+    label: "Accept terms and conditions",
     checked: false,
     disabled: false,
-    id: 'checkbox-default',
+    id: "checkbox-default",
   },
   render: (args) => ({
     props: args,

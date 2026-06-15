@@ -26,7 +26,7 @@
     </button>
   </div>
   <!-- Success Modal -->
-  <app-modal
+  <UiModal
     [isOpen]="successModal"
     (close)="handleCloseModal('success')"
     className="max-w-[600px] p-5 lg:p-10"
@@ -87,10 +87,10 @@
         </button>
       </div>
     </div>
-  </app-modal>
+  </UiModal>
 
   <!-- Info Modal -->
-  <app-modal
+  <UiModal
     [isOpen]="infoModal"
     (close)="handleCloseModal('info')"
     className="max-w-[600px] p-5 lg:p-10"
@@ -152,10 +152,10 @@
         </button>
       </div>
     </div>
-  </app-modal>
+  </UiModal>
 
   <!-- Warning Modal -->
-  <app-modal
+  <UiModal
     [isOpen]="warningModal"
     (close)="handleCloseModal('warning')"
     className="max-w-[600px] p-5 lg:p-10"
@@ -217,10 +217,10 @@
         </button>
       </div>
     </div>
-  </app-modal>
-  
+  </UiModal>
+
   <!-- Error Modal -->
-  <app-modal
+  <UiModal
     [isOpen]="errorModal"
     (close)="handleCloseModal('error')"
     className="max-w-[600px] p-5 lg:p-10"
@@ -282,5 +282,5 @@
         </button>
       </div>
     </div>
-  </app-modal>
+  </UiModal>
 </app-component-card>

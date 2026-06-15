@@ -1,86 +1,86 @@
-import type { Meta, StoryObj } from '@storybook/angular';
-import { moduleMetadata } from '@storybook/angular';
-import { CommonModule } from '@angular/common';
+import type { Meta, StoryObj } from "@storybook/angular";
+import { moduleMetadata } from "@storybook/angular";
+import { CommonModule } from "@angular/common";
 
-import { UiLabelComponent } from '@ui/label/label';
-import { UiTooltipComponent } from '@ui/tooltip/tooltip';
-import { ColorType } from '@styles/types/colors';
-import { FontWeightType, TypographyType } from '@styles/types/typography';
+import { UiLabelComponent } from "@shared/ui/label/label";
+import { UiTooltipComponent } from "@shared/ui/tooltip/tooltip";
+import { ColorType } from "@styles/types/colors";
+import { FontWeightType, TypographyType } from "@styles/types/typography";
 
 const typographyTypes: TypographyType[] = [
-  'bodyXxs',
-  'bodyXs',
-  'bodyS',
-  'HeadingXs',
-  'HeadingS',
-  'HeadingM',
-  'HeadingL',
-  'HeadingXl',
-  'HeadingXxl',
-  'HeadingTV',
+  "bodyXxs",
+  "bodyXs",
+  "bodyS",
+  "HeadingXs",
+  "HeadingS",
+  "HeadingM",
+  "HeadingL",
+  "HeadingXl",
+  "HeadingXxl",
+  "HeadingTV",
 ];
 
-const fontWeights: FontWeightType[] = ['regular', 'medium', 'semibold', 'bold'];
+const fontWeights: FontWeightType[] = ["regular", "medium", "semibold", "bold"];
 
 const colors: ColorType[] = [
-  'textStrong',
-  'textWeak',
-  'textWeakest',
-  'textDisabled',
-  'textAction',
-  'textActionStrong',
-  'textError',
-  'textSuccess',
-  'textWarning',
+  "textStrong",
+  "textWeak",
+  "textWeakest",
+  "textDisabled",
+  "textAction",
+  "textActionStrong",
+  "textError",
+  "textSuccess",
+  "textWarning",
 ];
 
 const meta: Meta<UiLabelComponent> = {
-  title: 'Shared/Label',
+  title: "Shared/Label",
   component: UiLabelComponent,
   decorators: [
     moduleMetadata({
       imports: [CommonModule, UiLabelComponent, UiTooltipComponent],
     }),
   ],
-  tags: ['autodocs'],
-  parameters: { layout: 'padded' },
+  tags: ["autodocs"],
+  parameters: { layout: "padded" },
   argTypes: {
     as: {
-      control: 'select',
-      options: ['small', 'span', 'p', 'strong'],
+      control: "select",
+      options: ["small", "span", "p", "strong"],
     },
-    for: { control: 'text' },
-    text: { control: 'text' },
+    for: { control: "text" },
+    text: { control: "text" },
     type: {
-      control: 'select',
+      control: "select",
       options: typographyTypes,
     },
     weight: {
-      control: 'select',
+      control: "select",
       options: [...fontWeights, null],
     },
     color: {
-      control: 'select',
+      control: "select",
       options: [...colors, null],
     },
-    wrapText: { control: 'boolean' },
-    wrapMaxLines: { control: { type: 'number', min: 1, max: 6 } },
-    availableSpaceOffset: { control: { type: 'number', min: 0 } },
-    italic: { control: 'boolean' },
-    refreshOnLoad: { control: 'boolean' },
+    wrapText: { control: "boolean" },
+    wrapMaxLines: { control: { type: "number", min: 1, max: 6 } },
+    availableSpaceOffset: { control: { type: "number", min: 0 } },
+    italic: { control: "boolean" },
+    refreshOnLoad: { control: "boolean" },
     align: {
-      control: 'select',
-      options: ['left', 'right', 'center', 'justify', null],
+      control: "select",
+      options: ["left", "right", "center", "justify", null],
     },
-    className: { control: 'text' },
+    className: { control: "text" },
     tooltipSide: {
-      control: 'select',
-      options: ['top', 'right', 'bottom', 'left'],
+      control: "select",
+      options: ["top", "right", "bottom", "left"],
     },
   },
   args: {
-    text: 'The quick brown fox jumps over the lazy dog',
-    type: 'bodyXs',
+    text: "The quick brown fox jumps over the lazy dog",
+    type: "bodyXs",
     wrapText: false,
   },
 };
@@ -158,7 +158,7 @@ export const Colors: Story = {
 
 // Estilos
 export const Italic: Story = {
-  args: { italic: true, text: 'Italic text' },
+  args: { italic: true, text: "Italic text" },
   render: (args) => ({
     props: args,
     template: `
@@ -185,8 +185,8 @@ export const Alignment: Story = {
 // Wrap
 export const NoWrap: Story = {
   args: {
-    type: 'bodyS',
-    text: 'Texto muy largo que no debería hacer wrap porque wrapText está en false. Si no cabe, se recorta con ellipsis.',
+    type: "bodyS",
+    text: "Texto muy largo que no debería hacer wrap porque wrapText está en false. Si no cabe, se recorta con ellipsis.",
   },
   render: (args) => ({
     props: args,
@@ -204,8 +204,8 @@ export const NoWrap: Story = {
 
 export const WrapMultiLine: Story = {
   args: {
-    type: 'bodyS',
-    text: 'Este texto sí hace wrap porque wrapText es true. Verás cómo se ajusta a varias líneas respetando el ancho del contenedor padre.',
+    type: "bodyS",
+    text: "Este texto sí hace wrap porque wrapText es true. Verás cómo se ajusta a varias líneas respetando el ancho del contenedor padre.",
   },
   render: (args) => ({
     props: args,
@@ -223,10 +223,10 @@ export const WrapMultiLine: Story = {
 
 export const LineClamp: Story = {
   args: {
-    type: 'bodyS',
+    type: "bodyS",
     wrapText: true,
     wrapMaxLines: 2,
-    text: 'Este es un texto largo que será recortado a 2 líneas gracias a webkit-line-clamp. Aunque haya más contenido, el overflow se oculta y se muestra ellipsis al final de la segunda línea.',
+    text: "Este es un texto largo que será recortado a 2 líneas gracias a webkit-line-clamp. Aunque haya más contenido, el overflow se oculta y se muestra ellipsis al final de la segunda línea.",
   },
   render: (args) => ({
     props: args,
@@ -245,10 +245,10 @@ export const LineClamp: Story = {
 
 export const LineClamp3: Story = {
   args: {
-    type: 'bodyS',
+    type: "bodyS",
     wrapText: true,
     wrapMaxLines: 3,
-    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
+    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
   },
   render: (args) => ({
     props: args,
@@ -266,12 +266,12 @@ export const LineClamp3: Story = {
 };
 
 const LONG_TEXT_FOR_TOOLTIP =
-  'Este texto es intencionalmente largo para que desborde el contenedor padre y dispare el tooltip con el contenido completo al hacer hover.';
+  "Este texto es intencionalmente largo para que desborde el contenedor padre y dispare el tooltip con el contenido completo al hacer hover.";
 
 // Tooltip
 export const WithTooltipOnOverflow: Story = {
   args: {
-    type: 'bodyS',
+    type: "bodyS",
     text: LONG_TEXT_FOR_TOOLTIP,
   },
   render: (args) => ({
@@ -290,10 +290,10 @@ export const WithTooltipOnOverflow: Story = {
 
 export const WithTooltipClamped: Story = {
   args: {
-    type: 'bodyS',
+    type: "bodyS",
     wrapText: true,
     wrapMaxLines: 2,
-    text: 'Texto largo con line-clamp a 2 líneas. Al hacer hover se muestra el Tooltip con el contenido íntegro porque el texto está siendo truncado y cumple la condición de overflow + wrapMaxLines.',
+    text: "Texto largo con line-clamp a 2 líneas. Al hacer hover se muestra el Tooltip con el contenido íntegro porque el texto está siendo truncado y cumple la condición de overflow + wrapMaxLines.",
   },
   render: (args) => ({
     props: args,
@@ -311,7 +311,7 @@ export const WithTooltipClamped: Story = {
 };
 
 export const WithTooltipTop: Story = {
-  args: { type: 'bodyS', text: LONG_TEXT_FOR_TOOLTIP, tooltipSide: 'top' },
+  args: { type: "bodyS", text: LONG_TEXT_FOR_TOOLTIP, tooltipSide: "top" },
   render: (args) => ({
     props: args,
     template: `
@@ -327,7 +327,7 @@ export const WithTooltipTop: Story = {
 };
 
 export const WithTooltipRight: Story = {
-  args: { type: 'bodyS', text: LONG_TEXT_FOR_TOOLTIP, tooltipSide: 'right' },
+  args: { type: "bodyS", text: LONG_TEXT_FOR_TOOLTIP, tooltipSide: "right" },
   render: (args) => ({
     props: args,
     template: `
@@ -343,7 +343,7 @@ export const WithTooltipRight: Story = {
 };
 
 export const WithTooltipBottom: Story = {
-  args: { type: 'bodyS', text: LONG_TEXT_FOR_TOOLTIP, tooltipSide: 'bottom' },
+  args: { type: "bodyS", text: LONG_TEXT_FOR_TOOLTIP, tooltipSide: "bottom" },
   render: (args) => ({
     props: args,
     template: `
@@ -359,7 +359,7 @@ export const WithTooltipBottom: Story = {
 };
 
 export const WithTooltipLeft: Story = {
-  args: { type: 'bodyS', text: LONG_TEXT_FOR_TOOLTIP, tooltipSide: 'left' },
+  args: { type: "bodyS", text: LONG_TEXT_FOR_TOOLTIP, tooltipSide: "left" },
   render: (args) => ({
     props: args,
     template: `
@@ -411,7 +411,7 @@ export const WithTooltipAllSides: Story = {
 };
 
 export const WithTooltipDark: Story = {
-  args: { type: 'bodyS', text: LONG_TEXT_FOR_TOOLTIP, tooltipSide: 'top' },
+  args: { type: "bodyS", text: LONG_TEXT_FOR_TOOLTIP, tooltipSide: "top" },
   render: (args) => ({
     props: args,
     template: `
@@ -429,7 +429,7 @@ export const WithTooltipDark: Story = {
 
 // Requerido
 export const RequiredField: Story = {
-  args: { for: 'email', type: 'bodyS', weight: 'medium' },
+  args: { for: "email", type: "bodyS", weight: "medium" },
   render: (args) => ({
     props: args,
     template: `

@@ -65,9 +65,9 @@
             {{ product.price }}
           </td>
           <td class="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-            <app-badge size="sm" [color]="getBadgeColor(product.status)">
+            <UiBadge size="sm" [color]="getBadgeColor(product.status)">
               {{ product.status }}
-            </app-badge>
+            </UiBadge>
           </td>
         </tr>
         }

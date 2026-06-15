@@ -1,26 +1,25 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { ModalComponent } from '../../../ui/modal/modal.component';
-import { ComponentCardComponent } from '../../../common/component-card/component-card.component';
-import { ButtonComponent } from '../../../ui/button/button.component';
-import { LabelComponent } from '../../../form/label/label.component';
-import { InputFieldComponent } from '../../../form/input/input-field.component';
+import { CommonModule } from "@angular/common";
+import { Component } from "@angular/core";
+import { UiModalComponent } from "@shared/ui/modal";
+import { ComponentCardComponent } from "../../../common/component-card/component-card.component";
+import { ButtonComponent } from "../../../ui/button/button.component";
+import { LabelComponent } from "../../../form/label/label.component";
+import { InputFieldComponent } from "../../../form/input/input-field.component";
 
 @Component({
-  selector: 'app-form-in-modal',
+  selector: "app-form-in-modal",
   imports: [
     CommonModule,
-    ModalComponent,
+    UiModalComponent,
     ComponentCardComponent,
     ButtonComponent,
     LabelComponent,
-    InputFieldComponent
+    InputFieldComponent,
   ],
-  templateUrl: './form-in-modal.component.html',
-  styles: ``
+  templateUrl: "./form-in-modal.component.html",
+  styles: ``,
 })
 export class FormInModalComponent {
-
   isOpen = false;
 
   openModal() {
@@ -32,7 +31,7 @@ export class FormInModalComponent {
   }
 
   handleSave() {
-    console.log('Saving changes...');
+    console.log("Saving changes...");
     this.closeModal();
   }
 }

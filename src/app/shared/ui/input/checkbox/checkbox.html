@@ -1,0 +1,42 @@
+<label
+  class="flex items-center space-x-3 group cursor-pointer"
+  [class.cursor-not-allowed]="disabled()"
+  [class.opacity-60]="disabled()"
+>
+  <div class="relative w-5 h-5">
+    <input
+      [id]="id() || null"
+      type="checkbox"
+      [class]="
+        'w-5 h-5 appearance-none cursor-pointer border border-gray-300 dark:border-gray-700 rounded-md checked:bg-brand-500 checked:border-transparent disabled:opacity-60 ' +
+        className()
+      "
+      [checked]="checked()"
+      (change)="onChange($event)"
+      [disabled]="disabled()"
+    />
+
+    @if (checked()) {
+      <IconCheck
+        color="white"
+        size="14"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+      />
+    }
+
+    @if (disabled()) {
+      <IconCheck
+        color="#E4E7EC"
+        [strokeWidth]="2.33333"
+        size="14"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+      />
+    }
+  </div>
+
+  @if (label()) {
+    <span class="text-sm font-medium text-gray-800 dark:text-gray-200">
+      {{ label() }}
+    </span>
+  }
+</label>

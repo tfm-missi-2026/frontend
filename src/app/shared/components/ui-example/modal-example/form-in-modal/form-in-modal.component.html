@@ -1,6 +1,6 @@
 <app-component-card title="Form In Modal">
   <app-button size="sm" (btnClick)="openModal()"> Open Modal </app-button>
-  <app-modal
+  <UiModal
     [isOpen]="isOpen"
     (close)="closeModal()"
     className="max-w-[584px] p-5 lg:p-10"
@@ -47,5 +47,5 @@
         <app-button size="sm" (btnClick)="handleSave()"> Save Changes </app-button>
       </div>
     </form>
-  </app-modal>
+  </UiModal>
 </app-component-card>

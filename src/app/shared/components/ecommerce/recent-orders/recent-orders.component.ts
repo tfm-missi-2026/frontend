@@ -11,15 +11,13 @@
 
 // }
 
-
-
-import { Component } from '@angular/core';
+import { Component } from "@angular/core";
 // import { TableComponent } from '../../ui/table/table.component';
 // import { TableBodyComponent } from '../../ui/table/table-body.component';
 // import { TableCellComponent } from '../../ui/table/table-cell.component';
 // import { TableHeaderComponent } from '../../ui/table/table-header.component';
 // import { TableRowComponent } from '../../ui/table/table-row.component';
-import { BadgeComponent } from '../../ui/badge/badge.component';
+import { UiBadgeComponent } from "@shared/ui/badge";
 
 interface Product {
   id: number;
@@ -28,15 +26,13 @@ interface Product {
   category: string;
   price: string;
   image: string;
-  status: 'Delivered' | 'Pending' | 'Canceled';
+  status: "Delivered" | "Pending" | "Canceled";
 }
 
 @Component({
-  selector: 'app-recent-orders',
-  imports: [
-    BadgeComponent
-],
-  templateUrl: './recent-orders.component.html'
+  selector: "app-recent-orders",
+  imports: [UiBadgeComponent],
+  templateUrl: "./recent-orders.component.html",
 })
 export class RecentOrdersComponent {
   tableData: Product[] = [
@@ -87,9 +83,9 @@ export class RecentOrdersComponent {
     },
   ];
 
-  getBadgeColor(status: string): 'success' | 'warning' | 'error' {
-    if (status === 'Delivered') return 'success';
-    if (status === 'Pending') return 'warning';
-    return 'error';
+  getBadgeColor(status: string): "success" | "warning" | "error" {
+    if (status === "Delivered") return "success";
+    if (status === "Pending") return "warning";
+    return "error";
   }
 }

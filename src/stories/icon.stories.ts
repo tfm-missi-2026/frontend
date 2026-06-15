@@ -3,6 +3,8 @@ import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 
 import {
+  IconCheckComponent,
+  IconChevronDownComponent,
   IconChevronLeftComponent,
   IconChevronRightComponent,
   IconCircleInfoLightComponent,
@@ -12,13 +14,16 @@ import {
   IconFloppyDiskLightComponent,
   IconInfoCircleComponent,
   IconInfoComponent,
+  IconPlusComponent,
   IconSearchComponent,
   IconSearchLightComponent,
   IconSuccessComponent,
   IconTrashLightComponent,
   IconUploadLightComponent,
+  IconValidationErrorComponent,
   IconWarningComponent,
-} from "@ui/icon";
+  IconXComponent,
+} from "@shared/ui/icon";
 
 interface IconEntry {
   name: string;
@@ -27,6 +32,12 @@ interface IconEntry {
 }
 
 const ICON_CATALOG: IconEntry[] = [
+  { name: "Check", component: IconCheckComponent, selector: "IconCheck" },
+  {
+    name: "Chevron Down",
+    component: IconChevronDownComponent,
+    selector: "IconChevronDown",
+  },
   {
     name: "Chevron Left",
     component: IconChevronLeftComponent,
@@ -60,6 +71,7 @@ const ICON_CATALOG: IconEntry[] = [
     component: IconInfoCircleComponent,
     selector: "IconInfoCircle",
   },
+  { name: "Plus", component: IconPlusComponent, selector: "IconPlus" },
   { name: "Search", component: IconSearchComponent, selector: "IconSearch" },
   {
     name: "Search Light",
@@ -77,7 +89,13 @@ const ICON_CATALOG: IconEntry[] = [
     component: IconUploadLightComponent,
     selector: "IconUploadLight",
   },
+  {
+    name: "Validation Error",
+    component: IconValidationErrorComponent,
+    selector: "IconValidationError",
+  },
   { name: "Warning", component: IconWarningComponent, selector: "IconWarning" },
+  { name: "X", component: IconXComponent, selector: "IconX" },
 ];
 
 const meta: Meta = {
