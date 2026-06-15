@@ -1,0 +1,10 @@
+<div [class]="containerClasses()" data-testid="video">
+  <iframe
+    [src]="src()"
+    [title]="title()"
+    frameborder="0"
+    [attr.allow]="allowFeatures"
+    allowfullscreen
+    class="w-full h-full"
+  ></iframe>
+</div>

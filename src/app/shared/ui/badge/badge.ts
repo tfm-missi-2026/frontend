@@ -10,37 +10,37 @@ import { inject } from "@angular/core";
 import { BadgeColor, BadgeSize, BadgeVariant } from "./badge.types";
 
 const SIZE_CLASSES: Record<BadgeSize, string> = {
-  sm: "text-theme-xs",
-  md: "text-sm",
+  sm: "px-2.5 py-0.5 text-theme-xs",
+  md: "px-3 py-1 text-sm",
 };
 
 const COLOR_CLASSES: Record<BadgeVariant, Record<BadgeColor, string>> = {
   light: {
     primary:
-      "bg-brand-50 text-brand-500 dark:bg-brand-500/15 dark:text-brand-400",
+      "bg-brand-50 text-brand-500 ring-1 ring-inset ring-brand-500/20 dark:bg-brand-500/15 dark:text-brand-400 dark:ring-brand-500/30",
     success:
-      "bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500",
+      "bg-success-50 text-success-600 ring-1 ring-inset ring-success-500/20 dark:bg-success-500/15 dark:text-success-500 dark:ring-success-500/30",
     error:
-      "bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500",
+      "bg-error-50 text-error-600 ring-1 ring-inset ring-error-500/20 dark:bg-error-500/15 dark:text-error-500 dark:ring-error-500/30",
     warning:
-      "bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-orange-400",
-    info: "bg-blue-light-50 text-blue-light-500 dark:bg-blue-light-500/15 dark:text-blue-light-500",
-    light: "bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-white/80",
-    dark: "bg-gray-500 text-white dark:bg-white/5 dark:text-white",
+      "bg-warning-50 text-warning-600 ring-1 ring-inset ring-warning-500/20 dark:bg-warning-500/15 dark:text-warning-500 dark:ring-warning-500/30",
+    info: "bg-blue-light-50 text-blue-light-500 ring-1 ring-inset ring-blue-light-500/20 dark:bg-blue-light-500/15 dark:text-blue-light-500 dark:ring-blue-light-500/30",
+    light: "bg-gray-100 text-gray-700 ring-1 ring-inset ring-gray-200 dark:bg-white/5 dark:text-white/80 dark:ring-white/10",
+    dark: "bg-gray-500 text-white ring-1 ring-inset ring-gray-500/30 dark:bg-white/5 dark:text-white dark:ring-white/10",
   },
   solid: {
-    primary: "bg-brand-500 text-white dark:text-white",
-    success: "bg-success-500 text-white dark:text-white",
-    error: "bg-error-500 text-white dark:text-white",
-    warning: "bg-warning-500 text-white dark:text-white",
-    info: "bg-blue-light-500 text-white dark:text-white",
-    light: "bg-gray-400 text-white dark:bg-white/5 dark:text-white/80",
-    dark: "bg-gray-700 text-white dark:text-white",
+    primary: "bg-brand-500 text-white shadow-sm dark:text-white",
+    success: "bg-success-500 text-white shadow-sm dark:text-white",
+    error: "bg-error-500 text-white shadow-sm dark:text-white",
+    warning: "bg-warning-500 text-white shadow-sm dark:text-white",
+    info: "bg-blue-light-500 text-white shadow-sm dark:text-white",
+    light: "bg-gray-400 text-white shadow-sm dark:bg-white/5 dark:text-white/80",
+    dark: "bg-gray-700 text-white shadow-sm dark:text-white",
   },
 };
 
 const BASE_STYLES =
-  "inline-flex items-center justify-center gap-1 rounded-full font-medium";
+  "inline-flex items-center justify-center gap-1 rounded-full font-medium leading-none whitespace-nowrap transition-colors";
 
 /**
  * `UiBadge`
@@ -65,11 +65,11 @@ const BASE_STYLES =
   template: `
     <span [class]="containerClasses()">
       @if (startIcon()) {
-        <span class="mr-1" [innerHTML]="safeStartIcon()"></span>
+        <span [innerHTML]="safeStartIcon()"></span>
       }
       <ng-content></ng-content>
       @if (endIcon()) {
-        <span class="ml-1" [innerHTML]="safeEndIcon()"></span>
+        <span [innerHTML]="safeEndIcon()"></span>
       }
     </span>
   `,

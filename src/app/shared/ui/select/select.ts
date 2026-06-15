@@ -29,6 +29,10 @@ import {
   IconValidationErrorComponent,
   IconXComponent,
 } from "@shared/ui/icon";
+import { UiFieldErrorComponent } from "@shared/ui/field-error";
+import { UiFieldValueComponent } from "@shared/ui/field-value";
+import { UiFormLabelComponent } from "@shared/ui/form-label";
+import { UiSelectChipComponent } from "@shared/ui/select-chip";
 import {
   LoadOptionsFn,
   MessageFn,
@@ -56,6 +60,10 @@ import {
     IconChevronDownComponent,
     IconValidationErrorComponent,
     IconXComponent,
+    UiFieldErrorComponent,
+    UiFieldValueComponent,
+    UiFormLabelComponent,
+    UiSelectChipComponent,
   ],
   templateUrl: "./select.html",
   providers: [

@@ -58,7 +58,7 @@ describe("UiBadge", () => {
   });
 
   it("uses md text size by default", () => {
-    expect(host.badge.sizeClass()).toBe("text-sm");
+    expect(host.badge.sizeClass()).toBe("px-3 py-1 text-sm");
   });
 
   it("updates classes when color changes", () => {
@@ -75,12 +75,22 @@ describe("UiBadge", () => {
     const span = fixture.nativeElement.querySelector("span") as HTMLSpanElement;
     expect(span.className).toContain("bg-error-500");
     expect(span.className).toContain("text-white");
+    expect(span.className).toContain("shadow-sm");
   });
 
   it("applies sm size class when size is sm", () => {
     host.size = "sm";
     fixture.detectChanges();
-    expect(host.badge.sizeClass()).toBe("text-theme-xs");
+    expect(host.badge.sizeClass()).toBe("px-2.5 py-0.5 text-theme-xs");
+  });
+
+  it("applies ring and leading-none to keep text contained", () => {
+    const span = fixture.nativeElement.querySelector("span") as HTMLSpanElement;
+    expect(span.className).toContain("ring-1");
+    expect(span.className).toContain("ring-inset");
+    expect(span.className).toContain("ring-brand-500/20");
+    expect(span.className).toContain("leading-none");
+    expect(span.className).toContain("whitespace-nowrap");
   });
 
   it("renders project content inside the badge", () => {

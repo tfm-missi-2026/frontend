@@ -2,19 +2,43 @@
 <div class="space-y-5 sm:space-y-6">
   <div>
     <app-component-card title="Responsive image">
-      <app-responsive-image />
+      <UiImage
+        [src]="coverImage.src"
+        [alt]="coverImage.alt"
+        rounded="xl"
+        [bordered]="true"
+        objectFit="cover"
+      />
     </app-component-card>
   </div>
 
   <div>
     <app-component-card title="Image in 2 Grid">
-      <app-two-column-image-grid />
+      <UiGrid
+        [columns]="2"
+        breakpoint="sm"
+        gap="gap-5"
+        ariaLabel="Galería de 2 imágenes"
+      >
+        @for (item of twoColImages; track item.src) {
+          <UiImage [src]="item.src" [alt]="item.alt" />
+        }
+      </UiGrid>
     </app-component-card>
   </div>
 
   <div>
     <app-component-card title="Image in 3 Grid">
-      <app-three-column-image-grid />
+      <UiGrid
+        [columns]="3"
+        breakpoint="sm"
+        gap="gap-5"
+        ariaLabel="Galería de 3 imágenes"
+      >
+        @for (item of threeColImages; track item.src) {
+          <UiImage [src]="item.src" [alt]="item.alt" />
+        }
+      </UiGrid>
     </app-component-card>
   </div>
 </div>

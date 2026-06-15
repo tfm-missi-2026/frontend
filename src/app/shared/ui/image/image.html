@@ -1,0 +1,24 @@
+@if (hasError() && !fallbackSrc()) {
+  <div
+    [class]="containerClasses()"
+    role="img"
+    [attr.aria-label]="alt() || 'Imagen no disponible'"
+    data-testid="image-fallback"
+  >
+    <div
+      class="flex items-center justify-center w-full h-full min-h-32 bg-gray-50 dark:bg-gray-900 text-sm text-gray-500 dark:text-gray-400"
+    >
+      Imagen no disponible
+    </div>
+  </div>
+} @else {
+  <div [class]="containerClasses()" data-testid="image">
+    <img
+      [src]="effectiveSrc()"
+      [alt]="alt()"
+      [loading]="loading()"
+      [class]="imageClasses()"
+      (error)="onError()"
+    />
+  </div>
+}

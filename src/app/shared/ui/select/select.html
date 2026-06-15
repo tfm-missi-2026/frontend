@@ -7,21 +7,14 @@
 >
   <!-- LABEL -->
   @if (labelText()) {
-    <label
-      class="inline-flex items-center gap-1 text-sm font-medium text-gray-700 dark:text-gray-400"
-      [attr.for]="inputId() || null"
-    >
-      <span>{{ labelText() }}</span>
-      @if (required()) {
-        <span class="text-error-500" aria-hidden="true">*</span>
-      }
-      @if (tooltip()) {
-        <span
-          class="inline-flex items-center justify-center w-3.5 h-3.5 text-[10px] rounded-full bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 cursor-help"
-          [title]="tooltip()"
-        >?</span>
-      }
-    </label>
+    <UiFormLabel
+      [labelText]="labelText()"
+      [labelFor]="inputId() || ''"
+      [required]="required()"
+      [disabled]="effectiveIsDisabled()"
+      [readOnly]="readOnly()"
+      [tooltip]="tooltip()"
+    ></UiFormLabel>
   }
 
   <!-- CONTROL -->
@@ -47,40 +40,23 @@
       [class.is-multi]="isMulti()"
     >
       @if (!isMulti()) {
-        @if (displayLabel()) {
-          <span class="text-sm text-gray-800 dark:text-white truncate">
-            {{ displayLabel() }}
-          </span>
-        } @else {
-          <span class="text-sm text-gray-400 dark:text-gray-500 m-0">
-            {{ placeholder() }}
-          </span>
-        }
+        <UiFieldValue
+          [value]="displayLabel()"
+          [placeholder]="placeholder()"
+        ></UiFieldValue>
       }
 
       @if (isMulti()) {
         @for (opt of selectedOptions(); track trackByValue($index, opt)) {
-          <span
-            class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-md py-0.5 px-2 text-xs text-gray-800 dark:text-gray-200 max-w-full"
-            [class.opacity-70]="effectiveIsDisabled() || readOnly()"
-          >
-            <span class="truncate max-w-50">{{ opt.label }}</span>
-            @if (!effectiveIsDisabled() && !readOnly()) {
-              <button
-                type="button"
-                class="inline-flex items-center justify-center bg-transparent border-0 p-0 cursor-pointer rounded text-gray-500 hover:text-error-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                (click)="removeAt($index, $event)"
-                aria-label="Quitar"
-              >
-                <IconX className="w-2.5 h-2.5" />
-              </button>
-            }
-          </span>
+          <UiSelectChip
+            [label]="opt.label"
+            [disabled]="effectiveIsDisabled()"
+            [readOnly]="readOnly()"
+            (remove)="removeAt($index)"
+          ></UiSelectChip>
         }
         @if (selectedOptions().length === 0) {
-          <span class="text-sm text-gray-400 dark:text-gray-500 m-0">
-            {{ placeholder() }}
-          </span>
+          <UiFieldValue [placeholder]="placeholder()"></UiFieldValue>
         }
       }
 
@@ -191,9 +167,5 @@
     </div>
   }
 
-  @if (errorMessage()) {
-    <span class="text-xs text-error-500 leading-4">
-      {{ errorMessage() }}
-    </span>
-  }
+  <UiFieldError [message]="errorMessage()"></UiFieldError>
 </div>
