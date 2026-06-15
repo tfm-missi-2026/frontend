@@ -40,7 +40,7 @@ const COLOR_CLASSES: Record<BadgeVariant, Record<BadgeColor, string>> = {
 };
 
 const BASE_STYLES =
-  "inline-flex items-center justify-center gap-2 rounded-full font-medium";
+  "inline-flex items-center justify-center gap-1 rounded-full font-medium";
 
 /**
  * `UiBadge`
