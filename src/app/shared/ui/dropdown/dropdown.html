@@ -1,0 +1,10 @@
+@if (isOpen()) {
+  <div
+    #dropdownRef
+    [ngClass]="panelClasses()"
+    role="menu"
+    data-testid="dropdown"
+  >
+    <ng-content></ng-content>
+  </div>
+}

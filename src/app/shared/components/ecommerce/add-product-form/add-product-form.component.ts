@@ -4,7 +4,7 @@ import { LabelComponent } from '../../form/label/label.component';
 import { InputFieldComponent } from '../../form/input/input-field.component';
 import { SelectComponent } from '../../form/select/select.component';
 import { TextAreaComponent } from '../../form/input/text-area.component';
-import { ButtonComponent } from '../../ui/button/button.component';
+import { UiButtonComponent } from '@shared/ui/button';
 
 @Component({
   selector: 'app-add-product-form',
@@ -14,7 +14,7 @@ import { ButtonComponent } from '../../ui/button/button.component';
     InputFieldComponent,
     SelectComponent,
     TextAreaComponent,
-    ButtonComponent
+    UiButtonComponent
   ],
   templateUrl: './add-product-form.component.html',
   styles: ``

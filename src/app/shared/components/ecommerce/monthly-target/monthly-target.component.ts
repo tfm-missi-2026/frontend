@@ -9,15 +9,14 @@ import {
   ApexOptions,
   NgApexchartsModule,
 } from 'ng-apexcharts';
-import { DropdownComponent } from '../../ui/dropdown/dropdown.component';
-import { DropdownItemComponent } from '../../ui/dropdown/dropdown-item/dropdown-item.component';
+import { UiDropdownComponent, UiDropdownItemComponent } from '@shared/ui/dropdown';
 
 @Component({
   selector: 'app-monthly-target',
   imports: [
     NgApexchartsModule,
-    DropdownComponent,
-    DropdownItemComponent
+    UiDropdownComponent,
+    UiDropdownItemComponent
 ],
   templateUrl: './monthly-target.component.html',
 })

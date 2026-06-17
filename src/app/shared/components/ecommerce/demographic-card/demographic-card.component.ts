@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { DropdownComponent } from '../../ui/dropdown/dropdown.component';
-import { DropdownItemComponent } from '../../ui/dropdown/dropdown-item/dropdown-item.component';
+import { UiDropdownComponent, UiDropdownItemComponent } from '@shared/ui/dropdown';
 import { CountryMapComponent } from '../country-map/country-map.component';
 
 @Component({
@@ -9,8 +8,8 @@ import { CountryMapComponent } from '../country-map/country-map.component';
   imports: [
     CommonModule,
     CountryMapComponent,
-    DropdownComponent,
-    DropdownItemComponent,
+    UiDropdownComponent,
+    UiDropdownItemComponent,
   ],
   templateUrl: './demographic-card.component.html',
 })

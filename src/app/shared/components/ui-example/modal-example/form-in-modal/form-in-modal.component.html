@@ -1,5 +1,5 @@
 <app-component-card title="Form In Modal">
-  <app-button size="sm" (btnClick)="openModal()"> Open Modal </app-button>
+  <UiButton [compact]="true" (click)="openModal()"> Open Modal </UiButton>
   <UiModal
     [isOpen]="isOpen"
     (close)="closeModal()"
@@ -41,10 +41,12 @@
       </div>
 
       <div class="flex items-center justify-end w-full gap-3 mt-6">
-        <app-button size="sm" variant="outline" (btnClick)="closeModal()">
+        <UiButton variant="secondary" [compact]="true" (click)="closeModal()">
           Close
-        </app-button>
-        <app-button size="sm" (btnClick)="handleSave()"> Save Changes </app-button>
+        </UiButton>
+        <UiButton [compact]="true" (click)="handleSave()">
+          Save Changes
+        </UiButton>
       </div>
     </form>
   </UiModal>

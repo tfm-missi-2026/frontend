@@ -21,6 +21,8 @@
  * ```
  */
 
+export { IconArrowRightComponent } from './arrow-right-icon';
+export { IconBoxComponent } from './box-icon';
 export { IconCheckComponent } from './check-icon';
 export { IconChevronDownComponent } from './chevron-down-icon';
 export { IconChevronLeftComponent } from './chevron-left-icon';
@@ -28,10 +30,12 @@ export { IconChevronRightComponent } from './chevron-right-icon';
 export { IconCircleInfoLightComponent } from './circle-info-icon-light';
 export { IconEditLightComponent } from './edit-icon-light';
 export { IconErrorComponent } from './error-icon';
+export { IconExternalLinkComponent } from './external-link-icon';
 export { IconEyeComponent } from './eye-icon';
 export { IconFloppyDiskLightComponent } from './floppy-disk-icon-light';
 export { IconInfoCircleComponent } from './info-circle-icon';
 export { IconInfoComponent } from './info-icon';
+export { IconLinkComponent } from './link-icon';
 export { IconPlusComponent } from './plus-icon';
 export { IconSearchComponent } from './search-icon';
 export { IconSearchLightComponent } from './search-icon-light';

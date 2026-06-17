@@ -2,7 +2,7 @@
 import { Component } from '@angular/core';
 import { LabelComponent } from '../../form/label/label.component';
 import { CheckboxComponent } from '../../form/input/checkbox.component';
-import { ButtonComponent } from '../../ui/button/button.component';
+import { UiButtonComponent } from '@shared/ui/button';
 import { InputFieldComponent } from '../../form/input/input-field.component';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms';
   imports: [
     LabelComponent,
     CheckboxComponent,
-    ButtonComponent,
+    UiButtonComponent,
     InputFieldComponent,
     RouterModule,
     FormsModule

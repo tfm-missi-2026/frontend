@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { ButtonComponent } from '../../../ui/button/button.component';
+import { UiButtonComponent } from '@shared/ui/button';
 
 @Component({
   selector: 'app-billing-plan',
   imports: [
-    ButtonComponent,
+    UiButtonComponent,
   ],
   templateUrl: './billing-plan.component.html',
   host:{

@@ -1,16 +1,16 @@
 import { CommonModule } from "@angular/common";
 import { Component } from "@angular/core";
 import { UiModalComponent } from "@shared/ui/modal";
+import { UiButtonComponent } from "@shared/ui/button";
 import { ComponentCardComponent } from "../../../common/component-card/component-card.component";
-import { ButtonComponent } from "../../../ui/button/button.component";
 
 @Component({
   selector: "app-vertically-centered-modal",
   imports: [
     CommonModule,
     UiModalComponent,
+    UiButtonComponent,
     ComponentCardComponent,
-    ButtonComponent,
   ],
   templateUrl: "./vertically-centered-modal.component.html",
   styles: ``,

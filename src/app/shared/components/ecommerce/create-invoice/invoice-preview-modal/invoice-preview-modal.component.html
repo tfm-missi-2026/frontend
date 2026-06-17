@@ -1,4 +1,4 @@
- <app-button variant="outline" (btnClick)="openModal()">
+ <UiButton variant="secondary" (click)="openModal()">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="20"
@@ -22,7 +22,7 @@
       />
     </svg>
     Preview Invoice
- </app-button>
+ </UiButton>
  <!-- modal -->
   <UiModal
     [isOpen]="isOpen"

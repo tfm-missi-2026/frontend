@@ -3,11 +3,11 @@ import { InputFieldComponent } from "./../../form/input/input-field.component";
 import { ModalService } from "../../../services/modal.service";
 
 import { UiModalComponent } from "@shared/ui/modal";
-import { ButtonComponent } from "../../ui/button/button.component";
+import { UiButtonComponent } from "@shared/ui/button";
 
 @Component({
   selector: "app-user-meta-card",
-  imports: [UiModalComponent, InputFieldComponent, ButtonComponent],
+  imports: [UiModalComponent, UiButtonComponent, InputFieldComponent],
   templateUrl: "./user-meta-card.component.html",
   styles: ``,
 })

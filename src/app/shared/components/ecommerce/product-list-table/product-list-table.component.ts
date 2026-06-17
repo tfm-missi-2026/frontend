@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { TableDropdownComponent } from '../../common/table-dropdown/table-dropdown.component';
-import { ButtonComponent } from '../../ui/button/button.component';
+import { UiButtonComponent } from '@shared/ui/button';
 import { RouterModule } from '@angular/router';
 
 interface Product {
@@ -24,7 +24,7 @@ interface Sort {
   imports: [
     CommonModule,
     TableDropdownComponent,
-    ButtonComponent,
+    UiButtonComponent,
     RouterModule,
   ],
   templateUrl: './product-list-table.component.html',

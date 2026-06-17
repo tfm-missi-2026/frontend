@@ -1,0 +1,67 @@
+<!--
+  Template del Link.
+
+  El slot <ng-content> es la fuente principal de contenido: el
+  consumidor puede escribir HTML arbitrario dentro del link (textos,
+  spans, iconos inline, etc.). Si se define `label` y el slot está
+  vacío, se usa como fallback de texto plano.
+
+  Estructura:
+  - Si `href` está definido → <a href="..."> (navegación externa).
+  - Si no → <a [routerLink]="to()"> (navegación SPA).
+  - Los íconos izquierda/derecha se montan vía *ngComponentOutlet.
+-->
+
+@if (isExternal()) {
+  <a
+    [class]="containerClasses()"
+    [attr.href]="disabled() ? null : effectiveHref() || null"
+    [attr.target]="target() || null"
+    [attr.rel]="computedRel()"
+    [attr.aria-label]="labelText() || null"
+    [attr.aria-disabled]="disabled() ? 'true' : null"
+    [attr.tabindex]="disabled() ? -1 : null"
+    (click)="onClick($event)"
+    data-testid="link"
+  >
+    @if (leftIcon()) {
+      <ng-container
+        *ngComponentOutlet="leftIcon() ?? null; inputs: leftIconInputs()"
+      ></ng-container>
+    }
+
+    <ng-content></ng-content>
+
+    @if (rightIcon()) {
+      <ng-container
+        *ngComponentOutlet="rightIcon() ?? null; inputs: rightIconInputs()"
+      ></ng-container>
+    }
+  </a>
+} @else {
+  <a
+    [class]="containerClasses()"
+    [routerLink]="to() || null"
+    [attr.target]="target() || null"
+    [attr.rel]="computedRel()"
+    [attr.aria-label]="labelText() || null"
+    [attr.aria-disabled]="disabled() ? 'true' : null"
+    [attr.tabindex]="disabled() ? -1 : null"
+    (click)="onClick($event)"
+    data-testid="link"
+  >
+    @if (leftIcon()) {
+      <ng-container
+        *ngComponentOutlet="leftIcon() ?? null; inputs: leftIconInputs()"
+      ></ng-container>
+    }
+
+    <ng-content></ng-content>
+
+    @if (rightIcon()) {
+      <ng-container
+        *ngComponentOutlet="rightIcon() ?? null; inputs: rightIconInputs()"
+      ></ng-container>
+    }
+  </a>
+}

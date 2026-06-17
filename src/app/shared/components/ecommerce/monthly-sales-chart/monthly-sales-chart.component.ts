@@ -1,16 +1,15 @@
 
 import { Component } from '@angular/core';
 import { NgApexchartsModule, ApexAxisChartSeries, ApexChart, ApexXAxis, ApexPlotOptions, ApexDataLabels, ApexStroke, ApexLegend, ApexYAxis, ApexGrid, ApexFill, ApexTooltip } from 'ng-apexcharts';
-import { DropdownComponent } from '../../ui/dropdown/dropdown.component';
-import { DropdownItemComponent } from '../../ui/dropdown/dropdown-item/dropdown-item.component';
+import { UiDropdownComponent, UiDropdownItemComponent } from '@shared/ui/dropdown';
 
 @Component({
   selector: 'app-monthly-sales-chart',
   standalone: true,
   imports: [
     NgApexchartsModule,
-    DropdownComponent,
-    DropdownItemComponent
+    UiDropdownComponent,
+    UiDropdownItemComponent
 ],
   templateUrl: './monthly-sales-chart.component.html'
 })

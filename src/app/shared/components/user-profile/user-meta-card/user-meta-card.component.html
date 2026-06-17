@@ -200,19 +200,19 @@
         </div>
       </div>
       <div class="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-        <app-button
-          size="sm"
-          variant="outline"
-          (btnClick)="closeModal()"
+        <UiButton
+          variant="secondary"
+          [compact]="true"
+          (click)="closeModal()"
         >
           Close
-        </app-button>
-        <app-button
-          size="sm"
-          (btnClick)="handleSave()"
+        </UiButton>
+        <UiButton
+          [compact]="true"
+          (click)="handleSave()"
         >
           Save Changes
-        </app-button>
+        </UiButton>
       </div>
     </form>
   </div>
