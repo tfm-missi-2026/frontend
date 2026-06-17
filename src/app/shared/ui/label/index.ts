@@ -6,5 +6,5 @@
  * descripciones, métricas, etc. (no para labels de formulario — para
  * eso usar `UiFormLabel`).
  */
-export { UiLabelComponent } from './label';
-export type { LabelAs } from './label';
+export { UiLabelComponent } from './label.component';
+export type { LabelAs } from './label.component';

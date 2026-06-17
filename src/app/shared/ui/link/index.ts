@@ -5,7 +5,7 @@
  * `routerLink` (`to`) y URL externa (`href`). El slot `<ng-content>` es
  * editable con HTML arbitrario. Standalone + OnPush + signal APIs.
  */
-export { UiLinkComponent } from './link';
+export { UiLinkComponent } from './link.component';
 export type {
   LinkProps,
   LinkVariant,

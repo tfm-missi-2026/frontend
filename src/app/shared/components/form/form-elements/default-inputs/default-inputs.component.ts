@@ -6,6 +6,11 @@ import { SelectComponent } from '../../select/select.component';
 import { DatePickerComponent } from '../../date-picker/date-picker.component';
 import { ComponentCardComponent } from '../../../common/component-card/component-card.component';
 import { TimePickerComponent } from '../../time-picker/time-picker.component';
+import {
+  IconEyeOffComponent,
+  IconEyeOpenComponent,
+  IconMastercardSmallComponent,
+} from '@shared/icons';
 
 @Component({
   selector: 'app-default-inputs',
@@ -15,7 +20,10 @@ import { TimePickerComponent } from '../../time-picker/time-picker.component';
     InputFieldComponent,
     SelectComponent,
     DatePickerComponent,
-    TimePickerComponent
+    TimePickerComponent,
+    IconEyeOffComponent,
+    IconEyeOpenComponent,
+    IconMastercardSmallComponent,
 ],
   templateUrl: './default-inputs.component.html',
   styles: ``

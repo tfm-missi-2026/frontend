@@ -11,7 +11,7 @@ import {
 import { isPlatformBrowser, NgClass, NgComponentOutlet } from "@angular/common";
 import { RouterModule } from "@angular/router";
 
-import { IconProps } from "@shared/ui/icon/icon.interface";
+import { IconProps } from "@shared/icons/icon.interface";
 import { TypographyType } from "@styles/types/typography";
 
 import { LinkProps, LinkSize, LinkUnderline, LinkVariant } from "./link.types";
@@ -68,7 +68,7 @@ const BASE_CLASSES =
   standalone: true,
   imports: [NgComponentOutlet, RouterModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: "./link.html",
+  templateUrl: "./link.component.html",
 })
 export class UiLinkComponent {
   /** Ruta del router-link. */

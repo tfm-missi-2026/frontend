@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UiLoadingTimeoutWrapperComponent } from './loading-timeout-wrapper';
+import { UiLoadingTimeoutWrapperComponent } from './loading-timeout-wrapper.component';
 
 describe('LoadingTimeoutWrapper', () => {
   let component: UiLoadingTimeoutWrapperComponent;

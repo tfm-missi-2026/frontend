@@ -6,6 +6,6 @@
  * signal APIs. Pensado para usarse con `UiDropdownItem` (subcomponente
  * re-exportado desde este mismo paquete).
  */
-export { UiDropdownComponent } from './dropdown';
-export { UiDropdownItemComponent } from './dropdown-item';
+export { UiDropdownComponent } from './dropdown.component';
+export { UiDropdownItemComponent } from './dropdown-item/dropdown-item.component';
 export type { DropdownAlignment, DropdownItemTag } from './dropdown.types';

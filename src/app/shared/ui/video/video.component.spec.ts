@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { UiVideoComponent } from "./video";
+import { UiVideoComponent } from "./video.component";
 import { VideoRatio } from "./video.types";
 
 /**

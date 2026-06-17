@@ -6,4 +6,4 @@
  * para deshabilitar el botón durante peticiones async y mostrar
  * feedback visual al usuario.
  */
-export { UiLoadingTimeoutWrapperComponent } from './loading-timeout-wrapper';
+export { UiLoadingTimeoutWrapperComponent } from './loading-timeout-wrapper.component';

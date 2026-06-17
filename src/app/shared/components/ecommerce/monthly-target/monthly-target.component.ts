@@ -10,13 +10,21 @@ import {
   NgApexchartsModule,
 } from 'ng-apexcharts';
 import { UiDropdownComponent, UiDropdownItemComponent } from '@shared/ui/dropdown';
+import {
+  IconArrowDownTrendComponent,
+  IconArrowUpTrendComponent,
+  IconDotsVerticalComponent,
+} from '@shared/icons';
 
 @Component({
   selector: 'app-monthly-target',
   imports: [
     NgApexchartsModule,
     UiDropdownComponent,
-    UiDropdownItemComponent
+    UiDropdownItemComponent,
+    IconArrowDownTrendComponent,
+    IconArrowUpTrendComponent,
+    IconDotsVerticalComponent,
 ],
   templateUrl: './monthly-target.component.html',
 })

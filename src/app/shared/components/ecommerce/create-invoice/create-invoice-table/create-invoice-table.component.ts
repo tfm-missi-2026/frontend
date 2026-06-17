@@ -3,6 +3,13 @@ import { Component } from '@angular/core';
 import { InputFieldComponent } from '../../../form/input/input-field.component';
 import { LabelComponent } from '../../../form/label/label.component';
 import { FormsModule } from '@angular/forms';
+import {
+  IconChevronDownComponent,
+  IconInfoCircleSmallComponent,
+  IconStepperMinusComponent,
+  IconStepperPlusComponent,
+  IconTrashComponent,
+} from '@shared/icons';
 
 
 interface Product {
@@ -28,6 +35,11 @@ interface FormData {
     InputFieldComponent,
     LabelComponent,
     FormsModule,
+    IconChevronDownComponent,
+    IconInfoCircleSmallComponent,
+    IconStepperMinusComponent,
+    IconStepperPlusComponent,
+    IconTrashComponent,
   ],
   templateUrl: './create-invoice-table.component.html',
   styles: ``

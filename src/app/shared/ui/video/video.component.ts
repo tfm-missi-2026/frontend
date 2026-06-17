@@ -39,7 +39,7 @@ const ALLOW_FEATURES =
   selector: "UiVideo",
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: "./video.html",
+  templateUrl: "./video.component.html",
 })
 export class UiVideoComponent {
   /** URL de embed del video (iframe `src`). */

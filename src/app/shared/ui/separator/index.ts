@@ -5,7 +5,7 @@
  * control sobre orientación, estilo, grosor, espaciado y color.
  * Standalone + OnPush + signal APIs.
  */
-export { UiSeparatorComponent } from './separator';
+export { UiSeparatorComponent } from './separator.component';
 export type {
   SeparatorProps,
   SeparatorOrientation,

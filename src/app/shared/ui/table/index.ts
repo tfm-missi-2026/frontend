@@ -27,11 +27,11 @@
  * ```
  */
 
-export { UiTableComponent } from './table';
+export { UiTableComponent } from './table.component';
 
 // Iconos stub internos (chevrons de paginación). Exportados por si el
 // consumer quiere reutilizarlos en otras partes de la UI.
-export { ChevronLeftIcon, ChevronRightIcon } from './table';
+export { ChevronLeftIcon, ChevronRightIcon } from './table.component';
 
 export type {
   TableCellContext,

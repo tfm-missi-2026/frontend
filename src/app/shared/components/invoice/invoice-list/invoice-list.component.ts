@@ -2,6 +2,17 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TableDropdownComponent } from '../../common/table-dropdown/table-dropdown.component';
+import {
+  IconArrowLeftPaginationComponent,
+  IconArrowRightPaginationComponent,
+  IconCheckboxCheckComponent,
+  IconDotsVerticalComponent,
+  IconFilterComponent,
+  IconSearchComponent,
+  IconSortDownComponent,
+  IconSortUpComponent,
+  IconUploadComponent,
+} from '@shared/icons';
 
 interface Invoice {
   id: number;
@@ -23,6 +34,15 @@ interface SortState {
     CommonModule,
     FormsModule,
     TableDropdownComponent,
+    IconSearchComponent,
+    IconFilterComponent,
+    IconUploadComponent,
+    IconCheckboxCheckComponent,
+    IconSortUpComponent,
+    IconSortDownComponent,
+    IconDotsVerticalComponent,
+    IconArrowLeftPaginationComponent,
+    IconArrowRightPaginationComponent,
   ],
   templateUrl: './invoice-list.component.html',
   styles: ``

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UiFormLabelComponent } from './form-label';
+import { UiFormLabelComponent } from './form-label.component';
 
 describe('FormLabel', () => {
   let component: UiFormLabelComponent;

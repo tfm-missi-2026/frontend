@@ -12,16 +12,16 @@ import {
   Type,
 } from "@angular/core";
 
-import { IconProps } from "@shared/ui/icon/icon.interface";
+import { IconProps } from "@shared/icons/icon.interface";
 import { TypographyType } from "@styles/types/typography";
 import designConstants from "@styles/constants";
 import {
   UiTooltipComponent,
   TooltipSide,
   TooltipVariantType,
-} from "@shared/ui/tooltip/tooltip";
-import { UiLabelComponent } from "@shared/ui/label/label";
-import { UiLoadingTimeoutWrapperComponent } from "@shared/ui/loading-timeout-wrapper/loading-timeout-wrapper";
+} from "@shared/ui/tooltip/tooltip.component";
+import { UiLabelComponent } from "@shared/ui/label/label.component";
+import { UiLoadingTimeoutWrapperComponent } from "@shared/ui/loading-timeout-wrapper/loading-timeout-wrapper.component";
 import { getFocusStyling } from "@utils/styling";
 import { NgComponentOutlet, NgTemplateOutlet } from "@angular/common";
 

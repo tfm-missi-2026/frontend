@@ -1,10 +1,11 @@
 
 import { Component, Input, Output, EventEmitter, ElementRef, ViewChild } from '@angular/core';
 import flatpickr from 'flatpickr';
+import { IconClockComponent } from '@shared/icons';
 
 @Component({
   selector: 'app-time-picker',
-  imports: [],
+  imports: [IconClockComponent],
   templateUrl: './time-picker.component.html',
   styles: ``
 })

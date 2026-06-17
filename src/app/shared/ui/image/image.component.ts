@@ -65,7 +65,7 @@ const BORDER_CLASSES =
   selector: "UiImage",
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: "./image.html",
+  templateUrl: "./image.component.html",
 })
 export class UiImageComponent {
   /** URL de la imagen. */

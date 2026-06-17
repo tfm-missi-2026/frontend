@@ -17,7 +17,7 @@ import {
   IconLinkComponent,
   IconPlusComponent,
   IconCheckComponent,
-} from "@shared/ui/icon";
+} from "@shared/icons";
 
 const meta: Meta<UiCardComponent> = {
   title: "Shared/Card",

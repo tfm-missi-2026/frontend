@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Output, EventEmitter, HostListener } from '@angular/core';
 import { ComponentCardComponent } from '../../../common/component-card/component-card.component';
+import { IconUploadLargeComponent } from '@shared/icons';
 
 
 @Component({
@@ -8,6 +9,7 @@ import { ComponentCardComponent } from '../../../common/component-card/component
   imports: [
     CommonModule,
     ComponentCardComponent,
+    IconUploadLargeComponent,
   ],
   templateUrl: './dropzone.component.html',
   styles: ``

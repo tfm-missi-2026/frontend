@@ -1,8 +1,17 @@
 import { Component } from '@angular/core';
+import {
+  IconCardComponent,
+  IconEnvelopeStrokeComponent,
+  IconShoppingCartComponent,
+} from '@shared/icons';
 
 @Component({
   selector: 'app-order-history',
-  imports: [],
+  imports: [
+    IconShoppingCartComponent,
+    IconCardComponent,
+    IconEnvelopeStrokeComponent,
+  ],
   templateUrl: './order-history.component.html',
   styles: ``
 })

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UiButtonComponent } from './button';
+import { UiButtonComponent } from './button.component';
 
 /**
  * Aplica un set de inputs a un `ComponentRef` de Angular. Signal-based

@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { IconChevronDownComponent } from '@shared/icons';
 
 export interface CountryCode {
   code: string;
@@ -10,6 +11,7 @@ export interface CountryCode {
   selector: 'app-phone-input',
   imports: [
     CommonModule,
+    IconChevronDownComponent,
   ],
   templateUrl: './phone-input.component.html',
   styles: ``

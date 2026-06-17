@@ -14,5 +14,5 @@
  * </UiGrid>
  * ```
  */
-export { UiGridComponent } from "./grid";
+export { UiGridComponent } from "./grid.component";
 export type { GridBreakpoint, GridColumns } from "./grid.types";

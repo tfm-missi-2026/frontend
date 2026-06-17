@@ -1,6 +1,6 @@
 import { Type } from "@angular/core";
 
-import { IconProps } from "@shared/ui/icon/icon.interface";
+import { IconProps } from "@shared/icons/icon.interface";
 
 /**
  * Variante visual del link. Define la jerarquía de color.

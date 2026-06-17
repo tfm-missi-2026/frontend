@@ -11,7 +11,7 @@ import {
 } from "@angular/core";
 import { isPlatformBrowser } from "@angular/common";
 
-import { IconXComponent } from "@shared/ui/icon";
+import { IconXComponent } from "@shared/icons";
 
 /**
  * `UiModal`

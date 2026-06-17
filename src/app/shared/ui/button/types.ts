@@ -1,6 +1,6 @@
 import { TemplateRef, Type } from "@angular/core";
 
-import { IconProps } from "@shared/ui/icon/icon.interface";
+import { IconProps } from "@shared/icons/icon.interface";
 import { TypographyType } from "@styles/types/typography";
 import {
   TooltipVariantType,

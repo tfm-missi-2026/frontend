@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from "@angular/core";
 
-import { IconValidationErrorComponent } from "@shared/ui/icon";
+import { IconValidationErrorComponent } from "@shared/icons";
 
 /**
  * `ValidationErrorIcon`

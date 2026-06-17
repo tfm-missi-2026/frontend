@@ -14,5 +14,5 @@
  * />
  * ```
  */
-export { UiImageComponent } from "./image";
+export { UiImageComponent } from "./image.component";
 export type { ObjectFit, RoundedSize, ImageLoading } from "./image.types";

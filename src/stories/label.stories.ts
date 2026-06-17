@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 import { CommonModule } from "@angular/common";
 
-import { UiLabelComponent } from "@shared/ui/label/label";
-import { UiTooltipComponent } from "@shared/ui/tooltip/tooltip";
+import { UiLabelComponent } from "@shared/ui/label/label.component";
+import { UiTooltipComponent } from "@shared/ui/tooltip/tooltip.component";
 import { ColorType } from "@styles/types/colors";
 import { FontWeightType, TypographyType } from "@styles/types/typography";
 

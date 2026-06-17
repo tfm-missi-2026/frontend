@@ -2,6 +2,7 @@
 import { Component } from '@angular/core';
 import { NgApexchartsModule, ApexAxisChartSeries, ApexChart, ApexXAxis, ApexPlotOptions, ApexDataLabels, ApexStroke, ApexLegend, ApexYAxis, ApexGrid, ApexFill, ApexTooltip } from 'ng-apexcharts';
 import { UiDropdownComponent, UiDropdownItemComponent } from '@shared/ui/dropdown';
+import { IconDotsVerticalComponent } from '@shared/icons';
 
 @Component({
   selector: 'app-monthly-sales-chart',
@@ -9,7 +10,8 @@ import { UiDropdownComponent, UiDropdownItemComponent } from '@shared/ui/dropdow
   imports: [
     NgApexchartsModule,
     UiDropdownComponent,
-    UiDropdownItemComponent
+    UiDropdownItemComponent,
+    IconDotsVerticalComponent,
 ],
   templateUrl: './monthly-sales-chart.component.html'
 })

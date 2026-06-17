@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { UiHeaderComponent } from "./header";
+import { UiHeaderComponent } from "./header.component";
 
 describe("UiHeader", () => {
   let fixture: ComponentFixture<UiHeaderComponent>;

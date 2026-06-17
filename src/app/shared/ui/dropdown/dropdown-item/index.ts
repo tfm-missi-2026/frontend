@@ -4,5 +4,5 @@
  * Item de menú para `UiDropdown`. Renderiza `<button>` o `<a routerLink>`
  * según `tag` o si se define `to`. Standalone + OnPush + signal APIs.
  */
-export { UiDropdownItemComponent } from './dropdown-item';
+export { UiDropdownItemComponent } from './dropdown-item.component';
 export type { DropdownItemTag } from '../dropdown.types';

@@ -18,10 +18,11 @@ import {
   ApexYAxis,
 } from 'ng-apexcharts';
 import { ChartTabComponent } from '../../common/chart-tab/chart-tab.component';
+import { IconCalendarComponent } from '@shared/icons';
 
 @Component({
   selector: 'app-statics-chart',
-  imports: [NgApexchartsModule, ChartTabComponent],
+  imports: [NgApexchartsModule, ChartTabComponent, IconCalendarComponent],
   templateUrl: './statics-chart.component.html',
 })
 export class StatisticsChartComponent implements AfterViewInit {

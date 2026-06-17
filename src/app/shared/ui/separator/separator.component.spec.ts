@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { Component } from "@angular/core";
 import { By } from "@angular/platform-browser";
 
-import { UiSeparatorComponent } from "./separator";
+import { UiSeparatorComponent } from "./separator.component";
 
 @Component({
   selector: "UiSeparatorHost",
@@ -33,9 +33,8 @@ describe("UiSeparator", () => {
   let host: UiSeparatorHostComponent;
 
   function getHr(): HTMLElement {
-    return fixture.debugElement.query(
-      By.css('[data-testid="separator"]'),
-    ).nativeElement;
+    return fixture.debugElement.query(By.css('[data-testid="separator"]'))
+      .nativeElement;
   }
 
   beforeEach(async () => {

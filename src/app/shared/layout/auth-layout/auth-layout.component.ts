@@ -12,7 +12,7 @@ import { UiImageComponent } from "@shared/ui/image";
     UiLinkComponent,
     UiImageComponent,
   ],
-  templateUrl: "./auth-layout.html",
+  templateUrl: "./auth-layout.component.html",
   styles: ``,
 })
 export class AuthLayoutComponent {}

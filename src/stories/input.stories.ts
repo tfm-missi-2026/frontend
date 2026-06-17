@@ -8,9 +8,9 @@ import {
   FormGroup,
 } from "@angular/forms";
 
-import { UiInputComponent } from "@shared/ui/input/input/input";
-import { IconSearchComponent } from "@shared/ui/icon/search-icon";
-import { IconEyeComponent } from "@shared/ui/icon/eye-icon";
+import { UiInputComponent } from "@shared/ui/input/input/input.component";
+import { IconSearchComponent } from "@shared/icons/search-icon";
+import { IconEyeComponent } from "@shared/icons/eye-icon";
 
 const meta: Meta<UiInputComponent> = {
   title: "Shared/Input",

@@ -1,7 +1,7 @@
 import { Component, ViewChild } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { UiAvatarComponent } from "./avatar";
+import { UiAvatarComponent } from "./avatar.component";
 import { AvatarSize, AvatarStatus } from "./avatar.types";
 
 // Host component — los `input()` de UiAvatar son read-only, así que el

@@ -5,8 +5,8 @@ import {
   input,
 } from "@angular/core";
 
-import { IconCircleInfoLightComponent } from "@shared/ui/icon/circle-info-icon-light";
-import { UiTooltipComponent } from "@shared/ui/tooltip/tooltip";
+import { IconCircleInfoLightComponent } from "@shared/icons/circle-info-icon-light";
+import { UiTooltipComponent } from "@shared/ui/tooltip/tooltip.component";
 
 /**
  * `UiInfoIconWithTooltip`

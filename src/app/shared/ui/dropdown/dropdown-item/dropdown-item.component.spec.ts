@@ -3,7 +3,7 @@ import { Component } from "@angular/core";
 import { By } from "@angular/platform-browser";
 import { provideRouter } from "@angular/router";
 
-import { UiDropdownItemComponent } from "./dropdown-item";
+import { UiDropdownItemComponent } from "./dropdown-item.component";
 
 @Component({
   selector: "UiDropdownItemHost",

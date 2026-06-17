@@ -5,5 +5,5 @@
  * Variantes: `light` | `solid`. Colores: `primary` | `success` |
  * `error` | `warning` | `info` | `light` | `dark`.
  */
-export { UiBadgeComponent } from './badge';
+export { UiBadgeComponent } from './badge.component';
 export type { BadgeVariant, BadgeSize, BadgeColor } from './badge.types';

@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import {
+  IconArrowLeftPaginationComponent,
+  IconArrowRightPaginationComponent,
+  IconDownloadComponent,
+  IconEyePreviewComponent,
+  IconPdfComponent,
+} from '@shared/icons';
 
 interface Invoice {
   id: number;
@@ -14,6 +21,11 @@ interface Invoice {
   selector: 'app-billing-invoice-table',
   imports: [
     CommonModule,
+    IconArrowLeftPaginationComponent,
+    IconArrowRightPaginationComponent,
+    IconDownloadComponent,
+    IconEyePreviewComponent,
+    IconPdfComponent,
   ],
   templateUrl: './billing-invoice-table.component.html',
 })

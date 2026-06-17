@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/angular";
-import { UiCheckboxComponent } from "@shared/ui/input/checkbox/checkbox";
+import { UiCheckboxComponent } from "@shared/ui/input/checkbox/checkbox.component";
 
 const meta: Meta<UiCheckboxComponent> = {
   title: "Shared/Checkbox",

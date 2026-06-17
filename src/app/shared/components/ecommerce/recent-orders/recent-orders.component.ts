@@ -18,6 +18,7 @@ import { Component } from "@angular/core";
 // import { TableHeaderComponent } from '../../ui/table/table-header.component';
 // import { TableRowComponent } from '../../ui/table/table-row.component';
 import { UiBadgeComponent } from "@shared/ui/badge";
+import { IconFilterComponent } from "@shared/icons";
 
 interface Product {
   id: number;
@@ -31,7 +32,7 @@ interface Product {
 
 @Component({
   selector: "app-recent-orders",
-  imports: [UiBadgeComponent],
+  imports: [UiBadgeComponent, IconFilterComponent],
   templateUrl: "./recent-orders.component.html",
 })
 export class RecentOrdersComponent {

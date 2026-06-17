@@ -5,7 +5,7 @@ import {
   output,
 } from "@angular/core";
 
-import { IconCheckComponent } from "@shared/ui/icon";
+import { IconCheckComponent } from "@shared/icons";
 
 /**
  * `UiCheckbox`
@@ -17,7 +17,7 @@ import { IconCheckComponent } from "@shared/ui/icon";
   standalone: true,
   imports: [IconCheckComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: "./checkbox.html",
+  templateUrl: "./checkbox.component.html",
 })
 export class UiCheckboxComponent {
   readonly label = input<string | undefined>(undefined);

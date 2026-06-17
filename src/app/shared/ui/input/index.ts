@@ -6,5 +6,5 @@
  *   date, time, etc.).
  * - `UiCheckboxComponent`: checkbox accesible del design system.
  */
-export { UiInputComponent } from './input/input';
-export { UiCheckboxComponent } from './checkbox/checkbox';
+export { UiInputComponent } from './input/input.component';
+export { UiCheckboxComponent } from './checkbox/checkbox.component';

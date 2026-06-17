@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { IconSearchComponent } from '@shared/icons';
 
 @Component({
   selector: 'app-invoice-sidebar',
   imports: [
     CommonModule,
+    IconSearchComponent,
   ],
   templateUrl: './invoice-sidebar.component.html',
   styles: ``

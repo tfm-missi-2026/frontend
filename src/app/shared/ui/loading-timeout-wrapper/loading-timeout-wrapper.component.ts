@@ -37,7 +37,7 @@ import { getVariantClasses } from "@shared/ui/button/variants";
       <ng-content></ng-content>
     </div>
   `,
-  styleUrls: ["./loading-timeout-wrapper.css"],
+  styleUrls: ["./loading-timeout-wrapper.component.css"],
 })
 export class UiLoadingTimeoutWrapperComponent {
   /** Variante visual. */

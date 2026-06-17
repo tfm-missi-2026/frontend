@@ -50,7 +50,7 @@ import { DropdownAlignment } from "./dropdown.types";
   standalone: true,
   imports: [NgClass],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: "./dropdown.html",
+  templateUrl: "./dropdown.component.html",
 })
 export class UiDropdownComponent implements AfterViewInit, OnDestroy {
   /** Estado de visibilidad del dropdown. */

@@ -6,4 +6,4 @@
  * dentro de inputs y selects que proyectan un valor visible encima del
  * control real (modo display).
  */
-export { UiFieldValueComponent } from "./field-value";
+export { UiFieldValueComponent } from "./field-value.component";

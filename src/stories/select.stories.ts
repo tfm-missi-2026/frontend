@@ -8,7 +8,7 @@ import {
   FormGroup,
 } from "@angular/forms";
 
-import { UiSelectComponent } from "@shared/ui/select/select";
+import { UiSelectComponent } from "@shared/ui/select/select.component";
 import {
   SelectOption,
   LoadOptionsFn,

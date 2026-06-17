@@ -5,7 +5,7 @@
  * de modo oscuro configurables. Expone `<ng-content>` para composición
  * libre. Standalone + OnPush + signal APIs.
  */
-export { UiCardComponent } from './card';
+export { UiCardComponent } from './card.component';
 export type {
   CardProps,
   CardPadding,

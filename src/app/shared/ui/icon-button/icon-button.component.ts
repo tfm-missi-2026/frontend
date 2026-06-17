@@ -12,15 +12,15 @@ import {
 } from "@angular/core";
 import { NgComponentOutlet, NgTemplateOutlet } from "@angular/common";
 
-import { IconProps } from "@shared/ui/icon/icon.interface";
+import { IconProps } from "@shared/icons/icon.interface";
 import { TypographyType } from "@styles/types/typography";
 import designConstants from "@styles/constants";
 import {
   UiTooltipComponent,
   TooltipSide,
   TooltipVariantType,
-} from "@shared/ui/tooltip/tooltip";
-import { UiLoadingTimeoutWrapperComponent } from "@shared/ui/loading-timeout-wrapper/loading-timeout-wrapper";
+} from "@shared/ui/tooltip/tooltip.component";
+import { UiLoadingTimeoutWrapperComponent } from "@shared/ui/loading-timeout-wrapper/loading-timeout-wrapper.component";
 import { getFocusStyling } from "@utils/styling";
 
 import {

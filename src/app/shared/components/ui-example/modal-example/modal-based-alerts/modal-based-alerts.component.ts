@@ -1,10 +1,25 @@
 import { Component } from "@angular/core";
+import {
+  IconAlertBlobComponent,
+  IconAlertErrorComponent,
+  IconAlertInfoComponent,
+  IconAlertSuccessComponent,
+  IconAlertWarningComponent,
+} from "@shared/icons";
 import { UiModalComponent } from "@shared/ui/modal";
 import { ComponentCardComponent } from "../../../common/component-card/component-card.component";
 
 @Component({
   selector: "app-modal-based-alerts",
-  imports: [ComponentCardComponent, UiModalComponent],
+  imports: [
+    ComponentCardComponent,
+    UiModalComponent,
+    IconAlertBlobComponent,
+    IconAlertErrorComponent,
+    IconAlertInfoComponent,
+    IconAlertSuccessComponent,
+    IconAlertWarningComponent,
+  ],
   templateUrl: "./modal-based-alerts.component.html",
   styles: ``,
 })

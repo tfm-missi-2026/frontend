@@ -5,4 +5,4 @@
  * de cierre opcional. Soporta modo pantalla completa vía
  * `isFullscreen`.
  */
-export { UiModalComponent } from './modal';
+export { UiModalComponent } from './modal.component';

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { UiDropdownComponent, UiDropdownItemComponent } from '@shared/ui/dropdown';
+import { IconDotsVerticalComponent } from '@shared/icons';
 import { CountryMapComponent } from '../country-map/country-map.component';
 
 @Component({
@@ -10,6 +11,7 @@ import { CountryMapComponent } from '../country-map/country-map.component';
     CountryMapComponent,
     UiDropdownComponent,
     UiDropdownItemComponent,
+    IconDotsVerticalComponent,
   ],
   templateUrl: './demographic-card.component.html',
 })

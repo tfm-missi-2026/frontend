@@ -6,7 +6,7 @@
  * por lo que se puede usar con `[(ngModel)]`, `formControl` y
  * `formControlName`.
  */
-export { UiSelectComponent } from './select';
+export { UiSelectComponent } from './select.component';
 export type {
   SelectOption,
   LoadOptionsFn,

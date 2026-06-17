@@ -71,7 +71,7 @@ const COLS_CLASSES: Record<GridBreakpoint, Record<GridColumns, string>> = {
   selector: "UiGrid",
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: "./grid.html",
+  templateUrl: "./grid.component.html",
 })
 export class UiGridComponent {
   /** Cantidad de columnas a partir del breakpoint. Default `2`. */

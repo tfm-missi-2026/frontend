@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { Component, signal } from "@angular/core";
 import { By } from "@angular/platform-browser";
 
-import { UiDropdownComponent } from "./dropdown";
+import { UiDropdownComponent } from "./dropdown.component";
 import { UiDropdownItemComponent } from "./dropdown-item";
 
 @Component({
@@ -11,11 +11,7 @@ import { UiDropdownItemComponent } from "./dropdown-item";
   imports: [UiDropdownComponent, UiDropdownItemComponent],
   template: `
     <div class="relative">
-      <button
-        type="button"
-        class="dropdown-toggle"
-        (click)="toggle()"
-      >
+      <button type="button" class="dropdown-toggle" (click)="toggle()">
         Toggle
       </button>
       <UiDropdown

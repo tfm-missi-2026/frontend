@@ -1,10 +1,19 @@
 import { Component } from "@angular/core";
 import { UiModalComponent } from "@shared/ui/modal";
 import { UiButtonComponent } from "@shared/ui/button";
+import {
+  IconChevronDownComponent,
+  IconEditPencilComponent,
+} from "@shared/icons";
 
 @Component({
   selector: "app-billing-info",
-  imports: [UiModalComponent, UiButtonComponent],
+  imports: [
+    UiModalComponent,
+    UiButtonComponent,
+    IconChevronDownComponent,
+    IconEditPencilComponent,
+  ],
   templateUrl: "./billing-info.component.html",
   host: {
     class:

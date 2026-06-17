@@ -1,5 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import {
+  IconChevronDownComponent,
+  IconCloseCircleComponent,
+} from '@shared/icons';
 
 export interface Option {
   value: string;
@@ -10,6 +14,8 @@ export interface Option {
   selector: 'app-multi-select',
   imports: [
     CommonModule,
+    IconChevronDownComponent,
+    IconCloseCircleComponent,
   ],
   templateUrl: './multi-select.component.html',
   styles: ``

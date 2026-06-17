@@ -39,7 +39,7 @@ const DEFAULT_BASE_CLASSES =
   standalone: true,
   imports: [NgClass, RouterModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: "./dropdown-item.html",
+  templateUrl: "./dropdown-item.component.html",
 })
 export class UiDropdownItemComponent {
   /**

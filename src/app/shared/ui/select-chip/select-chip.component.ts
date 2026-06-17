@@ -6,7 +6,7 @@ import {
   output,
 } from "@angular/core";
 
-import { IconXComponent } from "@shared/ui/icon";
+import { IconXComponent } from "@shared/icons";
 
 const CONTAINER_BASE =
   "inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-md py-0.5 px-2 text-xs text-gray-800 dark:text-gray-200 max-w-full";
@@ -76,7 +76,9 @@ export class UiSelectChipComponent {
     const base = CONTAINER_BASE;
     const state = this.isInactive() ? DISABLED_CLASSES : "";
     const extra = this.className();
-    return extra ? `${base} ${state} ${extra}`.trim() : `${base} ${state}`.trim();
+    return extra
+      ? `${base} ${state} ${extra}`.trim()
+      : `${base} ${state}`.trim();
   });
 
   readonly removeButtonClass = computed<string>(() => REMOVE_BUTTON_BASE);

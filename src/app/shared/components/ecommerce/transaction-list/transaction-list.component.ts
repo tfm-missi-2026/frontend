@@ -3,6 +3,17 @@ import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TableDropdownComponent } from '../../common/table-dropdown/table-dropdown.component';
 import { FormsModule } from '@angular/forms';
+import {
+  IconArrowLeftPaginationComponent,
+  IconArrowRightPaginationComponent,
+  IconCheckboxCheckComponent,
+  IconChevronDownComponent,
+  IconDotsVerticalComponent,
+  IconSearchLightComponent,
+  IconSortDownComponent,
+  IconSortUpComponent,
+  IconUploadComponent,
+} from '@shared/icons';
 
 interface Transaction {
   id: number;
@@ -27,6 +38,15 @@ interface SortState {
     RouterModule,
     TableDropdownComponent,
     FormsModule,
+    IconArrowLeftPaginationComponent,
+    IconArrowRightPaginationComponent,
+    IconCheckboxCheckComponent,
+    IconChevronDownComponent,
+    IconDotsVerticalComponent,
+    IconSearchLightComponent,
+    IconSortDownComponent,
+    IconSortUpComponent,
+    IconUploadComponent,
   ],
   templateUrl: './transaction-list.component.html',
   styles: ``

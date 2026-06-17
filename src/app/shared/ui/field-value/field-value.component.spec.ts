@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { UiFieldValueComponent } from "./field-value";
+import { UiFieldValueComponent } from "./field-value.component";
 
 describe("UiFieldValue", () => {
   let fixture: ComponentFixture<UiFieldValueComponent>;

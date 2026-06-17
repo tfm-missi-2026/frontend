@@ -3,6 +3,18 @@ import { Component } from '@angular/core';
 import { TableDropdownComponent } from '../../common/table-dropdown/table-dropdown.component';
 import { UiButtonComponent } from '@shared/ui/button';
 import { RouterModule } from '@angular/router';
+import {
+  IconArrowLeftPaginationComponent,
+  IconArrowRightPaginationComponent,
+  IconCheckboxCheckComponent,
+  IconDotsVerticalComponent,
+  IconFilterComponent,
+  IconPlusSimpleComponent,
+  IconSearchLightComponent,
+  IconSortDownComponent,
+  IconSortUpComponent,
+  IconUploadComponent,
+} from '@shared/icons';
 
 interface Product {
   id: number;
@@ -26,6 +38,16 @@ interface Sort {
     TableDropdownComponent,
     UiButtonComponent,
     RouterModule,
+    IconArrowLeftPaginationComponent,
+    IconArrowRightPaginationComponent,
+    IconCheckboxCheckComponent,
+    IconDotsVerticalComponent,
+    IconFilterComponent,
+    IconPlusSimpleComponent,
+    IconSearchLightComponent,
+    IconSortDownComponent,
+    IconSortUpComponent,
+    IconUploadComponent,
   ],
   templateUrl: './product-list-table.component.html',
   styles: ``

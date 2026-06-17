@@ -11,7 +11,7 @@ import {
   IconInfoCircleComponent,
   IconPlusComponent,
   IconTrashLightComponent,
-} from "@shared/ui/icon";
+} from "@shared/icons";
 
 const meta: Meta<UiLinkComponent> = {
   title: "Shared/Link",

@@ -1,0 +1,102 @@
+<UiFlex
+  direction="column"
+  justifyContent="center"
+  className="flex-1 w-full max-w-md mx-auto"
+>
+  <UiFlex direction="column" gap="24px">
+    <UiFlex direction="column" gap="8px">
+      <UiHeader [level]="1" text="Sign Up"></UiHeader>
+      <UiLabel
+        type="bodyS"
+        color="textWeak"
+        text="Enter your email and password to sign up!"
+      ></UiLabel>
+    </UiFlex>
+
+    <form (ngSubmit)="onSubmit()">
+      <UiFlex direction="column" gap="20px">
+        <UiGrid [columns]="2" breakpoint="sm" gap="gap-5">
+          <UiInput
+            id="signup-fname"
+            name="fname"
+            type="text"
+            labelText="First Name"
+            placeholder="Enter your first name"
+            [required]="true"
+            [value]="firstName()"
+            (valueChange)="onFirstNameChange($event)"
+          ></UiInput>
+
+          <UiInput
+            id="signup-lname"
+            name="lname"
+            type="text"
+            labelText="Last Name"
+            placeholder="Enter your last name"
+            [required]="true"
+            [value]="lastName()"
+            (valueChange)="onLastNameChange($event)"
+          ></UiInput>
+        </UiGrid>
+
+        <UiInput
+          id="signup-email"
+          name="email"
+          type="email"
+          labelText="Email"
+          placeholder="Enter your email"
+          [required]="true"
+          [value]="email()"
+          (valueChange)="onEmailChange($event)"
+        ></UiInput>
+
+        <UiFlex direction="column" gap="4px">
+          <UiInput
+            id="signup-password"
+            name="password"
+            [type]="showPassword() ? 'text' : 'password'"
+            labelText="Password"
+            placeholder="Enter your password"
+            [required]="true"
+            [value]="password()"
+            (valueChange)="onPasswordChange($event)"
+          ></UiInput>
+          <UiLink
+            size="sm"
+            variant="subtle"
+            underline="hover"
+            (click)="togglePasswordVisibility()"
+          >
+            @if (showPassword()) {
+              <IconEyeOpen [size]="14"></IconEyeOpen>
+            } @else {
+              <IconEyeOff [size]="14"></IconEyeOff>
+            }
+            {{ showPassword() ? "Hide" : "Show" }} password
+          </UiLink>
+        </UiFlex>
+
+        <UiButton [fullWidth]="true" [isSubmit]="true" (click)="onSubmit()">
+          Sign Up
+        </UiButton>
+      </UiFlex>
+    </form>
+
+    <UiFlex justifyContent="center" gap="6px" className="mt-2">
+      <UiLabel
+        type="bodyS"
+        color="textWeak"
+        text="Already have an account?"
+      ></UiLabel>
+      <UiLink
+        to="/signin"
+        size="sm"
+        variant="primary"
+        underline="hover"
+        (click)="onSignIn()"
+      >
+        Sign In
+      </UiLink>
+    </UiFlex>
+  </UiFlex>
+</UiFlex>

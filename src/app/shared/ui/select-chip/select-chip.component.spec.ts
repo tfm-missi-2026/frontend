@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { UiSelectChipComponent } from "./select-chip";
+import { UiSelectChipComponent } from "./select-chip.component";
 
 describe("UiSelectChip", () => {
   let fixture: ComponentFixture<UiSelectChipComponent>;

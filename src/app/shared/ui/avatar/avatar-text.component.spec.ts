@@ -1,7 +1,7 @@
 import { Component, ViewChild } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { UiAvatarTextComponent } from "./avatar-text";
+import { UiAvatarTextComponent } from "./avatar-text.component";
 
 // Host component — el `name` es read-only, así que el host lo pasa vía
 // template binding.

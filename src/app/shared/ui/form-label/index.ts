@@ -5,4 +5,4 @@
  * `for`, estado `required`, `disabled`, mensaje de error y estilos
  * consistentes con el resto del design system.
  */
-export { UiFormLabelComponent } from './form-label';
+export { UiFormLabelComponent } from './form-label.component';

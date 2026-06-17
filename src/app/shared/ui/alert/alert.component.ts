@@ -6,14 +6,14 @@ import {
 } from "@angular/core";
 import { RouterModule } from "@angular/router";
 
-import { UiFlexComponent } from "@shared/ui/flex/flex";
-import { UiLabelComponent } from "@shared/ui/label/label";
+import { UiFlexComponent } from "@shared/ui/flex/flex.component";
+import { UiLabelComponent } from "@shared/ui/label/label.component";
 import {
   IconErrorComponent,
   IconInfoCircleComponent,
   IconSuccessComponent,
   IconWarningComponent,
-} from "@shared/ui/icon";
+} from "@shared/icons";
 import { AlertVariant } from "./alert.types";
 
 interface VariantConfig {
@@ -67,7 +67,7 @@ const VARIANT_CONFIG: Record<AlertVariant, VariantConfig> = {
     IconInfoCircleComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: "./alert.html",
+  templateUrl: "./alert.component.html",
 })
 export class UiAlertComponent {
   /** Variante visual. Define colores e icono por defecto. */

@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UiIconButtonComponent } from './icon-button';
+import { UiIconButtonComponent } from './icon-button.component';
 
 @Component({
   selector: 'IconStub',

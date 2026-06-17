@@ -12,13 +12,13 @@ import {
 } from "@angular/core";
 import { NgTemplateOutlet } from "@angular/common";
 
-import { UiFlexComponent } from "@shared/ui/flex/flex";
-import { UiLabelComponent } from "@shared/ui/label/label";
-import { UiCheckboxComponent } from "@shared/ui/input/checkbox/checkbox";
-import { UiInputComponent } from "@shared/ui/input/input/input";
-import { UiIconButtonComponent } from "@shared/ui/icon-button/icon-button";
-import { IconChevronLeftComponent } from "@shared/ui/icon/chevron-left-icon";
-import { IconChevronRightComponent } from "@shared/ui/icon/chevron-right-icon";
+import { UiFlexComponent } from "@shared/ui/flex/flex.component";
+import { UiLabelComponent } from "@shared/ui/label/label.component";
+import { UiCheckboxComponent } from "@shared/ui/input/checkbox/checkbox.component";
+import { UiInputComponent } from "@shared/ui/input/input/input.component";
+import { UiIconButtonComponent } from "@shared/ui/icon-button/icon-button.component";
+import { IconChevronLeftComponent } from "@shared/icons/chevron-left-icon";
+import { IconChevronRightComponent } from "@shared/icons/chevron-right-icon";
 import {
   TableAction,
   TableCellContext,
@@ -55,8 +55,8 @@ import {
     NgTemplateOutlet,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: "./table.html",
-  styleUrls: ["./table.css"],
+  templateUrl: "./table.component.html",
+  styleUrls: ["./table.component.css"],
 })
 export class UiTableComponent {
   // ---------------------------------------------------------------------------

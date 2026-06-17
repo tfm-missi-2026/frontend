@@ -1,7 +1,7 @@
 import { Component, ViewChild } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { UiImageComponent } from "./image";
+import { UiImageComponent } from "./image.component";
 import {
   ImageLoading,
   ObjectFit,

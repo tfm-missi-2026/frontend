@@ -6,10 +6,10 @@ import {
 } from "@angular/core";
 import { NgTemplateOutlet } from "@angular/common";
 
-import { UiFlexComponent } from "@shared/ui/flex/flex";
-import { UiLabelComponent } from "@shared/ui/label/label";
+import { UiFlexComponent } from "@shared/ui/flex/flex.component";
+import { UiLabelComponent } from "@shared/ui/label/label.component";
 import { FontWeightType } from "@styles/types/typography";
-import { UiInfoIconWithTooltipComponent } from "@shared/ui/info-icon-with-tooltip/info-icon-with-tooltip";
+import { UiInfoIconWithTooltipComponent } from "@shared/ui/info-icon-with-tooltip/info-icon-with-tooltip.component";
 
 /**
  * `UiFormLabel`

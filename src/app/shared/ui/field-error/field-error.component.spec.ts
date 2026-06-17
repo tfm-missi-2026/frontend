@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { UiFieldErrorComponent } from "./field-error";
+import { UiFieldErrorComponent } from "./field-error.component";
 
 describe("UiFieldError", () => {
   let fixture: ComponentFixture<UiFieldErrorComponent>;

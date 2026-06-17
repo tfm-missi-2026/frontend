@@ -2,10 +2,10 @@ import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 import { CommonModule } from "@angular/common";
 
-import { UiButtonComponent } from "@shared/ui/button/button";
-import { UiTooltipComponent } from "@shared/ui/tooltip/tooltip";
-import { IconFloppyDiskLightComponent } from "@shared/ui/icon/floppy-disk-icon-light";
-import { IconUploadLightComponent } from "@shared/ui/icon/upload-icon-light";
+import { UiButtonComponent } from "@shared/ui/button/button.component";
+import { UiTooltipComponent } from "@shared/ui/tooltip/tooltip.component";
+import { IconFloppyDiskLightComponent } from "@shared/icons/floppy-disk-icon-light";
+import { IconUploadLightComponent } from "@shared/icons/upload-icon-light";
 
 const meta: Meta<UiButtonComponent> = {
   title: "Shared/Button",

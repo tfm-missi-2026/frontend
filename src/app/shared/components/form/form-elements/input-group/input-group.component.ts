@@ -4,6 +4,7 @@ import { LabelComponent } from '../../label/label.component';
 import { InputFieldComponent } from '../../input/input-field.component';
 import { PhoneInputComponent } from '../../group-input/phone-input/phone-input.component';
 import { ComponentCardComponent } from '../../../common/component-card/component-card.component';
+import { IconEnvelopeComponent } from '@shared/icons';
 
 @Component({
   selector: 'app-input-group',
@@ -11,7 +12,8 @@ import { ComponentCardComponent } from '../../../common/component-card/component
     LabelComponent,
     InputFieldComponent,
     PhoneInputComponent,
-    ComponentCardComponent
+    ComponentCardComponent,
+    IconEnvelopeComponent,
 ],
   templateUrl: './input-group.component.html',
   styles: ``

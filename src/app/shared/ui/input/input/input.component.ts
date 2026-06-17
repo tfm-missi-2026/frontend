@@ -17,15 +17,15 @@ import {
 import { NgComponentOutlet } from "@angular/common";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 
-import { UiLabelComponent } from "@shared/ui/label/label";
+import { UiLabelComponent } from "@shared/ui/label/label.component";
 import { ColorType } from "@styles/types/colors";
 import { FontWeightType } from "@styles/types/typography";
 import { getFocusStyling } from "@utils/styling";
 
-import { ValidationErrorIconComponent } from "./validation-error-icon";
+import { ValidationErrorIconComponent } from "./validation-error-icon.component";
 import { horizontalPaddingNumber, inputHeight } from "./common";
-import { UiFlexComponent } from "@shared/ui/flex/flex";
-import { UiFormLabelComponent } from "@shared/ui/form-label/form-label";
+import { UiFlexComponent } from "@shared/ui/flex/flex.component";
+import { UiFormLabelComponent } from "@shared/ui/form-label/form-label.component";
 
 /**
  * `UiInput`
@@ -57,7 +57,7 @@ import { UiFormLabelComponent } from "@shared/ui/form-label/form-label";
     UiLabelComponent,
     ValidationErrorIconComponent,
   ],
-  templateUrl: "./input.html",
+  templateUrl: "./input.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {

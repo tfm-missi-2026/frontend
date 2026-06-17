@@ -1,0 +1,86 @@
+<UiFlex direction="column" justifyContent="center" className="flex-1 w-full max-w-md mx-auto">
+  <UiFlex direction="column" gap="24px">
+    <UiFlex direction="column" gap="8px">
+      <UiHeader [level]="1" text="Sign In"></UiHeader>
+      <UiLabel
+        type="bodyS"
+        color="textWeak"
+        text="Enter your email and password to sign in!"
+      ></UiLabel>
+    </UiFlex>
+
+    <form (ngSubmit)="onSubmit()">
+      <UiFlex direction="column" gap="20px">
+        <UiInput
+          id="signin-email"
+          name="email"
+          type="email"
+          labelText="Email"
+          placeholder="info@gmail.com"
+          [required]="true"
+          [value]="email()"
+          (valueChange)="onEmailChange($event)"
+        ></UiInput>
+
+        <UiFlex direction="column" gap="4px">
+          <UiInput
+            id="signin-password"
+            name="password"
+            [type]="showPassword() ? 'text' : 'password'"
+            labelText="Password"
+            placeholder="Enter your password"
+            [required]="true"
+            [value]="password()"
+            (valueChange)="onPasswordChange($event)"
+          ></UiInput>
+          <UiLink
+            size="sm"
+            variant="subtle"
+            underline="hover"
+            (click)="togglePasswordVisibility()"
+          >
+            @if (showPassword()) {
+              <IconEyeOpen [size]="14"></IconEyeOpen>
+            } @else {
+              <IconEyeOff [size]="14"></IconEyeOff>
+            }
+            {{ showPassword() ? "Hide" : "Show" }} password
+          </UiLink>
+        </UiFlex>
+
+        <UiFlex justifyContent="flex-end">
+          <UiLink
+            to="/reset-password"
+            size="sm"
+            variant="primary"
+            underline="hover"
+            (click)="onForgotPassword()"
+          >
+            Forgot password?
+          </UiLink>
+        </UiFlex>
+
+        <UiButton [fullWidth]="true" [isSubmit]="true" (click)="onSubmit()">
+          Sign in
+        </UiButton>
+      </UiFlex>
+    </form>
+
+    <UiFlex justifyContent="center" gap="6px" className="mt-2">
+      <UiLabel
+        type="bodyS"
+        color="textWeak"
+        text="Don't have an account?"
+      ></UiLabel>
+      <UiLink
+        to="/signup"
+        size="sm"
+        variant="primary"
+        underline="hover"
+        (click)="onSignUp()"
+      >
+        Sign Up
+      </UiLink>
+    </UiFlex>
+  </UiFlex>
+</UiFlex>

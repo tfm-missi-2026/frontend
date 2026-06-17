@@ -3,7 +3,7 @@ import { Component } from "@angular/core";
 import { By } from "@angular/platform-browser";
 import { provideRouter } from "@angular/router";
 
-import { UiLinkComponent } from "./link";
+import { UiLinkComponent } from "./link.component";
 
 @Component({
   selector: "UiLinkHost",

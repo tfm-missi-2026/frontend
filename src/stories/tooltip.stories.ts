@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 import { CommonModule } from "@angular/common";
 
-import { UiTooltipComponent } from "@shared/ui/tooltip/tooltip";
+import { UiTooltipComponent } from "@shared/ui/tooltip/tooltip.component";
 import {
   TooltipVariantType,
   TooltipSide,

@@ -8,7 +8,7 @@
  * `UiIconButton` (en `@ui/icon-button`) es la variante circular solo
  * con icono del mismo design system.
  */
-export { UiButtonComponent } from './button';
+export { UiButtonComponent } from './button.component';
 export type {
   ButtonVariant,
   ButtonStyleType,

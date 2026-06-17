@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/angular";
-import { UiFlexComponent } from "@shared/ui/flex/flex";
+import { UiFlexComponent } from "@shared/ui/flex/flex.component";
 
 const meta: Meta<UiFlexComponent> = {
   title: "Shared/Flex",

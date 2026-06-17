@@ -12,5 +12,5 @@
  * />
  * ```
  */
-export { UiVideoComponent } from "./video";
+export { UiVideoComponent } from "./video.component";
 export type { VideoRatio } from "./video.types";

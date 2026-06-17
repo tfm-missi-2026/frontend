@@ -19,7 +19,7 @@ import designConstants, {
   FontWeightType,
   TypographyType,
 } from "@styles/constants";
-import { UiTooltipComponent } from "@shared/ui/tooltip/tooltip";
+import { UiTooltipComponent } from "@shared/ui/tooltip/tooltip.component";
 import { TooltipSide } from "@shared/ui/tooltip/tooltip.types";
 
 /** Elementos HTML válidos para el slot principal. */

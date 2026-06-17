@@ -5,6 +5,11 @@ import { InputFieldComponent } from '../../form/input/input-field.component';
 import { SelectComponent } from '../../form/select/select.component';
 import { TextAreaComponent } from '../../form/input/text-area.component';
 import { UiButtonComponent } from '@shared/ui/button';
+import {
+  IconStepperMinusComponent,
+  IconStepperPlusComponent,
+  IconUploadComponent,
+} from '@shared/icons';
 
 @Component({
   selector: 'app-add-product-form',
@@ -14,7 +19,10 @@ import { UiButtonComponent } from '@shared/ui/button';
     InputFieldComponent,
     SelectComponent,
     TextAreaComponent,
-    UiButtonComponent
+    UiButtonComponent,
+    IconStepperMinusComponent,
+    IconStepperPlusComponent,
+    IconUploadComponent,
   ],
   templateUrl: './add-product-form.component.html',
   styles: ``

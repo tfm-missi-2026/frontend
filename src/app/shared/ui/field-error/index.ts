@@ -6,4 +6,4 @@
  * wrapper de un field (input, select, textarea) y ser apuntado vía
  * `aria-describedby` desde el control asociado.
  */
-export { UiFieldErrorComponent } from "./field-error";
+export { UiFieldErrorComponent } from "./field-error.component";

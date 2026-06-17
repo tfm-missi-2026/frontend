@@ -28,7 +28,7 @@ import {
   IconChevronDownComponent,
   IconValidationErrorComponent,
   IconXComponent,
-} from "@shared/ui/icon";
+} from "@shared/icons";
 import { UiFieldErrorComponent } from "@shared/ui/field-error";
 import { UiFieldValueComponent } from "@shared/ui/field-value";
 import { UiFormLabelComponent } from "@shared/ui/form-label";
@@ -65,7 +65,7 @@ import {
     UiFormLabelComponent,
     UiSelectChipComponent,
   ],
-  templateUrl: "./select.html",
+  templateUrl: "./select.component.html",
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

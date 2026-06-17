@@ -1,10 +1,11 @@
 import { Component } from "@angular/core";
 import { UiButtonComponent } from "@shared/ui/button";
 import { UiModalComponent } from "@shared/ui/modal";
+import { IconEyePreviewComponent } from "@shared/icons";
 
 @Component({
   selector: "app-invoice-preview-modal",
-  imports: [UiButtonComponent, UiModalComponent],
+  imports: [UiButtonComponent, UiModalComponent, IconEyePreviewComponent],
   templateUrl: "./invoice-preview-modal.component.html",
   styles: ``,
 })
