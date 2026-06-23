@@ -231,27 +231,24 @@
                   </td>
                   <td class="p-4 whitespace-nowrap">
                     <div class="relative inline-block">
-                      <app-table-dropdown>
-                        <div dropdown-button>
-                          <button class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
-                            <IconDotsVertical className="fill-current" [size]="24" />
-                          </button>
-                        </div>
-                        <div dropdown-content>
-                          <button
-                            (click)="handleViewMore()"
-                            class="flex w-full font-normal text-left text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300 p-2"
-                          >
-                            View More
-                          </button>
-                          <button
-                            (click)="handleDelete()"
-                            class="flex w-full font-normal text-left text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300 p-2"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </app-table-dropdown>
+                      <button
+                        type="button"
+                        class="dropdown-toggle text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                        aria-label="Row actions"
+                        [attr.aria-expanded]="openMenuRowId() === row.id"
+                        (click)="toggleRowMenu(row.id)"
+                      >
+                        <IconDotsVertical className="fill-current" [size]="24" />
+                      </button>
+                      <UiDropdown
+                        [isOpen]="openMenuRowId() === row.id"
+                        align="right"
+                        className="min-w-[10rem] p-2"
+                        (close)="closeRowMenu()"
+                      >
+                        <UiDropdownItem (itemClick)="handleViewMore(); closeRowMenu()">View More</UiDropdownItem>
+                        <UiDropdownItem (itemClick)="handleDelete(); closeRowMenu()">Delete</UiDropdownItem>
+                      </UiDropdown>
                     </div>
                   </td>
                 </tr>

@@ -1,7 +1,7 @@
-<app-page-breadcrumb pageTitle="Images" />
+<CommonBreadcrumb pageTitle="Images" />
 <div class="space-y-5 sm:space-y-6">
   <div>
-    <app-component-card title="Responsive image">
+    <CommonComponentCard title="Responsive image">
       <UiImage
         [src]="coverImage.src"
         [alt]="coverImage.alt"
@@ -9,11 +9,11 @@
         [bordered]="true"
         objectFit="cover"
       />
-    </app-component-card>
+    </CommonComponentCard>
   </div>
 
   <div>
-    <app-component-card title="Image in 2 Grid">
+    <CommonComponentCard title="Image in 2 Grid">
       <UiGrid
         [columns]="2"
         breakpoint="sm"
@@ -24,11 +24,11 @@
           <UiImage [src]="item.src" [alt]="item.alt" />
         }
       </UiGrid>
-    </app-component-card>
+    </CommonComponentCard>
   </div>
 
   <div>
-    <app-component-card title="Image in 3 Grid">
+    <CommonComponentCard title="Image in 3 Grid">
       <UiGrid
         [columns]="3"
         breakpoint="sm"
@@ -39,6 +39,6 @@
           <UiImage [src]="item.src" [alt]="item.alt" />
         }
       </UiGrid>
-    </app-component-card>
+    </CommonComponentCard>
   </div>
 </div>

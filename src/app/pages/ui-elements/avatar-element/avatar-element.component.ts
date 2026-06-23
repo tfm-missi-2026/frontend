@@ -1,11 +1,11 @@
 import { Component } from "@angular/core";
 import { UiAvatarComponent } from "@shared/ui/avatar";
-import { ComponentCardComponent } from "../../../shared/common/component-card/component-card.component";
-import { PageBreadcrumbComponent } from "../../../shared/common/page-breadcrumb/page-breadcrumb.component";
+import { CommonComponentCardComponent } from "../../../shared/common/component-card";
+import { CommonBreadcrumbComponent } from "../../../shared/common/page-breadcrumb";
 
 @Component({
   selector: "app-avatar-element",
-  imports: [UiAvatarComponent, ComponentCardComponent, PageBreadcrumbComponent],
+  imports: [UiAvatarComponent, CommonComponentCardComponent, CommonBreadcrumbComponent],
   templateUrl: "./avatar-element.component.html",
   styles: ``,
 })

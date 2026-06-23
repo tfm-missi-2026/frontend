@@ -17,8 +17,6 @@ import {
   IconCalendar24Component,
   IconCalendarComponent,
   IconCardComponent,
-  IconCheckCheckboxDisabledComponent,
-  IconCheckCheckboxComponent,
   IconCheckComponent,
   IconCheckLargeComponent,
   IconCheckSmallComponent,
@@ -154,16 +152,6 @@ const ICON_CATALOG: IconEntry[] = [
   },
   { name: "Card", component: IconCardComponent, selector: "IconCard" },
   { name: "Check", component: IconCheckComponent, selector: "IconCheck" },
-  {
-    name: "Check Checkbox",
-    component: IconCheckCheckboxComponent,
-    selector: "IconCheckCheckbox",
-  },
-  {
-    name: "Check Checkbox Disabled",
-    component: IconCheckCheckboxDisabledComponent,
-    selector: "IconCheckCheckboxDisabled",
-  },
   {
     name: "Check Large",
     component: IconCheckLargeComponent,
@@ -416,7 +404,7 @@ const ICON_CATALOG: IconEntry[] = [
 ];
 
 const meta: Meta = {
-  title: "Shared/Icon",
+  title: "Icons/Icon",
   tags: ["autodocs"],
   decorators: [
     moduleMetadata({

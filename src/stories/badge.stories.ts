@@ -2,8 +2,7 @@ import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 
 import { UiBadgeComponent } from "@shared/ui/badge";
-
-const PLUS_ICON = `<svg class="fill-current" width="1em" height="1em" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.25012 3C5.25012 2.58579 5.58591 2.25 6.00012 2.25C6.41433 2.25 6.75012 2.58579 6.75012 3V5.25012L9.00034 5.25012C9.41455 5.25012 9.75034 5.58591 9.75034 6.00012C9.75034 6.41433 9.41455 6.75012 9.00034 6.75012H6.75012V9.00034C6.75012 9.41455 6.41433 9.75034 6.00012 9.75034C5.58591 9.75034 5.25012 9.41455 5.25012 9.00034L5.25012 6.75012H3C2.58579 6.75012 2.25 6.41433 2.25 6.00012C2.25 5.58591 2.58579 5.25012 3 5.25012H5.25012V3Z" fill=""></path></svg>`;
+import { IconPlusComponent } from "@shared/icons";
 
 const VARIANTS = ["light", "solid"] as const;
 const SIZES = ["sm", "md"] as const;
@@ -36,8 +35,8 @@ const meta: Meta<UiBadgeComponent> = {
       control: "select",
       options: [...COLORS],
     },
-    startIcon: { control: "text" },
-    endIcon: { control: "text" },
+    startIcon: { control: "object" },
+    endIcon: { control: "object" },
   },
   args: {
     variant: "light",
@@ -53,7 +52,7 @@ type Story = StoryObj<UiBadgeComponent>;
 // Default
 export const Default: Story = {
   render: (args) => ({
-    props: { ...args, PLUS_ICON },
+    props: { ...args, PlusIcon: IconPlusComponent },
     template: `
       <div class="p-6">
         <UiBadge
@@ -134,7 +133,7 @@ export const Sizes: Story = {
 // Con startIcon
 export const WithStartIcon: Story = {
   render: () => ({
-    props: { PLUS_ICON },
+    props: { PlusIcon: IconPlusComponent },
     template: `
       <div class="p-6 space-y-4">
         <div>
@@ -142,13 +141,13 @@ export const WithStartIcon: Story = {
             Light con startIcon
           </h3>
           <div class="flex flex-wrap items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/3">
-            <UiBadge variant="light" color="primary" [startIcon]="PLUS_ICON">Primary</UiBadge>
-            <UiBadge variant="light" color="success" [startIcon]="PLUS_ICON">Success</UiBadge>
-            <UiBadge variant="light" color="error" [startIcon]="PLUS_ICON">Error</UiBadge>
-            <UiBadge variant="light" color="warning" [startIcon]="PLUS_ICON">Warning</UiBadge>
-            <UiBadge variant="light" color="info" [startIcon]="PLUS_ICON">Info</UiBadge>
-            <UiBadge variant="light" color="light" [startIcon]="PLUS_ICON">Light</UiBadge>
-            <UiBadge variant="light" color="dark" [startIcon]="PLUS_ICON">Dark</UiBadge>
+            <UiBadge variant="light" color="primary" [startIcon]="PlusIcon">Primary</UiBadge>
+            <UiBadge variant="light" color="success" [startIcon]="PlusIcon">Success</UiBadge>
+            <UiBadge variant="light" color="error" [startIcon]="PlusIcon">Error</UiBadge>
+            <UiBadge variant="light" color="warning" [startIcon]="PlusIcon">Warning</UiBadge>
+            <UiBadge variant="light" color="info" [startIcon]="PlusIcon">Info</UiBadge>
+            <UiBadge variant="light" color="light" [startIcon]="PlusIcon">Light</UiBadge>
+            <UiBadge variant="light" color="dark" [startIcon]="PlusIcon">Dark</UiBadge>
           </div>
         </div>
         <div>
@@ -156,13 +155,13 @@ export const WithStartIcon: Story = {
             Solid con startIcon
           </h3>
           <div class="flex flex-wrap items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/3">
-            <UiBadge variant="solid" color="primary" [startIcon]="PLUS_ICON">Primary</UiBadge>
-            <UiBadge variant="solid" color="success" [startIcon]="PLUS_ICON">Success</UiBadge>
-            <UiBadge variant="solid" color="error" [startIcon]="PLUS_ICON">Error</UiBadge>
-            <UiBadge variant="solid" color="warning" [startIcon]="PLUS_ICON">Warning</UiBadge>
-            <UiBadge variant="solid" color="info" [startIcon]="PLUS_ICON">Info</UiBadge>
-            <UiBadge variant="solid" color="light" [startIcon]="PLUS_ICON">Light</UiBadge>
-            <UiBadge variant="solid" color="dark" [startIcon]="PLUS_ICON">Dark</UiBadge>
+            <UiBadge variant="solid" color="primary" [startIcon]="PlusIcon">Primary</UiBadge>
+            <UiBadge variant="solid" color="success" [startIcon]="PlusIcon">Success</UiBadge>
+            <UiBadge variant="solid" color="error" [startIcon]="PlusIcon">Error</UiBadge>
+            <UiBadge variant="solid" color="warning" [startIcon]="PlusIcon">Warning</UiBadge>
+            <UiBadge variant="solid" color="info" [startIcon]="PlusIcon">Info</UiBadge>
+            <UiBadge variant="solid" color="light" [startIcon]="PlusIcon">Light</UiBadge>
+            <UiBadge variant="solid" color="dark" [startIcon]="PlusIcon">Dark</UiBadge>
           </div>
         </div>
       </div>
@@ -173,7 +172,7 @@ export const WithStartIcon: Story = {
 // Con endIcon
 export const WithEndIcon: Story = {
   render: () => ({
-    props: { PLUS_ICON },
+    props: { PlusIcon: IconPlusComponent },
     template: `
       <div class="p-6 space-y-4">
         <div>
@@ -181,13 +180,13 @@ export const WithEndIcon: Story = {
             Light con endIcon
           </h3>
           <div class="flex flex-wrap items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/3">
-            <UiBadge variant="light" color="primary" [endIcon]="PLUS_ICON">Primary</UiBadge>
-            <UiBadge variant="light" color="success" [endIcon]="PLUS_ICON">Success</UiBadge>
-            <UiBadge variant="light" color="error" [endIcon]="PLUS_ICON">Error</UiBadge>
-            <UiBadge variant="light" color="warning" [endIcon]="PLUS_ICON">Warning</UiBadge>
-            <UiBadge variant="light" color="info" [endIcon]="PLUS_ICON">Info</UiBadge>
-            <UiBadge variant="light" color="light" [endIcon]="PLUS_ICON">Light</UiBadge>
-            <UiBadge variant="light" color="dark" [endIcon]="PLUS_ICON">Dark</UiBadge>
+            <UiBadge variant="light" color="primary" [endIcon]="PlusIcon">Primary</UiBadge>
+            <UiBadge variant="light" color="success" [endIcon]="PlusIcon">Success</UiBadge>
+            <UiBadge variant="light" color="error" [endIcon]="PlusIcon">Error</UiBadge>
+            <UiBadge variant="light" color="warning" [endIcon]="PlusIcon">Warning</UiBadge>
+            <UiBadge variant="light" color="info" [endIcon]="PlusIcon">Info</UiBadge>
+            <UiBadge variant="light" color="light" [endIcon]="PlusIcon">Light</UiBadge>
+            <UiBadge variant="light" color="dark" [endIcon]="PlusIcon">Dark</UiBadge>
           </div>
         </div>
         <div>
@@ -195,13 +194,13 @@ export const WithEndIcon: Story = {
             Solid con endIcon
           </h3>
           <div class="flex flex-wrap items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/3">
-            <UiBadge variant="solid" color="primary" [endIcon]="PLUS_ICON">Primary</UiBadge>
-            <UiBadge variant="solid" color="success" [endIcon]="PLUS_ICON">Success</UiBadge>
-            <UiBadge variant="solid" color="error" [endIcon]="PLUS_ICON">Error</UiBadge>
-            <UiBadge variant="solid" color="warning" [endIcon]="PLUS_ICON">Warning</UiBadge>
-            <UiBadge variant="solid" color="info" [endIcon]="PLUS_ICON">Info</UiBadge>
-            <UiBadge variant="solid" color="light" [endIcon]="PLUS_ICON">Light</UiBadge>
-            <UiBadge variant="solid" color="dark" [endIcon]="PLUS_ICON">Dark</UiBadge>
+            <UiBadge variant="solid" color="primary" [endIcon]="PlusIcon">Primary</UiBadge>
+            <UiBadge variant="solid" color="success" [endIcon]="PlusIcon">Success</UiBadge>
+            <UiBadge variant="solid" color="error" [endIcon]="PlusIcon">Error</UiBadge>
+            <UiBadge variant="solid" color="warning" [endIcon]="PlusIcon">Warning</UiBadge>
+            <UiBadge variant="solid" color="info" [endIcon]="PlusIcon">Info</UiBadge>
+            <UiBadge variant="solid" color="light" [endIcon]="PlusIcon">Light</UiBadge>
+            <UiBadge variant="solid" color="dark" [endIcon]="PlusIcon">Dark</UiBadge>
           </div>
         </div>
       </div>

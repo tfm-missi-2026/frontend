@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { TableDropdownComponent } from '../../common/table-dropdown/table-dropdown.component';
+import { Component, signal } from '@angular/core';
 import { UiButtonComponent } from '@shared/ui/button';
+import { UiDropdownComponent, UiDropdownItemComponent } from '@shared/ui/dropdown';
 import { RouterModule } from '@angular/router';
 import {
   IconArrowLeftPaginationComponent,
@@ -35,8 +35,9 @@ interface Sort {
   selector: 'app-product-list-table',
   imports: [
     CommonModule,
-    TableDropdownComponent,
     UiButtonComponent,
+    UiDropdownComponent,
+    UiDropdownItemComponent,
     RouterModule,
     IconArrowLeftPaginationComponent,
     IconArrowRightPaginationComponent,
@@ -353,5 +354,15 @@ export class ProductListTableComponent {
   handleDelete() {
     console.log('Delete clicked');
     // Add your delete logic here
+  }
+
+  protected readonly openMenuProductId = signal<number | null>(null);
+
+  protected toggleProductMenu(productId: number): void {
+    this.openMenuProductId.update((current) => (current === productId ? null : productId));
+  }
+
+  protected closeProductMenu(): void {
+    this.openMenuProductId.set(null);
   }
 }

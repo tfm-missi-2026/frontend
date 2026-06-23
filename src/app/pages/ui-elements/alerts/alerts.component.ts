@@ -1,11 +1,11 @@
 import { Component } from "@angular/core";
 import { UiAlertComponent } from "@shared/ui/alert";
-import { ComponentCardComponent } from "../../../shared/common/component-card/component-card.component";
-import { PageBreadcrumbComponent } from "../../../shared/common/page-breadcrumb/page-breadcrumb.component";
+import { CommonComponentCardComponent } from "../../../shared/common/component-card";
+import { CommonBreadcrumbComponent } from "../../../shared/common/page-breadcrumb";
 
 @Component({
   selector: "app-alerts",
-  imports: [UiAlertComponent, ComponentCardComponent, PageBreadcrumbComponent],
+  imports: [UiAlertComponent, CommonComponentCardComponent, CommonBreadcrumbComponent],
   templateUrl: "./alerts.component.html",
   styles: ``,
 })

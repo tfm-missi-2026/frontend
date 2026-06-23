@@ -1,12 +1,12 @@
 import { Component } from "@angular/core";
-import { ComponentCardComponent } from "../../../shared/common/component-card/component-card.component";
-import { PageBreadcrumbComponent } from "../../../shared/common/page-breadcrumb/page-breadcrumb.component";
+import { CommonComponentCardComponent } from "../../../shared/common/component-card";
+import { CommonBreadcrumbComponent } from "../../../shared/common/page-breadcrumb";
 import { UiButtonComponent } from "@shared/ui/button";
 import { IconBoxComponent } from "@shared/icons";
 
 @Component({
   selector: "app-buttons",
-  imports: [ComponentCardComponent, PageBreadcrumbComponent, UiButtonComponent],
+  imports: [CommonComponentCardComponent, CommonBreadcrumbComponent, UiButtonComponent],
   templateUrl: "./buttons.component.html",
   styles: ``,
 })

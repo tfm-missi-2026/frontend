@@ -8,11 +8,11 @@ import {
 /**
  * `IconInfoCircleFaq`
  * -------------------
- * Círculo con una "i" en su interior (24×26 viewBox), usado como
- * ícono decorativo en cada item del `FaqsThreeComponent`.
+ * Círculo con una "i" en su interior (24×26 viewBox), pensado como
+ * ícono decorativo en layouts de FAQ.
  *
- * El aspect ratio es ligeramente vertical (24×26) por diseño original
- * del layout de FAQ; se distingue de `IconInfoCircleBorder` (24×24).
+ * El aspect ratio es ligeramente vertical (24×26) por diseño original;
+ * se distingue de `IconInfoCircleBorder` (24×24).
  *
  * El color se controla con clases Tailwind pasadas vía `className`
  * (ej. `fill-current` para heredar el color del padre).

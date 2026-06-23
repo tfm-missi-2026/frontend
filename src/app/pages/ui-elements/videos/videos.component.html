@@ -1,46 +1,46 @@
-<app-page-breadcrumb pageTitle="Videos" />
+<CommonBreadcrumb pageTitle="Videos" />
 <div class="grid grid-cols-1 gap-5 sm:gap-6 xl:grid-cols-2">
   <div class="space-y-5 sm:space-y-6">
     <div>
-      <app-component-card title="Video Ratio 16:9">
+      <CommonComponentCard title="Video Ratio 16:9">
         <UiVideo
           [src]="sampleVideo"
           ratio="16:9"
           title="YouTube video 16:9"
         />
-      </app-component-card>
+      </CommonComponentCard>
     </div>
 
     <div>
-      <app-component-card title="Video Ratio 4:3">
+      <CommonComponentCard title="Video Ratio 4:3">
         <UiVideo
           [src]="sampleVideo"
           ratio="4:3"
           title="YouTube video 4:3"
         />
-      </app-component-card>
+      </CommonComponentCard>
     </div>
   </div>
 
   <div class="space-y-5 sm:space-y-6">
     <div>
-      <app-component-card title="Video Ratio 21:9">
+      <CommonComponentCard title="Video Ratio 21:9">
         <UiVideo
           [src]="sampleVideo"
           ratio="21:9"
           title="YouTube video 21:9"
         />
-      </app-component-card>
+      </CommonComponentCard>
     </div>
 
     <div>
-      <app-component-card title="Video Ratio 1:1">
+      <CommonComponentCard title="Video Ratio 1:1">
         <UiVideo
           [src]="sampleVideo"
           ratio="1:1"
           title="YouTube video 1:1"
         />
-      </app-component-card>
+      </CommonComponentCard>
     </div>
   </div>
 </div>

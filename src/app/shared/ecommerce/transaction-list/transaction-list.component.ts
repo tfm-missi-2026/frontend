@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { TableDropdownComponent } from '../../common/table-dropdown/table-dropdown.component';
 import { FormsModule } from '@angular/forms';
+import { UiDropdownComponent, UiDropdownItemComponent } from '@shared/ui/dropdown';
 import {
   IconArrowLeftPaginationComponent,
   IconArrowRightPaginationComponent,
@@ -36,7 +36,8 @@ interface SortState {
   imports: [
     CommonModule,
     RouterModule,
-    TableDropdownComponent,
+    UiDropdownComponent,
+    UiDropdownItemComponent,
     FormsModule,
     IconArrowLeftPaginationComponent,
     IconArrowRightPaginationComponent,
@@ -355,5 +356,15 @@ export class TransactionListComponent {
 
   handleDelete(): void {
     // Logic for delete
+  }
+
+  protected readonly openMenuRowId = signal<number | null>(null);
+
+  protected toggleRowMenu(rowId: number): void {
+    this.openMenuRowId.update((current) => (current === rowId ? null : rowId));
+  }
+
+  protected closeRowMenu(): void {
+    this.openMenuRowId.set(null);
   }
 }

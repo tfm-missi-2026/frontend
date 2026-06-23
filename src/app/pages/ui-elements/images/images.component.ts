@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 
-import { PageBreadcrumbComponent } from "../../../shared/common/page-breadcrumb/page-breadcrumb.component";
-import { ComponentCardComponent } from "../../../shared/common/component-card/component-card.component";
+import { CommonBreadcrumbComponent } from "../../../shared/common/page-breadcrumb";
+import { CommonComponentCardComponent } from "../../../shared/common/component-card";
 import { UiImageComponent } from "@shared/ui/image";
 import { UiGridComponent } from "@shared/ui/grid";
 
@@ -24,8 +24,8 @@ const THREE_COL_IMAGES = [
 @Component({
   selector: "app-images",
   imports: [
-    PageBreadcrumbComponent,
-    ComponentCardComponent,
+    CommonBreadcrumbComponent,
+    CommonComponentCardComponent,
     UiImageComponent,
     UiGridComponent,
   ],

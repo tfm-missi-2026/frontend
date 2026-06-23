@@ -42,7 +42,7 @@ describe('CommonTabGroup', () => {
   });
 
   it('emits selectedChange when clicking a non-disabled tab', () => {
-    const spy = vi.fn();
+    const spy = jasmine.createSpy('selectedChange');
     component.selectedChange.subscribe(spy);
 
     const buttons = native.querySelectorAll('button');
@@ -64,7 +64,7 @@ describe('CommonTabGroup', () => {
     fixture.componentRef.setInput('selectedId', 'monthly');
     fixture.detectChanges();
 
-    const spy = vi.fn();
+    const spy = jasmine.createSpy('selectedChange');
     component.selectedChange.subscribe(spy);
 
     const buttons = native.querySelectorAll('button');
@@ -83,7 +83,7 @@ describe('CommonTabGroup', () => {
     ]);
     fixture.detectChanges();
 
-    const spy = vi.fn();
+    const spy = jasmine.createSpy('selectedChange');
     component.selectedChange.subscribe(spy);
 
     const buttons = native.querySelectorAll('button');

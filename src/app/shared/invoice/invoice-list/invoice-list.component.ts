@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener } from '@angular/core';
+import { Component, ElementRef, HostListener, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { TableDropdownComponent } from '../../common/table-dropdown/table-dropdown.component';
+import { UiDropdownComponent, UiDropdownItemComponent } from '@shared/ui/dropdown';
 import {
   IconArrowLeftPaginationComponent,
   IconArrowRightPaginationComponent,
@@ -33,7 +33,8 @@ interface SortState {
   imports: [
     CommonModule,
     FormsModule,
-    TableDropdownComponent,
+    UiDropdownComponent,
+    UiDropdownItemComponent,
     IconSearchComponent,
     IconFilterComponent,
     IconUploadComponent,
@@ -407,5 +408,15 @@ export class InvoiceListComponent {
 
   toggleFilter(): void {
     this.showFilter = !this.showFilter;
+  }
+
+  protected readonly openMenuInvoiceId = signal<number | null>(null);
+
+  protected toggleInvoiceMenu(invoiceId: number): void {
+    this.openMenuInvoiceId.update((current) => (current === invoiceId ? null : invoiceId));
+  }
+
+  protected closeInvoiceMenu(): void {
+    this.openMenuInvoiceId.set(null);
   }
 }

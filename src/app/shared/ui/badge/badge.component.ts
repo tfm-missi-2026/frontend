@@ -3,10 +3,11 @@ import {
   Component,
   computed,
   input,
+  Type,
 } from "@angular/core";
-import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
-import { inject } from "@angular/core";
+import { NgComponentOutlet } from "@angular/common";
 
+import { IconProps } from "@shared/icons/icon.interface";
 import { BadgeColor, BadgeSize, BadgeVariant } from "./badge.types";
 
 const SIZE_CLASSES: Record<BadgeSize, string> = {
@@ -52,24 +53,30 @@ const BASE_STYLES =
  * Tamaños: `sm` | `md` (default `md`).
  * Colores: `primary` | `success` | `error` | `warning` | `info` | `light` | `dark` (default `primary`).
  *
- * `startIcon` y `endIcon` aceptan un string de SVG/HTML que se renderiza
- * vía `[innerHTML]` después de pasar por el `DomSanitizer` (bypass de
- * seguridad). Mantener el control sobre el contenido inyectado.
+ * `startIcon` y `endIcon` aceptan un **componente Angular** (`Type<unknown>`)
+ * del design system que se renderiza vía `NgComponentOutlet`. Esto
+ * mantiene la convención del DS (todos los iconos viven en
+ * `@shared/icons`) y se alinea con el patrón usado por `UiButton`.
  *
  * API signal-based (Angular 17.1+).
  */
 @Component({
   selector: "UiBadge",
   standalone: true,
+  imports: [NgComponentOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <span [class]="containerClasses()">
       @if (startIcon()) {
-        <span [innerHTML]="safeStartIcon()"></span>
+        <ng-container
+          *ngComponentOutlet="startIcon() ?? null; inputs: iconInputs()"
+        ></ng-container>
       }
       <ng-content></ng-content>
       @if (endIcon()) {
-        <span [innerHTML]="safeEndIcon()"></span>
+        <ng-container
+          *ngComponentOutlet="endIcon() ?? null; inputs: iconInputs()"
+        ></ng-container>
       }
     </span>
   `,
@@ -81,12 +88,14 @@ export class UiBadgeComponent {
   readonly size = input<BadgeSize>("md");
   /** Color semántico. */
   readonly color = input<BadgeColor>("primary");
-  /** SVG/HTML opcional a la izquierda del texto. */
-  readonly startIcon = input<string | undefined>(undefined);
-  /** SVG/HTML opcional a la derecha del texto. */
-  readonly endIcon = input<string | undefined>(undefined);
 
-  private readonly sanitizer = inject(DomSanitizer);
+  /** Componente Angular opcional a la izquierda del texto. */
+  readonly startIcon = input<Type<unknown> | undefined>(undefined);
+  /** Componente Angular opcional a la derecha del texto. */
+  readonly endIcon = input<Type<unknown> | undefined>(undefined);
+
+  /** Props para los íconos (size default 12). */
+  readonly iconProps = input<IconProps>({});
 
   readonly sizeClass = computed<string>(() => SIZE_CLASSES[this.size()]);
 
@@ -98,15 +107,11 @@ export class UiBadgeComponent {
     () => `${BASE_STYLES} ${this.sizeClass()} ${this.colorClass()}`,
   );
 
-  readonly safeStartIcon = computed<SafeHtml | string>(() =>
-    this.startIcon()
-      ? this.sanitizer.bypassSecurityTrustHtml(this.startIcon()!)
-      : "",
-  );
-
-  readonly safeEndIcon = computed<SafeHtml | string>(() =>
-    this.endIcon()
-      ? this.sanitizer.bypassSecurityTrustHtml(this.endIcon()!)
-      : "",
-  );
+  readonly iconInputs = computed<Record<string, unknown>>(() => {
+    const props: Record<string, unknown> = { ...this.iconProps() };
+    if (props["size"] === undefined) {
+      props["size"] = 12;
+    }
+    return props;
+  });
 }

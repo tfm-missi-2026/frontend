@@ -35,7 +35,12 @@ export type FlexDirection =
   host: { class: 'contents' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div [class]="classes()" [style]="styles()">
+    <div
+      [class]="classes()"
+      [style]="styles()"
+      [attr.aria-label]="ariaLabel()"
+      [attr.aria-hidden]="ariaHidden() ? 'true' : null"
+    >
       <ng-content />
     </div>
   `,
@@ -59,6 +64,10 @@ export class UiFlexComponent {
   readonly shrinkable = input<boolean>(false);
   /** Clases extra para el contenedor. */
   readonly className = input<string>('');
+  /** Etiqueta accesible del contenedor. */
+  readonly ariaLabel = input<string | undefined>(undefined);
+  /** Marca el contenedor como decorativo para lectores de pantalla. */
+  readonly ariaHidden = input<boolean>(false);
 
   /** Clases del contenedor (`flex` + extras del consumidor). */
   readonly classes = computed<string>(() => `flex ${this.className()}`.trim());
