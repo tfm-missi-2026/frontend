@@ -92,22 +92,10 @@
               Social Links
             </h5>
             <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-              <div>
-                <app-label>Facebook</app-label>
-                <app-input-field type="text" [value]="user.social.facebook" />
-              </div>
-              <div>
-                <app-label>X.com</app-label>
-                <app-input-field type="text" [value]="user.social.x" />
-              </div>
-              <div>
-                <app-label>Linkedin</app-label>
-                <app-input-field type="text" [value]="user.social.linkedin" />
-              </div>
-              <div>
-                <app-label>Instagram</app-label>
-                <app-input-field type="text" [value]="user.social.instagram" />
-              </div>
+              <UiInput labelText="Facebook" type="text" [value]="user.social.facebook" />
+              <UiInput labelText="X.com" type="text" [value]="user.social.x" />
+              <UiInput labelText="Linkedin" type="text" [value]="user.social.linkedin" />
+              <UiInput labelText="Instagram" type="text" [value]="user.social.instagram" />
             </div>
           </div>
           <div class="mt-7">
@@ -115,26 +103,11 @@
               Personal Information
             </h5>
             <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-              <div class="col-span-2 lg:col-span-1">
-                <app-label>First Name</app-label>
-                <app-input-field type="text" [value]="user.firstName" />
-              </div>
-              <div class="col-span-2 lg:col-span-1">
-                <app-label>Last Name</app-label>
-                <app-input-field type="text" [value]="user.lastName" />
-              </div>
-              <div class="col-span-2 lg:col-span-1">
-                <app-label>Email Address</app-label>
-                <app-input-field type="text" [value]="user.email" />
-              </div>
-              <div class="col-span-2 lg:col-span-1">
-                <app-label>Phone</app-label>
-                <app-input-field type="text" [value]="user.phone" />
-              </div>
-              <div class="col-span-2">
-                <app-label>Bio</app-label>
-                <app-input-field type="text" [value]="user.bio" />
-              </div>
+              <UiInput className="col-span-2 lg:col-span-1" labelText="First Name" type="text" [value]="user.firstName" />
+              <UiInput className="col-span-2 lg:col-span-1" labelText="Last Name" type="text" [value]="user.lastName" />
+              <UiInput className="col-span-2 lg:col-span-1" labelText="Email Address" type="text" [value]="user.email" />
+              <UiInput className="col-span-2 lg:col-span-1" labelText="Phone" type="text" [value]="user.phone" />
+              <UiInput className="col-span-2" labelText="Bio" type="text" [value]="user.bio" />
             </div>
           </div>
         </div>

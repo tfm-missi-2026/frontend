@@ -1,19 +1,13 @@
 import { Component } from "@angular/core";
 import { ModalService } from "../../../services/modal.service";
 
-import { InputFieldComponent } from "../../form/input/input-field.component";
-import { LabelComponent } from "../../form/label/label.component";
+import { UiInputComponent } from "@shared/ui/input";
 import { UiModalComponent } from "@shared/ui/modal";
 import { UiButtonComponent } from "@shared/ui/button";
 
 @Component({
   selector: "app-user-info-card",
-  imports: [
-    InputFieldComponent,
-    UiButtonComponent,
-    LabelComponent,
-    UiModalComponent,
-  ],
+  imports: [UiInputComponent, UiButtonComponent, UiModalComponent],
   templateUrl: "./user-info-card.component.html",
   styles: ``,
 })

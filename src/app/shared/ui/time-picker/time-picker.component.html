@@ -1,0 +1,57 @@
+<!--
+  Template del UiTimePicker.
+  Mismo layout que UiDatePicker: outer > form-label + container con icono clock.
+-->
+
+<div
+  [class]="outerClasses()"
+  [style]="outerStyles()"
+  data-testid="timepicker-wrapper"
+>
+  @if (labelText(); as lt) {
+    <UiFormLabel
+      [labelText]="lt"
+      [labelFor]="id() || ''"
+      [required]="required()"
+      [disabled]="isEffectivelyDisabled()"
+      [readOnly]="readOnly()"
+      [tooltip]="tooltip()"
+    ></UiFormLabel>
+  }
+
+  <div
+    [class]="containerClasses()"
+    [style]="containerStyles()"
+    data-testid="timepicker-container"
+  >
+    <input
+      #inputEl
+      [id]="id() || null"
+      [name]="name() || null"
+      type="text"
+      [class]="inputClasses()"
+      [placeholder]="placeholder()"
+      [disabled]="isEffectivelyDisabled()"
+      [readonly]="readOnly()"
+      [value]="internalValue"
+      (focus)="onFocusHandler()"
+      (blur)="onBlurHandler()"
+      data-testid="timepicker"
+    />
+    <span
+      class="inline-flex items-center justify-center shrink-0 text-gray-500 dark:text-gray-400 pointer-events-none"
+      aria-hidden="true"
+    >
+      <IconClock [size]="20" />
+    </span>
+  </div>
+
+  @if (legend(); as lgd) {
+    <UiLabel
+      type="bodyXxs"
+      color="textWeakest"
+      [text]="lgd"
+      [weight]="'regular'"
+    ></UiLabel>
+  }
+</div>

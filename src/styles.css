@@ -4,6 +4,8 @@
 @import "swiper/css";
 @import "swiper/css/navigation";
 @import "swiper/css/pagination";
+@import "flatpickr/dist/flatpickr.css";
+@import "apexcharts/dist/apexcharts.css";
 
 @custom-variant dark (&:is(.dark *));
 

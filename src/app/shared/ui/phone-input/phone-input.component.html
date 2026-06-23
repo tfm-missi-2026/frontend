@@ -1,0 +1,84 @@
+<!--
+  Template del UiPhoneInput.
+  Estructura:
+    <outer>             → col + gap[1] + width
+      <UiFormLabel>     → si hay labelText
+      <container>       → relative + flex + focus ring
+        <select wrapper>→ absolute a start/end
+          <select>      → códigos de país
+          <chevron>
+        <input>         → teléfono
+    </outer>
+-->
+
+<div
+  [class]="outerClasses()"
+  [style]="outerStyles()"
+  data-testid="phone-input-wrapper"
+>
+  @if (labelText(); as lt) {
+    <UiFormLabel
+      [labelText]="lt"
+      [labelFor]="id() || ''"
+      [required]="required()"
+      [disabled]="isEffectivelyDisabled()"
+      [readOnly]="readOnly()"
+      [tooltip]="tooltip()"
+    ></UiFormLabel>
+  }
+
+  <div
+    [class]="containerClasses()"
+    [style]="containerStyles()"
+    data-testid="phone-input-container"
+  >
+    <!-- Selector de país -->
+    <div [class]="selectWrapperClasses()">
+      <select
+        #selectEl
+        [class]="selectClasses()"
+        [style]="selectStyles()"
+        [value]="selectedCountry()"
+        [disabled]="isEffectivelyDisabled()"
+        (change)="handleCountryChange($event)"
+        data-testid="phone-country"
+      >
+        @for (country of countries(); track country.code) {
+          <option [value]="country.code">
+            {{ country.code }}
+          </option>
+        }
+      </select>
+      <div
+        class="absolute inset-y-0 flex items-center text-gray-700 pointer-events-none right-3 dark:text-gray-400"
+        aria-hidden="true"
+      >
+        <IconChevronDown [size]="20" />
+      </div>
+    </div>
+
+    <!-- Input de teléfono -->
+    <input
+      #inputEl
+      type="tel"
+      [id]="id() || null"
+      [class]="inputClasses()"
+      [placeholder]="placeholder()"
+      [value]="phoneNumber()"
+      [disabled]="isEffectivelyDisabled()"
+      [readonly]="readOnly()"
+      (input)="handlePhoneNumberChange($event)"
+      (blur)="onBlurHandler()"
+      data-testid="phone-number"
+    />
+  </div>
+
+  @if (legend(); as lgd) {
+    <UiLabel
+      type="bodyXxs"
+      color="textWeakest"
+      [text]="lgd"
+      [weight]="'regular'"
+    ></UiLabel>
+  }
+</div>

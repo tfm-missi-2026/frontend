@@ -32,6 +32,7 @@ export type FlexDirection =
 @Component({
   selector: 'UiFlex',
   standalone: true,
+  host: { class: 'contents' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div [class]="classes()" [style]="styles()">

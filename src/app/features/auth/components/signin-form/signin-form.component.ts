@@ -30,6 +30,7 @@ export interface SignInFormData {
 @Component({
   selector: "SigninForm",
   standalone: true,
+  host: { class: "w-full max-w-md mx-auto h-full flex flex-col" },
   imports: [
     UiButtonComponent,
     UiInputComponent,

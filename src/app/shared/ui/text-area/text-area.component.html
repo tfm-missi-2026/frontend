@@ -1,0 +1,77 @@
+<!--
+  Template del UiTextArea.
+  Estructura:
+    <outer>          → col + gap[1] + width
+      <UiFormLabel>  → si hay `labelText`
+      <textarea>
+      @if hint      → <p> de ayuda (rojo si error)
+      <UiFlex>      → legend | charCount
+    </outer>
+-->
+
+<div
+  [class]="outerClasses()"
+  [style]="outerStyles()"
+  data-testid="textarea-wrapper"
+>
+  @if (labelText(); as lt) {
+    <UiFormLabel
+      [labelText]="lt"
+      [labelFor]="id() || ''"
+      [required]="required()"
+      [disabled]="isDisabled()"
+      [readOnly]="readOnly()"
+      [tooltip]="tooltip()"
+    ></UiFormLabel>
+  }
+
+  <textarea
+    #textareaEl
+    [id]="id() || null"
+    [name]="name() || null"
+    [class]="textareaClasses()"
+    [placeholder]="placeholder()"
+    [rows]="rows()"
+    [attr.maxlength]="maxLength() || null"
+    [disabled]="isDisabled()"
+    [readonly]="readOnly()"
+    [value]="internalValue"
+    (input)="onInput($event)"
+    (focus)="onFocusHandler()"
+    (blur)="onBlurHandler()"
+    data-testid="textarea"
+  ></textarea>
+
+  @if (hint(); as h) {
+    <p
+      class="text-xs"
+      [class.text-error-500]="hasError()"
+      [class.text-gray-500]="!hasError()"
+    >
+      {{ h }}
+    </p>
+  }
+
+  @if (legend() || maxLength()) {
+    <UiFlex [justifyContent]="footerJustifyContent()">
+      @if (legend(); as lgd) {
+        <UiLabel
+          type="bodyXxs"
+          color="textWeakest"
+          [text]="lgd"
+          [weight]="legendWeight"
+        ></UiLabel>
+      }
+      @if (maxLength()) {
+        <span class="self-end">
+          <UiLabel
+            type="bodyXxs"
+            [color]="charCountColor()"
+            [text]="charCountText()"
+            [weight]="charCountWeight"
+          ></UiLabel>
+        </span>
+      }
+    </UiFlex>
+  }
+</div>
