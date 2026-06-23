@@ -2,14 +2,14 @@ import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 import { CommonModule } from "@angular/common";
 
-import { ChartRadialBarComponent } from "@shared/components/charts/radial-bar-chart";
-import { CHART_CIRCULAR_PALETTE } from "@shared/components/charts/tokens/chart-tokens";
+import { ChartRadialBarComponent } from "@shared/charts/radial-bar-chart";
+import { CHART_CIRCULAR_PALETTE } from "@shared/charts/tokens/chart-tokens";
 
 const defaultSeries = [76, 67, 61, 90];
 const defaultLabels = ["Sales", "Marketing", "Support", "Engineering"];
 
 const meta: Meta<ChartRadialBarComponent> = {
-  title: "Shared/RadialBarChart",
+  title: "Charts/RadialBarChart",
   component: ChartRadialBarComponent,
   decorators: [
     moduleMetadata({ imports: [CommonModule, ChartRadialBarComponent] }),

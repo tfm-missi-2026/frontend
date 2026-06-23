@@ -12,6 +12,7 @@ import {
 
 @Component({
   selector: 'app-user-dropdown',
+  standalone: true,
   templateUrl: './user-dropdown.component.html',
   imports: [
     CommonModule,

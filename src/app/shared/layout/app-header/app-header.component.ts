@@ -1,13 +1,14 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { SidebarService } from '../../services/sidebar.service';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { ThemeToggleButtonComponent } from '../../components/common/theme-toggle/theme-toggle-button.component';
-import { NotificationDropdownComponent } from '../../components/header/notification-dropdown/notification-dropdown.component';
-import { UserDropdownComponent } from '../../components/header/user-dropdown/user-dropdown.component';
+import { Component, ElementRef, ViewChild } from "@angular/core";
+import { SidebarService } from "../../services/sidebar.service";
+import { CommonModule } from "@angular/common";
+import { RouterModule } from "@angular/router";
+import { ThemeToggleButtonComponent } from "@shared/common/theme-toggle/theme-toggle-button.component";
+import { NotificationDropdownComponent } from "@shared/header/notification-dropdown/notification-dropdown.component";
+import { UserDropdownComponent } from "@shared/header/user-dropdown/user-dropdown.component";
 
 @Component({
-  selector: 'app-header',
+  selector: "app-header",
+  standalone: true,
   imports: [
     CommonModule,
     RouterModule,
@@ -15,13 +16,13 @@ import { UserDropdownComponent } from '../../components/header/user-dropdown/use
     NotificationDropdownComponent,
     UserDropdownComponent,
   ],
-  templateUrl: './app-header.component.html',
+  templateUrl: "./app-header.component.html",
 })
 export class AppHeaderComponent {
   isApplicationMenuOpen = false;
   readonly isMobileOpen$;
 
-  @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
+  @ViewChild("searchInput") searchInput!: ElementRef<HTMLInputElement>;
 
   constructor(public sidebarService: SidebarService) {
     this.isMobileOpen$ = this.sidebarService.isMobileOpen$;
@@ -40,15 +41,15 @@ export class AppHeaderComponent {
   }
 
   ngAfterViewInit() {
-    document.addEventListener('keydown', this.handleKeyDown);
+    document.addEventListener("keydown", this.handleKeyDown);
   }
 
   ngOnDestroy() {
-    document.removeEventListener('keydown', this.handleKeyDown);
+    document.removeEventListener("keydown", this.handleKeyDown);
   }
 
   handleKeyDown = (event: KeyboardEvent) => {
-    if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+    if ((event.metaKey || event.ctrlKey) && event.key === "k") {
       event.preventDefault();
       this.searchInput?.nativeElement.focus();
     }

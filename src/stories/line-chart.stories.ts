@@ -2,17 +2,36 @@ import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 import type { ApexAxisChartSeries } from "ng-apexcharts";
 
-import { ChartLineComponent } from "@shared/components/charts/line-chart";
-import { CHART_COLORS, CHART_SERIES_PALETTE } from "@shared/components/charts/tokens/chart-tokens";
+import { ChartLineComponent } from "@shared/charts/line-chart";
+import {
+  CHART_COLORS,
+  CHART_SERIES_PALETTE,
+} from "@shared/charts/tokens/chart-tokens";
 
 const months = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
 const twoSeries: ApexAxisChartSeries = [
-  { name: "Sales", data: [180, 190, 170, 160, 175, 165, 170, 205, 230, 210, 240, 235] },
-  { name: "Revenue", data: [40, 30, 50, 40, 55, 40, 70, 100, 110, 120, 150, 140] },
+  {
+    name: "Sales",
+    data: [180, 190, 170, 160, 175, 165, 170, 205, 230, 210, 240, 235],
+  },
+  {
+    name: "Revenue",
+    data: [40, 30, 50, 40, 55, 40, 70, 100, 110, 120, 150, 140],
+  },
 ];
 
 const singleSeries: ApexAxisChartSeries = [
@@ -20,11 +39,9 @@ const singleSeries: ApexAxisChartSeries = [
 ];
 
 const meta: Meta<ChartLineComponent> = {
-  title: "Shared/LineChart",
+  title: "Charts/LineChart",
   component: ChartLineComponent,
-  decorators: [
-    moduleMetadata({ imports: [ChartLineComponent] }),
-  ],
+  decorators: [moduleMetadata({ imports: [ChartLineComponent] })],
   tags: ["autodocs"],
   parameters: { layout: "padded" },
   argTypes: {

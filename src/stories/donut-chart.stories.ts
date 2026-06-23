@@ -2,14 +2,17 @@ import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 import { CommonModule } from "@angular/common";
 
-import { ChartDonutComponent } from "@shared/components/charts/donut-chart";
-import { CHART_CIRCULAR_PALETTE, CHART_COLORS } from "@shared/components/charts/tokens/chart-tokens";
+import { ChartDonutComponent } from "@shared/charts/donut-chart";
+import {
+  CHART_CIRCULAR_PALETTE,
+  CHART_COLORS,
+} from "@shared/charts/tokens/chart-tokens";
 
 const defaultSeries = [44, 55, 41, 17];
 const defaultLabels = ["Desktop", "Mobile", "Tablet", "Smart TV"];
 
 const meta: Meta<ChartDonutComponent> = {
-  title: "Shared/DonutChart",
+  title: "Charts/DonutChart",
   component: ChartDonutComponent,
   decorators: [
     moduleMetadata({ imports: [CommonModule, ChartDonutComponent] }),

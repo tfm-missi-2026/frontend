@@ -6,6 +6,7 @@ import { IconBellComponent, IconCloseLargeComponent } from '@shared/icons';
 
 @Component({
   selector: 'app-notification-dropdown',
+  standalone: true,
   templateUrl: './notification-dropdown.component.html',
   imports: [
     CommonModule,

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { GridShapeComponent } from '../../../shared/components/common/grid-shape/grid-shape.component';
+import { GridShapeComponent } from '../../../shared/common/grid-shape/grid-shape.component';
 import { RouterModule } from '@angular/router';
 
 @Component({

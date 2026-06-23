@@ -2,29 +2,49 @@ import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 import type { ApexAxisChartSeries } from "ng-apexcharts";
 
-import { ChartBarComponent } from "@shared/components/charts/bar-chart";
-import { CHART_COLORS, CHART_SERIES_PALETTE } from "@shared/components/charts/tokens/chart-tokens";
+import { ChartBarComponent } from "@shared/charts/bar-chart";
+import {
+  CHART_COLORS,
+  CHART_SERIES_PALETTE,
+} from "@shared/charts/tokens/chart-tokens";
 
 const months = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
 const salesSeries: ApexAxisChartSeries = [
-  { name: "Sales", data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112] },
+  {
+    name: "Sales",
+    data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112],
+  },
 ];
 
 const stackedSeries: ApexAxisChartSeries = [
-  { name: "Sales", data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112] },
-  { name: "Revenue", data: [40, 30, 50, 40, 55, 40, 70, 100, 110, 120, 150, 140] },
+  {
+    name: "Sales",
+    data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112],
+  },
+  {
+    name: "Revenue",
+    data: [40, 30, 50, 40, 55, 40, 70, 100, 110, 120, 150, 140],
+  },
 ];
 
 const meta: Meta<ChartBarComponent> = {
-  title: "Shared/BarChart",
+  title: "Charts/BarChart",
   component: ChartBarComponent,
-  decorators: [
-    moduleMetadata({ imports: [ChartBarComponent] }),
-  ],
+  decorators: [moduleMetadata({ imports: [ChartBarComponent] })],
   tags: ["autodocs"],
   parameters: { layout: "padded" },
   argTypes: {
@@ -93,7 +113,11 @@ export const CustomColors: Story = {
       { name: "Q3", data: [11, 17, 15, 15, 21, 14, 15, 13] },
     ],
     categories: ["A", "B", "C", "D", "E", "F", "G", "H"],
-    colors: [CHART_COLORS.brand500, CHART_COLORS.brand200, CHART_COLORS.brandTeal],
+    colors: [
+      CHART_COLORS.brand500,
+      CHART_COLORS.brand200,
+      CHART_COLORS.brandTeal,
+    ],
     height: 320,
   },
 };

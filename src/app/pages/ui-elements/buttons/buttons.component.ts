@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
-import { ComponentCardComponent } from "../../../shared/components/common/component-card/component-card.component";
-import { PageBreadcrumbComponent } from "../../../shared/components/common/page-breadcrumb/page-breadcrumb.component";
+import { ComponentCardComponent } from "../../../shared/common/component-card/component-card.component";
+import { PageBreadcrumbComponent } from "../../../shared/common/page-breadcrumb/page-breadcrumb.component";
 import { UiButtonComponent } from "@shared/ui/button";
 import { IconBoxComponent } from "@shared/icons";
 

@@ -2,18 +2,19 @@ import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 import { CommonModule } from "@angular/common";
 
-import { ChartPieComponent } from "@shared/components/charts/pie-chart";
-import { CHART_CIRCULAR_PALETTE, CHART_COLORS } from "@shared/components/charts/tokens/chart-tokens";
+import { ChartPieComponent } from "@shared/charts/pie-chart";
+import {
+  CHART_CIRCULAR_PALETTE,
+  CHART_COLORS,
+} from "@shared/charts/tokens/chart-tokens";
 
 const defaultSeries = [44, 55, 41, 17];
 const defaultLabels = ["Direct", "Referral", "Organic", "Social"];
 
 const meta: Meta<ChartPieComponent> = {
-  title: "Shared/PieChart",
+  title: "Charts/PieChart",
   component: ChartPieComponent,
-  decorators: [
-    moduleMetadata({ imports: [CommonModule, ChartPieComponent] }),
-  ],
+  decorators: [moduleMetadata({ imports: [CommonModule, ChartPieComponent] })],
   tags: ["autodocs"],
   parameters: { layout: "padded" },
   argTypes: {

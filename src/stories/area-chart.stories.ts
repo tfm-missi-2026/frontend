@@ -2,29 +2,49 @@ import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 import type { ApexAxisChartSeries } from "ng-apexcharts";
 
-import { ChartAreaComponent } from "@shared/components/charts/area-chart";
-import { CHART_COLORS, CHART_SERIES_PALETTE } from "@shared/components/charts/tokens/chart-tokens";
+import { ChartAreaComponent } from "@shared/charts/area-chart";
+import {
+  CHART_COLORS,
+  CHART_SERIES_PALETTE,
+} from "@shared/charts/tokens/chart-tokens";
 
 const months = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
 const defaultSeries: ApexAxisChartSeries = [
-  { name: "Sales", data: [180, 190, 170, 160, 175, 165, 170, 205, 230, 210, 240, 235] },
-  { name: "Revenue", data: [40, 30, 50, 40, 55, 40, 70, 100, 110, 120, 150, 140] },
+  {
+    name: "Sales",
+    data: [180, 190, 170, 160, 175, 165, 170, 205, 230, 210, 240, 235],
+  },
+  {
+    name: "Revenue",
+    data: [40, 30, 50, 40, 55, 40, 70, 100, 110, 120, 150, 140],
+  },
 ];
 
 const singleSeries: ApexAxisChartSeries = [
-  { name: "Sessions", data: [30, 40, 35, 50, 49, 60, 70, 91, 125, 150, 130, 140] },
+  {
+    name: "Sessions",
+    data: [30, 40, 35, 50, 49, 60, 70, 91, 125, 150, 130, 140],
+  },
 ];
 
 const meta: Meta<ChartAreaComponent> = {
-  title: "Shared/AreaChart",
+  title: "Charts/AreaChart",
   component: ChartAreaComponent,
-  decorators: [
-    moduleMetadata({ imports: [ChartAreaComponent] }),
-  ],
+  decorators: [moduleMetadata({ imports: [ChartAreaComponent] })],
   tags: ["autodocs"],
   parameters: { layout: "padded" },
   argTypes: {

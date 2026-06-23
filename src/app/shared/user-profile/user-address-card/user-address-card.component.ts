@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { ModalService } from "../../../services/modal.service";
+import { ModalService } from "../../services/modal.service";
 
 import { UiInputComponent } from "@shared/ui/input";
 import { UiModalComponent } from "@shared/ui/modal";
@@ -8,6 +8,7 @@ import { FormsModule } from "@angular/forms";
 
 @Component({
   selector: "app-user-address-card",
+  standalone: true,
   imports: [UiInputComponent, UiButtonComponent, UiModalComponent, FormsModule],
   templateUrl: "./user-address-card.component.html",
   styles: ``,

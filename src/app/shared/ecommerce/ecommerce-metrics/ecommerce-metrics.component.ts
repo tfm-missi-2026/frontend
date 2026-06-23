@@ -1,9 +1,10 @@
 import { Component } from "@angular/core";
 import { UiBadgeComponent } from "@shared/ui/badge";
-import { SafeHtmlPipe } from "../../../pipe/safe-html.pipe";
+import { SafeHtmlPipe } from "../../pipe/safe-html.pipe";
 
 @Component({
   selector: "app-ecommerce-metrics",
+  standalone: true,
   imports: [UiBadgeComponent, SafeHtmlPipe],
   templateUrl: "./ecommerce-metrics.component.html",
 })

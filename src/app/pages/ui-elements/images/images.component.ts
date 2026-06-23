@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 
-import { PageBreadcrumbComponent } from "../../../shared/components/common/page-breadcrumb/page-breadcrumb.component";
-import { ComponentCardComponent } from "../../../shared/components/common/component-card/component-card.component";
+import { PageBreadcrumbComponent } from "../../../shared/common/page-breadcrumb/page-breadcrumb.component";
+import { ComponentCardComponent } from "../../../shared/common/component-card/component-card.component";
 import { UiImageComponent } from "@shared/ui/image";
 import { UiGridComponent } from "@shared/ui/grid";
 

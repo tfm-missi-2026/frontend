@@ -1,4 +1,3 @@
-
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import flatpickr from 'flatpickr';
 import { Instance } from 'flatpickr/dist/types/instance';
@@ -17,16 +16,25 @@ import {
   ApexXAxis,
   ApexYAxis,
 } from 'ng-apexcharts';
-import { ChartTabComponent } from '../../common/chart-tab/chart-tab.component';
+import {
+  CommonTabGroupComponent,
+  CommonTabOption,
+} from '../../common/tab-group';
 import { IconCalendarComponent } from '@shared/icons';
 
 @Component({
   selector: 'app-statics-chart',
-  imports: [NgApexchartsModule, ChartTabComponent, IconCalendarComponent],
+  imports: [NgApexchartsModule, CommonTabGroupComponent, IconCalendarComponent],
   templateUrl: './statics-chart.component.html',
 })
 export class StatisticsChartComponent implements AfterViewInit {
   @ViewChild('datepicker') datepicker!: ElementRef<HTMLInputElement>;
+
+  public periodTabs: CommonTabOption[] = [
+    { value: 'monthly', label: 'Monthly' },
+    { value: 'quarterly', label: 'Quarterly' },
+    { value: 'annually', label: 'Annually' },
+  ];
 
   ngAfterViewInit() {
     flatpickr(this.datepicker.nativeElement, {
