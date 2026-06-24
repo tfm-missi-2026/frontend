@@ -76,7 +76,7 @@
           }
           @if (showActionsColumn) {
             <th class="px-4 py-3 w-px whitespace-nowrap">
-              <span class="sr-only">Actions</span>
+              <span class="sr-only">Acciones</span>
             </th>
           }
         </tr>
@@ -150,7 +150,7 @@
           [variant]="'tertiary'"
           [compact]="true"
           [disabled]="currentPage() === 1"
-          [labelText]="'Previous page'"
+          [labelText]="'Página anterior'"
           (click)="onPrevPage()"
         ></UiIconButton>
         <UiLabel
@@ -163,7 +163,7 @@
           [variant]="'tertiary'"
           [compact]="true"
           [disabled]="currentPage() === totalPages()"
-          [labelText]="'Next page'"
+          [labelText]="'Página siguiente'"
           (click)="onNextPage()"
         ></UiIconButton>
       </UiFlex>

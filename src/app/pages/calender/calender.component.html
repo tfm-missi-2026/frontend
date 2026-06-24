@@ -1,4 +1,6 @@
-<div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+<div
+  class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3"
+>
   <div class="custom-calendar">
     <full-calendar #calendar [options]="calendarOptions"></full-calendar>
   </div>
@@ -6,12 +8,14 @@
   <UiModal
     [isOpen]="isOpen"
     (close)="closeModal()"
-    className="max-w-[700px] p-6 lg:p-10"
+    className="max-w-175 p-6 lg:p-10"
   >
     <div class="flex flex-col px-2 overflow-y-auto custom-scrollbar">
       <div>
-        <h5 class="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl">
-          {{ selectedEvent ? 'Edit Event' : 'Add Event' }}
+        <h5
+          class="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl"
+        >
+          {{ selectedEvent ? "Edit Event" : "Add Event" }}
         </h5>
         <p class="text-sm text-gray-500 dark:text-gray-400">
           Plan your next big moment: schedule or edit an event to stay on track
@@ -19,7 +23,9 @@
       </div>
       <div class="mt-8">
         <div>
-          <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+          <label
+            class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+          >
             Event Title
           </label>
           <input
@@ -32,15 +38,18 @@
       </div>
 
       <div class="mt-6">
-        <label class="block mb-4 text-sm font-medium text-gray-700 dark:text-gray-400">
+        <label
+          class="block mb-4 text-sm font-medium text-gray-700 dark:text-gray-400"
+        >
           Event Color
         </label>
         <div class="flex flex-wrap items-center gap-4 sm:gap-5">
-          @for (entry of (calendarsEvents | keyvalue); track $index) {
-            <div
-              class="n-chk"
-            >
-              <div class="form-check form-check-inline" [class]="'form-check-' + entry.value">
+          @for (entry of calendarsEvents | keyvalue; track $index) {
+            <div class="n-chk">
+              <div
+                class="form-check form-check-inline"
+                [class]="'form-check-' + entry.value"
+              >
                 <label
                   class="flex items-center text-sm text-gray-700 form-check-label dark:text-gray-400"
                   [for]="'modal' + entry.key"
@@ -73,7 +82,9 @@
       </div>
 
       <div class="mt-6">
-        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+        <label
+          class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+        >
           Enter Start Date
         </label>
         <input
@@ -85,7 +96,9 @@
       </div>
 
       <div class="mt-6">
-        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+        <label
+          class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+        >
           Enter End Date
         </label>
         <input
@@ -109,7 +122,7 @@
           type="button"
           class="btn btn-success btn-update-event flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto"
         >
-          {{ selectedEvent ? 'Update Changes' : 'Add Event' }}
+          {{ selectedEvent ? "Update Changes" : "Add Event" }}
         </button>
       </div>
     </div>

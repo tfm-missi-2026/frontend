@@ -18,6 +18,10 @@ import { NgComponentOutlet } from "@angular/common";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 
 import { UiLabelComponent } from "@shared/ui/label/label.component";
+import {
+  IconEyeOffComponent,
+  IconEyeOpenComponent,
+} from "@shared/icons";
 import { ColorType } from "@styles/types/colors";
 import { FontWeightType } from "@styles/types/typography";
 import { getFocusStyling } from "@utils/styling";
@@ -26,6 +30,11 @@ import { ValidationErrorIconComponent } from "./validation-error-icon.component"
 import { horizontalPaddingNumber, inputHeight } from "./common";
 import { UiFlexComponent } from "@shared/ui/flex/flex.component";
 import { UiFormLabelComponent } from "@shared/ui/form-label/form-label.component";
+
+/** `aria-label` del botón toggle cuando la contraseña está oculta. */
+const SHOW_PASSWORD_LABEL = "Mostrar contraseña";
+/** `aria-label` del botón toggle cuando la contraseña está visible. */
+const HIDE_PASSWORD_LABEL = "Ocultar contraseña";
 
 /**
  * `UiInput`
@@ -91,6 +100,17 @@ export class UiInputComponent
   readonly type = input<string>("text");
   readonly autocomplete = input<string | undefined>(undefined);
   readonly className = input<string>("");
+  /**
+   * Muestra un botón ojo integrado que alterna entre `type="password"`
+   * y `type="text"`. Solo aplica cuando `type === "password"`.
+   * El control de visibilidad es interno al componente; los consumers
+   * no necesitan manejar estado externo.
+   */
+  readonly showPasswordToggle = input<boolean>(false);
+  /** Componente del icono para "mostrar contraseña". Default: `IconEyeOpenComponent`. */
+  readonly passwordVisibleIcon = input<Type<unknown>>(IconEyeOpenComponent);
+  /** Componente del icono para "ocultar contraseña". Default: `IconEyeOffComponent`. */
+  readonly passwordHiddenIcon = input<Type<unknown>>(IconEyeOffComponent);
   /** Valor controlado. Se sincroniza vía `ControlValueAccessor`. */
   readonly value = input<string | number | undefined>(undefined);
 
@@ -99,6 +119,8 @@ export class UiInputComponent
   readonly keyDown = output<KeyboardEvent>();
   readonly blurEvt = output<void>();
   readonly focusEvt = output<void>();
+  /** Emite el nuevo estado de visibilidad cuando el usuario alterna el toggle del password. */
+  readonly passwordVisibilityChange = output<boolean>();
 
   readonly inputEl =
     viewChild.required<ElementRef<HTMLInputElement>>("inputEl");
@@ -115,6 +137,9 @@ export class UiInputComponent
    * (es read-only), así que se combina con él en un `computed`.
    */
   private _formDisabled = signal(false);
+
+  /** Estado interno de visibilidad del password (solo cuando el toggle está activo). */
+  protected readonly _passwordVisible = signal(false);
 
   /** `disabled` efectivo: combina el input y el estado del form. */
   readonly isDisabled = computed<boolean>(
@@ -205,7 +230,42 @@ export class UiInputComponent
   readonly hasLeftIcon = computed<boolean>(() => !!this.leftIcon());
   readonly hasRightIcon = computed<boolean>(() => !!this.rightIcon());
   readonly hasError = computed<boolean>(() => !!this.errorMessage());
-  readonly isEffectivelyDisabled = computed<boolean>(() => this.disabled());
+  readonly isEffectivelyDisabled = computed<boolean>(
+    () => this.disabled() || this._formDisabled(),
+  );
+
+  /** El toggle de password aplica solo si el `type` actual es `"password"`. */
+  readonly shouldShowPasswordToggle = computed<boolean>(
+    () => this.showPasswordToggle() && this.type() === "password",
+  );
+
+  /** `type` efectivo: si el toggle está activo, devuelve `text` o `password` según el estado interno. */
+  readonly effectiveType = computed<string>(() => {
+    if (this.shouldShowPasswordToggle()) {
+      return this._passwordVisible() ? "text" : "password";
+    }
+    return this.type();
+  });
+
+  /** Icono actual del toggle (cambia según el estado de visibilidad). */
+  readonly currentPasswordIcon = computed<Type<unknown>>(() =>
+    this._passwordVisible()
+      ? this.passwordVisibleIcon()
+      : this.passwordHiddenIcon(),
+  );
+
+  /** `aria-label` actual del toggle. */
+  readonly currentPasswordToggleLabel = computed<string>(() =>
+    this._passwordVisible() ? HIDE_PASSWORD_LABEL : SHOW_PASSWORD_LABEL,
+  );
+
+  /** Alterna el estado interno de visibilidad del password. */
+  togglePasswordVisibility(): void {
+    if (!this.shouldShowPasswordToggle()) return;
+    const next = !this._passwordVisible();
+    this._passwordVisible.set(next);
+    this.passwordVisibilityChange.emit(next);
+  }
 
   /** Clases del contenedor exterior (`StyledControlContainer`). */
   readonly outerClasses = computed<string>(() =>
@@ -225,10 +285,10 @@ export class UiInputComponent
       "flex items-center gap-2 w-full rounded-lg border border-solid",
       "bg-white dark:bg-gray-900",
       this.isEffectivelyDisabled() || this.readOnly()
-        ? "bg-gray-50 border-gray-300"
+        ? "bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700"
         : this.hasError()
           ? "border-error-500"
-          : "border-gray-300",
+          : "border-gray-300 dark:border-gray-700",
       getFocusStyling("within"),
     ];
     return baseLayout.join(" ");
@@ -238,18 +298,21 @@ export class UiInputComponent
     height: inputHeight,
     "font-size": `var(--text-theme-sm)` /* fallback */,
     "padding-left": this.hasLeftIcon() ? "0" : `${horizontalPaddingNumber}px`,
-    "padding-right": this.hasRightIcon() ? "0" : `${horizontalPaddingNumber}px`,
+    "padding-right":
+      this.hasRightIcon() || this.shouldShowPasswordToggle()
+        ? "0"
+        : `${horizontalPaddingNumber}px`,
   }));
 
   /** Clases del `<input>` real (`StyledInput`). */
   readonly inputClasses = computed<string>(() =>
     [
       "flex-1 w-full border-0 outline-0 bg-transparent",
-      "text-sm text-gray-800 dark:text-white",
+      "text-sm text-gray-800 dark:text-white/90",
       "font-normal leading-5",
       "placeholder:text-gray-400 dark:placeholder:text-gray-500",
-      "read-only:text-gray-500",
-      "disabled:text-gray-300",
+      "read-only:text-gray-500 dark:read-only:text-gray-400",
+      "disabled:text-gray-300 dark:disabled:text-gray-600",
     ].join(" "),
   );
 

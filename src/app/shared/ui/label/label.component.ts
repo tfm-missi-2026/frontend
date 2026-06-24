@@ -19,6 +19,7 @@ import designConstants, {
   FontWeightType,
   TypographyType,
 } from "@styles/constants";
+import { COLOR_CLASSES } from "@styles/types/colors";
 import { UiTooltipComponent } from "@shared/ui/tooltip/tooltip.component";
 import { TooltipSide } from "@shared/ui/tooltip/tooltip.types";
 
@@ -75,10 +76,9 @@ const TYPE_TO_HTML_ELEMENT: Record<TypographyType, string> = {
       <span
         #container
         class="label wrap-break-word"
-        [class]="className()"
+        [class]="containerClasses()"
         [style]="containerStyles()"
         [attr.for]="for() || null"
-        [style.color]="resolvedColor()"
         [style.font-weight]="resolvedWeight()"
         [style.font-style]="italic() ? 'italic' : null"
         [style.text-align]="align() || null"
@@ -125,7 +125,7 @@ export class UiLabelComponent implements AfterViewInit, OnChanges, OnDestroy {
   readonly type = input<TypographyType>("bodyXs");
   /** `font-weight` (si se omite, usa el de `fontWeightByTypographyType[type]`). */
   readonly weight = input<FontWeightType | undefined>(undefined);
-  /** Color semántico. */
+  /** Color semántico. Si se omite, usa `textStrong` (gris oscuro / blanco/90 en dark). */
   readonly color = input<ColorType | undefined>(undefined);
   /** Si `false`, el texto no hace wrap (default). */
   readonly wrapText = input<boolean>(false);
@@ -160,10 +160,9 @@ export class UiLabelComponent implements AfterViewInit, OnChanges, OnDestroy {
 
   readonly resolvedText = computed<string>(() => this.text() ?? "");
 
-  readonly resolvedColor = computed<string>(() => {
+  readonly resolvedColorClass = computed<string>(() => {
     const c = this.color();
-    if (!c) return "currentColor";
-    return designConstants.colors[c] ?? "currentColor";
+    return COLOR_CLASSES[c ?? "textStrong"];
   });
 
   readonly resolvedWeight = computed<string>(() => {
@@ -181,6 +180,11 @@ export class UiLabelComponent implements AfterViewInit, OnChanges, OnDestroy {
     "font-size": designConstants.typography.fontSize[this.type()],
     "line-height": designConstants.typography.lineHeight[this.type()],
   }));
+
+  readonly containerClasses = computed<string>(() => {
+    const parts = [this.resolvedColorClass(), this.className()];
+    return parts.filter(Boolean).join(" ");
+  });
 
   readonly showTooltip = computed<boolean>(
     () => this.isOverflowing && (!this.wrapText() || !!this.wrapMaxLines()),

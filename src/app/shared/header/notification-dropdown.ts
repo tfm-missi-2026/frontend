@@ -171,14 +171,14 @@ export class HeaderNotificationDropdownComponent {
    */
   readonly notifying = input<boolean>(false);
   /** Título del panel. Default: `"Notification"`. */
-  readonly title = input<string>("Notification");
+  readonly title = input<string>("Notificaciones");
   /**
    * Configuración del enlace "view all" al pie del panel.
    * Default: `{ to: "/", label: "View All Notifications" }`.
    */
   readonly viewAll = input<HeaderNotificationViewAll>({
     to: "/",
-    label: "View All Notifications",
+    label: "Ver todas las notificaciones",
   });
 
   /** Estado interno de visibilidad del dropdown. */

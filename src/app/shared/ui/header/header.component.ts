@@ -10,6 +10,7 @@ import designConstants, {
   FontWeightType,
   TypographyType,
 } from "@styles/constants";
+import { COLOR_CLASSES } from "@styles/types/colors";
 import { UiHeaderLevel } from "./header.types";
 
 const LEVEL_TO_TYPOGRAPHY: Record<UiHeaderLevel, TypographyType> = {
@@ -38,6 +39,10 @@ const LEVEL_TO_TAG: Record<UiHeaderLevel, string> = {
  * opcionales: si se omiten, se usan los valores por defecto del tipo
  * de tipografía resuelto.
  *
+ * El color se aplica vía clase Tailwind (con variantes `dark:`) desde
+ * `COLOR_CLASSES`, no via `style.color`, para que el dark mode funcione
+ * correctamente.
+ *
  * Casos de uso:
  *  - `<UiHeader level="1">` → h1, 24px, bold.
  *  - `<UiHeader level="3" color="textStrong">` → h3, 18px, semibold.
@@ -57,7 +62,6 @@ const LEVEL_TO_TAG: Record<UiHeaderLevel, string> = {
         <h1
           [id]="id() || null"
           [class]="containerClasses()"
-          [style.color]="resolvedColor()"
           [style.font-weight]="resolvedWeight()"
           [style.font-size]="resolvedFontSize()"
           [style.line-height]="resolvedLineHeight()"
@@ -73,7 +77,6 @@ const LEVEL_TO_TAG: Record<UiHeaderLevel, string> = {
         <h2
           [id]="id() || null"
           [class]="containerClasses()"
-          [style.color]="resolvedColor()"
           [style.font-weight]="resolvedWeight()"
           [style.font-size]="resolvedFontSize()"
           [style.line-height]="resolvedLineHeight()"
@@ -89,7 +92,6 @@ const LEVEL_TO_TAG: Record<UiHeaderLevel, string> = {
         <h3
           [id]="id() || null"
           [class]="containerClasses()"
-          [style.color]="resolvedColor()"
           [style.font-weight]="resolvedWeight()"
           [style.font-size]="resolvedFontSize()"
           [style.line-height]="resolvedLineHeight()"
@@ -105,7 +107,6 @@ const LEVEL_TO_TAG: Record<UiHeaderLevel, string> = {
         <h4
           [id]="id() || null"
           [class]="containerClasses()"
-          [style.color]="resolvedColor()"
           [style.font-weight]="resolvedWeight()"
           [style.font-size]="resolvedFontSize()"
           [style.line-height]="resolvedLineHeight()"
@@ -121,7 +122,6 @@ const LEVEL_TO_TAG: Record<UiHeaderLevel, string> = {
         <h5
           [id]="id() || null"
           [class]="containerClasses()"
-          [style.color]="resolvedColor()"
           [style.font-weight]="resolvedWeight()"
           [style.font-size]="resolvedFontSize()"
           [style.line-height]="resolvedLineHeight()"
@@ -147,7 +147,7 @@ export class UiHeaderComponent {
   readonly text = input<string | undefined>(undefined);
   /** `font-weight`. Si se omite, usa el del `TypographyType` resuelto. */
   readonly weight = input<FontWeightType | undefined>(undefined);
-  /** Color semántico. Si se omite, usa `currentColor`. */
+  /** Color semántico. Si se omite, usa `textStrong` (gris oscuro / blanco/90 en dark). */
   readonly color = input<ColorType | undefined>(undefined);
   /** Clases extra para el contenedor. */
   readonly className = input<string>("");
@@ -160,10 +160,9 @@ export class UiHeaderComponent {
     () => LEVEL_TO_TYPOGRAPHY[this.level()],
   );
 
-  readonly resolvedColor = computed<string>(() => {
+  readonly resolvedColorClass = computed<string>(() => {
     const c = this.color();
-    if (!c) return "currentColor";
-    return designConstants.colors[c] ?? "currentColor";
+    return COLOR_CLASSES[c ?? "textStrong"];
   });
 
   readonly resolvedWeight = computed<string>(() => {
@@ -184,7 +183,7 @@ export class UiHeaderComponent {
   );
 
   readonly containerClasses = computed<string>(() => {
-    const extra = this.className();
-    return extra ? `font-outfit ${extra}` : "font-outfit";
+    const parts = ["font-outfit", this.resolvedColorClass(), this.className()];
+    return parts.filter(Boolean).join(" ");
   });
 }

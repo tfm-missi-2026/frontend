@@ -1,11 +1,11 @@
 <UiFlex direction="column" justifyContent="center" className="flex-1 w-full max-w-md mx-auto">
   <UiFlex direction="column" gap="24px">
     <UiFlex direction="column" gap="8px">
-      <UiHeader [level]="1" text="Sign In"></UiHeader>
+      <UiHeader [level]="1" text="Iniciar sesión"></UiHeader>
       <UiLabel
         type="bodyS"
         color="textWeak"
-        text="Enter your email and password to sign in!"
+        text="Ingresa tu correo electrónico y contraseña para iniciar sesión."
       ></UiLabel>
     </UiFlex>
 
@@ -15,38 +15,24 @@
           id="signin-email"
           name="email"
           type="email"
-          labelText="Email"
-          placeholder="info@gmail.com"
+          labelText="Correo electrónico"
+          placeholder="ejemplo@correo.com"
           [required]="true"
           [value]="email()"
           (valueChange)="onEmailChange($event)"
         ></UiInput>
 
-        <UiFlex direction="column" gap="4px">
-          <UiInput
-            id="signin-password"
-            name="password"
-            [type]="showPassword() ? 'text' : 'password'"
-            labelText="Password"
-            placeholder="Enter your password"
-            [required]="true"
-            [value]="password()"
-            (valueChange)="onPasswordChange($event)"
-          ></UiInput>
-          <UiLink
-            size="sm"
-            variant="subtle"
-            underline="hover"
-            (click)="togglePasswordVisibility()"
-          >
-            @if (showPassword()) {
-              <IconEyeOpen [size]="14"></IconEyeOpen>
-            } @else {
-              <IconEyeOff [size]="14"></IconEyeOff>
-            }
-            {{ showPassword() ? "Hide" : "Show" }} password
-          </UiLink>
-        </UiFlex>
+        <UiInput
+          id="signin-password"
+          name="password"
+          type="password"
+          labelText="Contraseña"
+          placeholder="Ingresa tu contraseña"
+          [required]="true"
+          [showPasswordToggle]="true"
+          [value]="password()"
+          (valueChange)="onPasswordChange($event)"
+        ></UiInput>
 
         <UiFlex justifyContent="flex-end">
           <UiLink
@@ -56,12 +42,12 @@
             underline="hover"
             (click)="onForgotPassword()"
           >
-            Forgot password?
+            ¿Olvidaste tu contraseña?
           </UiLink>
         </UiFlex>
 
         <UiButton [fullWidth]="true" [isSubmit]="true" (click)="onSubmit()">
-          Sign in
+          Iniciar sesión
         </UiButton>
       </UiFlex>
     </form>
@@ -70,7 +56,7 @@
       <UiLabel
         type="bodyS"
         color="textWeak"
-        text="Don't have an account?"
+        text="¿No tienes una cuenta?"
       ></UiLabel>
       <UiLink
         to="/signup"
@@ -79,7 +65,7 @@
         underline="hover"
         (click)="onSignUp()"
       >
-        Sign Up
+        Crear cuenta
       </UiLink>
     </UiFlex>
   </UiFlex>

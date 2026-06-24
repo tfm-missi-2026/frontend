@@ -3,7 +3,7 @@
     class="flex flex-col justify-center w-full h-screen lg:flex-row dark:bg-gray-900 sm:p-0"
   >
     <div class="relative flex-1 w-full">
-      <ng-content></ng-content>
+      <router-outlet></router-outlet>
       <div class="absolute z-50 hidden bottom-6 right-6 sm:block">
         <CommonThemeToggle variant="brand" size="lg" />
       </div>
@@ -19,11 +19,11 @@
             variant="unstyled"
             underline="none"
             className="block mb-4"
-            labelText="Logo"
+            labelText="SPSRT"
           >
             <UiImage
               src="/images/logo/auth-logo.svg"
-              alt="Logo"
+              alt="Logo SPSRT"
               width="w-[231px]"
               height="h-[48px]"
               rounded="none"
@@ -31,10 +31,11 @@
             />
           </UiLink>
           <p class="text-center text-gray-400 dark:text-white/60">
-            Free and Open-Source Tailwind CSS Admin Dashboard Template
+            Sistema de Planificación y Seguimiento de Recursos Técnicos
           </p>
         </div>
       </div>
     </div>
   </div>
 </div>
+

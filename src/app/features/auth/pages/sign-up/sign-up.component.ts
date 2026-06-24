@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component } from "@angular/core";
 import { Router } from "@angular/router";
 
-import { AuthLayoutComponent } from "@shared/layout/auth-layout/auth-layout.component";
 import {
   SignupFormComponent,
   SignUpFormData,
@@ -10,7 +9,7 @@ import {
 @Component({
   selector: "SignUp",
   standalone: true,
-  imports: [AuthLayoutComponent, SignupFormComponent],
+  imports: [SignupFormComponent],
   templateUrl: "./sign-up.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

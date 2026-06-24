@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component } from "@angular/core";
 import { Router } from "@angular/router";
 
-import { AuthLayoutComponent } from "@shared/layout/auth-layout/auth-layout.component";
 import {
   SigninFormComponent,
   SignInFormData,
@@ -10,7 +9,7 @@ import {
 @Component({
   selector: "SignIn",
   standalone: true,
-  imports: [AuthLayoutComponent, SigninFormComponent],
+  imports: [SigninFormComponent],
   templateUrl: "./sign-in.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -19,6 +18,7 @@ export class SignInComponent {
 
   onSubmit(data: SignInFormData): void {
     console.log("Sign in:", data);
+    void this.router.navigateByUrl("/app/administracion/usuarios");
   }
 
   onSignUp(): void {

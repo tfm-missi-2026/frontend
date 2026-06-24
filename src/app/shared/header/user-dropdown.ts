@@ -77,7 +77,7 @@ const ACTION_CLASS =
       >
         <UiAvatar
           [src]="user().avatar"
-          alt="User"
+          alt="Usuario"
           size="large"
           className="mr-3"
         />

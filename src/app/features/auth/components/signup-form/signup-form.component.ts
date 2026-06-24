@@ -12,7 +12,6 @@ import { UiGridComponent } from "@shared/ui/grid";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiLinkComponent } from "@shared/ui/link";
-import { IconEyeOffComponent, IconEyeOpenComponent } from "@shared/icons";
 
 export interface SignUpFormData {
   firstName: string;
@@ -25,7 +24,8 @@ export interface SignUpFormData {
  * Formulario de registro del feature `auth`.
  *
  * Mismas convenciones que `SigninFormComponent`: solo primitivas del
- * design system, sin `<div>` / `<span>` sueltos.
+ * design system, sin `<div>` / `<span>` sueltos. El toggle de visibilidad
+ * del password es responsabilidad del propio `UiInput` (`showPasswordToggle`).
  */
 @Component({
   selector: "SignupForm",
@@ -39,8 +39,6 @@ export interface SignUpFormData {
     UiHeaderComponent,
     UiLabelComponent,
     UiLinkComponent,
-    IconEyeOffComponent,
-    IconEyeOpenComponent,
   ],
   templateUrl: "./signup-form.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -50,14 +48,9 @@ export class SignupFormComponent {
   readonly lastName = signal<string>("");
   readonly email = signal<string>("");
   readonly password = signal<string>("");
-  readonly showPassword = signal<boolean>(false);
 
   readonly submitForm = output<SignUpFormData>();
   readonly signInRequested = output<void>();
-
-  togglePasswordVisibility(): void {
-    this.showPassword.update((v) => !v);
-  }
 
   onFirstNameChange(value: string): void {
     this.firstName.set(value);

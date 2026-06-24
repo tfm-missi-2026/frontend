@@ -11,7 +11,6 @@ import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiLinkComponent } from "@shared/ui/link";
-import { IconEyeOffComponent, IconEyeOpenComponent } from "@shared/icons";
 
 export interface SignInFormData {
   email: string;
@@ -22,7 +21,9 @@ export interface SignInFormData {
  * Formulario de inicio de sesión del feature `auth`.
  *
  * Compone únicamente primitivas del design system: `UiHeader`, `UiLabel`,
- * `UiInput`, `UiButton` y `UiLink`.
+ * `UiInput`, `UiButton` y `UiLink`. El toggle de visibilidad del password
+ * es responsabilidad del propio `UiInput` (`showPasswordToggle`), no del
+ * formulario.
  *
  * No emite submit por sí mismo: expone `submitForm` y `signUpRequested`
  * para que la página decida el routing y la integración con backend.
@@ -37,8 +38,6 @@ export interface SignInFormData {
     UiHeaderComponent,
     UiLabelComponent,
     UiLinkComponent,
-    IconEyeOffComponent,
-    IconEyeOpenComponent,
     UiFlexComponent,
   ],
   templateUrl: "./signin-form.component.html",
@@ -47,15 +46,10 @@ export interface SignInFormData {
 export class SigninFormComponent {
   readonly email = signal<string>("");
   readonly password = signal<string>("");
-  readonly showPassword = signal<boolean>(false);
 
   readonly submitForm = output<SignInFormData>();
   readonly forgotPasswordRequested = output<void>();
   readonly signUpRequested = output<void>();
-
-  togglePasswordVisibility(): void {
-    this.showPassword.update((v) => !v);
-  }
 
   onEmailChange(value: string): void {
     this.email.set(value);

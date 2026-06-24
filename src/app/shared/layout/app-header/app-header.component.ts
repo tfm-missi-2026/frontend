@@ -1,137 +1,180 @@
-import { Component, ElementRef, ViewChild } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { RouterModule } from "@angular/router";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { NgClass } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
-import { SidebarService } from "../../services/sidebar.service";
-import { CommonThemeToggleComponent } from "@shared/common/theme-toggle";
+import { SidebarService } from '../../services/sidebar.service';
+import { CommonThemeToggleComponent } from '@shared/common/theme-toggle';
 import {
   HeaderNotificationDropdownComponent,
   HeaderUserDropdownComponent,
   type HeaderNotificationItem,
   type HeaderUserInfo,
   type HeaderUserMenuItem,
-} from "@shared/header";
+} from '@shared/header';
 import {
+  IconDotsVerticalComponent,
+  IconHamburgerComponent,
   IconInfoCircleBorderComponent,
   IconLogoutComponent,
+  IconSearchComponent,
   IconSettingsComponent,
   IconUserCircleComponent,
-} from "@shared/icons";
+  IconXLargeComponent,
+} from '@shared/icons';
+import { UiFlexComponent } from '@shared/ui/flex';
+import { UiIconButtonComponent } from '@shared/ui/icon-button';
+import { UiImageComponent } from '@shared/ui/image';
 
 const CURRENT_USER: HeaderUserInfo = {
-  name: "Musharof Chowdhury",
-  email: "randomuser@pimjo.com",
-  avatar: "/images/user/owner.png",
+  name: 'Musharof Chowdhury',
+  email: 'randomuser@pimjo.com',
+  avatar: '/images/user/owner.png',
 };
 
 const USER_MENU_ITEMS: HeaderUserMenuItem[] = [
-  { to: "/profile", icon: IconUserCircleComponent, label: "Edit profile" },
-  { to: "/profile", icon: IconSettingsComponent, label: "Account Settings" },
-  { to: "/profile", icon: IconInfoCircleBorderComponent, label: "Support" },
+  { to: '/profile', icon: IconUserCircleComponent, label: 'Editar perfil' },
+  { to: '/profile', icon: IconSettingsComponent, label: 'Configuración de la cuenta' },
+  { to: '/profile', icon: IconInfoCircleBorderComponent, label: 'Soporte' },
 ];
 
 const SIGN_OUT_ITEM: HeaderUserMenuItem = {
-  to: "/signin",
+  to: '/signin',
   icon: IconLogoutComponent,
-  label: "Sign out",
+  label: 'Cerrar sesión',
 };
 
 const NOTIFICATIONS: HeaderNotificationItem[] = [
   {
-    actor: { name: "Terry Franci", avatar: "/images/user/user-02.jpg" },
-    action: "requests permission to change",
-    target: "Project - Nganter App",
-    category: "Project",
-    time: "5 min ago",
-    status: "online",
+    actor: { name: 'Terry Franci', avatar: '/images/user/user-02.jpg' },
+    action: 'solicita permiso para modificar',
+    target: 'Proyecto - Nganter App',
+    category: 'Proyecto',
+    time: 'hace 5 min',
+    status: 'online',
   },
   {
-    actor: { name: "Alena Franci", avatar: "/images/user/user-03.jpg" },
-    action: "requests permission to change",
-    target: "Project - Nganter App",
-    category: "Project",
-    time: "8 min ago",
-    status: "online",
+    actor: { name: 'Alena Franci', avatar: '/images/user/user-03.jpg' },
+    action: 'solicita permiso para modificar',
+    target: 'Proyecto - Nganter App',
+    category: 'Proyecto',
+    time: 'hace 8 min',
+    status: 'online',
   },
   {
-    actor: { name: "Jocelyn Kenter", avatar: "/images/user/user-04.jpg" },
-    action: "requests permission to change",
-    target: "Project - Nganter App",
-    category: "Project",
-    time: "15 min ago",
-    status: "online",
+    actor: { name: 'Jocelyn Kenter', avatar: '/images/user/user-04.jpg' },
+    action: 'solicita permiso para modificar',
+    target: 'Proyecto - Nganter App',
+    category: 'Proyecto',
+    time: 'hace 15 min',
+    status: 'online',
   },
   {
-    actor: { name: "Brandon Philips", avatar: "/images/user/user-05.jpg" },
-    action: "requests permission to change",
-    target: "Project - Nganter App",
-    category: "Project",
-    time: "1 hr ago",
-    status: "offline",
-    to: "/",
+    actor: { name: 'Brandon Philips', avatar: '/images/user/user-05.jpg' },
+    action: 'solicita permiso para modificar',
+    target: 'Proyecto - Nganter App',
+    category: 'Proyecto',
+    time: 'hace 1 hora',
+    status: 'offline',
+    to: '/',
   },
   {
-    actor: { name: "Terry Franci", avatar: "/images/user/user-02.jpg" },
-    action: "requests permission to change",
-    target: "Project - Nganter App",
-    category: "Project",
-    time: "5 min ago",
-    status: "online",
+    actor: { name: 'Terry Franci', avatar: '/images/user/user-02.jpg' },
+    action: 'solicita permiso para modificar',
+    target: 'Proyecto - Nganter App',
+    category: 'Proyecto',
+    time: 'hace 5 min',
+    status: 'online',
   },
   {
-    actor: { name: "Alena Franci", avatar: "/images/user/user-03.jpg" },
-    action: "requests permission to change",
-    target: "Project - Nganter App",
-    category: "Project",
-    time: "8 min ago",
-    status: "online",
+    actor: { name: 'Alena Franci', avatar: '/images/user/user-03.jpg' },
+    action: 'solicita permiso para modificar',
+    target: 'Proyecto - Nganter App',
+    category: 'Proyecto',
+    time: 'hace 8 min',
+    status: 'online',
   },
   {
-    actor: { name: "Jocelyn Kenter", avatar: "/images/user/user-04.jpg" },
-    action: "requests permission to change",
-    target: "Project - Nganter App",
-    category: "Project",
-    time: "15 min ago",
-    status: "online",
+    actor: { name: 'Jocelyn Kenter', avatar: '/images/user/user-04.jpg' },
+    action: 'solicita permiso para modificar',
+    target: 'Proyecto - Nganter App',
+    category: 'Proyecto',
+    time: 'hace 15 min',
+    status: 'online',
   },
   {
-    actor: { name: "Brandon Philips", avatar: "/images/user/user-05.jpg" },
-    action: "requests permission to change",
-    target: "Project - Nganter App",
-    category: "Project",
-    time: "1 hr ago",
-    status: "offline",
+    actor: { name: 'Brandon Philips', avatar: '/images/user/user-05.jpg' },
+    action: 'solicita permiso para modificar',
+    target: 'Proyecto - Nganter App',
+    category: 'Proyecto',
+    time: 'hace 1 hora',
+    status: 'offline',
   },
 ];
 
+/**
+ * `AppHeaderComponent`
+ * --------------------
+ * Header autenticado del shell. Contiene el toggle del sidebar, el
+ * logo mobile, el toggle del application menu, el search global y los
+ * dropdowns de notificaciones / usuario + theme toggle.
+ *
+ * Standalone + `OnPush` + signal API. El estado del sidebar se lee
+ * del `SidebarService` vía `toSignal`. El servicio sigue siendo RxJS
+ * por decisión explícita (migración fuera del scope de este refactor).
+ */
 @Component({
-  selector: "app-header",
+  selector: 'app-header',
   standalone: true,
   imports: [
-    CommonModule,
+    NgClass,
     RouterModule,
     CommonThemeToggleComponent,
     HeaderNotificationDropdownComponent,
     HeaderUserDropdownComponent,
+    IconSearchComponent,
+    UiFlexComponent,
+    UiIconButtonComponent,
+    UiImageComponent,
   ],
-  templateUrl: "./app-header.component.html",
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './app-header.component.html',
 })
 export class AppHeaderComponent {
-  isApplicationMenuOpen = false;
-  readonly isMobileOpen$;
+  private readonly sidebarService = inject(SidebarService);
+
+  protected readonly isMobileOpen = toSignal(this.sidebarService.isMobileOpen$, {
+    initialValue: false,
+  });
+
+  protected readonly isApplicationMenuOpen = signal(false);
 
   protected readonly currentUser = CURRENT_USER;
   protected readonly userMenuItems = USER_MENU_ITEMS;
   protected readonly signOutItem = SIGN_OUT_ITEM;
   protected readonly notifications = NOTIFICATIONS;
 
-  @ViewChild("searchInput") searchInput!: ElementRef<HTMLInputElement>;
+  protected readonly hamburgerIcon = IconHamburgerComponent;
+  protected readonly closeIcon = IconXLargeComponent;
+  protected readonly dotsIcon = IconDotsVerticalComponent;
+  protected readonly searchIcon = IconSearchComponent;
 
-  constructor(public sidebarService: SidebarService) {
-    this.isMobileOpen$ = this.sidebarService.isMobileOpen$;
-  }
+  protected readonly searchInput =
+    viewChild<ElementRef<HTMLInputElement>>('searchInput');
 
-  handleToggle() {
+  protected readonly mobileToggleBgClass = computed<string>(() =>
+    this.isMobileOpen() ? 'bg-gray-100 dark:bg-white/[0.03]' : '',
+  );
+
+  protected handleToggle(): void {
     if (window.innerWidth >= 1280) {
       this.sidebarService.toggleExpanded();
     } else {
@@ -139,22 +182,22 @@ export class AppHeaderComponent {
     }
   }
 
-  toggleApplicationMenu() {
-    this.isApplicationMenuOpen = !this.isApplicationMenuOpen;
+  protected toggleApplicationMenu(): void {
+    this.isApplicationMenuOpen.update((v) => !v);
   }
 
-  ngAfterViewInit() {
-    document.addEventListener("keydown", this.handleKeyDown);
-  }
-
-  ngOnDestroy() {
-    document.removeEventListener("keydown", this.handleKeyDown);
-  }
-
-  handleKeyDown = (event: KeyboardEvent) => {
-    if ((event.metaKey || event.ctrlKey) && event.key === "k") {
+  private readonly handleKeyDown = (event: KeyboardEvent): void => {
+    if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
       event.preventDefault();
-      this.searchInput?.nativeElement.focus();
+      this.searchInput()?.nativeElement.focus();
     }
   };
+
+  constructor() {
+    document.addEventListener('keydown', this.handleKeyDown);
+  }
+
+  ngOnDestroy(): void {
+    document.removeEventListener('keydown', this.handleKeyDown);
+  }
 }
