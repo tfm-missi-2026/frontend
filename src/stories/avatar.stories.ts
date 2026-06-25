@@ -1,33 +1,20 @@
 import type { Meta, StoryObj } from "@storybook/angular";
-import { moduleMetadata } from "@storybook/angular";
+import { applicationConfig, moduleMetadata } from "@storybook/angular";
+import { provideRouter } from "@angular/router";
 
-import { UiAvatarComponent, UiAvatarTextComponent } from "@shared/ui/avatar";
+import { UiAvatarComponent } from "@shared/ui/avatar";
+import { UiSurfaceComponent } from "@shared/ui/surface";
 
 const SAMPLE_SRC = "/images/user/user-01.jpg";
-
-const SIZES = [
-  "xsmall",
-  "small",
-  "medium",
-  "large",
-  "xlarge",
-  "xxlarge",
-] as const;
-
-const SAMPLE_NAMES = [
-  "Ada Lovelace",
-  "Grace Hopper",
-  "Linus Torvalds",
-  "Margaret Hamilton",
-  "Alan Turing",
-  "Dennis Ritchie",
-];
 
 const meta: Meta<UiAvatarComponent> = {
   title: "Shared/Avatar",
   component: UiAvatarComponent,
   decorators: [
-    moduleMetadata({ imports: [UiAvatarComponent, UiAvatarTextComponent] }),
+    applicationConfig({ providers: [provideRouter([])] }),
+    moduleMetadata({
+      imports: [UiAvatarComponent, UiSurfaceComponent],
+    }),
   ],
   tags: ["autodocs"],
   parameters: { layout: "padded" },
@@ -36,7 +23,7 @@ const meta: Meta<UiAvatarComponent> = {
     alt: { control: "text" },
     size: {
       control: "select",
-      options: [...SIZES],
+      options: ["xsmall", "small", "medium", "large", "xlarge", "xxlarge"],
     },
     status: {
       control: "select",
@@ -55,203 +42,85 @@ export default meta;
 
 type Story = StoryObj<UiAvatarComponent>;
 
-// Default
-export const Default: Story = {
+// Interactive — avatar único bindeado a los controles del meta
+export const Interactive: Story = {
   render: (args) => ({
     props: args,
     template: `
-      <div class="p-6">
+      <UiSurface className="max-w-2xl">
         <UiAvatar
           [src]="src"
           [alt]="alt"
           [size]="size"
           [status]="status"
         />
-      </div>
+      </UiSurface>
     `,
   }),
 };
 
-// Tamaños
+// AllSizes — un UiAvatar independiente por cada size, con status online
 export const AllSizes: Story = {
   render: () => ({
+    props: {
+      avatars: [
+        { id: "xsmall", size: "xsmall" },
+        { id: "small", size: "small" },
+        { id: "medium", size: "medium" },
+        { id: "large", size: "large" },
+        { id: "xlarge", size: "xlarge" },
+        { id: "xxlarge", size: "xxlarge" },
+      ],
+    },
     template: `
-      <div class="p-6">
-        <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-4">
-          Tamaños disponibles
-        </h3>
-        <div class="flex flex-wrap items-end gap-6 p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/3">
-          <div class="flex flex-col items-center gap-1 text-gray-500">
-            <UiAvatar src="${SAMPLE_SRC}" size="xsmall" />
-            <span class="text-[10px]">xsmall</span>
-          </div>
-          <div class="flex flex-col items-center gap-1 text-gray-500">
-            <UiAvatar src="${SAMPLE_SRC}" size="small" />
-            <span class="text-[10px]">small</span>
-          </div>
-          <div class="flex flex-col items-center gap-1 text-gray-500">
-            <UiAvatar src="${SAMPLE_SRC}" size="medium" />
-            <span class="text-[10px]">medium</span>
-          </div>
-          <div class="flex flex-col items-center gap-1 text-gray-500">
-            <UiAvatar src="${SAMPLE_SRC}" size="large" />
-            <span class="text-[10px]">large</span>
-          </div>
-          <div class="flex flex-col items-center gap-1 text-gray-500">
-            <UiAvatar src="${SAMPLE_SRC}" size="xlarge" />
-            <span class="text-[10px]">xlarge</span>
-          </div>
-          <div class="flex flex-col items-center gap-1 text-gray-500">
-            <UiAvatar src="${SAMPLE_SRC}" size="xxlarge" />
-            <span class="text-[10px]">xxlarge</span>
-          </div>
+      <UiSurface className="max-w-2xl">
+        <div class="flex flex-wrap items-end gap-6">
+          @for (avatar of avatars; track avatar.id) {
+            <div class="flex flex-col items-center gap-1">
+              <UiAvatar
+                src="${SAMPLE_SRC}"
+                [size]="avatar.size"
+                status="online"
+              />
+              <span class="text-xs text-gray-500 dark:text-gray-400">
+                {{ avatar.size }}
+              </span>
+            </div>
+          }
         </div>
-      </div>
+      </UiSurface>
     `,
   }),
 };
 
-// Estado online
-export const WithOnlineStatus: Story = {
+// Dark — los 4 estados forzados a tema oscuro vía clase .dark en el contenedor
+export const Dark: Story = {
   render: () => ({
+    props: {
+      avatars: [
+        { id: "online", status: "online" },
+        { id: "offline", status: "offline" },
+        { id: "busy", status: "busy" },
+        { id: "none", status: "none" },
+      ],
+    },
     template: `
-      <div class="p-6">
-        <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-4">
-          status="online"
-        </h3>
-        <div class="flex flex-wrap items-center gap-5 p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/3">
-          <UiAvatar src="${SAMPLE_SRC}" size="xsmall" status="online" />
-          <UiAvatar src="${SAMPLE_SRC}" size="small" status="online" />
-          <UiAvatar src="${SAMPLE_SRC}" size="medium" status="online" />
-          <UiAvatar src="${SAMPLE_SRC}" size="large" status="online" />
-          <UiAvatar src="${SAMPLE_SRC}" size="xlarge" status="online" />
-          <UiAvatar src="${SAMPLE_SRC}" size="xxlarge" status="online" />
+      <UiSurface variant="neutral" className="dark bg-gray-900 max-w-2xl">
+        <div class="flex flex-wrap items-center gap-6">
+          @for (avatar of avatars; track avatar.id) {
+            <div class="flex flex-col items-center gap-1">
+              <UiAvatar
+                src="${SAMPLE_SRC}"
+                size="large"
+                [status]="avatar.status"
+              />
+              <span class="text-xs text-gray-400">
+                {{ avatar.status }}
+              </span>
+            </div>
+          }
         </div>
-      </div>
-    `,
-  }),
-};
-
-// Estado offline
-export const WithOfflineStatus: Story = {
-  render: () => ({
-    template: `
-      <div class="p-6">
-        <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-4">
-          status="offline"
-        </h3>
-        <div class="flex flex-wrap items-center gap-5 p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/3">
-          <UiAvatar src="${SAMPLE_SRC}" size="xsmall" status="offline" />
-          <UiAvatar src="${SAMPLE_SRC}" size="small" status="offline" />
-          <UiAvatar src="${SAMPLE_SRC}" size="medium" status="offline" />
-          <UiAvatar src="${SAMPLE_SRC}" size="large" status="offline" />
-          <UiAvatar src="${SAMPLE_SRC}" size="xlarge" status="offline" />
-          <UiAvatar src="${SAMPLE_SRC}" size="xxlarge" status="offline" />
-        </div>
-      </div>
-    `,
-  }),
-};
-
-// Estado busy
-export const WithBusyStatus: Story = {
-  render: () => ({
-    template: `
-      <div class="p-6">
-        <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-4">
-          status="busy"
-        </h3>
-        <div class="flex flex-wrap items-center gap-5 p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/3">
-          <UiAvatar src="${SAMPLE_SRC}" size="xsmall" status="busy" />
-          <UiAvatar src="${SAMPLE_SRC}" size="small" status="busy" />
-          <UiAvatar src="${SAMPLE_SRC}" size="medium" status="busy" />
-          <UiAvatar src="${SAMPLE_SRC}" size="large" status="busy" />
-          <UiAvatar src="${SAMPLE_SRC}" size="xlarge" status="busy" />
-          <UiAvatar src="${SAMPLE_SRC}" size="xxlarge" status="busy" />
-        </div>
-      </div>
-    `,
-  }),
-};
-
-// Todos los estados juntos
-export const AllStatuses: Story = {
-  render: () => ({
-    template: `
-      <div class="p-6 space-y-6">
-        <div>
-          <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-4">
-            online / offline / busy / none
-          </h3>
-          <div class="flex flex-wrap items-center gap-5 p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/3">
-            <UiAvatar src="${SAMPLE_SRC}" size="large" status="online" />
-            <UiAvatar src="${SAMPLE_SRC}" size="large" status="offline" />
-            <UiAvatar src="${SAMPLE_SRC}" size="large" status="busy" />
-            <UiAvatar src="${SAMPLE_SRC}" size="large" status="none" />
-          </div>
-        </div>
-      </div>
-    `,
-  }),
-};
-
-// AvatarText
-export const AvatarTextGallery: Story = {
-  render: () => ({
-    template: `
-      <div class="p-6">
-        <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-4">
-          UiAvatarText — iniciales derivadas del nombre
-        </h3>
-        <div class="flex flex-wrap items-center gap-4 p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/3">
-          <div class="flex flex-col items-center gap-1 text-gray-500">
-            <UiAvatarText name="Ada Lovelace" />
-            <span class="text-[10px]">Ada Lovelace</span>
-          </div>
-          <div class="flex flex-col items-center gap-1 text-gray-500">
-            <UiAvatarText name="Grace Hopper" />
-            <span class="text-[10px]">Grace Hopper</span>
-          </div>
-          <div class="flex flex-col items-center gap-1 text-gray-500">
-            <UiAvatarText name="Linus Torvalds" />
-            <span class="text-[10px]">Linus Torvalds</span>
-          </div>
-          <div class="flex flex-col items-center gap-1 text-gray-500">
-            <UiAvatarText name="Margaret Hamilton" />
-            <span class="text-[10px]">Margaret Hamilton</span>
-          </div>
-          <div class="flex flex-col items-center gap-1 text-gray-500">
-            <UiAvatarText name="Alan Turing" />
-            <span class="text-[10px]">Alan Turing</span>
-          </div>
-          <div class="flex flex-col items-center gap-1 text-gray-500">
-            <UiAvatarText name="Dennis Ritchie" />
-            <span class="text-[10px]">Dennis Ritchie</span>
-          </div>
-        </div>
-
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-4">
-          El color de fondo se calcula con un hash estable del nombre, así
-          la misma persona siempre obtiene la misma paleta.
-        </p>
-      </div>
-    `,
-  }),
-};
-
-// AvatarText con className extra
-export const AvatarTextWithClassName: Story = {
-  render: () => ({
-    template: `
-      <div class="p-6">
-        <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-4">
-          UiAvatarText con className adicional
-        </h3>
-        <div class="flex flex-wrap items-center gap-4 p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/3">
-          <UiAvatarText name="Ada Lovelace" className="shadow-md ring-2 ring-brand-300" />
-          <UiAvatarText name="Grace Hopper" className="shadow-md ring-2 ring-pink-300" />
-        </div>
-      </div>
+      </UiSurface>
     `,
   }),
 };

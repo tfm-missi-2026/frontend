@@ -4,80 +4,49 @@ import {
   computed,
   input,
 } from "@angular/core";
-import { NgTemplateOutlet } from "@angular/common";
 
-import { UiFlexComponent } from "@shared/ui/flex/flex.component";
 import { UiLabelComponent } from "@shared/ui/label/label.component";
-import { FontWeightType } from "@styles/types/typography";
 import { UiInfoIconWithTooltipComponent } from "@shared/ui/info-icon-with-tooltip/info-icon-with-tooltip.component";
+import { FontWeightType } from "@styles/types/typography";
 
 /**
- * `UiFormLabel`
- * -------------
- * Etiqueta semántica asociada a un input por su `id` (atributo `for`).
- *
- * Capacidades:
- *  - Texto del label vía `<UiLabel type="bodyS">`.
- *  - Asterisco `*` obligatorio cuando `required` y no `disabled`/`readOnly`.
- *  - Tooltip opcional vía `<UiInfoIconWithTooltip>`.
- *  - `gap` interno = 4px entre el label y `*`.
- *  - `gap` externo (cuando hay tooltip) = 4px entre el bloque label y
- *    el icono de tooltip.
+ * Etiqueta semántica para formularios. Renderiza el `<label for>` real
+ * vía `<UiLabel>` y, opcionalmente, un asterisco `*` cuando `required`
+ * y un tooltip de ayuda. El asterisco se oculta si `disabled` o
+ * `readOnly`. El wrapper es `<span>` (no `<label>`) para evitar
+ * `<label><label>` anidado, ya que `UiLabel` ahora es `<label>`.
  */
 @Component({
   selector: "UiFormLabel",
   standalone: true,
-  imports: [
-    NgTemplateOutlet,
-    UiFlexComponent,
-    UiLabelComponent,
-    UiInfoIconWithTooltipComponent,
-  ],
+  imports: [UiLabelComponent, UiInfoIconWithTooltipComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (tooltip(); as t) {
-      <UiFlex [alignItems]="'center'" [gap]="'4px'">
-        <ng-container *ngTemplateOutlet="labelTpl"></ng-container>
-        <InfoIconWithTooltip [tooltip]="t"></InfoIconWithTooltip>
-      </UiFlex>
-    } @else {
-      <ng-container *ngTemplateOutlet="labelTpl"></ng-container>
-    }
-
-    <ng-template #labelTpl>
-      <label
-        [attr.for]="labelFor()"
-        class="form-label inline-flex items-center gap-1"
-      >
-        <UiLabel
-          type="bodyS"
-          [text]="labelText()"
-          [weight]="weight() ?? 'medium'"
-          [wrapText]="wrapText()"
-        ></UiLabel>
-        @if (showRequired()) {
-          <span aria-hidden="true">*</span>
-        }
-      </label>
-    </ng-template>
+    <span class="inline-flex items-center gap-1">
+      <UiLabel
+        [for]="labelFor()"
+        type="bodyS"
+        [text]="labelText()"
+        [weight]="weight() ?? 'medium'"
+        [wrapText]="wrapText()"
+      ></UiLabel>
+      @if (showRequired()) {
+        <span aria-hidden="true" class="text-error-500 dark:text-error-400">*</span>
+      }
+      @if (tooltip()) {
+        <InfoIconWithTooltip [tooltip]="tooltip() ?? ''"></InfoIconWithTooltip>
+      }
+    </span>
   `,
 })
 export class UiFormLabelComponent {
-  /** Texto del label. */
   readonly labelText = input<string>("");
-  /** `id` del input al que se asocia (atributo `for` del HTML). */
   readonly labelFor = input<string>("");
-  /** Muestra el asterisco `*`. Se oculta si `disabled` o `readOnly`. */
   readonly required = input<boolean>(false);
-  /** Estado disabled — oculta el asterisco. */
   readonly disabled = input<boolean>(false);
-  /** Estado readOnly — oculta el asterisco. */
   readonly readOnly = input<boolean>(false);
-  /** `font-weight` del texto. Default: `'medium'`. */
   readonly weight = input<FontWeightType | undefined>(undefined);
-  /** Si `true`, el texto puede hacer wrap. */
   readonly wrapText = input<boolean>(false);
-  /** Tooltip opcional. Si se define, se renderiza el icono de ayuda. */
   readonly tooltip = input<string | undefined>(undefined);
 
   readonly showRequired = computed<boolean>(

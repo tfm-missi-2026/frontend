@@ -1,18 +1,3 @@
-<!--
-  Template del UiInput.
-  Estructura:
-    <outer>           → StyledControlContainer (col + gap[1] + flex/width)
-      <UiFormLabel>   → solo si hay `labelText`
-      <container>     → StyledInputContainer (frame con borde, focus, error)
-        <leftIcon>    → ngComponentOutlet si `leftIcon`
-        <UiFlex>      → prefix | <input> | sufix
-        <errorIcon>   → ValidationErrorIcon si `errorMessage`
-        <rightIcon>   → ngComponentOutlet si `rightIcon`
-      </container>
-      <UiFlex footer> → legend | charCount (si hay `legend` o `maxLength`)
-    </outer>
--->
-
 <div
   [class]="outerClasses()"
   [style]="outerStyles()"
@@ -23,7 +8,7 @@
       [labelText]="lt"
       [labelFor]="id() || ''"
       [required]="required()"
-      [disabled]="isDisabled()"
+      [disabled]="isEffectivelyDisabled()"
       [readOnly]="readOnly()"
       [tooltip]="tooltip()"
     ></UiFormLabel>
@@ -37,7 +22,7 @@
     @if (leftIcon()) {
       <span
         class="inline-flex items-center justify-center shrink-0"
-        [style.color]="iconColor()"
+        [class]="iconColorClass()"
       >
         <ng-container
           *ngComponentOutlet="leftIcon() ?? null; inputs: leftIconInputs()"
@@ -45,7 +30,7 @@
       </span>
     }
 
-    <UiFlex [gap]="'4px'" [flex]="'1'">
+    <div class="flex flex-1 gap-1 items-center">
       @if (prefix(); as pfx) {
         <UiLabel
           type="bodyS"
@@ -62,11 +47,11 @@
         [name]="name() || null"
         [type]="effectiveType()"
         [placeholder]="placeholder() || null"
-        [disabled]="isDisabled()"
+        [disabled]="isEffectivelyDisabled()"
         [readonly]="readOnly()"
         [attr.autocomplete]="autocomplete() || null"
         [attr.maxlength]="maxLength() || null"
-        [value]="internalValue"
+        [value]="internalValue()"
         (input)="onInput($event)"
         (keydown)="onKeyDownHandler($event)"
         (focus)="onFocusHandler()"
@@ -82,7 +67,7 @@
           [text]="sfx"
         ></UiLabel>
       }
-    </UiFlex>
+    </div>
 
     @if (hasError()) {
       <ValidationErrorIcon
@@ -93,7 +78,7 @@
     @if (rightIcon()) {
       <span
         class="inline-flex items-center justify-center shrink-0"
-        [style.color]="iconColor()"
+        [class]="iconColorClass()"
       >
         <ng-container
           *ngComponentOutlet="rightIcon() ?? null; inputs: rightIconInputs()"
@@ -118,7 +103,7 @@
   </div>
 
   @if (legend() || maxLength()) {
-    <UiFlex [justifyContent]="footerJustifyContent()">
+    <div class="flex w-full" [class]="footerJustifyClass()">
       @if (legend(); as lgd) {
         <UiLabel
           type="bodyXxs"
@@ -137,6 +122,6 @@
           ></UiLabel>
         </span>
       }
-    </UiFlex>
+    </div>
   }
 </div>

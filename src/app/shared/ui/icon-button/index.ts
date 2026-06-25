@@ -6,5 +6,5 @@
  * destructive) pero pensada para acciones compactas en barras,
  * tablas y headers.
  */
-export { UiIconButtonComponent } from './icon-button.component';
-export type { IconButtonProps } from '../button/types';
+export { UiIconButtonComponent } from "./icon-button.component";
+export type { IconButtonProps } from "../button/button.types";

@@ -4,10 +4,8 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { UiAlertComponent } from "./alert.component";
 import { AlertVariant } from "./alert.types";
 
-// ---------------------------------------------------------------------------
 // Host component — los `input()` de UiAlert son read-only, así que el
 // fixture directo no puede mutarlos. El host los pasa vía template binding.
-// ---------------------------------------------------------------------------
 
 @Component({
   standalone: true,
@@ -34,8 +32,6 @@ class AlertHostComponent {
   @ViewChild(UiAlertComponent) alert!: UiAlertComponent;
 }
 
-// ---------------------------------------------------------------------------
-
 describe("UiAlert", () => {
   let fixture: ComponentFixture<AlertHostComponent>;
   let host: AlertHostComponent;
@@ -56,28 +52,39 @@ describe("UiAlert", () => {
 
   it("uses the info variant by default", () => {
     expect(host.alert.variant()).toBe("info");
-    expect(host.alert.config().iconClass).toContain("blue-light-500");
+    expect(host.alert.surfaceVariant()).toBe("info");
+    expect(host.alert.iconVariant()).toBe("info");
   });
 
-  it('picks the success palette for variant="success"', () => {
+  it('maps variant="success" to surfaceVariant and iconVariant', () => {
     host.variant = "success";
     fixture.detectChanges();
-    expect(host.alert.config().container).toContain("success-500");
-    expect(host.alert.config().iconClass).toContain("success-500");
+    expect(host.alert.surfaceVariant()).toBe("success");
+    expect(host.alert.iconVariant()).toBe("success");
   });
 
-  it('picks the error palette for variant="error"', () => {
+  it('maps variant="error" to surfaceVariant and iconVariant', () => {
     host.variant = "error";
     fixture.detectChanges();
-    expect(host.alert.config().container).toContain("error-500");
-    expect(host.alert.config().iconClass).toContain("error-500");
+    expect(host.alert.surfaceVariant()).toBe("error");
+    expect(host.alert.iconVariant()).toBe("error");
   });
 
-  it('picks the warning palette for variant="warning"', () => {
+  it('maps variant="warning" to surfaceVariant and iconVariant', () => {
     host.variant = "warning";
     fixture.detectChanges();
-    expect(host.alert.config().container).toContain("warning-500");
-    expect(host.alert.config().iconClass).toContain("warning-500");
+    expect(host.alert.surfaceVariant()).toBe("warning");
+    expect(host.alert.iconVariant()).toBe("warning");
+  });
+
+  it("renders the surface with the alert testid", () => {
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.querySelector('[data-testid="alert"]')).not.toBeNull();
+  });
+
+  it("renders the icon slot with the alert-icon testid", () => {
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.querySelector('[data-testid="alert-icon"]')).not.toBeNull();
   });
 
   it("renders title and message when provided", () => {
@@ -107,5 +114,6 @@ describe("UiAlert", () => {
     ) as HTMLAnchorElement | null;
     expect(link).toBeTruthy();
     expect(link?.textContent?.trim()).toBe("Read the docs");
+    expect(link?.getAttribute("href")).toBe("/docs");
   });
 });

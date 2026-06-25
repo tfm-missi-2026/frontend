@@ -1,6 +1,10 @@
-<div [class]="containerClasses()" data-testid="alert">
+<UiSurface
+  [variant]="surfaceVariant()"
+  [padding]="'md'"
+  [dataTestId]="'alert'"
+>
   <UiFlex [alignItems]="'flex-start'" [gap]="'12px'">
-    <div [class]="iconClasses()">
+    <UiIcon [variant]="iconVariant()" [dataTestId]="'alert-icon'">
       @switch (variant()) {
         @case ('success') {
           <IconSuccess [size]="24" />
@@ -15,7 +19,7 @@
           <IconInfoCircle [size]="24" />
         }
       }
-    </div>
+    </UiIcon>
 
     <UiFlex [direction]="'column'" [gap]="'2px'">
       @if (title()) {
@@ -34,13 +38,15 @@
       ></UiLabel>
 
       @if (showLink()) {
-        <a
-          [routerLink]="linkHref()"
-          class="inline-block mt-3 text-sm font-medium text-gray-500 underline dark:text-gray-400"
+        <UiLink
+          [to]="linkHref()"
+          [variant]="'subtle'"
+          [underline]="'always'"
+          [size]="'md'"
         >
           {{ linkText() }}
-        </a>
+        </UiLink>
       }
     </UiFlex>
   </UiFlex>
-</div>
+</UiSurface>

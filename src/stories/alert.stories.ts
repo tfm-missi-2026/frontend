@@ -1,12 +1,19 @@
 import type { Meta, StoryObj } from "@storybook/angular";
-import { moduleMetadata } from "@storybook/angular";
+import { applicationConfig, moduleMetadata } from "@storybook/angular";
+import { provideRouter } from "@angular/router";
 
 import { UiAlertComponent } from "@shared/ui/alert";
+import { UiSurfaceComponent } from "@shared/ui/surface";
 
 const meta: Meta<UiAlertComponent> = {
   title: "Shared/Alert",
   component: UiAlertComponent,
-  decorators: [moduleMetadata({ imports: [UiAlertComponent] })],
+  decorators: [
+    applicationConfig({ providers: [provideRouter([])] }),
+    moduleMetadata({
+      imports: [UiAlertComponent, UiSurfaceComponent],
+    }),
+  ],
   tags: ["autodocs"],
   parameters: { layout: "padded" },
   argTypes: {
@@ -35,12 +42,12 @@ export default meta;
 
 type Story = StoryObj<UiAlertComponent>;
 
-// Default
-export const Default: Story = {
+// Interactive — alert único bindeado a los controles del meta
+export const Interactive: Story = {
   render: (args) => ({
     props: args,
     template: `
-      <div class="max-w-2xl">
+      <UiSurface className="max-w-2xl">
         <UiAlert
           [variant]="variant"
           [title]="title"
@@ -48,17 +55,18 @@ export const Default: Story = {
           [showLink]="showLink"
           [linkHref]="linkHref"
           [linkText]="linkText"
+          [className]="className"
         />
-      </div>
+      </UiSurface>
     `,
   }),
 };
 
-// All variants
-export const AllVariants: Story = {
+// Light variants — un UiAlert independiente por story
+export const Success: Story = {
   render: () => ({
     template: `
-      <div class="space-y-4 max-w-2xl">
+      <UiSurface className="max-w-2xl">
         <UiAlert
           variant="success"
           title="Success Message"
@@ -67,6 +75,15 @@ export const AllVariants: Story = {
           linkHref="/"
           linkText="Learn more"
         />
+      </UiSurface>
+    `,
+  }),
+};
+
+export const Warning: Story = {
+  render: () => ({
+    template: `
+      <UiSurface className="max-w-2xl">
         <UiAlert
           variant="warning"
           title="Warning Message"
@@ -75,6 +92,15 @@ export const AllVariants: Story = {
           linkHref="/"
           linkText="Learn more"
         />
+      </UiSurface>
+    `,
+  }),
+};
+
+export const Error: Story = {
+  render: () => ({
+    template: `
+      <UiSurface className="max-w-2xl">
         <UiAlert
           variant="error"
           title="Error Message"
@@ -83,6 +109,15 @@ export const AllVariants: Story = {
           linkHref="/"
           linkText="Learn more"
         />
+      </UiSurface>
+    `,
+  }),
+};
+
+export const Info: Story = {
+  render: () => ({
+    template: `
+      <UiSurface className="max-w-2xl">
         <UiAlert
           variant="info"
           title="Info Message"
@@ -91,70 +126,76 @@ export const AllVariants: Story = {
           linkHref="/"
           linkText="Learn more"
         />
-      </div>
+      </UiSurface>
     `,
   }),
 };
 
-// Link
-export const WithLink: Story = {
-  args: {
-    variant: "success",
-    showLink: true,
-    linkHref: "/docs/getting-started",
-    linkText: "Read the docs",
-  },
+// Dark variants — un UiAlert independiente por story, dentro de UiSurface con clase .dark
+export const SuccessDark: Story = {
+  render: () => ({
+    template: `
+      <UiSurface variant="neutral" className="dark bg-gray-900 max-w-2xl">
+        <UiAlert
+          variant="success"
+          title="Success Message"
+          message="Your changes have been saved successfully."
+          [showLink]="true"
+          linkHref="/"
+          linkText="Learn more"
+        />
+      </UiSurface>
+    `,
+  }),
 };
 
-export const WithoutLink: Story = {
-  args: {
-    variant: "warning",
-    showLink: false,
-  },
+export const WarningDark: Story = {
+  render: () => ({
+    template: `
+      <UiSurface variant="neutral" className="dark bg-gray-900 max-w-2xl">
+        <UiAlert
+          variant="warning"
+          title="Warning Message"
+          message="Be cautious when performing this action."
+          [showLink]="true"
+          linkHref="/"
+          linkText="Learn more"
+        />
+      </UiSurface>
+    `,
+  }),
 };
 
-// Custom
-export const MessageOnly: Story = {
-  args: {
-    variant: "info",
-    title: "",
-    message: "A short, single-line informational note.",
-    showLink: false,
-  },
+export const ErrorDark: Story = {
+  render: () => ({
+    template: `
+      <UiSurface variant="neutral" className="dark bg-gray-900 max-w-2xl">
+        <UiAlert
+          variant="error"
+          title="Error Message"
+          message="Something went wrong. Please try again."
+          [showLink]="true"
+          linkHref="/"
+          linkText="Learn more"
+        />
+      </UiSurface>
+    `,
+  }),
 };
 
-export const CustomLink: Story = {
-  args: {
-    variant: "error",
-    title: "Action required",
-    message: "You need to verify your email before continuing.",
-    showLink: true,
-    linkHref: "/auth/verify",
-    linkText: "Verify now",
-  },
-};
-
-// Variants
-export const Success: Story = {
-  args: {
-    variant: "success",
-    title: "Success",
-    message: "Operation completed.",
-  },
-};
-
-export const Warning: Story = {
-  args: {
-    variant: "warning",
-    title: "Warning",
-    message: "Proceed with caution.",
-  },
-};
-
-export const Error: Story = {
-  args: { variant: "error", title: "Error", message: "Operation failed." },
-};
-
-export const Info: Story = {
-  args: { variant: "info", title: "Info", message: "Just so you know." },
+export const InfoDark: Story = {
+  render: () => ({
+    template: `
+      <UiSurface variant="neutral" className="dark bg-gray-900 max-w-2xl">
+        <UiAlert
+          variant="info"
+          title="Info Message"
+          message="This is an informational message."
+          [showLink]="true"
+          linkHref="/"
+          linkText="Learn more"
+        />
+      </UiSurface>
+    `,
+  }),
 };

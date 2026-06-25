@@ -1,16 +1,17 @@
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   computed,
+  DestroyRef,
+  effect,
   inject,
   input,
-  OnDestroy,
   output,
   signal,
   TemplateRef,
   Type,
 } from "@angular/core";
+import { NgComponentOutlet, NgTemplateOutlet } from "@angular/common";
 
 import { IconProps } from "@shared/icons/icon.interface";
 import { TypographyType } from "@styles/types/typography";
@@ -23,32 +24,16 @@ import {
 import { UiLabelComponent } from "@shared/ui/label/label.component";
 import { UiLoadingTimeoutWrapperComponent } from "@shared/ui/loading-timeout-wrapper/loading-timeout-wrapper.component";
 import { getFocusStyling } from "@utils/styling";
-import { NgComponentOutlet, NgTemplateOutlet } from "@angular/common";
 
-import {
-  ButtonProps,
-  ButtonStyleType,
-  ButtonTooltip,
-  ButtonVariant,
-} from "./types";
-import { getVariantClasses } from "./variants";
+import { ButtonStyleType, ButtonTooltip, ButtonVariant } from "./button.types";
+import { getVariantClasses } from "./button.variants";
 
 /**
- * `UiButton`
- * ----------
  * Botón del design system.
- *
- * Capacidades:
- *  - 3 variants (`primary` | `secondary` | `tertiary`) × 5 styleTypes.
- *  - Íconos izquierda/derecha como **componentes Angular** (`Type<unknown>`).
- *  - Tooltip integrado con el `UiTooltipComponent` del DS.
- *  - Loading wrapper con progress bar (`timeout` + `isLoading`).
- *  - Foco accesible con `focus-visible` (vía `getFocusStyling`).
- *  - Soporte de `<a>` vía `asLink` + `linkProps`.
- *  - Reset manual del timer: el consumidor lo invoca con
- *    `viewChild.button.resetTimeout()`.
- *
- * API signal-based (Angular 17.1+).
+ * Soporta variants (`primary`/`secondary`/`tertiary`) × styleTypes,
+ * iconos izquierda/derecha como componentes Angular, tooltip integrado,
+ * loading wrapper con progress bar y render como `<a>` vía `asLink`.
+ * El reset manual del timer se hace con `viewChild.button.resetTimeout()`.
  */
 @Component({
   selector: "UiButton",
@@ -61,112 +46,9 @@ import { getVariantClasses } from "./variants";
     UiLoadingTimeoutWrapperComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <ng-template #buttonTpl>
-      @if (asLink()) {
-        <a
-          [class]="buttonClasses()"
-          [attr.href]="linkProps()?.href || null"
-          [attr.target]="linkProps()?.target || null"
-          [attr.download]="linkProps()?.download || null"
-          [attr.rel]="computedRel()"
-          [attr.aria-label]="labelText() || null"
-          (click)="onClick($event)"
-          data-testid="button"
-        >
-          @if (LeftIcon()) {
-            <ng-container
-              *ngComponentOutlet="LeftIcon() ?? null; inputs: leftIconInputs()"
-            ></ng-container>
-          }
-
-          @if (labelRender()) {
-            <ng-container *ngTemplateOutlet="labelRender()"></ng-container>
-          } @else if (label(); as lbl) {
-            <UiLabel [type]="fontSize()" [text]="lbl" weight="medium"></UiLabel>
-          } @else {
-            <ng-content></ng-content>
-          }
-
-          @if (RightIcon()) {
-            <ng-container
-              *ngComponentOutlet="
-                RightIcon() ?? null;
-                inputs: rightIconInputs()
-              "
-            ></ng-container>
-          }
-        </a>
-      } @else {
-        <button
-          [class]="buttonClasses()"
-          [type]="isSubmit() ? 'submit' : 'button'"
-          [disabled]="isEffectivelyDisabled()"
-          [attr.aria-label]="labelText() || null"
-          (click)="onClick($event)"
-          data-testid="button"
-        >
-          @if (LeftIcon()) {
-            <ng-container
-              *ngComponentOutlet="LeftIcon() ?? null; inputs: leftIconInputs()"
-            ></ng-container>
-          }
-
-          @if (labelRender()) {
-            <ng-container *ngTemplateOutlet="labelRender()"></ng-container>
-          } @else if (label(); as lbl) {
-            <UiLabel [type]="fontSize()" [text]="lbl" weight="medium"></UiLabel>
-          } @else {
-            <ng-content></ng-content>
-          }
-
-          @if (RightIcon()) {
-            <ng-container
-              *ngComponentOutlet="
-                RightIcon() ?? null;
-                inputs: rightIconInputs()
-              "
-            ></ng-container>
-          }
-        </button>
-      }
-    </ng-template>
-
-    @if (showWrapper()) {
-      <UiLoadingTimeoutWrapper
-        [variant]="variant()"
-        [styleType]="styleType()"
-        [fullWidth]="fullWidth()"
-        [transparent]="transparent()"
-        [timeout]="hasActiveTimeout() ? timeout() : undefined"
-        [className]="className()"
-      >
-        @if (tooltip() !== undefined && tooltip() !== null) {
-          <UiTooltip
-            [content]="tooltip()!"
-            [variant]="tooltipVariant()"
-            [side]="tooltipSide()"
-          >
-            <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
-          </UiTooltip>
-        } @else {
-          <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
-        }
-      </UiLoadingTimeoutWrapper>
-    } @else if (tooltip() !== undefined && tooltip() !== null) {
-      <UiTooltip
-        [content]="tooltip()!"
-        [variant]="tooltipVariant()"
-        [side]="tooltipSide()"
-      >
-        <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
-      </UiTooltip>
-    } @else {
-      <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
-    }
-  `,
+  templateUrl: "./button.component.html",
 })
-export class UiButtonComponent implements OnDestroy {
+export class UiButtonComponent {
   readonly variant = input<ButtonVariant>("primary");
   readonly styleType = input<ButtonStyleType>("default");
   readonly transparent = input<boolean>(false);
@@ -176,35 +58,17 @@ export class UiButtonComponent implements OnDestroy {
   readonly isLoading = input<boolean>(false);
   readonly isSubmit = input<boolean>(false);
   readonly fontSize = input<TypographyType>("bodyS");
-
-  /** Texto del botón (alternativa al slot `<ng-content>` o a `labelRender`). */
   readonly label = input<string | undefined>(undefined);
-
-  /** Template alternativa a `label` para contenido complejo. */
   readonly labelRender = input<TemplateRef<unknown> | undefined>(undefined);
-
-  /** Componente Angular a la izquierda del label. */
   readonly LeftIcon = input<Type<unknown> | undefined>(undefined);
-
-  /** Componente Angular a la derecha del label. */
   readonly RightIcon = input<Type<unknown> | undefined>(undefined);
-
-  /** Props para los íconos (size por defecto = `fontSize` en px). */
   readonly iconProps = input<IconProps>({});
-
-  /** Tooltip opcional (string o `TemplateRef`). */
   readonly tooltip = input<ButtonTooltip | undefined>(undefined);
   readonly tooltipSide = input<TooltipSide>("bottom");
   readonly tooltipVariant = input<TooltipVariantType>("dark");
-
-  /** Mapea a `aria-label` (no se reenvía como atributo suelto). */
   readonly labelText = input<string | undefined>(undefined);
-
-  /** Duración del timer (ms) — activa la progress bar. */
   readonly timeout = input<number | undefined>(undefined);
   readonly disableOnTimeout = input<boolean>(true);
-
-  /** Si `true`, se renderiza como `<a>` y se aplican `linkProps`. */
   readonly asLink = input<boolean>(false);
   readonly linkProps = input<
     | {
@@ -215,47 +79,31 @@ export class UiButtonComponent implements OnDestroy {
       }
     | undefined
   >(undefined);
-
-  /** Clases extra para el contenedor exterior. */
   readonly className = input<string>("");
-
-  /** Emite el `MouseEvent` nativo al hacer click. */
   readonly click = output<MouseEvent>();
 
-  private cdr = inject(ChangeDetectorRef);
   private timeoutId?: ReturnType<typeof setTimeout>;
-
-  /** `true` mientras la progress bar del `timeout` está corriendo. */
   private readonly _runningTimeout = signal(false);
 
-  /** Effect-like: re-arrancamos el timer cuando cambia `timeout()` o `isLoading()`. */
-  private timeoutWatcher = (): void => {
-    // Iniciamos el timer en ngOnInit equivalente (primer render).
-    if (this.timeout() !== undefined) this.startTimeout();
-  };
-
-  ngOnInit(): void {
-    this.timeoutWatcher();
-  }
-
-  ngOnDestroy(): void {
-    this.clearTimeout();
-  }
-
-  /**
-   * Reinicia el `timeout`. Útil cuando el consumidor quiere resetear
-   * el timer desde su handler de click.
-   */
-  resetTimeout = (): void => {
-    this.clearTimeout();
-    if (this.timeout() !== undefined) {
+  constructor() {
+    effect(() => {
+      const ms = this.timeout();
+      this.clearTimeout();
+      if (ms === undefined) return;
       this._runningTimeout.set(true);
-      this.cdr.markForCheck();
-      this.timeoutId = setTimeout(() => {
-        this._runningTimeout.set(false);
-        this.cdr.markForCheck();
-      }, this.timeout()!);
-    }
+      this.timeoutId = setTimeout(() => this._runningTimeout.set(false), ms);
+    });
+
+    inject(DestroyRef).onDestroy(() => this.clearTimeout());
+  }
+
+  /** Reinicia el `timeout`. Útil desde el handler de click del consumidor. */
+  resetTimeout = (): void => {
+    const ms = this.timeout();
+    this.clearTimeout();
+    if (ms === undefined) return;
+    this._runningTimeout.set(true);
+    this.timeoutId = setTimeout(() => this._runningTimeout.set(false), ms);
   };
 
   onClick(event: MouseEvent): void {
@@ -265,16 +113,6 @@ export class UiButtonComponent implements OnDestroy {
       return;
     }
     this.click.emit(event);
-  }
-
-  private startTimeout(): void {
-    this.clearTimeout();
-    this._runningTimeout.set(true);
-    this.cdr.markForCheck();
-    this.timeoutId = setTimeout(() => {
-      this._runningTimeout.set(false);
-      this.cdr.markForCheck();
-    }, this.timeout()!);
   }
 
   private clearTimeout(): void {

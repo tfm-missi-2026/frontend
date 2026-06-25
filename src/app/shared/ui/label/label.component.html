@@ -1,0 +1,29 @@
+@if (showTooltip()) {
+  <UiTooltip
+    variant="light"
+    align="start"
+    [content]="resolvedText()"
+    [side]="tooltipSide()"
+  >
+    <ng-container *ngTemplateOutlet="renderedTpl()"></ng-container>
+  </UiTooltip>
+} @else {
+  <ng-container *ngTemplateOutlet="renderedTpl()"></ng-container>
+}
+
+<ng-template #labelTpl>
+  <label
+    #container
+    [attr.for]="for() || null"
+    [class]="hostClasses()"
+    [style.font-size]="fontSize()"
+    [style.line-height]="lineHeight()"
+    [style.-webkit-line-clamp]="dynamicLineClamp()"
+  >
+    @if (text()) {
+      {{ text() }}
+    } @else {
+      <ng-content></ng-content>
+    }
+  </label>
+</ng-template>

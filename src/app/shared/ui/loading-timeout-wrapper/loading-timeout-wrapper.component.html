@@ -1,8 +1,12 @@
-<div [ngClass]="containerClasses" data-testid="loading-timeout-wrapper">
-  @if (timeout) {
+<div
+  [class]="containerClasses()"
+  data-testid="loading-timeout-wrapper"
+>
+  @if (timeout() !== undefined) {
     <div
-      class="loading-timeout-wrapper__progress"
-      [ngStyle]="progressStyle"
+      class="absolute inset-0 bg-current opacity-20 origin-left pointer-events-none rounded-[inherit] animate-[ltw-progress-fill_linear_forwards]"
+      [style.animationDuration.ms]="timeout()"
+      data-testid="loading-timeout-wrapper-progress"
       aria-hidden="true"
     ></div>
   }

@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { UiLoadingTimeoutWrapperComponent } from './loading-timeout-wrapper.component';
 
-describe('LoadingTimeoutWrapper', () => {
+describe('UiLoadingTimeoutWrapperComponent', () => {
   let component: UiLoadingTimeoutWrapperComponent;
   let fixture: ComponentFixture<UiLoadingTimeoutWrapperComponent>;
 
@@ -24,7 +24,7 @@ describe('LoadingTimeoutWrapper', () => {
     fixture.componentRef.setInput('timeout', undefined);
     fixture.detectChanges();
     const progress = fixture.nativeElement.querySelector(
-      '.loading-timeout-wrapper__progress',
+      '[data-testid="loading-timeout-wrapper-progress"]',
     );
     expect(progress).toBeNull();
   });
@@ -33,8 +33,8 @@ describe('LoadingTimeoutWrapper', () => {
     fixture.componentRef.setInput('timeout', 5000);
     fixture.detectChanges();
     const progress = fixture.nativeElement.querySelector(
-      '.loading-timeout-wrapper__progress',
-    );
+      '[data-testid="loading-timeout-wrapper-progress"]',
+    ) as HTMLElement;
     expect(progress).not.toBeNull();
     expect(progress.style.animationDuration).toBe('5000ms');
   });

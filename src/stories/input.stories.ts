@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
-import { CommonModule } from "@angular/common";
+import { JsonPipe } from "@angular/common";
 import {
-  FormsModule,
-  ReactiveFormsModule,
   FormControl,
   FormGroup,
+  ReactiveFormsModule,
 } from "@angular/forms";
 
 import { UiInputComponent } from "@shared/ui/input/input/input.component";
 import { IconSearchComponent } from "@shared/icons/search-icon";
 import { IconEyeComponent } from "@shared/icons/eye-icon";
+import { CommonThemeToggleComponent } from "@shared/common/theme-toggle/theme-toggle.component";
 
 const meta: Meta<UiInputComponent> = {
   title: "Shared/Input",
@@ -18,12 +18,12 @@ const meta: Meta<UiInputComponent> = {
   decorators: [
     moduleMetadata({
       imports: [
-        CommonModule,
-        FormsModule,
+        JsonPipe,
         ReactiveFormsModule,
         UiInputComponent,
         IconSearchComponent,
         IconEyeComponent,
+        CommonThemeToggleComponent,
       ],
     }),
   ],
@@ -54,6 +54,7 @@ const meta: Meta<UiInputComponent> = {
     keyDown: { action: "keyDown" },
     blurEvt: { action: "blurEvt" },
     focusEvt: { action: "focusEvt" },
+    passwordVisibilityChange: { action: "passwordVisibilityChange" },
   },
   args: {
     id: "demo-input",
@@ -67,7 +68,6 @@ export default meta;
 
 type Story = StoryObj<UiInputComponent>;
 
-// Default
 export const Default: Story = {};
 
 export const Required: Story = {
@@ -82,7 +82,6 @@ export const ReadOnly: Story = {
   args: { readOnly: true, value: "Solo lectura" },
 };
 
-// Validaciones
 export const WithError: Story = {
   args: {
     errorMessage: "Este correo no es válido",
@@ -90,14 +89,12 @@ export const WithError: Story = {
   },
 };
 
-// Tooltip
 export const WithTooltip: Story = {
   args: {
     tooltip: "Nunca compartiremos tu correo con terceros.",
   },
 };
 
-// Helpers
 export const WithLegend: Story = {
   args: {
     legend: "Te enviaremos un código de verificación.",
@@ -129,7 +126,6 @@ export const MaxLengthReached: Story = {
   },
 };
 
-// Iconos
 export const WithLeftIcon: Story = {
   args: {
     labelText: "Buscar",
@@ -165,7 +161,15 @@ export const WithIconAndError: Story = {
   },
 };
 
-// Width
+export const PasswordWithToggle: Story = {
+  args: {
+    labelText: "Contraseña",
+    type: "password",
+    placeholder: "••••••••",
+    showPasswordToggle: true,
+  },
+};
+
 export const FixedWidth: Story = {
   args: {
     labelText: "Código postal",
@@ -175,7 +179,6 @@ export const FixedWidth: Story = {
   },
 };
 
-// Debounce
 export const WithDebounce: Story = {
   args: {
     labelText: "Búsqueda con debounce",
@@ -185,7 +188,23 @@ export const WithDebounce: Story = {
   },
 };
 
-// Forms
+export const NumberType: Story = {
+  args: {
+    labelText: "Edad",
+    type: "number",
+    placeholder: "0",
+  },
+};
+
+export const EmailType: Story = {
+  args: {
+    labelText: "Email",
+    type: "email",
+    placeholder: "tu@correo.com",
+    autocomplete: "email",
+  },
+};
+
 export const ReactiveFormExample: Story = {
   render: () => {
     const form = new FormGroup({
@@ -216,23 +235,6 @@ export const ReactiveFormExample: Story = {
   },
 };
 
-export const NgModelExample: Story = {
-  render: () => ({
-    props: { value: "two-way bound" },
-    template: `
-      <div class="space-y-2 max-w-sm">
-        <UiInput
-          [(value)]="value"
-          labelText="Two-way binding"
-          placeholder="Escribe algo"
-        ></UiInput>
-        <pre class="text-xs">value = "{{ value }}"</pre>
-      </div>
-    `,
-  }),
-};
-
-// Full example
 export const FullExample: Story = {
   args: {
     id: "full",
@@ -245,4 +247,35 @@ export const FullExample: Story = {
     maxLength: 60,
     legend: "Solo letras y espacios.",
   },
+};
+
+export const DarkMode: Story = {
+  render: () => ({
+    template: `
+      <div class="dark bg-gray-900 p-6 rounded-lg space-y-4 max-w-sm">
+        <UiInput labelText="Default" placeholder="Texto"></UiInput>
+        <UiInput labelText="Required" placeholder="Obligatorio" [required]="true"></UiInput>
+        <UiInput labelText="Disabled" [disabled]="true" value="No editable"></UiInput>
+        <UiInput labelText="Read only" [readOnly]="true" value="Solo lectura"></UiInput>
+        <UiInput labelText="Con error" value="mal" errorMessage="Formato inválido"></UiInput>
+        <UiInput labelText="Con tooltip" placeholder="Hover el icono" tooltip="Texto de ayuda"></UiInput>
+        <UiInput labelText="Password" type="password" [showPasswordToggle]="true"></UiInput>
+      </div>
+    `,
+  }),
+};
+
+export const WithThemeSwitch: Story = {
+  render: () => ({
+    template: `
+      <div class="flex flex-col items-start gap-6 p-6">
+        <CommonThemeToggle variant="subtle" size="md"></CommonThemeToggle>
+        <div class="space-y-3 w-full max-w-sm">
+          <UiInput labelText="Email" placeholder="tu@correo.com" [required]="true"></UiInput>
+          <UiInput labelText="Contraseña" type="password" placeholder="••••••••" tooltip="Mínimo 8 caracteres"></UiInput>
+          <UiInput labelText="Descripción" placeholder="..." [maxLength]="80" legend="Máximo 80 caracteres"></UiInput>
+        </div>
+      </div>
+    `,
+  }),
 };

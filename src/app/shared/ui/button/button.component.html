@@ -1,89 +1,67 @@
-<!--
-  Template del Button.
-  Estructura: LoadingTimeoutWrapper > Tooltip > button/a.
-  Cada nivel se renderiza opcionalmente (@if) para evitar wrappers innecesarios.
--->
+<ng-template #innerContent>
+  @if (LeftIcon()) {
+    <ng-container
+      *ngComponentOutlet="LeftIcon() ?? null; inputs: leftIconInputs()"
+    ></ng-container>
+  }
 
-<!-- Definición del botón real (se reusa desde los condicionales) -->
+  @if (labelRender()) {
+    <ng-container *ngTemplateOutlet="labelRender()"></ng-container>
+  } @else if (label(); as lbl) {
+    <UiLabel [type]="fontSize()" [text]="lbl" weight="medium"></UiLabel>
+  } @else {
+    <ng-content></ng-content>
+  }
+
+  @if (RightIcon()) {
+    <ng-container
+      *ngComponentOutlet="RightIcon() ?? null; inputs: rightIconInputs()"
+    ></ng-container>
+  }
+</ng-template>
+
 <ng-template #buttonTpl>
-  @if (asLink) {
+  @if (asLink()) {
     <a
-      [class]="buttonClasses"
-      [attr.href]="linkProps?.href || null"
-      [attr.target]="linkProps?.target || null"
-      [attr.download]="linkProps?.download || null"
-      [attr.rel]="computedRel"
-      [attr.aria-label]="labelText || null"
+      [class]="buttonClasses()"
+      [attr.href]="linkProps()?.href || null"
+      [attr.target]="linkProps()?.target || null"
+      [attr.download]="linkProps()?.download || null"
+      [attr.rel]="computedRel()"
+      [attr.aria-label]="labelText() || null"
       (click)="onClick($event)"
       data-testid="button"
     >
-      @if (LeftIcon) {
-        <ng-container
-          *ngComponentOutlet="LeftIcon; inputs: leftIconInputs"
-        ></ng-container>
-      }
-
-      @if (labelRender) {
-        <ng-container *ngTemplateOutlet="labelRender"></ng-container>
-      } @else if (label) {
-        <UiLabel [type]="fontSize" [text]="label" weight="medium"></UiLabel>
-      } @else {
-        <ng-content></ng-content>
-      }
-
-      @if (RightIcon) {
-        <ng-container
-          *ngComponentOutlet="RightIcon; inputs: rightIconInputs"
-        ></ng-container>
-      }
+      <ng-container *ngTemplateOutlet="innerContent"></ng-container>
     </a>
   } @else {
     <button
-      [class]="buttonClasses"
-      [type]="isSubmit ? 'submit' : 'button'"
-      [disabled]="isEffectivelyDisabled"
-      [attr.aria-label]="labelText || null"
+      [class]="buttonClasses()"
+      [type]="isSubmit() ? 'submit' : 'button'"
+      [disabled]="isEffectivelyDisabled()"
+      [attr.aria-label]="labelText() || null"
       (click)="onClick($event)"
       data-testid="button"
     >
-      @if (LeftIcon) {
-        <ng-container
-          *ngComponentOutlet="LeftIcon; inputs: leftIconInputs"
-        ></ng-container>
-      }
-
-      @if (labelRender) {
-        <ng-container *ngTemplateOutlet="labelRender"></ng-container>
-      } @else if (label) {
-        <UiLabel [type]="fontSize" [text]="label" weight="medium"></UiLabel>
-      } @else {
-        <ng-content></ng-content>
-      }
-
-      @if (RightIcon) {
-        <ng-container
-          *ngComponentOutlet="RightIcon; inputs: rightIconInputs"
-        ></ng-container>
-      }
+      <ng-container *ngTemplateOutlet="innerContent"></ng-container>
     </button>
   }
 </ng-template>
 
-<!-- Render condicional: Wrapper > Tooltip > button -->
-@if (showWrapper) {
+@if (showWrapper()) {
   <UiLoadingTimeoutWrapper
-    [variant]="variant"
-    [styleType]="styleType"
-    [fullWidth]="fullWidth"
-    [transparent]="transparent"
-    [timeout]="hasActiveTimeout ? timeout : undefined"
-    [className]="className"
+    [variant]="variant()"
+    [styleType]="styleType()"
+    [fullWidth]="fullWidth()"
+    [transparent]="transparent()"
+    [timeout]="hasActiveTimeout() ? timeout() : undefined"
+    [className]="className()"
   >
-    @if (tooltip !== undefined && tooltip !== null) {
+    @if (tooltip() !== undefined && tooltip() !== null) {
       <UiTooltip
-        [content]="tooltip"
-        [variant]="tooltipVariant"
-        [side]="tooltipSide"
+        [content]="tooltip()!"
+        [variant]="tooltipVariant()"
+        [side]="tooltipSide()"
       >
         <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
       </UiTooltip>
@@ -91,11 +69,11 @@
       <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
     }
   </UiLoadingTimeoutWrapper>
-} @else if (tooltip !== undefined && tooltip !== null) {
+} @else if (tooltip() !== undefined && tooltip() !== null) {
   <UiTooltip
-    [content]="tooltip"
-    [variant]="tooltipVariant"
-    [side]="tooltipSide"
+    [content]="tooltip()!"
+    [variant]="tooltipVariant()"
+    [side]="tooltipSide()"
   >
     <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
   </UiTooltip>

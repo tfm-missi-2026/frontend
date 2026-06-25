@@ -323,6 +323,15 @@
   }
 }
 
+@keyframes ltw-progress-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
 .tableCheckbox:checked ~ span span {
   @apply opacity-100;
 }

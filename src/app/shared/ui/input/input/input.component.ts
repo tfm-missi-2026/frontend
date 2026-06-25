@@ -1,6 +1,5 @@
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   computed,
   ElementRef,
@@ -17,51 +16,29 @@ import {
 import { NgComponentOutlet } from "@angular/common";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 
-import { UiLabelComponent } from "@shared/ui/label/label.component";
 import {
   IconEyeOffComponent,
   IconEyeOpenComponent,
 } from "@shared/icons";
-import { ColorType } from "@styles/types/colors";
+import { ColorType, COLOR_CLASSES } from "@styles/types/colors";
 import { FontWeightType } from "@styles/types/typography";
 import { getFocusStyling } from "@utils/styling";
 
 import { ValidationErrorIconComponent } from "./validation-error-icon.component";
 import { horizontalPaddingNumber, inputHeight } from "./common";
-import { UiFlexComponent } from "@shared/ui/flex/flex.component";
+import { UiLabelComponent } from "@shared/ui/label/label.component";
 import { UiFormLabelComponent } from "@shared/ui/form-label/form-label.component";
 
-/** `aria-label` del botón toggle cuando la contraseña está oculta. */
 const SHOW_PASSWORD_LABEL = "Mostrar contraseña";
-/** `aria-label` del botón toggle cuando la contraseña está visible. */
 const HIDE_PASSWORD_LABEL = "Ocultar contraseña";
 
-/**
- * `UiInput`
- * --------
- * Input de texto con label, iconos, prefix/sufix, error y contador.
- *
- * Capacidades:
- *  - Label integrable vía `<UiFormLabel>` (asterisco `*` automático).
- *  - Tooltip junto al label.
- *  - Iconos izquierda/derecha como **componentes Angular** (`Type<unknown>`)
- *    que se renderizan con `*ngComponentOutlet`.
- *  - Prefix / sufix en línea (`UiLabel` con `color="textAction"`).
- *  - Estado de error: borde rojo + `<ValidationErrorIcon>` a la derecha.
- *  - Estado `disabled` / `readOnly`: cambio de color de fondo y borde.
- *  - Contador `N/maxLength` debajo del input, alineado según `legend`.
- *  - `ControlValueAccessor` para integración con `ngModel` / `formControl`.
- *  - Debounce opcional en `valueChange` cuando el input es no-controlado.
- *  - Método público `focusInput()` para exponer el `focus` del `<input>`.
- *
- * API signal-based (Angular 17.1+).
- */
+// Input de texto con label, iconos, prefix/sufix, error y contador. Integra
+// `ControlValueAccessor` para `ngModel`/`formControl` y soporta debounce.
 @Component({
   selector: "UiInput",
   standalone: true,
   imports: [
     NgComponentOutlet,
-    UiFlexComponent,
     UiFormLabelComponent,
     UiLabelComponent,
     ValidationErrorIconComponent,
@@ -100,18 +77,9 @@ export class UiInputComponent
   readonly type = input<string>("text");
   readonly autocomplete = input<string | undefined>(undefined);
   readonly className = input<string>("");
-  /**
-   * Muestra un botón ojo integrado que alterna entre `type="password"`
-   * y `type="text"`. Solo aplica cuando `type === "password"`.
-   * El control de visibilidad es interno al componente; los consumers
-   * no necesitan manejar estado externo.
-   */
   readonly showPasswordToggle = input<boolean>(false);
-  /** Componente del icono para "mostrar contraseña". Default: `IconEyeOpenComponent`. */
   readonly passwordVisibleIcon = input<Type<unknown>>(IconEyeOpenComponent);
-  /** Componente del icono para "ocultar contraseña". Default: `IconEyeOffComponent`. */
   readonly passwordHiddenIcon = input<Type<unknown>>(IconEyeOffComponent);
-  /** Valor controlado. Se sincroniza vía `ControlValueAccessor`. */
   readonly value = input<string | number | undefined>(undefined);
 
   readonly valueChange = output<string>();
@@ -119,35 +87,22 @@ export class UiInputComponent
   readonly keyDown = output<KeyboardEvent>();
   readonly blurEvt = output<void>();
   readonly focusEvt = output<void>();
-  /** Emite el nuevo estado de visibilidad cuando el usuario alterna el toggle del password. */
   readonly passwordVisibilityChange = output<boolean>();
 
   readonly inputEl =
     viewChild.required<ElementRef<HTMLInputElement>>("inputEl");
 
-  /** Valor interno (lo que ve el `<input>`). Se sincroniza con `value`. */
-  internalValue = "";
+  readonly internalValue = signal<string>("");
+  readonly charCount = signal<number>(0);
 
-  /** Contador de caracteres actual (para `maxLength`). */
-  charCount = 0;
-
-  /**
-   * Estado `disabled` que llega desde el `FormControl` (vía
-   * `setDisabledState`). No se puede escribir al `disabled` input signal
-   * (es read-only), así que se combina con él en un `computed`.
-   */
   private _formDisabled = signal(false);
-
-  /** Estado interno de visibilidad del password (solo cuando el toggle está activo). */
   protected readonly _passwordVisible = signal(false);
 
-  /** `disabled` efectivo: combina el input y el estado del form. */
-  readonly isDisabled = computed<boolean>(
+  readonly isEffectivelyDisabled = computed<boolean>(
     () => this.disabled() || this._formDisabled(),
   );
 
   private timer?: ReturnType<typeof setTimeout>;
-  private cdr = inject(ChangeDetectorRef);
   private onChangeFn: (value: string) => void = () => {};
   private onTouchedFn: () => void = () => {};
 
@@ -159,18 +114,12 @@ export class UiInputComponent
     if (this.timer) clearTimeout(this.timer);
   }
 
-  /**
-   * Foco programático en el `<input>`.
-   * (Se llama `focusInput` para no chocar con el `Output() focusEvt`.)
-   */
   focusInput(): void {
     this.inputEl()?.nativeElement.focus();
   }
 
   writeValue(value: string | number | null | undefined): void {
-    this.internalValue = (value ?? "").toString();
-    this.charCount = this.internalValue.length;
-    this.cdr.markForCheck();
+    this.setValue(value);
   }
 
   registerOnChange(fn: (value: string) => void): void {
@@ -183,14 +132,11 @@ export class UiInputComponent
 
   setDisabledState(isDisabled: boolean): void {
     this._formDisabled.set(isDisabled);
-    this.cdr.markForCheck();
   }
 
   onInput(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    const next = target.value;
-    this.internalValue = next;
-    this.charCount = next.length;
+    const next = (event.target as HTMLInputElement).value;
+    this.setValue(next);
 
     const debounce = this.debounceTime();
     if (debounce && debounce > 0) {
@@ -222,24 +168,23 @@ export class UiInputComponent
   }
 
   private syncFromValue(): void {
-    const v = this.value();
-    this.internalValue = v?.toString() ?? "";
-    this.charCount = this.internalValue.length;
+    this.setValue(this.value());
+  }
+
+  private setValue(value: string | number | null | undefined): void {
+    const next = (value ?? "").toString();
+    this.internalValue.set(next);
+    this.charCount.set(next.length);
   }
 
   readonly hasLeftIcon = computed<boolean>(() => !!this.leftIcon());
   readonly hasRightIcon = computed<boolean>(() => !!this.rightIcon());
   readonly hasError = computed<boolean>(() => !!this.errorMessage());
-  readonly isEffectivelyDisabled = computed<boolean>(
-    () => this.disabled() || this._formDisabled(),
-  );
 
-  /** El toggle de password aplica solo si el `type` actual es `"password"`. */
   readonly shouldShowPasswordToggle = computed<boolean>(
     () => this.showPasswordToggle() && this.type() === "password",
   );
 
-  /** `type` efectivo: si el toggle está activo, devuelve `text` o `password` según el estado interno. */
   readonly effectiveType = computed<string>(() => {
     if (this.shouldShowPasswordToggle()) {
       return this._passwordVisible() ? "text" : "password";
@@ -247,19 +192,16 @@ export class UiInputComponent
     return this.type();
   });
 
-  /** Icono actual del toggle (cambia según el estado de visibilidad). */
   readonly currentPasswordIcon = computed<Type<unknown>>(() =>
     this._passwordVisible()
       ? this.passwordVisibleIcon()
       : this.passwordHiddenIcon(),
   );
 
-  /** `aria-label` actual del toggle. */
   readonly currentPasswordToggleLabel = computed<string>(() =>
     this._passwordVisible() ? HIDE_PASSWORD_LABEL : SHOW_PASSWORD_LABEL,
   );
 
-  /** Alterna el estado interno de visibilidad del password. */
   togglePasswordVisibility(): void {
     if (!this.shouldShowPasswordToggle()) return;
     const next = !this._passwordVisible();
@@ -267,7 +209,6 @@ export class UiInputComponent
     this.passwordVisibilityChange.emit(next);
   }
 
-  /** Clases del contenedor exterior (`StyledControlContainer`). */
   readonly outerClasses = computed<string>(() =>
     ["flex flex-col gap-1 w-full font-outfit", this.className()]
       .filter(Boolean)
@@ -279,7 +220,6 @@ export class UiInputComponent
     width: this.width() ?? "",
   }));
 
-  /** Clases del `StyledInputContainer` (el "frame" del input). */
   readonly containerClasses = computed<string>(() => {
     const baseLayout = [
       "flex items-center gap-2 w-full rounded-lg border border-solid",
@@ -304,7 +244,6 @@ export class UiInputComponent
         : `${horizontalPaddingNumber}px`,
   }));
 
-  /** Clases del `<input>` real (`StyledInput`). */
   readonly inputClasses = computed<string>(() =>
     [
       "flex-1 w-full border-0 outline-0 bg-transparent",
@@ -316,45 +255,41 @@ export class UiInputComponent
     ].join(" "),
   );
 
-  /** Color efectivo de los iconos en función del estado. */
-  readonly iconColor = computed<string>(() => {
-    if (this.hasError()) return "var(--color-error-500)";
-    if (this.isEffectivelyDisabled() || this.readOnly())
-      return "var(--color-gray-300)";
-    return "var(--color-gray-500)";
+  readonly iconColorType = computed<ColorType>(() => {
+    if (this.hasError()) return "textError";
+    if (this.isEffectivelyDisabled() || this.readOnly()) return "textDisabled";
+    return "textWeak";
   });
 
-  /** Inputs por defecto para los iconos (componente externo). */
+  readonly iconColorClass = computed<string>(
+    () => COLOR_CLASSES[this.iconColorType()],
+  );
+
   readonly leftIconInputs = computed<Record<string, unknown>>(() => ({
-    color: this.iconColor(),
     size: 16,
   }));
 
-  readonly rightIconInputs = computed<Record<string, unknown>>(() =>
-    this.leftIconInputs(),
-  );
+  readonly rightIconInputs = computed<Record<string, unknown>>(() => ({
+    size: 16,
+  }));
 
-  /** Color del contador `N/maxLength` (cambia a `textAction` al alcanzar el límite). */
   readonly charCountColor = computed<ColorType>(() => {
     const limit = this.maxLength() ?? Infinity;
-    return this.charCount < limit ? "textWeakest" : "textAction";
+    return this.charCount() < limit ? "textWeakest" : "textAction";
   });
 
-  /** Texto del contador. */
   readonly charCountText = computed<string>(
-    () => `${this.charCount}/${this.maxLength() ?? 0}`,
+    () => `${this.charCount()}/${this.maxLength() ?? 0}`,
   );
 
-  /** Pesos para `legend` y char count (alineado con la convención de typography). */
   readonly charCountWeight: FontWeightType = "regular";
   readonly legendWeight: FontWeightType = "regular";
 
-  /** Justify del footer según la combinación `legend` + `maxLength`. */
-  readonly footerJustifyContent = computed<string>(() => {
+  readonly footerJustifyClass = computed<string>(() => {
     const hasLegend = !!this.legend();
     const hasMax = !!this.maxLength();
-    if (hasLegend && hasMax) return "space-between";
-    if (hasLegend) return "flex-start";
-    return "flex-end";
+    if (hasLegend && hasMax) return "justify-between";
+    if (hasLegend) return "justify-start";
+    return "justify-end";
   });
 }

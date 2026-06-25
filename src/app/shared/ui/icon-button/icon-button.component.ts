@@ -1,11 +1,11 @@
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   computed,
+  DestroyRef,
+  effect,
   inject,
   input,
-  OnDestroy,
   output,
   signal,
   Type,
@@ -28,18 +28,14 @@ import {
   ButtonStyleType,
   ButtonTooltip,
   ButtonVariant,
-} from "@shared/ui/button/types";
-import { getVariantClasses } from "@shared/ui/button/variants";
+} from "@shared/ui/button/button.types";
+import { getVariantClasses } from "@shared/ui/button/button.variants";
 
 /**
- * `UiIconButton`
- * --------------
- * Botón cuadrado (aspect-ratio 1:1) que contiene un único ícono.
- *
- * Mismas capacidades que `UiButton` (variants, styleTypes, loading
- * wrapper, tooltip, `asLink`) salvo que no tiene label.
- *
- * API signal-based (Angular 17.1+).
+ * Botón cuadrado (aspect-ratio 1:1) con un único ícono. Mismas
+ * capacidades que `UiButton` (variants, styleTypes, loading wrapper,
+ * tooltip, `asLink`) salvo que no tiene label. Pensado para acciones
+ * compactas en barras, tablas y headers.
  */
 @Component({
   selector: "UiIconButton",
@@ -51,74 +47,9 @@ import { getVariantClasses } from "@shared/ui/button/variants";
     UiLoadingTimeoutWrapperComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <ng-template #buttonTpl>
-      @if (asLink()) {
-        <a
-          [class]="buttonClasses()"
-          [attr.href]="linkProps()?.href || null"
-          [attr.target]="linkProps()?.target || null"
-          [attr.download]="linkProps()?.download || null"
-          [attr.rel]="computedRel()"
-          [attr.aria-label]="labelText() || null"
-          (click)="onClick($event)"
-          data-testid="icon-button"
-        >
-          <ng-container
-            *ngComponentOutlet="Icon(); inputs: iconInputs()"
-          ></ng-container>
-        </a>
-      } @else {
-        <button
-          [class]="buttonClasses()"
-          [type]="isSubmit() ? 'submit' : 'button'"
-          [disabled]="isEffectivelyDisabled()"
-          [attr.aria-label]="labelText() || null"
-          (click)="onClick($event)"
-          data-testid="icon-button"
-        >
-          <ng-container
-            *ngComponentOutlet="Icon(); inputs: iconInputs()"
-          ></ng-container>
-        </button>
-      }
-    </ng-template>
-
-    @if (showWrapper()) {
-      <UiLoadingTimeoutWrapper
-        [variant]="variant()"
-        [styleType]="styleType()"
-        [transparent]="transparent()"
-        [fullWidth]="false"
-        [timeout]="hasActiveTimeout() ? timeout() : undefined"
-        [className]="className()"
-      >
-        @if (tooltip() !== undefined && tooltip() !== null) {
-          <UiTooltip
-            [content]="tooltip()!"
-            [variant]="tooltipVariant()"
-            [side]="tooltipSide()"
-          >
-            <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
-          </UiTooltip>
-        } @else {
-          <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
-        }
-      </UiLoadingTimeoutWrapper>
-    } @else if (tooltip() !== undefined && tooltip() !== null) {
-      <UiTooltip
-        [content]="tooltip()!"
-        [variant]="tooltipVariant()"
-        [side]="tooltipSide()"
-      >
-        <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
-      </UiTooltip>
-    } @else {
-      <ng-container *ngTemplateOutlet="buttonTpl"></ng-container>
-    }
-  `,
+  templateUrl: "./icon-button.component.html",
 })
-export class UiIconButtonComponent implements OnDestroy {
+export class UiIconButtonComponent {
   readonly variant = input<ButtonVariant>("primary");
   readonly styleType = input<ButtonStyleType>("default");
   readonly transparent = input<boolean>(false);
@@ -127,14 +58,9 @@ export class UiIconButtonComponent implements OnDestroy {
   readonly isLoading = input<boolean>(false);
   readonly isSubmit = input<boolean>(false);
   readonly fontSize = input<TypographyType>("bodyS");
-
-  /** Componente Angular que se renderiza dentro del botón. */
   readonly Icon = input.required<Type<unknown>>();
   readonly iconProps = input<IconProps>({});
-
-  /** Ancho explícito del botón. Si se omite, usa aspect-ratio 1:1. */
   readonly width = input<string | undefined>(undefined);
-
   readonly tooltip = input<ButtonTooltip | undefined>(undefined);
   readonly tooltipSide = input<TooltipSide>("bottom");
   readonly tooltipVariant = input<TooltipVariantType>("dark");
@@ -144,31 +70,30 @@ export class UiIconButtonComponent implements OnDestroy {
   readonly asLink = input<boolean>(false);
   readonly linkProps = input<ButtonLinkProps | undefined>(undefined);
   readonly className = input<string>("");
-
   readonly click = output<MouseEvent>();
 
-  private cdr = inject(ChangeDetectorRef);
   private timeoutId?: ReturnType<typeof setTimeout>;
   private readonly _runningTimeout = signal(false);
 
-  ngOnInit(): void {
-    if (this.timeout() !== undefined) this.startTimeout();
-  }
-
-  ngOnDestroy(): void {
-    this.clearTimeout();
-  }
-
-  resetTimeout = (): void => {
-    this.clearTimeout();
-    if (this.timeout() !== undefined) {
+  constructor() {
+    effect(() => {
+      const ms = this.timeout();
+      this.clearTimeout();
+      if (ms === undefined) return;
       this._runningTimeout.set(true);
-      this.cdr.markForCheck();
-      this.timeoutId = setTimeout(() => {
-        this._runningTimeout.set(false);
-        this.cdr.markForCheck();
-      }, this.timeout()!);
-    }
+      this.timeoutId = setTimeout(() => this._runningTimeout.set(false), ms);
+    });
+
+    inject(DestroyRef).onDestroy(() => this.clearTimeout());
+  }
+
+  /** Reinicia el `timeout`. Útil desde el handler de click del consumidor. */
+  resetTimeout = (): void => {
+    const ms = this.timeout();
+    this.clearTimeout();
+    if (ms === undefined) return;
+    this._runningTimeout.set(true);
+    this.timeoutId = setTimeout(() => this._runningTimeout.set(false), ms);
   };
 
   onClick(event: MouseEvent): void {
@@ -178,6 +103,13 @@ export class UiIconButtonComponent implements OnDestroy {
       return;
     }
     this.click.emit(event);
+  }
+
+  private clearTimeout(): void {
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+      this.timeoutId = undefined;
+    }
   }
 
   readonly isEffectivelyDisabled = computed<boolean>(
@@ -204,7 +136,6 @@ export class UiIconButtonComponent implements OnDestroy {
       "cursor-pointer select-none",
       "border border-solid",
       this.compact() ? "p-1" : "p-2",
-      width ? `w-[${width}]` : "",
       aspect,
     ];
 
@@ -231,6 +162,7 @@ export class UiIconButtonComponent implements OnDestroy {
     return props;
   });
 
+  /** `rel` automático si `target="_blank"` (anti-tabnabbing). */
   readonly computedRel = computed<string | null>(() => {
     if (!this.asLink()) return null;
     const explicit = this.linkProps()?.rel;
@@ -239,22 +171,11 @@ export class UiIconButtonComponent implements OnDestroy {
     return null;
   });
 
-  private startTimeout(): void {
-    this.clearTimeout();
-    this._runningTimeout.set(true);
-    this.cdr.markForCheck();
-    this.timeoutId = setTimeout(() => {
-      this._runningTimeout.set(false);
-      this.cdr.markForCheck();
-    }, this.timeout()!);
-  }
-
-  private clearTimeout(): void {
-    if (this.timeoutId) {
-      clearTimeout(this.timeoutId);
-      this.timeoutId = undefined;
-    }
-  }
+  /** Estilo inline para ancho explícito (`[style.width]` evita JIT miss). */
+  readonly widthStyle = computed<{ width?: string }>(() => {
+    const width = this.width();
+    return width !== undefined ? { width } : {};
+  });
 
   private getFocusClasses(): string {
     return getFocusStyling("visible");
