@@ -1,0 +1,52 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
+
+/**
+ * `IconAlertSuccess`
+ * ------------------
+ * Check dentro de un círculo (38×38) usado como ícono central del
+ * alert de éxito en los modales de alerta (`ModalBasedAlerts`).
+ *
+ * El color se controla con clases Tailwind pasadas vía `className`
+ * (ej. `fill-success-600 dark:fill-success-500`).
+ */
+@Component({
+  selector: 'IconAlertSuccess',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="computedWidth()"
+      [attr.height]="computedHeight()"
+      viewBox="0 0 38 38"
+      fill="none"
+      aria-hidden="true"
+      [attr.data-testid]="dataTestId() || null"
+      [attr.class]="className() || null"
+      style="flex-shrink: 0; display: inline-block;"
+    >
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M5.9375 19.0004C5.9375 11.7854 11.7864 5.93652 19.0014 5.93652C26.2164 5.93652 32.0653 11.7854 32.0653 19.0004C32.0653 26.2154 26.2164 32.0643 19.0014 32.0643C11.7864 32.0643 5.9375 26.2154 5.9375 19.0004ZM19.0014 2.93652C10.1296 2.93652 2.9375 10.1286 2.9375 19.0004C2.9375 27.8723 10.1296 35.0643 19.0014 35.0643C27.8733 35.0643 35.0653 27.8723 35.0653 19.0004C35.0653 10.1286 27.8733 2.93652 19.0014 2.93652ZM24.7855 17.0575C25.3713 16.4717 25.3713 15.522 24.7855 14.9362C24.1997 14.3504 23.25 14.3504 22.6642 14.9362L17.7177 19.8827L15.3387 17.5037C14.7529 16.9179 13.8031 16.9179 13.2173 17.5037C12.6316 18.0894 12.6316 19.0392 13.2173 19.625L16.657 23.0647C16.9383 23.346 17.3199 23.504 17.7177 23.504C18.1155 23.504 18.4971 23.346 18.7784 23.0647L24.7855 17.0575Z"
+        fill="currentColor"
+      />
+    </svg>
+  `,
+})
+export class IconAlertSuccessComponent {
+  readonly size = input<number | string>(38);
+  readonly width = input<number | string | undefined>(undefined);
+  readonly height = input<number | string | undefined>(undefined);
+  readonly className = input<string>('');
+  readonly dataTestId = input<string | undefined>(undefined);
+  readonly style = input<Record<string, unknown> | undefined>(undefined);
+
+  readonly computedWidth = computed(() => this.width() ?? this.size());
+  readonly computedHeight = computed(() => this.height() ?? this.size());
+}

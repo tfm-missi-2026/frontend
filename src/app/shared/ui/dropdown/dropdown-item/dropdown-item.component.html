@@ -1,0 +1,21 @@
+@if (isLink()) {
+  <a
+    [routerLink]="to()"
+    [ngClass]="containerClasses()"
+    [attr.aria-disabled]="disabled() ? 'true' : null"
+    (click)="handleClick($event)"
+    data-testid="dropdown-item"
+  >
+    <ng-content></ng-content>
+  </a>
+} @else {
+  <button
+    [type]="type()"
+    [ngClass]="containerClasses()"
+    [disabled]="disabled()"
+    (click)="handleClick($event)"
+    data-testid="dropdown-item"
+  >
+    <ng-content></ng-content>
+  </button>
+}

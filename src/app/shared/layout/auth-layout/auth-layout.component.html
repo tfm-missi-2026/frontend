@@ -1,0 +1,41 @@
+<div class="relative p-6 bg-white z-1 dark:bg-gray-900 sm:p-0">
+  <div
+    class="flex flex-col justify-center w-full h-screen lg:flex-row dark:bg-gray-900 sm:p-0"
+  >
+    <div class="relative flex-1 w-full">
+      <router-outlet></router-outlet>
+      <div class="absolute z-50 hidden bottom-6 right-6 sm:block">
+        <CommonThemeToggle variant="brand" size="lg" />
+      </div>
+    </div>
+    <div
+      class="items-center hidden w-full h-full lg:w-1/2 bg-brand-950 dark:bg-white/5 lg:grid relative"
+    >
+      <div class="flex items-center justify-center z-1">
+        <CommonGridShape />
+        <div class="flex flex-col items-center max-w-xs">
+          <UiLink
+            to="/"
+            variant="unstyled"
+            underline="none"
+            className="block mb-4"
+            labelText="SPSRT"
+          >
+            <UiImage
+              src="/images/logo/auth-logo.svg"
+              alt="Logo SPSRT"
+              width="w-[231px]"
+              height="h-[48px]"
+              rounded="none"
+              [bordered]="false"
+            />
+          </UiLink>
+          <p class="text-center text-gray-400 dark:text-white/60">
+            Sistema de Planificación y Seguimiento de Recursos Técnicos
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

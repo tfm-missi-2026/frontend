@@ -4,12 +4,14 @@
 @import "swiper/css";
 @import "swiper/css/navigation";
 @import "swiper/css/pagination";
+@import "flatpickr/dist/flatpickr.css";
+@import "apexcharts/dist/apexcharts.css";
 
 @custom-variant dark (&:is(.dark *));
 
 @layer base {
   body {
-    @apply font-outfit bg-gray-50;
+    @apply font-outfit bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-white/90;
   }
 }
 
@@ -270,6 +272,18 @@
 
 @utility menu-dropdown-badge-pro-inactive {
   @apply bg-brand-50 group-hover:bg-brand-100 dark:bg-brand-500/15 dark:group-hover:bg-brand-500/20;
+}
+
+@utility menu-dropdown-badge-pending {
+  @apply text-warning-600 dark:text-warning-500 block rounded-full px-2.5 py-0.5 text-xs font-medium uppercase;
+}
+
+@utility menu-dropdown-badge-pending-active {
+  @apply bg-warning-100 dark:bg-warning-500/20;
+}
+
+@utility menu-dropdown-badge-pending-inactive {
+  @apply bg-warning-50 group-hover:bg-warning-100 dark:bg-warning-500/15 dark:group-hover:bg-warning-500/20;
 }
 
 @utility no-scrollbar {

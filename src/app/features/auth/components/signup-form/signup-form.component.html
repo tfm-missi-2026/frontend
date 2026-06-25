@@ -1,0 +1,88 @@
+<UiFlex
+  direction="column"
+  justifyContent="center"
+  className="flex-1 w-full max-w-md mx-auto"
+>
+  <UiFlex direction="column" gap="24px">
+    <UiFlex direction="column" gap="8px">
+      <UiHeader [level]="1" text="Crear cuenta"></UiHeader>
+      <UiLabel
+        type="bodyS"
+        color="textWeak"
+        text="Ingresa tus datos para registrarte en el sistema."
+      ></UiLabel>
+    </UiFlex>
+
+    <form (ngSubmit)="onSubmit()">
+      <UiFlex direction="column" gap="20px">
+        <UiGrid [columns]="2" breakpoint="sm" gap="gap-5">
+          <UiInput
+            id="signup-fname"
+            name="fname"
+            type="text"
+            labelText="Nombre"
+            placeholder="Ingresa tu nombre"
+            [required]="true"
+            [value]="firstName()"
+            (valueChange)="onFirstNameChange($event)"
+          ></UiInput>
+
+          <UiInput
+            id="signup-lname"
+            name="lname"
+            type="text"
+            labelText="Apellido"
+            placeholder="Ingresa tu apellido"
+            [required]="true"
+            [value]="lastName()"
+            (valueChange)="onLastNameChange($event)"
+          ></UiInput>
+        </UiGrid>
+
+        <UiInput
+          id="signup-email"
+          name="email"
+          type="email"
+          labelText="Correo electrónico"
+          placeholder="Ingresa tu correo electrónico"
+          [required]="true"
+          [value]="email()"
+          (valueChange)="onEmailChange($event)"
+        ></UiInput>
+
+        <UiInput
+          id="signup-password"
+          name="password"
+          type="password"
+          labelText="Contraseña"
+          placeholder="Ingresa tu contraseña"
+          [required]="true"
+          [showPasswordToggle]="true"
+          [value]="password()"
+          (valueChange)="onPasswordChange($event)"
+        ></UiInput>
+
+        <UiButton [fullWidth]="true" [isSubmit]="true" (click)="onSubmit()">
+          Crear cuenta
+        </UiButton>
+      </UiFlex>
+    </form>
+
+    <UiFlex justifyContent="center" gap="6px" className="mt-2">
+      <UiLabel
+        type="bodyS"
+        color="textWeak"
+        text="¿Ya tienes una cuenta?"
+      ></UiLabel>
+      <UiLink
+        to="/signin"
+        size="sm"
+        variant="primary"
+        underline="hover"
+        (click)="onSignIn()"
+      >
+        Iniciar sesión
+      </UiLink>
+    </UiFlex>
+  </UiFlex>
+</UiFlex>

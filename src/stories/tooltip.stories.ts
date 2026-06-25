@@ -1,52 +1,52 @@
-import type { Meta, StoryObj } from '@storybook/angular';
-import { moduleMetadata } from '@storybook/angular';
-import { CommonModule } from '@angular/common';
+import type { Meta, StoryObj } from "@storybook/angular";
+import { moduleMetadata } from "@storybook/angular";
+import { CommonModule } from "@angular/common";
 
-import { UiTooltipComponent } from '@ui/tooltip/tooltip';
+import { UiTooltipComponent } from "@shared/ui/tooltip/tooltip.component";
 import {
   TooltipVariantType,
   TooltipSide,
   TooltipAlign,
-} from '@ui/tooltip/tooltip.types';
+} from "@shared/ui/tooltip/tooltip.types";
 
 const variants: TooltipVariantType[] = [
-  'light',
-  'dark',
-  'info',
-  'success',
-  'warning',
-  'error',
+  "light",
+  "dark",
+  "info",
+  "success",
+  "warning",
+  "error",
 ];
 
-const sides: TooltipSide[] = ['top', 'right', 'bottom', 'left'];
-const aligns: TooltipAlign[] = ['start', 'center', 'end'];
+const sides: TooltipSide[] = ["top", "right", "bottom", "left"];
+const aligns: TooltipAlign[] = ["start", "center", "end"];
 
 const meta: Meta<UiTooltipComponent> = {
-  title: 'Shared/Tooltip',
+  title: "Shared/Tooltip",
   component: UiTooltipComponent,
   decorators: [
     moduleMetadata({
       imports: [CommonModule, UiTooltipComponent],
     }),
   ],
-  tags: ['autodocs'],
-  parameters: { layout: 'padded' },
+  tags: ["autodocs"],
+  parameters: { layout: "padded" },
   argTypes: {
-    content: { control: 'text' },
-    variant: { control: 'select', options: variants },
-    side: { control: 'select', options: sides },
-    sideOffset: { control: { type: 'number', min: 0, max: 32 } },
-    align: { control: 'select', options: aligns },
-    delayDuration: { control: { type: 'number', min: 0, max: 3000, step: 50 } },
-    closeDelay: { control: { type: 'number', min: 0, max: 1000, step: 50 } },
-    className: { control: 'text' },
+    content: { control: "text" },
+    variant: { control: "select", options: variants },
+    side: { control: "select", options: sides },
+    sideOffset: { control: { type: "number", min: 0, max: 32 } },
+    align: { control: "select", options: aligns },
+    delayDuration: { control: { type: "number", min: 0, max: 3000, step: 50 } },
+    closeDelay: { control: { type: "number", min: 0, max: 1000, step: 50 } },
+    className: { control: "text" },
   },
   args: {
-    content: 'Texto del tooltip',
-    variant: 'light',
-    side: 'bottom',
+    content: "Texto del tooltip",
+    variant: "light",
+    side: "bottom",
     sideOffset: 8,
-    align: 'center',
+    align: "center",
     delayDuration: 200,
   },
 };
@@ -56,7 +56,8 @@ export default meta;
 type Story = StoryObj<UiTooltipComponent>;
 
 // Helpers
-const trigger = (label = 'Hover me') => `<button type="button" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm text-gray-800 hover:bg-gray-50">${label}</button>`;
+const trigger = (label = "Hover me") =>
+  `<button type="button" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm text-gray-800 hover:bg-gray-50">${label}</button>`;
 
 // Default
 export const Default: Story = {
@@ -85,13 +86,13 @@ export const Default: Story = {
 
 // Variantes
 export const Dark: Story = {
-  args: { variant: 'dark', content: 'Tooltip dark con texto blanco' },
+  args: { variant: "dark", content: "Tooltip dark con texto blanco" },
   render: (args) => ({
     props: args,
     template: `
       <div class="flex h-40 items-center justify-center">
         <UiTooltip [content]="content" [variant]="variant">
-          ${trigger('Hover (dark)')}
+          ${trigger("Hover (dark)")}
         </UiTooltip>
       </div>
     `,
@@ -99,13 +100,13 @@ export const Dark: Story = {
 };
 
 export const Info: Story = {
-  args: { variant: 'info', content: 'Información adicional para el usuario' },
+  args: { variant: "info", content: "Información adicional para el usuario" },
   render: (args) => ({
     props: args,
     template: `
       <div class="flex h-40 items-center justify-center">
         <UiTooltip [content]="content" [variant]="variant">
-          ${trigger('Hover (info)')}
+          ${trigger("Hover (info)")}
         </UiTooltip>
       </div>
     `,
@@ -113,13 +114,13 @@ export const Info: Story = {
 };
 
 export const Success: Story = {
-  args: { variant: 'success', content: 'Acción completada con éxito' },
+  args: { variant: "success", content: "Acción completada con éxito" },
   render: (args) => ({
     props: args,
     template: `
       <div class="flex h-40 items-center justify-center">
         <UiTooltip [content]="content" [variant]="variant">
-          ${trigger('Hover (success)')}
+          ${trigger("Hover (success)")}
         </UiTooltip>
       </div>
     `,
@@ -127,13 +128,16 @@ export const Success: Story = {
 };
 
 export const Warning: Story = {
-  args: { variant: 'warning', content: 'Atención: revisa los datos antes de continuar' },
+  args: {
+    variant: "warning",
+    content: "Atención: revisa los datos antes de continuar",
+  },
   render: (args) => ({
     props: args,
     template: `
       <div class="flex h-40 items-center justify-center">
         <UiTooltip [content]="content" [variant]="variant">
-          ${trigger('Hover (warning)')}
+          ${trigger("Hover (warning)")}
         </UiTooltip>
       </div>
     `,
@@ -141,13 +145,13 @@ export const Warning: Story = {
 };
 
 export const Error: Story = {
-  args: { variant: 'error', content: 'No se pudo guardar el formulario' },
+  args: { variant: "error", content: "No se pudo guardar el formulario" },
   render: (args) => ({
     props: args,
     template: `
       <div class="flex h-40 items-center justify-center">
         <UiTooltip [content]="content" [variant]="variant">
-          ${trigger('Hover (error)')}
+          ${trigger("Hover (error)")}
         </UiTooltip>
       </div>
     `,
@@ -158,12 +162,12 @@ export const AllVariants: Story = {
   render: () => ({
     template: `
       <div class="flex flex-wrap items-center gap-6 p-6">
-        <UiTooltip variant="light" content="Variant light">${trigger('light')}</UiTooltip>
-        <UiTooltip variant="dark" content="Variant dark">${trigger('dark')}</UiTooltip>
-        <UiTooltip variant="info" content="Variant info">${trigger('info')}</UiTooltip>
-        <UiTooltip variant="success" content="Variant success">${trigger('success')}</UiTooltip>
-        <UiTooltip variant="warning" content="Variant warning">${trigger('warning')}</UiTooltip>
-        <UiTooltip variant="error" content="Variant error">${trigger('error')}</UiTooltip>
+        <UiTooltip variant="light" content="Variant light">${trigger("light")}</UiTooltip>
+        <UiTooltip variant="dark" content="Variant dark">${trigger("dark")}</UiTooltip>
+        <UiTooltip variant="info" content="Variant info">${trigger("info")}</UiTooltip>
+        <UiTooltip variant="success" content="Variant success">${trigger("success")}</UiTooltip>
+        <UiTooltip variant="warning" content="Variant warning">${trigger("warning")}</UiTooltip>
+        <UiTooltip variant="error" content="Variant error">${trigger("error")}</UiTooltip>
       </div>
     `,
   }),
@@ -176,21 +180,21 @@ export const AllSides: Story = {
       <div class="grid h-72 grid-cols-3 grid-rows-3 items-center justify-items-center gap-4 p-6">
         <div></div>
         <UiTooltip side="top" content="Aparece desde arriba (slide-down + fade)">
-          ${trigger('top')}
+          ${trigger("top")}
         </UiTooltip>
         <div></div>
 
         <UiTooltip side="left" content="Aparece desde la izquierda (slide-right + fade)">
-          ${trigger('left')}
+          ${trigger("left")}
         </UiTooltip>
         <div class="text-xs text-gray-500">center</div>
         <UiTooltip side="right" content="Aparece desde la derecha (slide-left + fade)">
-          ${trigger('right')}
+          ${trigger("right")}
         </UiTooltip>
 
         <div></div>
         <UiTooltip side="bottom" content="Aparece desde abajo (slide-up + fade)">
-          ${trigger('bottom')}
+          ${trigger("bottom")}
         </UiTooltip>
         <div></div>
       </div>
@@ -200,7 +204,7 @@ export const AllSides: Story = {
 
 // Delay
 export const WithDelay: Story = {
-  args: { delayDuration: 1000, content: 'Aparece 1s después del hover' },
+  args: { delayDuration: 1000, content: "Aparece 1s después del hover" },
   render: (args) => ({
     props: args,
     template: `
@@ -210,7 +214,7 @@ export const WithDelay: Story = {
           [variant]="variant"
           [delayDuration]="delayDuration"
         >
-          ${trigger('Hover y espera')}
+          ${trigger("Hover y espera")}
         </UiTooltip>
       </div>
     `,
@@ -221,14 +225,14 @@ export const WithDelay: Story = {
 export const WithLongContent: Story = {
   args: {
     content:
-      'Este tooltip contiene un texto largo que demuestra que el contenido puede hacer wrap correctamente respetando el max-width definido por el componente (500px en desktop, 50vw en móvil).',
+      "Este tooltip contiene un texto largo que demuestra que el contenido puede hacer wrap correctamente respetando el max-width definido por el componente (500px en desktop, 50vw en móvil).",
   },
   render: (args) => ({
     props: args,
     template: `
       <div class="flex h-40 items-center justify-center">
         <UiTooltip [content]="content" [variant]="variant">
-          ${trigger('Hover para ver el wrap')}
+          ${trigger("Hover para ver el wrap")}
         </UiTooltip>
       </div>
     `,
@@ -261,22 +265,22 @@ export const DarkMode: Story = {
       <div class="dark bg-gray-900 rounded-lg p-6">
         <div class="grid grid-cols-3 gap-4">
           <UiTooltip variant="light" content="Variant light">
-            ${trigger('light')}
+            ${trigger("light")}
           </UiTooltip>
           <UiTooltip variant="dark" content="Variant dark">
-            ${trigger('dark')}
+            ${trigger("dark")}
           </UiTooltip>
           <UiTooltip variant="info" content="Variant info">
-            ${trigger('info')}
+            ${trigger("info")}
           </UiTooltip>
           <UiTooltip variant="success" content="Variant success">
-            ${trigger('success')}
+            ${trigger("success")}
           </UiTooltip>
           <UiTooltip variant="warning" content="Variant warning">
-            ${trigger('warning')}
+            ${trigger("warning")}
           </UiTooltip>
           <UiTooltip variant="error" content="Variant error">
-            ${trigger('error')}
+            ${trigger("error")}
           </UiTooltip>
         </div>
       </div>

@@ -1,18 +1,12 @@
-import { Component } from '@angular/core';
-import { UiAlertComponent } from '@ui/alert';
-import { ComponentCardComponent } from '../../../shared/components/common/component-card/component-card.component';
-import { PageBreadcrumbComponent } from '../../../shared/components/common/page-breadcrumb/page-breadcrumb.component';
+import { Component } from "@angular/core";
+import { UiAlertComponent } from "@shared/ui/alert";
+import { CommonComponentCardComponent } from "../../../shared/common/component-card";
+import { CommonBreadcrumbComponent } from "../../../shared/common/page-breadcrumb";
 
 @Component({
-  selector: 'app-alerts',
-  imports: [
-    UiAlertComponent,
-    ComponentCardComponent,
-    PageBreadcrumbComponent,
-  ],
-  templateUrl: './alerts.component.html',
-  styles: ``
+  selector: "app-alerts",
+  imports: [UiAlertComponent, CommonComponentCardComponent, CommonBreadcrumbComponent],
+  templateUrl: "./alerts.component.html",
+  styles: ``,
 })
-export class AlertsComponent {
-
-}
+export class AlertsComponent {}

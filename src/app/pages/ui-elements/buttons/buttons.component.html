@@ -1,76 +1,75 @@
 <div>
-  <app-page-breadcrumb pageTitle="Buttons" />
+  <CommonBreadcrumb pageTitle="Buttons" />
   <div class="space-y-5 sm:space-y-6">
     <!-- Primary Button  -->
     <div>
-      <app-component-card title="Primary Button">
+      <CommonComponentCard title="Primary Button">
         <div class="flex items-center gap-5">
-          <app-button size="sm" variant="primary"> Button Text </app-button>
-          <app-button size="md" variant="primary"> Button Text </app-button>
+          <UiButton [compact]="true" variant="primary"> Button Text </UiButton>
+          <UiButton variant="primary"> Button Text </UiButton>
         </div>
-      </app-component-card>
+      </CommonComponentCard>
     </div>
     <!-- Primary Button with Start Icon -->
     <div>
-      <app-component-card title="Primary Button with Left Icon">
+      <CommonComponentCard title="Primary Button with Left Icon">
         <div class="flex items-center gap-5">
-          <app-button size="sm" variant="primary" [startIcon]="boxIcon">
+          <UiButton [compact]="true" variant="primary" [LeftIcon]="boxIcon">
             Button Text
-          </app-button>
-          <app-button size="md" variant="primary" [startIcon]="boxIcon">
+          </UiButton>
+          <UiButton variant="primary" [LeftIcon]="boxIcon">
             Button Text
-          </app-button>
+          </UiButton>
         </div>
-      </app-component-card>
+      </CommonComponentCard>
     </div>
     <!-- Primary Button with Start Icon -->
     <div>
-      <app-component-card title="Primary Button with Right Icon">
+      <CommonComponentCard title="Primary Button with Right Icon">
         <div class="flex items-center gap-5">
-          <app-button size="sm" variant="primary" [endIcon]="boxIcon">
+          <UiButton [compact]="true" variant="primary" [RightIcon]="boxIcon">
             Button Text
-          </app-button>
-          <app-button size="md" variant="primary" [endIcon]="boxIcon">
+          </UiButton>
+          <UiButton variant="primary" [RightIcon]="boxIcon">
             Button Text
-          </app-button>
+          </UiButton>
         </div>
-      </app-component-card>
+      </CommonComponentCard>
     </div>
     <!-- Outline Button -->
     <div>
-      <app-component-card title="Secondary Button">
+      <CommonComponentCard title="Secondary Button">
         <div class="flex items-center gap-5">
-          <!-- Outline Button -->
-          <app-button size="sm" variant="outline"> Button Text </app-button>
-          <app-button size="md" variant="outline"> Button Text </app-button>
+          <UiButton [compact]="true" variant="secondary"> Button Text </UiButton>
+          <UiButton variant="secondary"> Button Text </UiButton>
         </div>
-      </app-component-card>
+      </CommonComponentCard>
     </div>
     <!-- Outline Button with Start Icon -->
     <div>
-      <app-component-card title="Outline Button with Left Icon">
+      <CommonComponentCard title="Outline Button with Left Icon">
         <div class="flex items-center gap-5">
-          <app-button size="sm" variant="outline" [startIcon]="boxIcon">
+          <UiButton [compact]="true" variant="secondary" [LeftIcon]="boxIcon">
             Button Text
-          </app-button>
-          <app-button size="md" variant="outline" [startIcon]="boxIcon">
+          </UiButton>
+          <UiButton variant="secondary" [LeftIcon]="boxIcon">
             Button Text
-          </app-button>
+          </UiButton>
         </div>
-      </app-component-card>
+      </CommonComponentCard>
     </div>
     <!-- Outline Button with Start Icon -->
     <div>
-      <app-component-card title="Outline Button with Right Icon">
+      <CommonComponentCard title="Outline Button with Right Icon">
         <div class="flex items-center gap-5">
-          <app-button size="sm" variant="outline" [endIcon]="boxIcon">
+          <UiButton [compact]="true" variant="secondary" [RightIcon]="boxIcon">
             Button Text
-          </app-button>
-          <app-button size="md" variant="outline" [endIcon]="boxIcon">
+          </UiButton>
+          <UiButton variant="secondary" [RightIcon]="boxIcon">
             Button Text
-          </app-button>
+          </UiButton>
         </div>
-      </app-component-card>
+      </CommonComponentCard>
     </div>
   </div>
 </div>

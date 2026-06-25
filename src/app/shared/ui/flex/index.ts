@@ -1,0 +1,8 @@
+/**
+ * Public API del `UiFlex`.
+ *
+ * Wrapper presentacional para layouts flex simples. Acepta direction,
+ * align, justify, gap, wrap vía inputs signal-based.
+ */
+export { UiFlexComponent } from './flex.component';
+export type { FlexDirection } from './flex.component';

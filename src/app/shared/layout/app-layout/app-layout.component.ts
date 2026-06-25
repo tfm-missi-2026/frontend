@@ -1,43 +1,71 @@
-import { Component } from '@angular/core';
-import { SidebarService } from '../../services/sidebar.service';
-import { CommonModule } from '@angular/common';
-import { AppSidebarComponent } from '../app-sidebar/app-sidebar.component';
-import { BackdropComponent } from '../backdrop/backdrop.component';
-import { RouterModule } from '@angular/router';
-import { AppHeaderComponent } from '../app-header/app-header.component';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from "@angular/core";
+import { toSignal } from "@angular/core/rxjs-interop";
+import { NgClass } from "@angular/common";
+import { RouterOutlet } from "@angular/router";
 
+import { SidebarService } from "@shared/services/sidebar.service";
+import { AppHeaderComponent } from "../app-header/app-header.component";
+import { BackdropComponent } from "../backdrop/backdrop.component";
+import { SidebarLayoutComponent } from "../app-sidebar/sidebar-layout.component";
+
+/**
+ * `AppLayoutComponent`
+ * --------------------
+ * Shell autenticado del SPSRT. Compone `AppHeaderComponent`,
+ * `SidebarLayoutComponent`, `BackdropComponent` y el `<router-outlet>`
+ * del segmento `/app/*`. Standalone + `OnPush` + signal API.
+ *
+ * Las clases del contenedor principal se derivan vía `computed()` del
+ * estado expuesto por `SidebarService` (leído con `toSignal`). El
+ * servicio sigue siendo RxJS por decisión explícita — fuera del scope
+ * de este refactor.
+ */
 @Component({
-  selector: 'app-layout',
+  selector: "AppLayout",
+  standalone: true,
   imports: [
-    CommonModule,
-    RouterModule,
+    NgClass,
+    RouterOutlet,
     AppHeaderComponent,
-    AppSidebarComponent,
-    BackdropComponent
+    BackdropComponent,
+    SidebarLayoutComponent,
   ],
-  templateUrl: './app-layout.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: "./app-layout.component.html",
 })
-
 export class AppLayoutComponent {
-  readonly isExpanded$;
-  readonly isHovered$;
-  readonly isMobileOpen$;
+  private readonly sidebarService = inject(SidebarService);
 
-  constructor(public sidebarService: SidebarService) {
-    this.isExpanded$ = this.sidebarService.isExpanded$;
-    this.isHovered$ = this.sidebarService.isHovered$;
-    this.isMobileOpen$ = this.sidebarService.isMobileOpen$;
-  }
+  protected readonly isExpanded = toSignal(this.sidebarService.isExpanded$, {
+    initialValue: true,
+  });
+  protected readonly isHovered = toSignal(this.sidebarService.isHovered$, {
+    initialValue: false,
+  });
+  protected readonly isMobileOpen = toSignal(
+    this.sidebarService.isMobileOpen$,
+    {
+      initialValue: false,
+    },
+  );
 
-  get containerClasses() {
+  protected readonly containerClasses = computed<string>(() => {
+    const expanded = this.isExpanded() || this.isHovered();
+    const mobile = this.isMobileOpen();
     return [
-      'flex-1',
-      'transition-all',
-      'duration-300',
-      'ease-in-out',
-      (this.isExpanded$ || this.isHovered$) ? 'xl:ml-[290px]' : 'xl:ml-[90px]',
-      this.isMobileOpen$ ? 'ml-0' : ''
-    ];
-  }
-
+      "flex-1",
+      "transition-all",
+      "duration-300",
+      "ease-in-out",
+      expanded ? "xl:ml-[290px]" : "xl:ml-[90px]",
+      mobile ? "ml-0" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+  });
 }

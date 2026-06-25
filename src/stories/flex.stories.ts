@@ -1,54 +1,54 @@
-import type { Meta, StoryObj } from '@storybook/angular';
-import { UiFlexComponent } from '@ui/flex/flex';
+import type { Meta, StoryObj } from "@storybook/angular";
+import { UiFlexComponent } from "@shared/ui/flex/flex.component";
 
 const meta: Meta<UiFlexComponent> = {
-  title: 'Shared/Flex',
+  title: "Shared/Flex",
   component: UiFlexComponent,
 
-  tags: ['autodocs'],
+  tags: ["autodocs"],
 
   argTypes: {
     direction: {
-      control: 'select',
-      options: ['row', 'column'],
+      control: "select",
+      options: ["row", "column"],
     },
 
     justifyContent: {
-      control: 'select',
+      control: "select",
       options: [
-        'flex-start',
-        'center',
-        'flex-end',
-        'space-between',
-        'space-around',
-        'space-evenly',
+        "flex-start",
+        "center",
+        "flex-end",
+        "space-between",
+        "space-around",
+        "space-evenly",
       ],
     },
 
     alignItems: {
-      control: 'select',
-      options: ['stretch', 'flex-start', 'center', 'flex-end', 'baseline'],
+      control: "select",
+      options: ["stretch", "flex-start", "center", "flex-end", "baseline"],
     },
 
     gap: {
-      control: 'text',
+      control: "text",
     },
 
     flex: {
-      control: 'text',
+      control: "text",
     },
 
     overflow: {
-      control: 'select',
-      options: ['visible', 'hidden', 'scroll', 'auto'],
+      control: "select",
+      options: ["visible", "hidden", "scroll", "auto"],
     },
 
     noWrap: {
-      control: 'boolean',
+      control: "boolean",
     },
 
     shrinkable: {
-      control: 'boolean',
+      control: "boolean",
     },
   },
 };
@@ -59,8 +59,8 @@ type Story = StoryObj<UiFlexComponent>;
 
 export const Default: Story = {
   args: {
-    direction: 'row',
-    gap: '16px',
+    direction: "row",
+    gap: "16px",
   },
 
   render: (args) => ({
@@ -95,8 +95,8 @@ export const Default: Story = {
 
 export const Column: Story = {
   args: {
-    direction: 'row',
-    gap: '12px',
+    direction: "row",
+    gap: "12px",
   },
 
   render: (args) => ({
@@ -125,9 +125,9 @@ export const Column: Story = {
 
 export const Centered: Story = {
   args: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '20px',
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "20px",
   },
 
   render: (args) => ({
@@ -157,8 +157,8 @@ export const Centered: Story = {
 export const NoWrap: Story = {
   args: {
     noWrap: true,
-    overflow: 'auto',
-    gap: '12px',
+    overflow: "auto",
+    gap: "12px",
   },
 
   render: (args) => ({
@@ -194,9 +194,9 @@ export const NoWrap: Story = {
 
 export const Shrinkable: Story = {
   args: {
-    direction: 'row',
+    direction: "row",
     shrinkable: true,
-    gap: '12px',
+    gap: "12px",
   },
 
   render: (args) => ({

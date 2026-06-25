@@ -1,0 +1,23 @@
+<div
+  role="tablist"
+  [attr.aria-label]="ariaLabel() || null"
+  [class]="containerClasses()"
+>
+  @for (tab of tabs(); track tab.value) {
+    <span role="presentation">
+      <UiButton
+        [variant]="buttonVariant(tab)"
+        [styleType]="buttonStyleType()"
+        [compact]="true"
+        [fullWidth]="fullWidth()"
+        [fontSize]="buttonFontSize()"
+        [disabled]="!!tab.disabled"
+        [label]="tab.label"
+        [className]="buttonExtraClassName(tab)"
+        (click)="onTabClick(tab)"
+        [attr.tabindex]="buttonTabIndex(tab)"
+        [attr.aria-selected]="buttonAriaSelected(tab)"
+      />
+    </span>
+  }
+</div>

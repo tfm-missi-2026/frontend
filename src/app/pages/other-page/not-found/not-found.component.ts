@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
-import { GridShapeComponent } from '../../../shared/components/common/grid-shape/grid-shape.component';
 import { RouterModule } from '@angular/router';
+import { CommonGridShapeComponent } from '../../../shared/common/grid-shape';
 
 @Component({
   selector: 'app-not-found',
   imports: [
-    GridShapeComponent,
     RouterModule,
+    CommonGridShapeComponent,
   ],
   templateUrl: './not-found.component.html',
   styles: ``

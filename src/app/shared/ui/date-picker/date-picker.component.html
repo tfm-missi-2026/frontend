@@ -1,0 +1,63 @@
+<!--
+  Template del UiDatePicker.
+  Estructura:
+    <outer>            → col + gap[1] + width
+      <UiFormLabel>    → si hay `labelText`
+      <container>      → frame con borde, focus, error
+        <input>        → con icono calendar superpuesto a la derecha
+      </UiFlex>        → legend
+    </outer>
+-->
+
+<div
+  [class]="outerClasses()"
+  [style]="outerStyles()"
+  data-testid="datepicker-wrapper"
+>
+  @if (labelText(); as lt) {
+    <UiFormLabel
+      [labelText]="lt"
+      [labelFor]="id() || ''"
+      [required]="required()"
+      [disabled]="isEffectivelyDisabled()"
+      [readOnly]="readOnly()"
+      [tooltip]="tooltip()"
+    ></UiFormLabel>
+  }
+
+  <div
+    [class]="containerClasses()"
+    [style]="containerStyles()"
+    data-testid="datepicker-container"
+  >
+    <input
+      #inputEl
+      [id]="id() || null"
+      [name]="name() || null"
+      type="text"
+      [class]="inputClasses()"
+      [placeholder]="placeholder()"
+      [disabled]="isEffectivelyDisabled()"
+      [readonly]="readOnly()"
+      [value]="internalValue"
+      (focus)="onFocusHandler()"
+      (blur)="onBlurHandler()"
+      data-testid="datepicker"
+    />
+    <span
+      class="inline-flex items-center justify-center shrink-0 text-gray-500 dark:text-gray-400 pointer-events-none"
+      aria-hidden="true"
+    >
+      <IconCalendar24 [size]="20" />
+    </span>
+  </div>
+
+  @if (legend(); as lgd) {
+    <UiLabel
+      type="bodyXxs"
+      color="textWeakest"
+      [text]="lgd"
+      [weight]="'regular'"
+    ></UiLabel>
+  }
+</div>

@@ -1,0 +1,176 @@
+ <div class="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+<div class="px-6">
+  <div class="flex flex-col justify-between gap-5 py-4 sm:flex-row sm:items-center">
+    <div>
+      <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">
+        Invoices
+      </h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Access all your previous invoices.
+      </p>
+    </div>
+    <div>
+      <button (click)="onDownloadAll()" type="button" class="shadow-theme-xs flex w-full justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
+        <IconDownload [size]="21" />
+        Download All
+      </button>
+    </div>
+  </div>
+</div>
+<div>
+  <div class="custom-scrollbar overflow-x-auto px-6">
+    <table class="min-w-full">
+      <thead>
+        <tr class="border-y border-gray-200 dark:border-gray-800">
+          <th
+            class="px-6 py-3 text-left text-sm font-normal text-gray-500 first:pl-0 dark:text-gray-400"
+          >
+            Name
+          </th>
+          <th
+            class="px-6 py-3 text-left text-sm font-normal text-gray-500 dark:text-gray-400"
+          >
+            Date
+          </th>
+          <th
+            class="px-6 py-3 text-left text-sm font-normal text-gray-500 dark:text-gray-400"
+          >
+            Price
+          </th>
+          <th
+            class="px-6 py-3 text-left text-sm font-normal text-gray-500 dark:text-gray-400"
+          >
+            Plan
+          </th>
+          <th
+            class="px-6 py-3 text-left text-sm font-normal text-gray-500 dark:text-gray-400"
+          >
+            Status
+          </th>
+          <th
+            class="px-6 py-3 text-right text-sm font-normal text-gray-500 dark:text-gray-400"
+          >
+            Action
+          </th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
+        @for (invoice of paginatedInvoices; track invoice.id) {
+        <tr>
+          <td class="px-6 py-3 text-left whitespace-nowrap first:pl-0">
+            <div class="flex gap-3 pl-2">
+              <IconPdf className="h-8 w-7" [width]="21" [height]="24" />
+              <p class="text-sm font-normal text-gray-700 dark:text-gray-400">
+                {{ invoice.name }}
+              </p>
+            </div>
+          </td>
+          <td
+            class="px-6 py-3 text-sm font-normal whitespace-nowrap text-gray-700 dark:text-gray-400"
+          >
+            {{ invoice.date }}
+          </td>
+          <td
+            class="px-6 py-3 text-sm font-normal whitespace-nowrap text-gray-700 dark:text-gray-400"
+          >
+            {{ invoice.price }}
+          </td>
+          <td
+            class="px-6 py-3 text-sm font-normal whitespace-nowrap text-gray-700 dark:text-gray-400"
+          >
+            {{ invoice.plan }}
+          </td>
+          <td class="px-6 py-3">
+            <span
+              class="inline-flex items-center justify-center gap-1 rounded-full px-2.5 py-0.5 text-sm font-medium"
+              [ngClass]="{
+                'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500':
+                  invoice.status === 'Paid',
+                'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500':
+                  invoice.status === 'Unpaid'
+              }"
+            >
+              {{ invoice.status }}
+            </span>
+          </td>
+          <td class="px-6 py-3">
+            <div class="flex justify-end gap-2">
+              <button class="shadow-theme-xs inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 text-gray-500 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
+                <IconDownload [size]="21" />
+              </button>
+              <button class="shadow-theme-xs inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 text-gray-500 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
+                <IconEyePreview [size]="21" />
+              </button>
+            </div>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <div class="rounded-b-xl border-t border-gray-200 px-6 py-4 dark:border-gray-800">
+    <div class="flex justify-center">
+      <div
+        class="block pb-4 text-sm text-gray-700 sm:hidden dark:text-gray-400"
+      >
+        Showing <span>{{ startItem }}</span> to
+        <span>{{ endItem }}</span> of <span>{{ totalInvoices }}</span>
+        invoices
+      </div>
+    </div>
+    <div
+      class="flex items-center justify-between gap-8 bg-gray-50 dark:bg-white/[0.03] p-4 rounded-lg sm:p-0 dark:sm:bg-transparent sm:bg-transparent"
+    >
+      <button
+        class="shadow-theme-xs flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-700 sm:px-3.5 sm:py-2.5 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
+        [ngClass]="{
+          'opacity-50 cursor-not-allowed': currentPage === 1,
+          'hover:bg-gray-50 hover:text-gray-800 dark:hover:bg-white/[0.03] dark:hover:text-gray-200':
+            currentPage !== 1
+        }"
+        [disabled]="currentPage === 1"
+        (btnClick)="previousPage()"
+      >
+      <IconArrowLeftPagination className="fill-current" [size]="20" />
+        <span class="hidden sm:inline">Previous</span>
+      </button>
+      <span
+        class="block text-sm font-medium text-gray-700 sm:hidden dark:text-gray-400"
+      >
+        Page {{ currentPage }} of {{ totalPages }}
+      </span>
+      <ul class="hidden items-center gap-0.5 sm:flex">
+        @for (page of visiblePages(); track page) {
+        <li>
+          <button
+            class="flex h-10 w-10 items-center justify-center rounded-lg text-sm font-medium"
+            [ngClass]="{
+              'bg-brand-500 text-white hover:bg-brand-500 hover:text-white':
+                currentPage === page,
+              'text-gray-700 hover:bg-brand-500 hover:text-white dark:text-gray-400 dark:hover:text-white':
+                currentPage !== page
+            }"
+            (click)="goToPage(page)"
+          >
+            {{ page }}
+          </button>
+        </li>
+        }
+      </ul>
+      <button
+        class="shadow-theme-xs flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-700 sm:px-3.5 sm:py-2.5 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
+        [ngClass]="{
+          'opacity-50 cursor-not-allowed': currentPage === totalPages,
+          'hover:bg-gray-50 hover:text-gray-800 dark:hover:bg-white/[0.03] dark:hover:text-gray-200':
+            currentPage !== totalPages
+        }"
+        [disabled]="currentPage === totalPages"
+        (btnClick)="nextPage()"
+      >
+        <span class="hidden sm:inline">Next</span>
+        <IconArrowRightPagination className="fill-current" [size]="20" />
+      </button>
+    </div>
+  </div>
+</div>
+</div>

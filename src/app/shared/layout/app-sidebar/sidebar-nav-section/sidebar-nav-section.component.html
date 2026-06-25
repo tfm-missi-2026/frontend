@@ -1,0 +1,196 @@
+<ul class="flex flex-col gap-1">
+  @for (nav of items(); track trackByIndex($index); let i = $index) {
+    <li>
+      @if (nav.subItems?.length) {
+        <button
+          type="button"
+          (click)="toggleSubmenu(i)"
+          class="menu-item group cursor-pointer"
+          [class.menu-item-active]="isItemOpen(i)"
+          [class.menu-item-inactive]="!isItemOpen(i)"
+          [ngClass]="{
+            'xl:justify-center': !isExpandedOrHovered(),
+            'xl:justify-start': isExpandedOrHovered(),
+          }"
+        >
+          <span
+            class="menu-item-icon-size"
+            [class.menu-item-icon-active]="isItemOpen(i)"
+            [class.menu-item-icon-inactive]="!isItemOpen(i)"
+          >
+            <ng-container *ngComponentOutlet="nav.icon"></ng-container>
+          </span>
+
+          @if (isVisible()) {
+            <UiLabel
+              type="bodyS"
+              color="textStrong"
+              weight="medium"
+              className="menu-item-text"
+            >
+              {{ nav.name }}
+            </UiLabel>
+          }
+
+          @if (nav.new && isVisible()) {
+            <span
+              class="ml-auto absolute right-10 menu-dropdown-badge"
+              [ngClass]="{
+                'menu-dropdown-badge-active': isItemOpen(i),
+                'menu-dropdown-badge-inactive': !isItemOpen(i),
+              }"
+            >
+              nuevo
+            </span>
+          }
+
+          @if (isVisible()) {
+            <UiIconButton
+              variant="tertiary"
+              [compact]="true"
+              [Icon]="chevronIcon"
+              [iconProps]="chevronIconProps(isItemOpen(i))"
+              className="ml-auto w-5 h-5 transition-transform duration-200"
+              [attr.aria-hidden]="true"
+              tabindex="-1"
+            />
+          }
+        </button>
+
+        <div
+          class="overflow-hidden transition-all duration-300"
+          [id]="sectionKey() + '-' + i"
+          [style.display]="isVisible() ? 'block' : 'none'"
+          [style.height.px]="isItemOpen(i) ? submenuHeight(i) : 0"
+        >
+          <ul class="mt-2 space-y-1 ml-9">
+            @for (
+              subItem of nav.subItems;
+              track trackSubItem($index, subItem)
+            ) {
+              <li>
+                <a
+                  [routerLink]="subItem.path"
+                  routerLinkActive=""
+                  (click)="onSubmenuClick()"
+                  class="menu-dropdown-item"
+                  [ngClass]="{
+                    'menu-dropdown-item-inactive': !isActive(subItem.path),
+                    'menu-dropdown-item-active': isActive(subItem.path),
+                  }"
+                >
+                  {{ subItem.name }}
+                  <span class="flex items-center gap-1 ml-auto">
+                    @if (subItem.new) {
+                      <span
+                        class="menu-dropdown-badge"
+                        [ngClass]="{
+                          'menu-dropdown-badge-active': isActive(subItem.path),
+                          'menu-dropdown-badge-inactive': !isActive(
+                            subItem.path
+                          ),
+                        }"
+                      >
+                        nuevo
+                      </span>
+                    }
+                    @if (subItem.pro) {
+                      <span
+                        class="ml-auto menu-dropdown-badge-pro"
+                        [ngClass]="{
+                          'menu-dropdown-badge-pro-active': isActive(
+                            subItem.path
+                          ),
+                          'menu-dropdown-badge-pro-inactive': !isActive(
+                            subItem.path
+                          ),
+                        }"
+                      >
+                        pro
+                      </span>
+                    }
+                  </span>
+                </a>
+              </li>
+            }
+          </ul>
+        </div>
+      } @else if (nav.path) {
+        @if (nav.pending) {
+          <span
+            class="menu-item group pointer-events-none opacity-60 cursor-not-allowed"
+            aria-disabled="true"
+            [ngClass]="{ 'xl:justify-center': !isExpandedOrHovered() }"
+          >
+            <span class="menu-item-icon-size menu-item-icon-inactive">
+              <ng-container *ngComponentOutlet="nav.icon"></ng-container>
+            </span>
+            @if (isVisible()) {
+              <UiLabel
+                type="bodyS"
+                color="textWeak"
+                weight="medium"
+                className="menu-item-text"
+              >
+                {{ nav.name }}
+              </UiLabel>
+              <span class="ml-auto menu-dropdown-badge-pending menu-dropdown-badge-pending-inactive">
+                pendiente
+              </span>
+            }
+          </span>
+        } @else {
+          <a
+            [routerLink]="nav.path"
+            routerLinkActive="menu-item-active"
+            class="menu-item group"
+            [ngClass]="{ 'menu-item-inactive': !isActive(nav.path) }"
+          >
+            <span
+              class="menu-item-icon-size"
+              [ngClass]="{
+                'menu-item-icon-active': isActive(nav.path),
+                'menu-item-icon-inactive': !isActive(nav.path),
+              }"
+            >
+              <ng-container *ngComponentOutlet="nav.icon"></ng-container>
+            </span>
+            @if (isVisible()) {
+              <UiLabel
+                type="bodyS"
+                color="textStrong"
+                weight="medium"
+                className="menu-item-text"
+              >
+                {{ nav.name }}
+              </UiLabel>
+            }
+          </a>
+        }
+      } @else if (nav.pending) {
+        <span
+          class="menu-item group pointer-events-none opacity-60 cursor-not-allowed"
+          aria-disabled="true"
+          [ngClass]="{ 'xl:justify-center': !isExpandedOrHovered() }"
+        >
+          <span class="menu-item-icon-size menu-item-icon-inactive">
+            <ng-container *ngComponentOutlet="nav.icon"></ng-container>
+          </span>
+          @if (isVisible()) {
+            <UiLabel
+              type="bodyS"
+              color="textWeak"
+              weight="medium"
+              className="menu-item-text"
+            >
+              {{ nav.name }}
+            </UiLabel>
+            <span class="ml-auto menu-dropdown-badge-pending menu-dropdown-badge-pending-inactive">
+              pendiente
+            </span>
+          }
+        </span>
+      }
+    </li>
+  }
+</ul>

@@ -1,19 +1,19 @@
-import type { Meta, StoryObj } from '@storybook/angular';
-import { moduleMetadata } from '@storybook/angular';
-import { CommonModule } from '@angular/common';
+import type { Meta, StoryObj } from "@storybook/angular";
+import { moduleMetadata } from "@storybook/angular";
+import { CommonModule } from "@angular/common";
 import {
   FormsModule,
   ReactiveFormsModule,
   FormControl,
   FormGroup,
-} from '@angular/forms';
+} from "@angular/forms";
 
-import { UiInputComponent } from '@ui/input/input/input';
-import { IconSearchComponent } from '@ui/icon/search-icon';
-import { IconEyeComponent } from '@ui/icon/eye-icon';
+import { UiInputComponent } from "@shared/ui/input/input/input.component";
+import { IconSearchComponent } from "@shared/icons/search-icon";
+import { IconEyeComponent } from "@shared/icons/eye-icon";
 
 const meta: Meta<UiInputComponent> = {
-  title: 'Shared/Input',
+  title: "Shared/Input",
   component: UiInputComponent,
   decorators: [
     moduleMetadata({
@@ -27,39 +27,39 @@ const meta: Meta<UiInputComponent> = {
       ],
     }),
   ],
-  tags: ['autodocs'],
-  parameters: { layout: 'padded' },
+  tags: ["autodocs"],
+  parameters: { layout: "padded" },
   argTypes: {
-    id: { control: 'text' },
-    name: { control: 'text' },
-    labelText: { control: 'text' },
-    required: { control: 'boolean' },
-    disabled: { control: 'boolean' },
-    readOnly: { control: 'boolean' },
-    placeholder: { control: 'text' },
-    errorMessage: { control: 'text' },
-    tooltip: { control: 'text' },
-    prefix: { control: 'text' },
-    sufix: { control: 'text' },
-    maxLength: { control: { type: 'number', min: 0 } },
-    debounceTime: { control: { type: 'number', min: 0 } },
-    width: { control: 'text' },
-    legend: { control: 'text' },
+    id: { control: "text" },
+    name: { control: "text" },
+    labelText: { control: "text" },
+    required: { control: "boolean" },
+    disabled: { control: "boolean" },
+    readOnly: { control: "boolean" },
+    placeholder: { control: "text" },
+    errorMessage: { control: "text" },
+    tooltip: { control: "text" },
+    prefix: { control: "text" },
+    sufix: { control: "text" },
+    maxLength: { control: { type: "number", min: 0 } },
+    debounceTime: { control: { type: "number", min: 0 } },
+    width: { control: "text" },
+    legend: { control: "text" },
     type: {
-      control: 'select',
-      options: ['text', 'email', 'password', 'number', 'tel', 'url'],
+      control: "select",
+      options: ["text", "email", "password", "number", "tel", "url"],
     },
-    valueChange: { action: 'valueChange' },
-    enterKey: { action: 'enterKey' },
-    keyDown: { action: 'keyDown' },
-    blurEvt: { action: 'blurEvt' },
-    focusEvt: { action: 'focusEvt' },
+    valueChange: { action: "valueChange" },
+    enterKey: { action: "enterKey" },
+    keyDown: { action: "keyDown" },
+    blurEvt: { action: "blurEvt" },
+    focusEvt: { action: "focusEvt" },
   },
   args: {
-    id: 'demo-input',
-    labelText: 'Email',
-    placeholder: 'tu@correo.com',
-    type: 'text',
+    id: "demo-input",
+    labelText: "Email",
+    placeholder: "tu@correo.com",
+    type: "text",
   },
 };
 
@@ -75,82 +75,82 @@ export const Required: Story = {
 };
 
 export const Disabled: Story = {
-  args: { disabled: true, value: 'No editable' },
+  args: { disabled: true, value: "No editable" },
 };
 
 export const ReadOnly: Story = {
-  args: { readOnly: true, value: 'Solo lectura' },
+  args: { readOnly: true, value: "Solo lectura" },
 };
 
 // Validaciones
 export const WithError: Story = {
   args: {
-    errorMessage: 'Este correo no es válido',
-    value: 'mal-formato',
+    errorMessage: "Este correo no es válido",
+    value: "mal-formato",
   },
 };
 
 // Tooltip
 export const WithTooltip: Story = {
   args: {
-    tooltip: 'Nunca compartiremos tu correo con terceros.',
+    tooltip: "Nunca compartiremos tu correo con terceros.",
   },
 };
 
 // Helpers
 export const WithLegend: Story = {
   args: {
-    legend: 'Te enviaremos un código de verificación.',
+    legend: "Te enviaremos un código de verificación.",
   },
 };
 
 export const WithPrefixSufix: Story = {
   args: {
-    labelText: 'Precio',
-    prefix: '$',
-    sufix: 'USD',
-    placeholder: '0.00',
+    labelText: "Precio",
+    prefix: "$",
+    sufix: "USD",
+    placeholder: "0.00",
   },
 };
 
 export const WithMaxLength: Story = {
   args: {
-    labelText: 'Descripción corta',
+    labelText: "Descripción corta",
     maxLength: 50,
-    legend: 'Máximo 50 caracteres',
+    legend: "Máximo 50 caracteres",
   },
 };
 
 export const MaxLengthReached: Story = {
   args: {
-    labelText: 'Descripción corta',
+    labelText: "Descripción corta",
     maxLength: 20,
-    value: 'Texto de veinte carac',
+    value: "Texto de veinte carac",
   },
 };
 
 // Iconos
 export const WithLeftIcon: Story = {
   args: {
-    labelText: 'Buscar',
-    placeholder: '¿Qué buscas?',
+    labelText: "Buscar",
+    placeholder: "¿Qué buscas?",
     leftIcon: IconSearchComponent,
   },
 };
 
 export const WithRightIcon: Story = {
   args: {
-    labelText: 'Contraseña',
-    type: 'password',
-    placeholder: '••••••••',
+    labelText: "Contraseña",
+    type: "password",
+    placeholder: "••••••••",
     rightIcon: IconEyeComponent,
   },
 };
 
 export const WithBothIcons: Story = {
   args: {
-    labelText: 'Búsqueda avanzada',
-    placeholder: 'Buscar…',
+    labelText: "Búsqueda avanzada",
+    placeholder: "Buscar…",
     leftIcon: IconSearchComponent,
     rightIcon: IconEyeComponent,
   },
@@ -158,19 +158,19 @@ export const WithBothIcons: Story = {
 
 export const WithIconAndError: Story = {
   args: {
-    labelText: 'Búsqueda',
-    placeholder: 'Buscar…',
+    labelText: "Búsqueda",
+    placeholder: "Buscar…",
     leftIcon: IconSearchComponent,
-    errorMessage: 'Sin resultados',
+    errorMessage: "Sin resultados",
   },
 };
 
 // Width
 export const FixedWidth: Story = {
   args: {
-    labelText: 'Código postal',
-    width: '200px',
-    placeholder: '00000',
+    labelText: "Código postal",
+    width: "200px",
+    placeholder: "00000",
     maxLength: 5,
   },
 };
@@ -178,10 +178,10 @@ export const FixedWidth: Story = {
 // Debounce
 export const WithDebounce: Story = {
   args: {
-    labelText: 'Búsqueda con debounce',
+    labelText: "Búsqueda con debounce",
     debounceTime: 500,
     leftIcon: IconSearchComponent,
-    placeholder: 'Escribe para buscar…',
+    placeholder: "Escribe para buscar…",
   },
 };
 
@@ -189,8 +189,8 @@ export const WithDebounce: Story = {
 export const ReactiveFormExample: Story = {
   render: () => {
     const form = new FormGroup({
-      email: new FormControl<string>(''),
-      password: new FormControl<string>(''),
+      email: new FormControl<string>(""),
+      password: new FormControl<string>(""),
     });
     return {
       props: { form },
@@ -218,7 +218,7 @@ export const ReactiveFormExample: Story = {
 
 export const NgModelExample: Story = {
   render: () => ({
-    props: { value: 'two-way bound' },
+    props: { value: "two-way bound" },
     template: `
       <div class="space-y-2 max-w-sm">
         <UiInput
@@ -235,14 +235,14 @@ export const NgModelExample: Story = {
 // Full example
 export const FullExample: Story = {
   args: {
-    id: 'full',
-    name: 'full',
-    labelText: 'Nombre completo',
-    placeholder: 'María González',
+    id: "full",
+    name: "full",
+    labelText: "Nombre completo",
+    placeholder: "María González",
     required: true,
-    tooltip: 'Tal como aparece en tu documento de identidad.',
-    prefix: '👤',
+    tooltip: "Tal como aparece en tu documento de identidad.",
+    prefix: "👤",
     maxLength: 60,
-    legend: 'Solo letras y espacios.',
+    legend: "Solo letras y espacios.",
   },
 };

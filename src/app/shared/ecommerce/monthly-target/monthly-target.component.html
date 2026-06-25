@@ -1,0 +1,81 @@
+<div class="rounded-2xl border border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-white/[0.03]">
+  <div class="px-5 pt-5 bg-white shadow-default rounded-2xl pb-11 dark:bg-gray-900 sm:px-6 sm:pt-6">
+    <div class="flex justify-between">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">
+          Monthly Target
+        </h3>
+        <p class="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">
+          Target you’ve set for each month
+        </p>
+      </div>
+      <div class="relative inline-block">
+        <button class="dropdown-toggle" (click)="toggleDropdown()">
+          <IconDotsVertical className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 size-6" />
+        </button>
+        
+        <UiDropdown [isOpen]="isOpen" (close)="closeDropdown()" className="w-40 p-2">
+          <UiDropdownItem (itemClick)="closeDropdown()"
+            className="flex w-full font-normal text-left text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300">
+            View More
+          </UiDropdownItem>
+          <UiDropdownItem (itemClick)="closeDropdown()"
+            className="flex w-full font-normal text-left text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300">
+            Delete
+          </UiDropdownItem>
+        </UiDropdown>
+      </div>
+    </div>
+    <div class="relative">
+      <div class="max-h-[330px]" id="chartDarkStyle">
+        <apx-chart
+          [series]="series"
+          [chart]="chart"
+          [plotOptions]="plotOptions"
+          [fill]="fill"
+          [stroke]="stroke"
+          [labels]="labels"
+          [colors]="colors"
+        ></apx-chart>
+      </div>
+      <span class="absolute left-1/2 top-full -translate-x-1/2 -translate-y-[95%] rounded-full bg-success-50 px-3 py-1 text-xs font-medium text-success-600 dark:bg-success-500/15 dark:text-success-500">
+        +10%
+      </span>
+    </div>
+    <p class="mx-auto mt-10 w-full max-w-[380px] text-center text-sm text-gray-500 sm:text-base">
+      You earn $3287 today, it's higher than last month. Keep up your good work!
+    </p>
+  </div>
+
+  <div class="flex items-center justify-center gap-5 px-6 py-3.5 sm:gap-8 sm:py-5">
+    <div>
+      <p class="mb-1 text-center text-gray-500 text-theme-xs dark:text-gray-400 sm:text-sm">
+        Target
+      </p>
+      <p class="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
+        $20K
+        <IconArrowDownTrend [size]="16" />
+      </p>
+    </div>
+    <div class="w-px bg-gray-200 h-7 dark:bg-gray-800"></div>
+    <div>
+      <p class="mb-1 text-center text-gray-500 text-theme-xs dark:text-gray-400 sm:text-sm">
+        Revenue
+      </p>
+      <p class="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
+        $20K
+        <IconArrowUpTrend [size]="16" />
+      </p>
+    </div>
+    <div class="w-px bg-gray-200 h-7 dark:bg-gray-800"></div>
+    <div>
+      <p class="mb-1 text-center text-gray-500 text-theme-xs dark:text-gray-400 sm:text-sm">
+        Today
+      </p>
+      <p class="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
+        $20K
+        <IconArrowUpTrend [size]="16" />
+      </p>
+    </div>
+  </div>
+</div>

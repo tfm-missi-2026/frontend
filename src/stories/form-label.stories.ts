@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 import { CommonModule } from "@angular/common";
 
-import { UiFormLabelComponent } from "@ui/form-label/form-label";
+import { UiFormLabelComponent } from "@shared/ui/form-label/form-label.component";
 import { FontWeightType } from "@styles/types/typography";
 
 const fontWeights: FontWeightType[] = ["regular", "medium", "semibold", "bold"];

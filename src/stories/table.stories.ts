@@ -8,11 +8,11 @@ import {
 import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 
-import { UiTableComponent } from "@ui/table";
-import { TableCellContext, TableColumn } from "@ui/table/table.types";
-import { IconSearchLightComponent } from "@ui/icon/search-icon-light";
-import { IconEditLightComponent } from "@ui/icon/edit-icon-light";
-import { IconTrashLightComponent } from "@ui/icon/trash-icon-light";
+import { UiTableComponent } from "@shared/ui/table";
+import { TableCellContext, TableColumn } from "@shared/ui/table/table.types";
+import { IconSearchLightComponent } from "@shared/icons/search-icon-light";
+import { IconEditLightComponent } from "@shared/icons/edit-icon-light";
+import { IconTrashLightComponent } from "@shared/icons/trash-icon-light";
 
 interface User {
   id: number;

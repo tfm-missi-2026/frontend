@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 
-import { UiAlertComponent } from "@ui/alert";
+import { UiAlertComponent } from "@shared/ui/alert";
 
 const meta: Meta<UiAlertComponent> = {
   title: "Shared/Alert",

@@ -1,59 +1,72 @@
-import type { Meta, StoryObj } from '@storybook/angular';
-import { moduleMetadata } from '@storybook/angular';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormControl, FormGroup } from '@angular/forms';
+import type { Meta, StoryObj } from "@storybook/angular";
+import { moduleMetadata } from "@storybook/angular";
+import { CommonModule } from "@angular/common";
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormControl,
+  FormGroup,
+} from "@angular/forms";
 
-import { UiSelectComponent } from '@ui/select/select';
-import { SelectOption, LoadOptionsFn } from '@ui/select/select.interface';
+import { UiSelectComponent } from "@shared/ui/select/select.component";
+import {
+  SelectOption,
+  LoadOptionsFn,
+} from "@shared/ui/select/select.interface";
 
 const options: SelectOption[] = [
-  { label: 'Angular', value: 'angular' },
-  { label: 'React', value: 'react' },
-  { label: 'Vue', value: 'vue' },
-  { label: 'Svelte', value: 'svelte' },
-  { label: 'NextJS', value: 'nextjs' },
-  { label: 'NuxtJS', value: 'nuxtjs' },
+  { label: "Angular", value: "angular" },
+  { label: "React", value: "react" },
+  { label: "Vue", value: "vue" },
+  { label: "Svelte", value: "svelte" },
+  { label: "NextJS", value: "nextjs" },
+  { label: "NuxtJS", value: "nuxtjs" },
 ];
 
 const meta: Meta<UiSelectComponent> = {
-  title: 'Shared/Select',
+  title: "Shared/Select",
   component: UiSelectComponent,
   decorators: [
     moduleMetadata({
-      imports: [CommonModule, FormsModule, ReactiveFormsModule, UiSelectComponent],
+      imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        UiSelectComponent,
+      ],
     }),
   ],
-  parameters: { layout: 'centered' },
-  tags: ['autodocs'],
+  parameters: { layout: "centered" },
+  tags: ["autodocs"],
   argTypes: {
-    options: { control: 'object' },
-    placeholder: { control: 'text' },
-    labelText: { control: 'text' },
-    required: { control: 'boolean' },
-    isMulti: { control: 'boolean' },
-    isClearable: { control: 'boolean' },
-    isDisabled: { control: 'boolean' },
-    readOnly: { control: 'boolean' },
-    searchable: { control: 'boolean' },
-    isLoading: { control: 'boolean' },
-    creatable: { control: 'boolean' },
-    async: { control: 'boolean' },
-    errorMessage: { control: 'text' },
-    tooltip: { control: 'text' },
-    menuIsOpen: { control: 'boolean' },
-    tabSelectsValue: { control: 'boolean' },
-    closeOnSelect: { control: 'boolean' },
-    width: { control: 'text' },
-    minWidth: { control: 'text' },
-    selectionChange: { action: 'selectionChange' },
-    menuOpenChange: { action: 'menuOpenChange' },
-    searchChange: { action: 'searchChange' },
-    createOption: { action: 'createOption' },
+    options: { control: "object" },
+    placeholder: { control: "text" },
+    labelText: { control: "text" },
+    required: { control: "boolean" },
+    isMulti: { control: "boolean" },
+    isClearable: { control: "boolean" },
+    isDisabled: { control: "boolean" },
+    readOnly: { control: "boolean" },
+    searchable: { control: "boolean" },
+    isLoading: { control: "boolean" },
+    creatable: { control: "boolean" },
+    async: { control: "boolean" },
+    errorMessage: { control: "text" },
+    tooltip: { control: "text" },
+    menuIsOpen: { control: "boolean" },
+    tabSelectsValue: { control: "boolean" },
+    closeOnSelect: { control: "boolean" },
+    width: { control: "text" },
+    minWidth: { control: "text" },
+    selectionChange: { action: "selectionChange" },
+    menuOpenChange: { action: "menuOpenChange" },
+    searchChange: { action: "searchChange" },
+    createOption: { action: "createOption" },
   },
   args: {
     options,
-    placeholder: 'Selecciona una opción',
-    labelText: 'Tecnologías',
+    placeholder: "Selecciona una opción",
+    labelText: "Tecnologías",
     required: false,
     isMulti: false,
     isClearable: false,
@@ -127,7 +140,7 @@ export const Clearable: Story = {
 };
 
 export const Disabled: Story = {
-  args: { isDisabled: true, value: 'angular' as any },
+  args: { isDisabled: true, value: "angular" as any },
   render: (args: any) => ({
     props: args,
     template: `
@@ -143,7 +156,7 @@ export const Disabled: Story = {
 };
 
 export const ReadOnly: Story = {
-  args: { readOnly: true, value: 'react' as any },
+  args: { readOnly: true, value: "react" as any },
   render: (args: any) => ({
     props: args,
     template: `
@@ -176,15 +189,15 @@ export const Loading: Story = {
 };
 
 export const WithError: Story = {
-  args: { errorMessage: 'Este campo es obligatorio' },
+  args: { errorMessage: "Este campo es obligatorio" },
 };
 
 export const WithTooltip: Story = {
-  args: { tooltip: 'Puedes seleccionar varias opciones' },
+  args: { tooltip: "Puedes seleccionar varias opciones" },
 };
 
 export const Required: Story = {
-  args: { required: true, labelText: 'Framework *' },
+  args: { required: true, labelText: "Framework *" },
 };
 
 export const Creatable: Story = {
@@ -205,14 +218,14 @@ export const Creatable: Story = {
 };
 
 const allCountries: SelectOption[] = [
-  { label: 'Argentina', value: 'ar' },
-  { label: 'Brasil', value: 'br' },
-  { label: 'Chile', value: 'cl' },
-  { label: 'Colombia', value: 'co' },
-  { label: 'España', value: 'es' },
-  { label: 'México', value: 'mx' },
-  { label: 'Perú', value: 'pe' },
-  { label: 'Uruguay', value: 'uy' },
+  { label: "Argentina", value: "ar" },
+  { label: "Brasil", value: "br" },
+  { label: "Chile", value: "cl" },
+  { label: "Colombia", value: "co" },
+  { label: "España", value: "es" },
+  { label: "México", value: "mx" },
+  { label: "Perú", value: "pe" },
+  { label: "Uruguay", value: "uy" },
 ];
 
 const loadCountries: LoadOptionsFn = (search: string) => {
@@ -236,10 +249,10 @@ export const Async: Story = {
       loadOptions: loadCountries,
       defaultOptions: true,
       isClearable: true,
-      placeholder: 'Busca un país...',
-      labelText: 'País',
-      loadingMessage: () => 'Buscando...',
-      noOptionsMessage: () => 'Sin coincidencias',
+      placeholder: "Busca un país...",
+      labelText: "País",
+      loadingMessage: () => "Buscando...",
+      noOptionsMessage: () => "Sin coincidencias",
     };
     return {
       props: asyncProps,
@@ -270,8 +283,8 @@ export const AsyncCreatable: Story = {
       creatable: true,
       loadOptions: loadCountries,
       isClearable: true,
-      placeholder: 'Busca o crea un país...',
-      labelText: 'País',
+      placeholder: "Busca o crea un país...",
+      labelText: "País",
     };
     return {
       props: asyncProps,
@@ -328,7 +341,7 @@ export const MultiDefaultValues: Story = {
 export const ReactiveFormExample: Story = {
   render: () => {
     const form = new FormGroup({
-      technology: new FormControl<string[]>(['angular', 'vue']),
+      technology: new FormControl<string[]>(["angular", "vue"]),
     });
     return {
       props: { form, options },
@@ -358,7 +371,7 @@ export const ReactiveFormExample: Story = {
 
 export const ReactiveFormSingle: Story = {
   render: () => {
-    const control = new FormControl<string | null>('react');
+    const control = new FormControl<string | null>("react");
     return {
       props: { control, options },
       template: `
@@ -383,7 +396,7 @@ export const ReactiveFormSingle: Story = {
 
 // Mobile / Many options
 export const MobileView: Story = {
-  parameters: { viewport: { defaultViewport: 'mobile1' } },
+  parameters: { viewport: { defaultViewport: "mobile1" } },
   args: { isMulti: true, searchable: true, isClearable: true },
   render: (args: any) => ({
     props: args,
@@ -405,8 +418,8 @@ export const ManyOptions: Story = {
     props: {
       ...args,
       options: Array.from({ length: 50 }).map((_, i) => ({
-        label: 'Option ' + (i + 1),
-        value: 'option-' + (i + 1),
+        label: "Option " + (i + 1),
+        value: "option-" + (i + 1),
       })),
     },
     template: `
@@ -423,8 +436,12 @@ export const ManyOptions: Story = {
 };
 
 export const DarkMode: Story = {
-  parameters: { backgrounds: { default: 'dark' } },
-  args: { isMulti: true, isClearable: true, value: ['angular', 'react'] as any },
+  parameters: { backgrounds: { default: "dark" } },
+  args: {
+    isMulti: true,
+    isClearable: true,
+    value: ["angular", "react"] as any,
+  },
   render: (args: any) => ({
     props: args,
     template: `

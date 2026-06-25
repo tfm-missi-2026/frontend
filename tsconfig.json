@@ -21,7 +21,6 @@
       "@shared/*": ["./src/app/shared/*"],
       "@features/*": ["./src/app/features/*"],
       "@layout/*": ["./src/app/layout/*"],
-      "@ui/*": ["./src/app/ui/*"],
       "@styles/*": ["./src/app/styles/*"],
       "@utils/*": ["./src/app/utils/*"],
       "@env/*": ["./src/environments/*"]

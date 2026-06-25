@@ -1,20 +1,44 @@
-<app-page-breadcrumb pageTitle="Images" />
+<CommonBreadcrumb pageTitle="Images" />
 <div class="space-y-5 sm:space-y-6">
   <div>
-    <app-component-card title="Responsive image">
-      <app-responsive-image />
-    </app-component-card>
+    <CommonComponentCard title="Responsive image">
+      <UiImage
+        [src]="coverImage.src"
+        [alt]="coverImage.alt"
+        rounded="xl"
+        [bordered]="true"
+        objectFit="cover"
+      />
+    </CommonComponentCard>
   </div>
 
   <div>
-    <app-component-card title="Image in 2 Grid">
-      <app-two-column-image-grid />
-    </app-component-card>
+    <CommonComponentCard title="Image in 2 Grid">
+      <UiGrid
+        [columns]="2"
+        breakpoint="sm"
+        gap="gap-5"
+        ariaLabel="Galería de 2 imágenes"
+      >
+        @for (item of twoColImages; track item.src) {
+          <UiImage [src]="item.src" [alt]="item.alt" />
+        }
+      </UiGrid>
+    </CommonComponentCard>
   </div>
 
   <div>
-    <app-component-card title="Image in 3 Grid">
-      <app-three-column-image-grid />
-    </app-component-card>
+    <CommonComponentCard title="Image in 3 Grid">
+      <UiGrid
+        [columns]="3"
+        breakpoint="sm"
+        gap="gap-5"
+        ariaLabel="Galería de 3 imágenes"
+      >
+        @for (item of threeColImages; track item.src) {
+          <UiImage [src]="item.src" [alt]="item.alt" />
+        }
+      </UiGrid>
+    </CommonComponentCard>
   </div>
 </div>

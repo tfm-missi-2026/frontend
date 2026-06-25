@@ -1,14 +1,14 @@
-import type { Meta, StoryObj } from '@storybook/angular';
-import { moduleMetadata } from '@storybook/angular';
-import { CommonModule } from '@angular/common';
+import type { Meta, StoryObj } from "@storybook/angular";
+import { moduleMetadata } from "@storybook/angular";
+import { CommonModule } from "@angular/common";
 
-import { UiButtonComponent } from '@ui/button/button';
-import { UiTooltipComponent } from '@ui/tooltip/tooltip';
-import { IconFloppyDiskLightComponent } from '@ui/icon/floppy-disk-icon-light';
-import { IconUploadLightComponent } from '@ui/icon/upload-icon-light';
+import { UiButtonComponent } from "@shared/ui/button/button.component";
+import { UiTooltipComponent } from "@shared/ui/tooltip/tooltip.component";
+import { IconFloppyDiskLightComponent } from "@shared/icons/floppy-disk-icon-light";
+import { IconUploadLightComponent } from "@shared/icons/upload-icon-light";
 
 const meta: Meta<UiButtonComponent> = {
-  title: 'Shared/Button',
+  title: "Shared/Button",
   component: UiButtonComponent,
   decorators: [
     moduleMetadata({
@@ -21,62 +21,62 @@ const meta: Meta<UiButtonComponent> = {
       ],
     }),
   ],
-  tags: ['autodocs'],
-  parameters: { layout: 'padded' },
+  tags: ["autodocs"],
+  parameters: { layout: "padded" },
   argTypes: {
     variant: {
-      control: 'select',
-      options: ['primary', 'secondary', 'tertiary'],
+      control: "select",
+      options: ["primary", "secondary", "tertiary"],
     },
     styleType: {
-      control: 'select',
-      options: ['default', 'danger', 'monochrome', 'warning', 'success'],
+      control: "select",
+      options: ["default", "danger", "monochrome", "warning", "success"],
     },
-    compact: { control: 'boolean' },
-    fullWidth: { control: 'boolean' },
-    transparent: { control: 'boolean' },
-    disabled: { control: 'boolean' },
-    isSubmit: { control: 'boolean' },
-    isLoading: { control: 'boolean' },
+    compact: { control: "boolean" },
+    fullWidth: { control: "boolean" },
+    transparent: { control: "boolean" },
+    disabled: { control: "boolean" },
+    isSubmit: { control: "boolean" },
+    isLoading: { control: "boolean" },
     fontSize: {
-      control: 'select',
+      control: "select",
       options: [
-        'bodyXxs',
-        'bodyXs',
-        'bodyS',
-        'HeadingXs',
-        'HeadingS',
-        'HeadingM',
-        'HeadingL',
+        "bodyXxs",
+        "bodyXs",
+        "bodyS",
+        "HeadingXs",
+        "HeadingS",
+        "HeadingM",
+        "HeadingL",
       ],
     },
-    tooltip: { control: 'text' },
+    tooltip: { control: "text" },
     tooltipSide: {
-      control: 'select',
-      options: ['top', 'right', 'bottom', 'left'],
+      control: "select",
+      options: ["top", "right", "bottom", "left"],
     },
     tooltipVariant: {
-      control: 'select',
-      options: ['light', 'dark', 'info', 'success', 'warning', 'error'],
+      control: "select",
+      options: ["light", "dark", "info", "success", "warning", "error"],
     },
-    labelText: { control: 'text' },
-    timeout: { control: { type: 'number', min: 0 } },
-    disableOnTimeout: { control: 'boolean' },
-    label: { control: 'text' },
-    className: { control: 'text' },
-    click: { action: 'clicked' },
+    labelText: { control: "text" },
+    timeout: { control: { type: "number", min: 0 } },
+    disableOnTimeout: { control: "boolean" },
+    label: { control: "text" },
+    className: { control: "text" },
+    click: { action: "clicked" },
   },
   args: {
-    variant: 'primary',
-    styleType: 'default',
+    variant: "primary",
+    styleType: "default",
     compact: false,
     fullWidth: false,
     transparent: false,
     disabled: false,
     isSubmit: false,
     isLoading: false,
-    fontSize: 'bodyS',
-    label: 'Button',
+    fontSize: "bodyS",
+    label: "Button",
   },
 };
 
@@ -194,7 +194,7 @@ export const Loading: Story = {
 // Timeout
 export const WithTimeout: Story = {
   args: {
-    variant: 'primary',
+    variant: "primary",
     timeout: 5000,
   },
   render: (args) => ({
@@ -214,10 +214,10 @@ export const WithTimeout: Story = {
 
 export const WithTimeoutEnabledInteraction: Story = {
   args: {
-    variant: 'primary',
+    variant: "primary",
     timeout: 5000,
     disableOnTimeout: false,
-    label: 'Clickable during timeout',
+    label: "Clickable during timeout",
   },
   render: (args) => ({
     props: args,
@@ -347,7 +347,7 @@ export const AsLink: Story = {
 
 // Tooltip
 export const WithTooltip: Story = {
-  args: { tooltip: 'Guardar los cambios del formulario' },
+  args: { tooltip: "Guardar los cambios del formulario" },
   render: (args) => ({
     props: args,
     template: `
@@ -363,7 +363,7 @@ export const WithTooltip: Story = {
 };
 
 export const WithTooltipOnDisabled: Story = {
-  args: { tooltip: 'No puedes continuar hasta completar el paso anterior' },
+  args: { tooltip: "No puedes continuar hasta completar el paso anterior" },
   render: (args) => ({
     props: args,
     template: `
