@@ -9,8 +9,16 @@
       ></UiLabel>
     </UiFlex>
 
-    <form (ngSubmit)="onSubmit()">
+    <form (submit)="onSubmit($event)">
       <UiFlex direction="column" gap="20px">
+        @if (errorMessage()) {
+          <UiAlert
+            variant="error"
+            title="No se pudo iniciar sesión"
+            [message]="errorMessage() ?? ''"
+          ></UiAlert>
+        }
+
         <UiInput
           id="signin-email"
           name="email"
@@ -46,7 +54,12 @@
           </UiLink>
         </UiFlex>
 
-        <UiButton [fullWidth]="true" [isSubmit]="true" (click)="onSubmit()">
+        <UiButton
+          [fullWidth]="true"
+          [isSubmit]="true"
+          [isLoading]="loading()"
+          [disabled]="loading()"
+        >
           Iniciar sesión
         </UiButton>
       </UiFlex>

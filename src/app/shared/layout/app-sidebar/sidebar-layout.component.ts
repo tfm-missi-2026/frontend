@@ -3,48 +3,39 @@ import {
   Component,
   computed,
   inject,
+  signal,
 } from "@angular/core";
-import { toSignal } from "@angular/core/rxjs-interop";
-import { NgClass, NgComponentOutlet } from "@angular/common";
+import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
+import { NgClass } from "@angular/common";
 import { RouterModule } from "@angular/router";
 
-import {
-  IconBoxComponent,
-  IconCardComponent,
-  IconDotsVerticalComponent,
-  IconSettingsComponent,
-  IconUserCircleComponent,
-} from "@shared/icons";
+import { AuthService } from "@core/auth/auth.service";
+import { ModulosService } from "@core/modulos/modulos.service";
+import { IconDotsVerticalComponent } from "@shared/icons";
 import { UiFlexComponent } from "@shared/ui/flex";
-import { UiImageComponent } from "@shared/ui/image";
 
 import { SidebarService } from "../../services/sidebar.service";
 import { SidebarLayoutLogoComponent } from "./sidebar-logo";
 import { SidebarLayoutSectionComponent } from "./sidebar-section";
 import { SidebarLayoutWidgetComponent } from "./sidebar-layout-widget.component";
 import {
-  SidebarLayoutNavSectionComponent,
-  type NavItem,
-} from "./sidebar-nav-section";
-
-interface SidebarSectionConfig {
-  title: string;
-  sectionKey: string;
-  items: NavItem[];
-}
+  construirNavDesdeModulos,
+  type SidebarSectionConfig,
+} from "./sidebar-nav.builder";
 
 /**
  * `SidebarLayoutComponent`
  * ------------------------
  * Sidebar autenticado del shell del SPSRT. Renderiza el logo, las
- * secciones de navegación (`Administración` y `Cuenta`) vía
- * `<SidebarLayoutNavSection>` y el widget inferior con el CTA del
- * sistema.
+ * secciones de navegación y el widget inferior con el CTA del sistema.
  *
- * Standalone + `OnPush` + signal API. El estado del sidebar
- * (expandido / hover / mobile-open) se lee del `SidebarService` vía
- * `toSignal`. El servicio sigue siendo RxJS por decisión explícita
- * (migración futura fuera del scope de este refactor).
+ * Las secciones se construyen dinámicamente desde el backend: al iniciar,
+ * consulta `/api/modulos/por-rol/{rolId}` (rol del usuario logueado) y arma
+ * el árbol de navegación. Así el sidebar refleja exactamente los módulos que
+ * el rol tiene autorizados, sin nav hardcodeado.
+ *
+ * Standalone + `OnPush` + signal API. El estado del sidebar (expandido /
+ * hover / mobile-open) se lee del `SidebarService` vía `toSignal`.
  */
 @Component({
   selector: "SidebarLayout",
@@ -62,6 +53,8 @@ interface SidebarSectionConfig {
 })
 export class SidebarLayoutComponent {
   protected readonly sidebarService = inject(SidebarService);
+  private readonly auth = inject(AuthService);
+  private readonly modulosService = inject(ModulosService);
 
   protected readonly isExpanded = toSignal(this.sidebarService.isExpanded$, {
     initialValue: true,
@@ -86,47 +79,21 @@ export class SidebarLayoutComponent {
 
   protected readonly sectionIcon = IconDotsVerticalComponent;
 
-  protected readonly sections: SidebarSectionConfig[] = [
-    {
-      title: "Administración",
-      sectionKey: "administracion",
-      items: [
-        {
-          icon: IconUserCircleComponent,
-          name: "Usuarios",
-          path: "/app/administracion/usuarios",
-        },
-        {
-          icon: IconSettingsComponent,
-          name: "Roles",
-          path: "/app/administracion/roles",
-        },
-        {
-          icon: IconBoxComponent,
-          name: "Catálogo",
-          path: "/app/administracion/catalogo",
-        },
-        {
-          icon: IconCardComponent,
-          name: "Módulos",
-          path: "/app/administracion/modulos",
-          pending: true,
-        },
-      ],
-    },
-    {
-      title: "Cuenta",
-      sectionKey: "cuenta",
-      items: [
-        {
-          icon: IconSettingsComponent,
-          name: "Configuración",
-          path: "/app/cuenta/configuracion",
-          pending: true,
-        },
-      ],
-    },
-  ];
+  protected readonly sections = signal<SidebarSectionConfig[]>([]);
+
+  constructor() {
+    const rolId = this.auth.rolId();
+    if (rolId) {
+      this.modulosService
+        .listarPorRol(rolId)
+        .pipe(takeUntilDestroyed())
+        .subscribe({
+          next: (modulos) =>
+            this.sections.set(construirNavDesdeModulos(modulos)),
+          error: () => this.sections.set([]),
+        });
+    }
+  }
 
   protected onSidebarMouseEnter(): void {
     if (!this.isExpanded()) {

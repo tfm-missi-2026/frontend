@@ -1,10 +1,12 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  input,
   output,
   signal,
 } from "@angular/core";
 
+import { UiAlertComponent } from "@shared/ui/alert";
 import { UiButtonComponent } from "@shared/ui/button";
 import { UiInputComponent } from "@shared/ui/input";
 import { UiFlexComponent } from "@shared/ui/flex";
@@ -33,6 +35,7 @@ export interface SignInFormData {
   standalone: true,
   host: { class: "w-full max-w-md mx-auto h-full flex flex-col" },
   imports: [
+    UiAlertComponent,
     UiButtonComponent,
     UiInputComponent,
     UiHeaderComponent,
@@ -47,6 +50,11 @@ export class SigninFormComponent {
   readonly email = signal<string>("");
   readonly password = signal<string>("");
 
+  /** Bloquea el submit y muestra estado de carga mientras se autentica. */
+  readonly loading = input<boolean>(false);
+  /** Mensaje de error a mostrar (credenciales inválidas / fallo de red). */
+  readonly errorMessage = input<string | null>(null);
+
   readonly submitForm = output<SignInFormData>();
   readonly forgotPasswordRequested = output<void>();
   readonly signUpRequested = output<void>();
@@ -59,7 +67,8 @@ export class SigninFormComponent {
     this.password.set(value);
   }
 
-  onSubmit(): void {
+  onSubmit(event?: Event): void {
+    event?.preventDefault();
     this.submitForm.emit({
       email: this.email(),
       password: this.password(),

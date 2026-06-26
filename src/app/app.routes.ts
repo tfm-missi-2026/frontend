@@ -1,5 +1,7 @@
 import type { Routes } from "@angular/router";
 
+import { authGuard } from "@core/auth/auth.guard";
+
 import { NotFoundComponent } from "./pages/other-page/not-found/not-found.component";
 
 export const routes: Routes = [
@@ -15,6 +17,7 @@ export const routes: Routes = [
   },
   {
     path: "app",
+    canActivate: [authGuard],
     loadComponent: () =>
       import("@shared/layout/app-layout/app-layout.component").then(
         (m) => m.AppLayoutComponent,
