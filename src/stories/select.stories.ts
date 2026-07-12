@@ -12,7 +12,7 @@ import { UiSelectComponent } from "@shared/ui/select/select.component";
 import {
   SelectOption,
   LoadOptionsFn,
-} from "@shared/ui/select/select.interface";
+} from "@shared/ui/select/select.types";
 
 const options: SelectOption[] = [
   { label: "Angular", value: "angular" },

@@ -6,15 +6,17 @@ import {
   inject,
   input,
   output,
+  PLATFORM_ID,
   signal,
 } from "@angular/core";
+import { FormsModule } from "@angular/forms";
 import { isPlatformBrowser } from "@angular/common";
-import { PLATFORM_ID } from "@angular/core";
 
 import { IconLinkComponent } from "@shared/icons";
 import { UiAlertComponent } from "@shared/ui/alert";
 import { UiButtonComponent } from "@shared/ui/button";
 import { UiFlexComponent } from "@shared/ui/flex";
+import { UiInputComponent } from "@shared/ui/input";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
 
@@ -26,9 +28,11 @@ import { userFullName } from "../../models/user";
   selector: "ResetPasswordModal",
   standalone: true,
   imports: [
+    FormsModule,
     UiAlertComponent,
     UiButtonComponent,
     UiFlexComponent,
+    UiInputComponent,
     UiLabelComponent,
     UiModalComponent,
   ],
@@ -36,7 +40,7 @@ import { userFullName } from "../../models/user";
   template: `
     <UiModal
       [isOpen]="isOpen()"
-      [showCloseButton]="false"
+      [showCloseButton]="true"
       className="max-w-115 p-6 lg:p-8"
       (close)="onCancel()"
     >
@@ -71,15 +75,14 @@ import { userFullName } from "../../models/user";
       <UiFlex
         direction="row"
         alignItems="center"
-        justifyContent="space-between"
-        gap="12px"
-        className="mb-2 rounded-xl border border-dashed border-gray-300 bg-gray-50 px-4 py-3 dark:border-gray-700 dark:bg-white/3"
+        [gap]="3"
+        className="mb-2"
       >
-        <code
-          class="font-mono text-xl font-bold tracking-widest text-gray-800 dark:text-white/90"
-        >
-          {{ generatedPassword() }}
-        </code>
+        <UiInput
+          className="flex-1"
+          [readOnly]="true"
+          [ngModel]="generatedPassword()"
+        />
         <UiButton
           variant="secondary"
           [compact]="true"
@@ -95,10 +98,30 @@ import { userFullName } from "../../models/user";
         Deberá cambiarla en su primer acceso.
       </UiLabel>
 
+      @if (copyFeedback() === "success") {
+        <UiAlert
+          variant="success"
+          message="Contraseña temporal copiada al portapapeles."
+          className="mb-4"
+        />
+      } @else if (copyFeedback() === "error") {
+        <UiAlert
+          variant="error"
+          message="No se pudo copiar la contraseña. Selecciónala manualmente."
+          className="mb-4"
+        />
+      }
+
+      <UiAlert
+        variant="info"
+        message="Este flujo permite que el administrador restablezca la contraseña cuando un usuario no puede acceder."
+        className="mb-4"
+      />
+
       <UiFlex
         direction="row"
-        justifyContent="flex-end"
-        gap="8px"
+        justifyContent="end"
+        [gap]="2"
         className="mt-4 border-t border-dashed border-gray-200 pt-4 dark:border-gray-800"
       >
         <UiButton variant="secondary" labelText="Cerrar" (click)="onCancel()" />
@@ -122,6 +145,7 @@ export class ResetPasswordModalComponent {
   readonly confirm = output<string>();
 
   protected readonly generatedPassword = signal<string>("");
+  protected readonly copyFeedback = signal<"success" | "error" | null>(null);
 
   protected readonly fullName = computed<string>(() => {
     const u = this.user();
@@ -134,19 +158,28 @@ export class ResetPasswordModalComponent {
     effect(() => {
       const open = this.isOpen();
       if (open) {
+        this.copyFeedback.set(null);
         this.generatedPassword.set(this.usersService.generateTempPassword());
       }
     });
   }
 
-  protected onCopy(): void {
+  protected async onCopy(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) return;
     if (
-      typeof navigator !== "undefined" &&
-      navigator.clipboard &&
-      typeof navigator.clipboard.writeText === "function"
+      typeof navigator === "undefined" ||
+      !navigator.clipboard ||
+      typeof navigator.clipboard.writeText !== "function"
     ) {
-      void navigator.clipboard.writeText(this.generatedPassword());
+      this.copyFeedback.set("error");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(this.generatedPassword());
+      this.copyFeedback.set("success");
+    } catch {
+      this.copyFeedback.set("error");
     }
   }
 

@@ -6,5 +6,5 @@
  * pedido. Standalone + OnPush + signal APIs.
  */
 export { UiIconComponent } from './icon.component';
-export { ICON_VARIANT_CLASSES } from './icon.variants';
-export type { IconVariant } from './icon.variants';
+export { ICON_VARIANT_CLASSES } from './icon.utils';
+export type { IconVariant } from './icon.utils';

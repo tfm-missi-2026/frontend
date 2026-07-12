@@ -36,14 +36,14 @@ import { UsersMockService } from "../../services/users-mock.service";
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <UiFlex direction="column" gap="20px">
+    <UiFlex direction="column" [gap]="5">
       <CommonBreadcrumb [items]="breadcrumbItems" />
 
       <UiFlex
         direction="row"
         alignItems="center"
-        justifyContent="space-between"
-        gap="12px"
+        justifyContent="between"
+        [gap]="3"
         className="flex-wrap"
       >
         <UiHeader [level]="1" text="Gestión de usuarios" />
@@ -72,6 +72,7 @@ import { UsersMockService } from "../../services/users-mock.service";
         (resetPassword)="openResetPassword($event)"
         (deactivate)="onDeactivate($event)"
         (clearFilters)="onClearFilters()"
+        (create)="openCreate()"
       />
     </UiFlex>
 

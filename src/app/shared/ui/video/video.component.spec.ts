@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { ChangeDetectionStrategy, Component } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { UiVideoComponent } from "./video.component";
@@ -12,6 +12,7 @@ import { VideoRatio } from "./video.types";
 @Component({
   standalone: true,
   imports: [UiVideoComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <UiVideo
       [src]="src"

@@ -2,13 +2,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  EventEmitter,
-  Input,
   OnInit,
-  Output,
   signal,
   TemplateRef,
   Type,
+  input,
+  output,
 } from "@angular/core";
 import { NgTemplateOutlet } from "@angular/common";
 
@@ -29,7 +28,6 @@ import {
 
 /**
  * `UiTable`
- * --------
  * Tabla genérica data-driven del design system.
  *
  * Cubre los features presentes en los `basic-table-{one..five}`:
@@ -39,9 +37,6 @@ import {
  *  - Paginación client-side con `pageSize` configurable.
  *  - Acciones por fila (`<UiIconButton>` con tooltip).
  *  - Toolbar opcional con title + slot para acciones globales.
- *
- * Réplica del patrón React usado en la lib original; pensada para
- * centralizar la lógica que estaba duplicada en cada `basic-table-*`.
  */
 @Component({
   selector: "UiTable",
@@ -58,71 +53,63 @@ import {
   templateUrl: "./table.component.html",
   styleUrls: ["./table.component.css"],
 })
-export class UiTableComponent {
-  // ---------------------------------------------------------------------------
-  // Data inputs
-  // ---------------------------------------------------------------------------
+export class UiTableComponent implements OnInit {
+  readonly data = input<unknown[]>([]);
+  readonly columns = input<TableColumn[]>([]);
+  readonly actions = input<TableAction[]>([]);
 
-  @Input() data: unknown[] = [];
-  @Input() columns: TableColumn[] = [];
-  @Input() actions: TableAction[] = [];
+  readonly title = input<string | undefined>(undefined);
+  readonly description = input<string | undefined>(undefined);
+  readonly variant = input<"card" | "flat">("card");
+  readonly searchPlaceholder = input<string>("Search...");
+  readonly emptyText = input<string>("No results found.");
+  readonly className = input<string>("");
 
-  // ---------------------------------------------------------------------------
-  // Display
-  // ---------------------------------------------------------------------------
+  readonly searchable = input<boolean>(false);
+  readonly selectable = input<boolean>(false);
+  readonly paginated = input<boolean>(false);
+  readonly hasActions = input<boolean>(true);
 
-  @Input() title?: string;
-  @Input() description?: string;
-  @Input() variant: "card" | "flat" = "card";
-  @Input() searchPlaceholder = "Search...";
-  @Input() emptyText = "No results found.";
-  @Input() className = "";
+  readonly pageSize = input<number>(10);
+  readonly trackByKey = input<string>("id");
+  readonly searchIcon = input<Type<unknown> | undefined>(undefined);
+  readonly prevIcon = input<Type<unknown>>(ChevronLeftIcon);
+  readonly nextIcon = input<Type<unknown>>(ChevronRightIcon);
+  readonly initialSearchTerm = input<string>("");
 
-  // ---------------------------------------------------------------------------
-  // Feature flags
-  // ---------------------------------------------------------------------------
-
-  @Input() searchable = false;
-  @Input() selectable = false;
-  @Input() paginated = false;
-  @Input() hasActions = true;
-
-  // ---------------------------------------------------------------------------
-  // Configurable
-  // ---------------------------------------------------------------------------
-
-  @Input() pageSize = 10;
-  @Input() trackByKey = "id";
-  @Input() searchIcon?: Type<unknown>;
-  @Input() prevIcon: Type<unknown> = ChevronLeftIcon;
-  @Input() nextIcon: Type<unknown> = ChevronRightIcon;
-  @Input() initialSearchTerm = "";
-
-  // ---------------------------------------------------------------------------
-  // Outputs
-  // ---------------------------------------------------------------------------
-
-  @Output() rowSelect = new EventEmitter<TableSelection>();
-  @Output() searchChange = new EventEmitter<string>();
-  @Output() pageChange = new EventEmitter<TablePageEvent>();
-
-  // ---------------------------------------------------------------------------
-  // Estado interno (signals)
-  // ---------------------------------------------------------------------------
+  readonly rowSelect = output<TableSelection>();
+  readonly searchChange = output<string>();
+  readonly pageChange = output<TablePageEvent>();
 
   protected readonly searchTerm = signal("");
   protected readonly currentPage = signal(1);
   protected readonly selectedRows = signal<unknown[]>([]);
 
+  // Mapa tipado para mapear `TableColumn.width` a clases Tailwind estáticas
+  // (necesario para que el JIT de Tailwind detecte las clases en build).
+  private static readonly WIDTH_CLASS_MAP: Record<string, string> = {
+    "60px": "min-w-[60px]",
+    "80px": "min-w-[80px]",
+    "100px": "min-w-[100px]",
+    "120px": "min-w-[120px]",
+    "140px": "min-w-[140px]",
+    "160px": "min-w-[160px]",
+    "180px": "min-w-[180px]",
+    "200px": "min-w-[200px]",
+    "240px": "min-w-[240px]",
+    "280px": "min-w-[280px]",
+    "320px": "min-w-[320px]",
+  };
+
   /** Filas tras aplicar la búsqueda. */
   protected readonly filteredData = computed<unknown[]>(() => {
     const term = this.searchTerm().trim().toLowerCase();
-    if (!term || !this.searchable) return this.data;
+    if (!term || !this.searchable()) return this.data();
 
-    const cols = this.columns.filter((c) => c.searchable !== false && c.key);
-    if (!cols.length) return this.data;
+    const cols = this.columns().filter((c) => c.searchable !== false && c.key);
+    if (!cols.length) return this.data();
 
-    return this.data.filter((row) =>
+    return this.data().filter((row) =>
       cols.some((c) => {
         const value = (row as Record<string, unknown>)[c.key];
         if (value === null || value === undefined) return false;
@@ -133,16 +120,16 @@ export class UiTableComponent {
 
   /** Filas visibles en la página actual. */
   protected readonly pagedData = computed<unknown[]>(() => {
-    if (!this.paginated) return this.filteredData();
-    const size = Math.max(1, this.pageSize);
+    if (!this.paginated()) return this.filteredData();
+    const size = Math.max(1, this.pageSize());
     const start = (this.currentPage() - 1) * size;
     return this.filteredData().slice(start, start + size);
   });
 
   /** Total de páginas. */
   protected readonly totalPages = computed<number>(() => {
-    if (!this.paginated) return 1;
-    return Math.max(1, Math.ceil(this.filteredData().length / this.pageSize));
+    if (!this.paginated()) return 1;
+    return Math.max(1, Math.ceil(this.filteredData().length / this.pageSize()));
   });
 
   /** Indica si la fila dada está seleccionada. */
@@ -167,23 +154,24 @@ export class UiTableComponent {
 
   /** Rango "Showing X–Y of Z". */
   protected readonly rangeLabel = computed<string>(() => {
-    if (!this.paginated) return "";
+    if (!this.paginated()) return "";
     const total = this.filteredData().length;
     if (!total) return "Showing 0 of 0";
-    const size = Math.max(1, this.pageSize);
+    const size = Math.max(1, this.pageSize());
     const start = (this.currentPage() - 1) * size + 1;
     const end = Math.min(start + size - 1, total);
     return `Showing ${start}–${end} of ${total}`;
   });
 
   ngOnInit(): void {
-    this.searchTerm.set(this.initialSearchTerm);
+    this.searchTerm.set(this.initialSearchTerm());
   }
 
   /** `trackBy` para `@for`. */
   protected trackByRow = (_: number, row: unknown): unknown => {
-    if (this.trackByKey && typeof row === "object" && row !== null) {
-      return (row as Record<string, unknown>)[this.trackByKey];
+    const key = this.trackByKey();
+    if (key && typeof row === "object" && row !== null) {
+      return (row as Record<string, unknown>)[key];
     }
     return row;
   };
@@ -202,6 +190,7 @@ export class UiTableComponent {
       "px-4 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400",
       col.align === "center" ? "text-center" : "",
       col.align === "end" ? "text-end" : "",
+      this.widthClass(col.width),
       col.headerClassName ?? "",
     ]
       .filter(Boolean)
@@ -214,15 +203,17 @@ export class UiTableComponent {
       "px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400",
       col.align === "center" ? "text-center" : "",
       col.align === "end" ? "text-end" : "",
+      this.widthClass(col.width),
       col.cellClassName ?? "",
     ]
       .filter(Boolean)
       .join(" ");
   }
 
-  /** Style binding para el ancho de columna. */
-  protected thStyle(col: TableColumn): Record<string, string> {
-    return col.width ? { width: col.width } : {};
+  /** Mapea `TableColumn.width` a una clase Tailwind estática del mapa. */
+  private widthClass(width: string | undefined): string {
+    if (!width) return "";
+    return UiTableComponent.WIDTH_CLASS_MAP[width] ?? "";
   }
 
   /** Context para `*ngTemplateOutlet` de una celda. */
@@ -236,26 +227,26 @@ export class UiTableComponent {
 
   /** Indica si hay acciones configuradas y `hasActions` está activo. */
   protected get showActionsColumn(): boolean {
-    return this.hasActions && this.actions.length > 0;
+    return this.hasActions() && this.actions().length > 0;
   }
 
   /** Indica si se debe renderizar la columna de select. */
   protected get showSelectColumn(): boolean {
-    return this.selectable;
+    return this.selectable();
   }
 
   /** Indica si se debe renderizar el toolbar. */
   protected get showToolbar(): boolean {
-    return !!this.title || this.searchable;
+    return !!this.title() || this.searchable();
   }
 
   /** Clases del contenedor raíz. */
   protected get containerClasses(): string {
     const base =
-      this.variant === "card"
+      this.variant() === "card"
         ? "rounded-2xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]"
         : "rounded-2xl";
-    return [base, this.className].filter(Boolean).join(" ");
+    return [base, this.className()].filter(Boolean).join(" ");
   }
 
   protected onSearchInput(value: string | number | undefined): void {
@@ -263,7 +254,7 @@ export class UiTableComponent {
     this.searchTerm.set(term);
     this.currentPage.set(1);
     this.searchChange.emit(term);
-    this.pageChange.emit({ page: 1, pageSize: this.pageSize });
+    this.pageChange.emit({ page: 1, pageSize: this.pageSize() });
   }
 
   protected onRowToggle(row: unknown, checked: boolean): void {
@@ -297,32 +288,28 @@ export class UiTableComponent {
     const next = Math.max(1, this.currentPage() - 1);
     if (next === this.currentPage()) return;
     this.currentPage.set(next);
-    this.pageChange.emit({ page: next, pageSize: this.pageSize });
+    this.pageChange.emit({ page: next, pageSize: this.pageSize() });
   }
 
   protected onNextPage(): void {
     const next = Math.min(this.totalPages(), this.currentPage() + 1);
     if (next === this.currentPage()) return;
     this.currentPage.set(next);
-    this.pageChange.emit({ page: next, pageSize: this.pageSize });
+    this.pageChange.emit({ page: next, pageSize: this.pageSize() });
   }
 
   private emitSelection(rows: unknown[]): void {
+    const key = this.trackByKey();
     const keys = rows.map((r) =>
-      typeof r === "object" && r !== null && this.trackByKey
-        ? (r as Record<string, unknown>)[this.trackByKey]
+      typeof r === "object" && r !== null && key
+        ? (r as Record<string, unknown>)[key]
         : r,
     );
     this.rowSelect.emit({ rows, keys });
   }
 }
 
-// ---------------------------------------------------------------------------
-// Iconos de paginación por defecto (re-exportados desde `@ui/icon`).
-// Se exponen como `Type<unknown>` para que encajen en `prevIcon`/`nextIcon`
-// sin necesidad de cast en el consumer.
-// ---------------------------------------------------------------------------
-
+// Iconos de paginación por defecto re-exportados desde `@ui/icon` como `Type<unknown>` para encajar en `prevIcon`/`nextIcon` sin cast en el consumer.
 export const ChevronLeftIcon =
   IconChevronLeftComponent as unknown as Type<unknown>;
 export const ChevronRightIcon =

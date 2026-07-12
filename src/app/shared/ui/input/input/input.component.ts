@@ -25,7 +25,6 @@ import { FontWeightType } from "@styles/types/typography";
 import { getFocusStyling } from "@utils/styling";
 
 import { ValidationErrorIconComponent } from "./validation-error-icon.component";
-import { horizontalPaddingNumber, inputHeight } from "./common";
 import { UiLabelComponent } from "@shared/ui/label/label.component";
 import { UiFormLabelComponent } from "@shared/ui/form-label/form-label.component";
 
@@ -210,19 +209,19 @@ export class UiInputComponent
   }
 
   readonly outerClasses = computed<string>(() =>
-    ["flex flex-col gap-1 w-full font-outfit", this.className()]
+    [
+      "flex flex-col gap-1 w-full font-outfit",
+      this.className(),
+      this.flex() ?? "",
+      this.width() ?? "",
+    ]
       .filter(Boolean)
       .join(" "),
   );
 
-  readonly outerStyles = computed<Record<string, string>>(() => ({
-    flex: this.flex() ?? "",
-    width: this.width() ?? "",
-  }));
-
   readonly containerClasses = computed<string>(() => {
     const baseLayout = [
-      "flex items-center gap-2 w-full rounded-lg border border-solid",
+      "flex items-center gap-2 w-full h-10 rounded-lg border border-solid text-sm",
       "bg-white dark:bg-gray-900",
       this.isEffectivelyDisabled() || this.readOnly()
         ? "bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700"
@@ -230,19 +229,11 @@ export class UiInputComponent
           ? "border-error-500"
           : "border-gray-300 dark:border-gray-700",
       getFocusStyling("within"),
+      this.hasLeftIcon() ? "pl-0" : "pl-3",
+      this.hasRightIcon() || this.shouldShowPasswordToggle() ? "pr-0" : "pr-3",
     ];
-    return baseLayout.join(" ");
+    return baseLayout.filter(Boolean).join(" ");
   });
-
-  readonly containerStyles = computed<Record<string, string>>(() => ({
-    height: inputHeight,
-    "font-size": `var(--text-theme-sm)` /* fallback */,
-    "padding-left": this.hasLeftIcon() ? "0" : `${horizontalPaddingNumber}px`,
-    "padding-right":
-      this.hasRightIcon() || this.shouldShowPasswordToggle()
-        ? "0"
-        : `${horizontalPaddingNumber}px`,
-  }));
 
   readonly inputClasses = computed<string>(() =>
     [

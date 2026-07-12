@@ -128,10 +128,6 @@ describe('UiButtonComponent', () => {
     expect(typeof fixture.componentInstance.resetTimeout).toBe('function');
   });
 
-  // ---------------------------------------------------------------------------
-  // Timeout / progress bar
-  // ---------------------------------------------------------------------------
-
   it('wraps the button in a LoadingTimeoutWrapper when timeout is set', () => {
     const fixture = buildFixture({ timeout: 5000 });
     const wrapper = fixture.nativeElement.querySelector(

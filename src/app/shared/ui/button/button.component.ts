@@ -26,7 +26,7 @@ import { UiLoadingTimeoutWrapperComponent } from "@shared/ui/loading-timeout-wra
 import { getFocusStyling } from "@utils/styling";
 
 import { ButtonStyleType, ButtonTooltip, ButtonVariant } from "./button.types";
-import { getVariantClasses } from "./button.variants";
+import { getVariantClasses } from "./button.utils";
 
 /**
  * Botón del design system.

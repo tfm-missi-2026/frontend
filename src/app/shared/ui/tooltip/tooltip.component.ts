@@ -5,10 +5,8 @@ import {
   DestroyRef,
   effect,
   ElementRef,
-  HostListener,
   inject,
   input,
-  OnDestroy,
   signal,
   TemplateRef,
   viewChild,
@@ -23,34 +21,18 @@ import { ThemeService } from "@shared/services/theme.service";
 
 import { TooltipAlign, TooltipSide, TooltipVariantType } from "./tooltip.types";
 import {
+  createTooltipPositionStrategy,
   DARK_VARIANT_CLASSES,
   LIGHT_VARIANT_CLASSES,
+  nextTooltipDomId,
   SIDE_TRANSLATE_CLASSES,
-} from "./tooltip.variants";
-import { buildPositions, nextTooltipDomId } from "./tooltip.utils";
+} from "./tooltip.utils";
 
 export type { TooltipVariantType, TooltipSide, TooltipAlign };
 
 const BASE_TRANSITION_CLASSES =
   "transition-opacity transition-transform duration-200 ease-out";
 
-/**
- * `UiTooltip`
- * -----------
- * Tooltip accesible basado en Angular CDK Overlay.
- *
- * El propio host (`<UiTooltip>`) actúa como trigger, así que no hace
- * falta un wrapper intermedio: los listeners y el `aria-describedby`
- * se declaran vía `host: {}`.
- *
- *  - 6 variantes (`light`, `dark`, `info`, `success`, `warning`, `error`)
- *    reactivas al tema global.
- *  - 4 lados + auto-flip cuando el lado preferido no cabe.
- *  - Animaciones con clases Tailwind (fade + `translate-*` por lado).
- *  - Soporte de `string` o `TemplateRef` como contenido.
- *  - Anti-flicker: entrar a la burbuja cancela el hide timer.
- *  - Reposicionamiento en `scroll`/`resize`.
- */
 @Component({
   selector: "UiTooltip",
   standalone: true,
@@ -63,10 +45,11 @@ const BASE_TRANSITION_CLASSES =
     "(mouseleave)": "onTriggerLeave()",
     "(focusin)": "onTriggerEnter()",
     "(focusout)": "onTriggerLeave()",
+    "(document:keydown.escape)": "onEscape()",
   },
   templateUrl: "./tooltip.component.html",
 })
-export class UiTooltipComponent implements OnDestroy {
+export class UiTooltipComponent {
   readonly content = input<string | TemplateRef<unknown>>("");
   readonly variant = input<TooltipVariantType>("light");
   readonly delayDuration = input<number>(200);
@@ -126,34 +109,31 @@ export class UiTooltipComponent implements OnDestroy {
   private viewportListeners?: { remove(): void };
 
   constructor() {
-    this.destroyRef.onDestroy(() => this.disposeOverlay());
+    this.destroyRef.onDestroy(() => {
+      this.clearTimers();
+      this.disposeOverlay();
+    });
 
     effect(() => {
+      const side = this.side();
+      const align = this.align();
+      const sideOffset = this.sideOffset();
+      const autoPosition = this.autoPosition();
+
       if (!this.overlayRef) return;
       this.overlayRef.updatePositionStrategy(
-        this.overlay
-          .position()
-          .flexibleConnectedTo(this.host.nativeElement)
-          .withPositions(
-            buildPositions(
-              this.side(),
-              this.align(),
-              this.sideOffset(),
-              this.autoPosition(),
-            ),
-          )
-          .withFlexibleDimensions(false)
-          .withPush(true),
+        createTooltipPositionStrategy(
+          this.overlay,
+          this.host.nativeElement,
+          side,
+          align,
+          sideOffset,
+          autoPosition,
+        ),
       );
     });
   }
 
-  ngOnDestroy(): void {
-    this.clearTimers();
-    this.disposeOverlay();
-  }
-
-  @HostListener("document:keydown.escape")
   onEscape(): void {
     if (this.isOpen()) this.hide();
   }
@@ -177,19 +157,14 @@ export class UiTooltipComponent implements OnDestroy {
     if (!tpl) return;
 
     this.overlayRef = this.overlay.create({
-      positionStrategy: this.overlay
-        .position()
-        .flexibleConnectedTo(this.host.nativeElement)
-        .withPositions(
-          buildPositions(
-            this.side(),
-            this.align(),
-            this.sideOffset(),
-            this.autoPosition(),
-          ),
-        )
-        .withFlexibleDimensions(false)
-        .withPush(true),
+      positionStrategy: createTooltipPositionStrategy(
+        this.overlay,
+        this.host.nativeElement,
+        this.side(),
+        this.align(),
+        this.sideOffset(),
+        this.autoPosition(),
+      ),
       scrollStrategy: this.overlay.scrollStrategies.reposition(),
       panelClass: "ui-tooltip-panel",
     });

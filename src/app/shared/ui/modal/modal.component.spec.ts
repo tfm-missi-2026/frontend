@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { UiModalComponent } from './modal.component';
@@ -6,6 +6,7 @@ import { UiModalComponent } from './modal.component';
 @Component({
   standalone: true,
   imports: [UiModalComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <UiModal
       [isOpen]="isOpen"

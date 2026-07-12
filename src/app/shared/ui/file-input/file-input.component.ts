@@ -1,10 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   ElementRef,
   forwardRef,
   input,
-  OnInit,
   output,
   viewChild,
 } from "@angular/core";
@@ -25,8 +25,8 @@ import {
  *  - `change` emite el `Event` nativo para casos avanzados.
  *  - `ControlValueAccessor` para integración con `ngModel` /
  *    `formControl` (emite `FileList`).
- *  - `fileNamesText` getter accesible para mostrar el nombre del
- *    archivo seleccionado en el placeholder.
+ *  - `fileNamesText` computed para mostrar el nombre del archivo
+ *    seleccionado en el placeholder.
  *
  * API signal-based (Angular 17.1+).
  */
@@ -57,9 +57,7 @@ import {
     },
   ],
 })
-export class UiFileInputComponent
-  implements ControlValueAccessor, OnInit
-{
+export class UiFileInputComponent implements ControlValueAccessor {
   readonly id = input<string | undefined>(undefined);
   readonly name = input<string | undefined>(undefined);
   readonly accept = input<string | undefined>(undefined);
@@ -67,7 +65,6 @@ export class UiFileInputComponent
   readonly disabled = input<boolean>(false);
   readonly ariaLabel = input<string | undefined>(undefined);
   readonly buttonText = input<string>("Subir archivo");
-  readonly width = input<string | undefined>(undefined);
   readonly className = input<string>("");
 
   readonly valueChange = output<File | File[] | null>();
@@ -78,10 +75,6 @@ export class UiFileInputComponent
 
   private onChangeFn: (value: FileList | null) => void = () => {};
   private onTouchedFn: () => void = () => {};
-
-  ngOnInit(): void {
-    // noop
-  }
 
   onChange(event: Event): void {
     const target = event.target as HTMLInputElement;
@@ -124,17 +117,16 @@ export class UiFileInputComponent
     if (el) el.disabled = isDisabled;
   }
 
-  /** Texto derivado del input: nombre del archivo o `buttonText`. */
-  fileNamesText(): string {
+  readonly fileNamesText = computed<string>(() => {
     const el = this.inputEl()?.nativeElement;
     if (!el || !el.files || el.files.length === 0) return this.buttonText();
     if (this.multiple() && el.files.length > 1) {
       return `${el.files.length} archivos`;
     }
     return el.files[0]?.name ?? this.buttonText();
-  }
+  });
 
-  readonly inputClasses = (): string =>
+  readonly inputClasses = computed<string>(() =>
     [
       "h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 shadow-theme-xs transition-colors",
       "file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200",
@@ -147,10 +139,6 @@ export class UiFileInputComponent
       this.className(),
     ]
       .filter(Boolean)
-      .join(" ");
-
-  /** Estilo inline opcional para el `width`. */
-  readonly styles = (): Record<string, string> => ({
-    width: this.width() ?? "",
-  });
+      .join(" "),
+  );
 }

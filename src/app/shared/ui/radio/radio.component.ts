@@ -84,10 +84,6 @@ export class UiRadioComponent {
     this.valueChange.emit(this.value());
   }
 
-  // ---------------------------------------------------------------------------
-  // Computed styling
-  // ---------------------------------------------------------------------------
-
   readonly isSm = computed<boolean>(() => this.size() === "sm");
 
   readonly wrapperClasses = computed<string>(() =>

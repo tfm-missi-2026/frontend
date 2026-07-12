@@ -6,7 +6,7 @@ import {
 } from "@angular/core";
 
 import { ButtonStyleType, ButtonVariant } from "@shared/ui/button/button.types";
-import { getVariantClasses } from "@shared/ui/button/button.variants";
+import { getVariantClasses } from "@shared/ui/button/button.utils";
 
 /**
  * Wrapper presentacional que aplica el marco visual (background,
@@ -43,8 +43,10 @@ export class UiLoadingTimeoutWrapperComponent {
       .join(" "),
   );
 
-  /** Duración dinámica de la animación. `undefined` cuando no hay timeout. */
-  readonly animationDuration = computed<string | null>(() =>
-    this.timeout() !== undefined ? `${this.timeout()}ms` : null,
-  );
+  readonly progressClasses = computed<string>(() => {
+    const base =
+      "absolute inset-0 bg-current opacity-20 origin-left pointer-events-none rounded-[inherit] animate-[ltw-progress-fill_linear_forwards]";
+    const timeout = this.timeout();
+    return timeout !== undefined ? `${base} duration-[${timeout}ms]` : base;
+  });
 }

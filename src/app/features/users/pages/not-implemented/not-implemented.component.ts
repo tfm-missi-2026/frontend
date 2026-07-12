@@ -30,7 +30,7 @@ import { UiLabelComponent } from "@shared/ui/label";
       direction="column"
       alignItems="center"
       justifyContent="center"
-      gap="16px"
+      [gap]="16"
       className="min-h-96 px-6 py-20 text-center"
     >
       <UiHeader [level]="2" text="Funcionalidad pendiente" />

@@ -18,7 +18,7 @@
     className="flex-1 no-scrollbar"
   >
     <nav class="mb-6">
-      <UiFlex direction="column" gap="16px">
+      <UiFlex direction="column" [gap]="16">
         @for (s of sections; track s.sectionKey) {
           <SidebarLayoutSection
             [title]="s.title"

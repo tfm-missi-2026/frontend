@@ -1,4 +1,4 @@
-import type { SelectOption } from "@shared/ui/select/select.interface";
+import type { SelectOption } from "@shared/ui/select/select.types";
 
 export type UserRole =
   | "recurso_tecnico"

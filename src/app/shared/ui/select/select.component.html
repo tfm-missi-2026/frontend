@@ -2,10 +2,9 @@
   #rootRef
   class="relative flex flex-col gap-1.5 w-full font-outfit"
   [class]="className()"
-  [style.width]="width() || null"
-  [style.minWidth]="minWidth() || null"
+  [class]="widthClass()"
+  [class]="minWidthClass()"
 >
-  <!-- LABEL -->
   @if (labelText()) {
     <UiFormLabel
       [labelText]="labelText()"
@@ -17,7 +16,6 @@
     ></UiFormLabel>
   }
 
-  <!-- CONTROL -->
   <div
     class="flex items-center gap-1.5 min-h-11 w-full py-1 px-3 rounded-lg border bg-white border-gray-300 cursor-pointer transition-colors dark:bg-gray-900 dark:border-gray-700"
     [class.flex-wrap]="isMulti()"
@@ -69,8 +67,8 @@
           [attr.name]="name() || null"
           [attr.autocomplete]="'off'"
           [attr.tabindex]="0"
-          [(ngModel)]="searchInput"
-          (input)="onSearchInput($any($event.target).value)"
+          [ngModel]="searchInput()"
+          (ngModelChange)="searchInput.set($event); onSearchInput($event)"
           (keydown)="onKeyDown($event)"
           (focus)="onInputFocus()"
           (blur)="onInputBlur()"
@@ -78,7 +76,6 @@
       }
     </div>
 
-    <!-- INDICATORS -->
     <div class="inline-flex items-center gap-2 shrink-0 text-gray-400">
       @if (errorMessage()) {
         <span
@@ -113,7 +110,6 @@
     </div>
   </div>
 
-  <!-- MENU -->
   @if (isOpen()) {
     <div
       class="absolute left-0 right-0 top-[calc(100%+4px)] z-9999 bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-lg shadow-theme-lg p-1 max-h-65 overflow-y-auto"
@@ -126,13 +122,13 @@
       } @else if (filteredOptions().length === 0) {
         <div class="py-3 px-4 text-sm text-center text-gray-500 dark:text-gray-400 flex flex-col items-center gap-2">
           <span>{{ resolveMessage(noOptionsMessage()) }}</span>
-          @if (creatable() && searchInput.trim()) {
+          @if (creatable() && searchInput().trim()) {
             <button
               type="button"
               class="text-[13px] text-brand-500 bg-transparent border border-dashed border-brand-300 rounded-md py-1.5 px-3 cursor-pointer hover:bg-brand-50 dark:hover:bg-brand-500/10 transition-colors"
               (click)="createFromInput()"
             >
-              Crear "{{ searchInput }}"
+              Crear "{{ searchInput() }}"
             </button>
           }
         </div>

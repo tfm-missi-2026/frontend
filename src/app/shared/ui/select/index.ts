@@ -12,4 +12,4 @@ export type {
   LoadOptionsFn,
   MessageFn,
   SelectValue,
-} from './select.interface';
+} from './select.types';

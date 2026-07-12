@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Component, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, TemplateRef, ViewChild } from '@angular/core';
 import { Overlay } from '@angular/cdk/overlay';
 
 import { UiTooltipComponent } from './tooltip.component';
@@ -45,6 +45,7 @@ describe('Tooltip', () => {
 @Component({
   standalone: true,
   imports: [UiTooltipComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <UiTooltip [content]="'hello'"></UiTooltip>
     <ng-template #tpl>rich content</ng-template>

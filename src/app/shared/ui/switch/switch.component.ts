@@ -89,10 +89,6 @@ export class UiSwitchComponent {
     this.checkedChange.emit(next);
   }
 
-  // ---------------------------------------------------------------------------
-  // Computed styling
-  // ---------------------------------------------------------------------------
-
   readonly wrapperClasses = computed<string>(() =>
     [
       "flex cursor-pointer select-none items-center gap-3 text-sm font-medium",

@@ -7,6 +7,26 @@ import {
   TooltipSide,
 } from "@shared/ui/tooltip/tooltip.types";
 
+// Tokens semánticos consumidos por la paleta de variantes (ver button.utils.tokens.ts).
+export type ColorToken =
+  | "brand-500"
+  | "brand-600"
+  | "error-500"
+  | "error-600"
+  | "gray-100"
+  | "gray-200"
+  | "gray-300"
+  | "gray-500"
+  | "gray-700"
+  | "gray-800"
+  | "gray-900"
+  | "warning-500"
+  | "warning-600"
+  | "success-500"
+  | "success-600"
+  | "white"
+  | "transparent";
+
 /** Variante visual del botón (define la "jerarquía" principal). */
 export type ButtonVariant = "primary" | "secondary" | "tertiary";
 

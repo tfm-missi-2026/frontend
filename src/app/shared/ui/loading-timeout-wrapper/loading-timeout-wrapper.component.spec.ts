@@ -36,6 +36,6 @@ describe('UiLoadingTimeoutWrapperComponent', () => {
       '[data-testid="loading-timeout-wrapper-progress"]',
     ) as HTMLElement;
     expect(progress).not.toBeNull();
-    expect(progress.style.animationDuration).toBe('5000ms');
+    expect(progress.className).toContain('duration-[5000ms]');
   });
 });

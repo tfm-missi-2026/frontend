@@ -8,4 +8,4 @@
  * Standalone + OnPush + signal APIs.
  */
 export { UiDatePickerComponent } from "./date-picker.component";
-export type { DatePickerMode, DatePickerValue } from "./types";
+export type { DatePickerMode, DatePickerValue } from "./date-picker.types";

@@ -4,8 +4,7 @@
 >
   @if (timeout() !== undefined) {
     <div
-      class="absolute inset-0 bg-current opacity-20 origin-left pointer-events-none rounded-[inherit] animate-[ltw-progress-fill_linear_forwards]"
-      [style.animationDuration.ms]="timeout()"
+      [class]="progressClasses()"
       data-testid="loading-timeout-wrapper-progress"
       aria-hidden="true"
     ></div>

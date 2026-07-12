@@ -1,4 +1,4 @@
-import { Component, TemplateRef, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, TemplateRef, ViewChild } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { UiTableComponent } from "./table.component";
@@ -24,6 +24,18 @@ const SAMPLE_COLUMNS: TableColumn<User>[] = [
   { key: "role", header: "Role" },
 ];
 
+function applyInputs<T>(
+  fixture: ComponentFixture<T>,
+  opts: Record<string, unknown>,
+): void {
+  const ref = fixture.componentRef as unknown as {
+    setInput: (name: string, value: unknown) => void;
+  };
+  for (const [k, v] of Object.entries(opts)) {
+    ref.setInput(k, v);
+  }
+}
+
 describe("Table", () => {
   let fixture: ComponentFixture<UiTableComponent>;
   let component: UiTableComponent;
@@ -35,8 +47,10 @@ describe("Table", () => {
 
     fixture = TestBed.createComponent(UiTableComponent);
     component = fixture.componentInstance;
-    component.columns = SAMPLE_COLUMNS;
-    component.data = SAMPLE_DATA;
+    applyInputs(fixture, {
+      columns: SAMPLE_COLUMNS,
+      data: SAMPLE_DATA,
+    });
   });
 
   it("should create", () => {
@@ -46,12 +60,11 @@ describe("Table", () => {
   it("renders one row per data item by default", () => {
     fixture.detectChanges();
     const rows = fixture.nativeElement.querySelectorAll("tbody tr");
-    // 3 data rows + 0 empty row (only renders when there are zero rows)
     expect(rows.length).toBe(3);
   });
 
   it("renders the empty state when data is empty", () => {
-    component.data = [];
+    fixture.componentRef.setInput("data", []);
     fixture.detectChanges();
     const empty = fixture.nativeElement.querySelector("tbody tr td[colspan]");
     expect(empty).toBeTruthy();
@@ -60,7 +73,8 @@ describe("Table", () => {
 
   describe("search", () => {
     beforeEach(() => {
-      component.searchable = true;
+      fixture.componentRef.setInput("searchable", true);
+      fixture.detectChanges();
     });
 
     it("filters rows by the search term", () => {
@@ -89,7 +103,7 @@ describe("Table", () => {
 
   describe("selection", () => {
     beforeEach(() => {
-      component.selectable = true;
+      fixture.componentRef.setInput("selectable", true);
       fixture.detectChanges();
     });
 
@@ -126,8 +140,10 @@ describe("Table", () => {
 
   describe("pagination", () => {
     beforeEach(() => {
-      component.paginated = true;
-      component.pageSize = 2;
+      applyInputs(fixture, {
+        paginated: true,
+        pageSize: 2,
+      });
     });
 
     it("paginates filtered data", () => {
@@ -187,12 +203,12 @@ describe("Table", () => {
 
   describe("trackBy", () => {
     it("uses the configured trackByKey by default", () => {
-      component.trackByKey = "id";
+      fixture.componentRef.setInput("trackByKey", "id");
       expect(component["trackByRow"](0, SAMPLE_DATA[0])).toBe(1);
     });
 
     it("falls back to row reference when trackByKey is not in row", () => {
-      component.trackByKey = "unknown";
+      fixture.componentRef.setInput("trackByKey", "unknown");
       expect(component["trackByRow"](0, SAMPLE_DATA[0])).toBe(SAMPLE_DATA[0]);
     });
   });
@@ -201,6 +217,7 @@ describe("Table", () => {
     @Component({
       standalone: true,
       imports: [UiTableComponent],
+      changeDetection: ChangeDetectionStrategy.OnPush,
       template: `
         <ng-template #badgeTpl let-row>
           <span data-testid="custom-cell">[{{ row.role }}]</span>
@@ -216,10 +233,10 @@ describe("Table", () => {
       hostFixture.detectChanges();
       const tpl = hostFixture.componentInstance.badgeTpl;
 
-      component.columns = [
+      fixture.componentRef.setInput("columns", [
         ...SAMPLE_COLUMNS.slice(0, 3),
         { key: "role", header: "Role", cell: tpl as TableColumn["cell"] },
-      ];
+      ]);
       fixture.detectChanges();
 
       const customCell = fixture.nativeElement.querySelector(

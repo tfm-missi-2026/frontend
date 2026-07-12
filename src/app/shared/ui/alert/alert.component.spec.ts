@@ -1,4 +1,4 @@
-import { Component, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ViewChild } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { UiAlertComponent } from "./alert.component";
@@ -10,6 +10,7 @@ import { AlertVariant } from "./alert.types";
 @Component({
   standalone: true,
   imports: [UiAlertComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <UiAlert
       [variant]="variant"

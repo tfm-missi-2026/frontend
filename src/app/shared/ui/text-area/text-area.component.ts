@@ -14,7 +14,7 @@ import {
 } from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 
-import { UiFlexComponent } from "@shared/ui/flex/flex.component";
+import { UiFlexComponent, type FlexJustify } from "@shared/ui/flex/flex.component";
 import { UiFormLabelComponent } from "@shared/ui/form-label/form-label.component";
 import { UiLabelComponent } from "@shared/ui/label/label.component";
 import { ColorType } from "@styles/types/colors";
@@ -139,10 +139,6 @@ export class UiTextAreaComponent implements ControlValueAccessor, OnInit {
     this.charCount = this.internalValue.length;
   }
 
-  // ---------------------------------------------------------------------------
-  // Computed styling
-  // ---------------------------------------------------------------------------
-
   readonly isDisabled = computed<boolean>(
     () => this.disabled() || this._formDisabled(),
   );
@@ -150,14 +146,14 @@ export class UiTextAreaComponent implements ControlValueAccessor, OnInit {
   readonly hasError = computed<boolean>(() => !!this.errorMessage());
 
   readonly outerClasses = computed<string>(() =>
-    ["flex flex-col gap-1 w-full font-outfit", this.className()]
+    [
+      "flex flex-col gap-1 w-full font-outfit",
+      this.className(),
+      this.width() ?? "",
+    ]
       .filter(Boolean)
       .join(" "),
   );
-
-  readonly outerStyles = computed<Record<string, string>>(() => ({
-    width: this.width() ?? "",
-  }));
 
   readonly textareaClasses = computed<string>(() =>
     [
@@ -189,11 +185,11 @@ export class UiTextAreaComponent implements ControlValueAccessor, OnInit {
   readonly charCountWeight: FontWeightType = "regular";
   readonly legendWeight: FontWeightType = "regular";
 
-  readonly footerJustifyContent = computed<string>(() => {
+  readonly footerJustifyContent = computed<FlexJustify>(() => {
     const hasLegend = !!this.legend();
     const hasMax = !!this.maxLength();
-    if (hasLegend && hasMax) return "space-between";
-    if (hasLegend) return "flex-start";
-    return "flex-end";
+    if (hasLegend && hasMax) return "between";
+    if (hasLegend) return "start";
+    return "end";
   });
 }

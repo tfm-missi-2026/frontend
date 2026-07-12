@@ -9,6 +9,7 @@ import {
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 
+import { UiAlertComponent } from "@shared/ui/alert";
 import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiButtonComponent } from "@shared/ui/button";
 import { UiFlexComponent } from "@shared/ui/flex";
@@ -20,7 +21,7 @@ import { UiRadioComponent } from "@shared/ui/radio";
 import { UiSelectComponent } from "@shared/ui/select";
 
 import { emptyUserForm, type UserFormSavePayload } from "../../models/user-form";
-import type { User, UserRole, UserStatus } from "../../models/user";
+import type { User, UserRole } from "../../models/user";
 import { USER_ROLE_OPTIONS } from "../../models/user";
 
 export type UserFormMode = "create" | "edit";
@@ -30,6 +31,7 @@ export type UserFormMode = "create" | "edit";
   standalone: true,
   imports: [
     FormsModule,
+    UiAlertComponent,
     UiBadgeComponent,
     UiButtonComponent,
     UiFlexComponent,
@@ -44,7 +46,7 @@ export type UserFormMode = "create" | "edit";
   template: `
     <UiModal
       [isOpen]="isOpen()"
-      [showCloseButton]="false"
+      [showCloseButton]="true"
       className="max-w-140 p-6 lg:p-8"
       (close)="onCancel()"
     >
@@ -64,55 +66,64 @@ export type UserFormMode = "create" | "edit";
         {{ subheading() }}
       </UiLabel>
 
-      <div class="mb-4">
-        <UiLabel type="bodyXs" color="textStrong" weight="medium" className="mb-2 block uppercase">
+      @if (validationMessage()) {
+        <UiAlert
+          variant="error"
+          title="Revisa los datos del usuario"
+          [message]="validationMessage() ?? ''"
+          className="mb-4"
+        />
+      }
+
+      <UiFlex direction="column" [gap]="2" className="mb-4">
+        <UiLabel type="bodyXs" color="textStrong" weight="medium" className="uppercase">
           Nombres
         </UiLabel>
         <UiInput
           placeholder="p. ej. Ana María"
-          [value]="form().firstName"
-          (valueChange)="patch({ firstName: $event })"
+          [ngModel]="form().firstName"
+          (ngModelChange)="patch({ firstName: $event })"
         />
-      </div>
+      </UiFlex>
 
-      <UiGrid [columns]="2" gap="14px" className="mb-4">
-        <div>
-          <UiLabel type="bodyXs" color="textStrong" weight="medium" className="mb-2 block uppercase">
+      <UiGrid [columns]="2" gap="gap-3.5" className="mb-4">
+        <UiFlex direction="column" [gap]="2">
+          <UiLabel type="bodyXs" color="textStrong" weight="medium" className="uppercase">
             Apellido paterno
           </UiLabel>
           <UiInput
             placeholder="p. ej. Quispe"
-            [value]="form().lastNamePaternal"
-            (valueChange)="patch({ lastNamePaternal: $event })"
+            [ngModel]="form().lastNamePaternal"
+            (ngModelChange)="patch({ lastNamePaternal: $event })"
           />
-        </div>
-        <div>
-          <UiLabel type="bodyXs" color="textStrong" weight="medium" className="mb-2 block uppercase">
+        </UiFlex>
+        <UiFlex direction="column" [gap]="2">
+          <UiLabel type="bodyXs" color="textStrong" weight="medium" className="uppercase">
             Apellido materno
           </UiLabel>
           <UiInput
             placeholder="p. ej. Rojas"
-            [value]="form().lastNameMaternal"
-            (valueChange)="patch({ lastNameMaternal: $event })"
+            [ngModel]="form().lastNameMaternal"
+            (ngModelChange)="patch({ lastNameMaternal: $event })"
           />
-        </div>
+        </UiFlex>
       </UiGrid>
 
-      <div class="mb-4">
-        <UiLabel type="bodyXs" color="textStrong" weight="medium" className="mb-2 block uppercase">
+      <UiFlex direction="column" [gap]="2" className="mb-4">
+        <UiLabel type="bodyXs" color="textStrong" weight="medium" className="uppercase">
           Correo electrónico
         </UiLabel>
         <UiInput
           type="email"
           placeholder="nombre.apellido@institucion.gob.pe"
-          [value]="form().email"
-          (valueChange)="patch({ email: $event })"
+          [ngModel]="form().email"
+          (ngModelChange)="patch({ email: $event })"
         />
-      </div>
+      </UiFlex>
 
-      <UiGrid [columns]="2" gap="14px" className="mb-4">
-        <div>
-          <UiLabel type="bodyXs" color="textStrong" weight="medium" className="mb-2 block uppercase">
+      <UiGrid [columns]="2" gap="gap-3.5" className="mb-4">
+        <UiFlex direction="column" [gap]="2">
+          <UiLabel type="bodyXs" color="textStrong" weight="medium" className="uppercase">
             Rol
           </UiLabel>
           <UiSelect
@@ -121,12 +132,12 @@ export type UserFormMode = "create" | "edit";
             [ngModel]="form().role"
             (ngModelChange)="onRoleChange($event)"
           />
-        </div>
-        <div>
-          <UiLabel type="bodyXs" color="textStrong" weight="medium" className="mb-2 block uppercase">
+        </UiFlex>
+        <UiFlex direction="column" [gap]="2">
+          <UiLabel type="bodyXs" color="textStrong" weight="medium" className="uppercase">
             Estado
           </UiLabel>
-          <UiFlex direction="row" alignItems="center" gap="16px" className="pt-1.5">
+          <UiFlex direction="row" alignItems="center" [gap]="4" className="pt-1.5">
             <UiRadio
               name="user-status"
               value="active"
@@ -142,14 +153,16 @@ export type UserFormMode = "create" | "edit";
               (valueChange)="patch({ status: 'inactive' })"
             />
           </UiFlex>
-        </div>
+        </UiFlex>
       </UiGrid>
 
       @if (mode() === "create") {
-        <div
-          class="mb-4 rounded-xl border border-dashed border-gray-300 p-3 dark:border-gray-700"
+        <UiFlex
+          direction="column"
+          [gap]="2"
+          className="rounded-xl border border-dashed border-gray-300 p-3 dark:border-gray-700"
         >
-          <UiFlex direction="row" alignItems="center" justifyContent="space-between" className="mb-2">
+          <UiFlex direction="row" alignItems="center" justifyContent="between">
             <UiLabel type="bodyXs" color="textStrong" weight="medium" className="uppercase">
               Contraseña inicial
             </UiLabel>
@@ -161,19 +174,19 @@ export type UserFormMode = "create" | "edit";
             type="password"
             placeholder="••••••••"
             [showPasswordToggle]="true"
-            [value]="form().initialPassword ?? ''"
-            (valueChange)="patch({ initialPassword: $event })"
+            [ngModel]="form().initialPassword ?? ''"
+            (ngModelChange)="patch({ initialPassword: $event })"
           />
-          <UiLabel type="bodyXs" color="textWeak" className="mt-2 block">
+          <UiLabel type="bodyXs" color="textWeak">
             Al editar un usuario existente este campo no aparece; la contraseña se cambia desde “Restablecer”.
           </UiLabel>
-        </div>
+        </UiFlex>
       }
 
       <UiFlex
         direction="row"
-        justifyContent="flex-end"
-        gap="8px"
+        justifyContent="end"
+        [gap]="2"
         className="mt-4 border-t border-dashed border-gray-200 pt-4 dark:border-gray-800"
       >
         <UiButton variant="secondary" labelText="Cancelar" (click)="onCancel()" />
@@ -193,6 +206,7 @@ export class UserFormModalComponent {
   protected readonly roleOptions = USER_ROLE_OPTIONS;
 
   protected readonly form = signal(emptyUserForm());
+  protected readonly validationMessage = signal<string | null>(null);
 
   protected readonly heading = computed<string>(() =>
     this.mode() === "create" ? "Nuevo usuario" : "Editar usuario",
@@ -209,6 +223,7 @@ export class UserFormModalComponent {
       if (!open) return;
       const u = this.user();
       const m = this.mode();
+      this.validationMessage.set(null);
       if (m === "edit" && u) {
         this.form.set({
           firstName: u.firstName,
@@ -225,6 +240,7 @@ export class UserFormModalComponent {
   }
 
   protected patch(partial: Partial<ReturnType<typeof emptyUserForm>>): void {
+    this.validationMessage.set(null);
     this.form.update((f) => ({ ...f, ...partial }));
   }
 
@@ -239,6 +255,12 @@ export class UserFormModalComponent {
   protected onSave(): void {
     const f = this.form();
     const m = this.mode();
+    const validationMessage = this.validate(f, m);
+    if (validationMessage) {
+      this.validationMessage.set(validationMessage);
+      return;
+    }
+
     const u = this.user();
     if (m === "create") {
       this.save.emit({
@@ -267,5 +289,27 @@ export class UserFormModalComponent {
         },
       });
     }
+  }
+
+  private validate(
+    form: ReturnType<typeof emptyUserForm>,
+    mode: UserFormMode,
+  ): string | null {
+    const requiredValues = [
+      form.firstName,
+      form.lastNamePaternal,
+      form.lastNameMaternal,
+      form.email,
+    ];
+    if (requiredValues.some((value) => !value.trim())) {
+      return "Completa nombres, apellidos y correo electrónico antes de guardar.";
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      return "Ingresa un correo electrónico válido.";
+    }
+    if (mode === "create" && (form.initialPassword?.length ?? 0) < 8) {
+      return "La contraseña inicial debe tener al menos 8 caracteres.";
+    }
+    return null;
   }
 }

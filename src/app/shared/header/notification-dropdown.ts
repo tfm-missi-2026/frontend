@@ -129,7 +129,7 @@ const VIEW_ALL_CLASS =
                   size="medium"
                   [status]="item.status"
                 />
-                <UiFlex direction="column" gap="0.375rem">
+                <UiFlex direction="column" [gap]="1.5">
                   <UiLabel
                     type="bodyS"
                     color="textWeak"

@@ -1,0 +1,137 @@
+<UiFlex direction="column" [gap]="5">
+  <CommonBreadcrumb [items]="breadcrumbItems" />
+
+  <UiFlex
+    direction="row"
+    alignItems="center"
+    justifyContent="between"
+    [gap]="3"
+    className="flex-wrap"
+  >
+    <UiHeader [level]="1" text="Roles y permisos" />
+    <UiButton
+      variant="primary"
+      [LeftIcon]="plusIcon"
+      labelText="Nuevo rol"
+      (click)="onCreate()"
+    />
+  </UiFlex>
+
+  @if (successAlert(); as msg) {
+    <UiAlert
+      variant="success"
+      [message]="msg"
+      className="cursor-pointer"
+      (click)="onDismissAlert()"
+    />
+  }
+
+  <div class="grid grid-cols-1 gap-5 lg:grid-cols-[280px_1fr]">
+    <div>
+      <RoleListPanel
+        [roles]="roles()"
+        [selectedId]="selectedId()"
+        (select)="onSelectRole($event)"
+      />
+    </div>
+
+    <div>
+      @if (selectedRole(); as role) {
+        <UiCard variant="default" padding="lg" className="h-full">
+          <div class="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+            <div class="min-w-0 flex-1">
+              <UiHeader
+                [level]="2"
+                [text]="role.name"
+                className="text-2xl"
+              />
+              <UiLabel
+                type="bodyS"
+                color="textWeak"
+                [text]="role.description"
+                className="mt-2 block max-w-prose"
+              />
+            </div>
+            <UiBadge
+              [variant]="role.kind === 'system' ? 'light' : 'light'"
+              [color]="role.kind === 'system' ? 'primary' : 'info'"
+              size="md"
+            >
+              {{ role.code }}
+            </UiBadge>
+          </div>
+
+          <div
+            class="mt-6 flex flex-col gap-2 border-t border-dashed border-gray-200 pt-4 dark:border-gray-800 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <p
+              class="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+            >
+              Módulos visibles / permisos
+            </p>
+            <UiLabel
+              type="bodyXs"
+              color="textWeak"
+              [text]="permissionCountLabel()"
+            />
+          </div>
+          <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            Marca los módulos del sidebar a los que este rol puede acceder.
+          </p>
+
+          <div class="mt-4">
+            <PermissionsMatrix
+              [selected]="effectivePermissions()"
+              [readonly]="!canEditSelected()"
+              (selectedChange)="onPermissionsChange($event)"
+            />
+          </div>
+
+          @if (canEditSelected()) {
+            <UiFlex
+              direction="row"
+              justifyContent="end"
+              [gap]="2"
+              className="mt-6 border-t border-dashed border-gray-200 pt-4 dark:border-gray-800"
+            >
+              <UiButton
+                variant="secondary"
+                labelText="Cancelar"
+                [disabled]="!hasChanges()"
+                (click)="onCancelPermissions()"
+              />
+              <UiButton
+                variant="primary"
+                [LeftIcon]="checkIcon"
+                labelText="Guardar cambios"
+                [disabled]="!hasChanges()"
+                (click)="onSavePermissions()"
+              />
+            </UiFlex>
+          } @else {
+            <p
+              class="mt-6 border-t border-dashed border-gray-200 pt-4 text-xs text-gray-500 dark:border-gray-800 dark:text-gray-400"
+            >
+              Los roles del sistema son de solo lectura. Crea un rol
+              personalizado para editar sus permisos.
+            </p>
+          }
+        </UiCard>
+      } @else {
+        <UiCard variant="default" padding="lg">
+          <UiLabel
+            type="bodyS"
+            color="textWeak"
+            text="Selecciona un rol de la lista para ver sus permisos."
+          />
+        </UiCard>
+      }
+    </div>
+  </div>
+</UiFlex>
+
+<RoleFormModal
+  [isOpen]="createOpen()"
+  (close)="createOpen.set(false)"
+  (save)="onSaveRole($event)"
+/>

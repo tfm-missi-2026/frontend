@@ -1,4 +1,4 @@
-import { Component, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ViewChild } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { UiGridComponent } from "./grid.component";
@@ -7,6 +7,7 @@ import { GridBreakpoint, GridColumns } from "./grid.types";
 @Component({
   standalone: true,
   imports: [UiGridComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <UiGrid
       [columns]="columns"

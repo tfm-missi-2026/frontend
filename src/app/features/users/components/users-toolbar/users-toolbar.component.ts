@@ -11,20 +11,8 @@ import { UiFlexComponent } from "@shared/ui/flex";
 import { UiInputComponent } from "@shared/ui/input";
 import { UiSelectComponent } from "@shared/ui/select";
 
-import type { SelectOption } from "@shared/ui/select/select.interface";
+import type { SelectOption } from "@shared/ui/select/select.types";
 
-import type { UserRole, UserStatus } from "../../models/user";
-
-/**
- * `UsersToolbarComponent`
- * -----------------------
- * Barra de filtros de la página de gestión de usuarios. Contiene el
- * input de búsqueda, el filtro por rol y el filtro por estado.
- *
- * Componente presentacional sin estado: el padre controla los valores
- * vía inputs y escucha los cambios vía outputs. Standalone + OnPush +
- * signal API.
- */
 @Component({
   selector: "UsersToolbar",
   standalone: true,
@@ -34,7 +22,7 @@ import type { UserRole, UserStatus } from "../../models/user";
     <UiFlex
       direction="row"
       alignItems="center"
-      gap="12px"
+      [gap]="3"
       className="flex-wrap"
     >
       <UiInput
@@ -42,8 +30,8 @@ import type { UserRole, UserStatus } from "../../models/user";
         type="text"
         placeholder="Buscar por nombre o correo…"
         [leftIcon]="searchIcon"
-        [value]="searchTerm()"
-        (valueChange)="searchChange.emit($event)"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchChange.emit($event)"
       />
 
       <UiSelect

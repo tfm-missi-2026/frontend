@@ -10,7 +10,7 @@ import {
   AVATAR_SIZE_CLASSES,
   AVATAR_STATUS_COLOR_CLASSES,
   AVATAR_STATUS_SIZE_CLASSES,
-} from "./avatar.variants";
+} from "./avatar.utils";
 
 /**
  * `UiAvatar`

@@ -80,13 +80,13 @@ const SOCIAL_LINK_CLASS = "rounded-full! shadow-xs! shadow-theme-xs";
       <UiFlex
         direction="column"
         alignItems="stretch"
-        gap="1.25rem"
+        [gap]="5"
         className="xl:flex-row! xl:items-center! xl:justify-between!"
       >
         <UiFlex
           direction="column"
           alignItems="center"
-          gap="1.5rem"
+          [gap]="6"
           className="xl:flex-row!"
         >
           <UiAvatar
@@ -99,7 +99,7 @@ const SOCIAL_LINK_CLASS = "rounded-full! shadow-xs! shadow-theme-xs";
           <UiFlex
             direction="column"
             alignItems="center"
-            gap="0.25rem"
+            [gap]="1"
             className="order-3 xl:order-2 xl:items-start!"
           >
             <UiHeader
@@ -110,15 +110,17 @@ const SOCIAL_LINK_CLASS = "rounded-full! shadow-xs! shadow-theme-xs";
             <UiFlex
               direction="column"
               alignItems="center"
-              gap="0.25rem"
+              [gap]="1"
               className="xl:flex-row! xl:gap-3!"
             >
               <UiLabel as="p" type="bodyS" color="textWeak" [wrapText]="true">{{
                 user().role
               }}</UiLabel>
-              <div
-                class="hidden h-3.5 w-px bg-gray-300 dark:bg-gray-700 xl:block"
-              ></div>
+              <UiFlex
+                direction="column"
+                [gap]="0"
+                className="hidden h-3.5 w-px bg-gray-300 dark:bg-gray-700 xl:flex"
+              />
               <UiLabel as="p" type="bodyS" color="textWeak" [wrapText]="true">{{
                 user().location
               }}</UiLabel>
@@ -128,7 +130,7 @@ const SOCIAL_LINK_CLASS = "rounded-full! shadow-xs! shadow-theme-xs";
           <UiFlex
             direction="row"
             alignItems="center"
-            gap="0.5rem"
+            [gap]="2"
             className="order-2 grow xl:order-3 xl:justify-end"
           >
             <UiIconButton
@@ -296,7 +298,7 @@ const SOCIAL_LINK_CLASS = "rounded-full! shadow-xs! shadow-theme-xs";
           <UiFlex
             direction="row"
             alignItems="center"
-            gap="0.75rem"
+            [gap]="3"
             className="px-2 mt-6 lg:justify-end"
           >
             <UiButton

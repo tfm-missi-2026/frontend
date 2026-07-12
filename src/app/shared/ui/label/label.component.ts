@@ -22,13 +22,19 @@ import { COLOR_CLASSES } from '@styles/types/colors';
 import { UiTooltipComponent } from '@shared/ui/tooltip/tooltip.component';
 import { TooltipSide } from '@shared/ui/tooltip/tooltip.types';
 
-import { ALIGN_CLASS, FONT_WEIGHT_CLASS, LINE_CLAMP_CLASS } from './label.variants';
+import {
+  ALIGN_CLASS,
+  FONT_SIZE_CLASS,
+  FONT_WEIGHT_CLASS,
+  LINE_CLAMP_CLASS,
+  LINE_HEIGHT_CLASS,
+} from './label.utils';
 
 /**
  * Etiqueta tipográfica del design system renderizada como `<label>`.
  * Detecta overflow y envuelve el texto en un `UiTooltip` cuando aplica.
- * `font-size`/`line-height` se aplican vía `[style.*]` (tokens en px);
- * el resto son clases Tailwind para soportar light/dark vía `dark:`.
+ * El tipográfico se aplica con clases Tailwind (`text-*`, `leading-*`,
+ * `line-clamp-*`) para soportar light/dark vía `dark:`.
  */
 @Component({
   selector: 'UiLabel',
@@ -75,17 +81,18 @@ export class UiLabelComponent {
     return FONT_WEIGHT_CLASS[w];
   });
 
-  readonly fontSize = computed<string>(
-    () => designConstants.typography.fontSize[this.type()],
+  readonly fontSizeClass = computed<string>(
+    () => FONT_SIZE_CLASS[this.type()],
   );
 
-  readonly lineHeight = computed<string>(
-    () => designConstants.typography.lineHeight[this.type()],
+  readonly lineHeightClass = computed<string>(
+    () => LINE_HEIGHT_CLASS[this.type()],
   );
 
-  readonly dynamicLineClamp = computed<string | null>(() => {
+  readonly dynamicLineClampClass = computed<string | null>(() => {
     const n = this.wrapMaxLines();
-    return this.wrapText() && n && !LINE_CLAMP_CLASS[n] ? n.toString() : null;
+    if (!this.wrapText() || !n) return null;
+    return LINE_CLAMP_CLASS[n] ?? `line-clamp-[${n}]`;
   });
 
   readonly hostClasses = computed<string>(() => {
@@ -93,16 +100,17 @@ export class UiLabelComponent {
       'inline-block max-w-full break-words',
       this.resolvedColorClass(),
       this.resolvedWeightClass(),
+      this.fontSizeClass(),
+      this.lineHeightClass(),
       this.className(),
       this.italic() ? 'italic' : null,
       this.align() ? ALIGN_CLASS[this.align()!] : null,
+      this.dynamicLineClampClass(),
     ];
     if (!this.wrapText()) {
       parts.push('whitespace-nowrap overflow-hidden text-ellipsis');
-    } else {
-      const n = this.wrapMaxLines();
-      if (n && LINE_CLAMP_CLASS[n]) parts.push(LINE_CLAMP_CLASS[n]);
-      else if (n) parts.push('overflow-hidden');
+    } else if (!this.wrapMaxLines()) {
+      parts.push('overflow-hidden');
     }
     return parts.filter(Boolean).join(' ');
   });

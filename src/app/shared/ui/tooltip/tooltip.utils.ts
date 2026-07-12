@@ -1,19 +1,23 @@
-import { ConnectedPosition } from '@angular/cdk/overlay';
+import type {
+  ConnectedPosition,
+  FlexibleConnectedPositionStrategy,
+  Overlay,
+} from "@angular/cdk/overlay";
 
-import { TooltipAlign, TooltipSide } from './tooltip.types';
+import { TooltipAlign, TooltipSide, TooltipVariantType } from "./tooltip.types";
+
+const ALIGN_X = (align: TooltipAlign): "start" | "center" | "end" =>
+  align === "start" ? "start" : align === "end" ? "end" : "center";
+
+const ALIGN_Y = (align: TooltipAlign): "top" | "center" | "bottom" =>
+  align === "start" ? "top" : align === "end" ? "bottom" : "center";
 
 /**
  * Orden de prioridad al auto-posicionar: el primero que tenga espacio
  * suficiente es elegido por CDK Overlay. Si `autoPosition` es `false`,
  * se respeta solo el `side` preferido.
  */
-export const SIDE_PRIORITY: TooltipSide[] = ['top', 'right', 'bottom', 'left'];
-
-const ALIGN_X = (align: TooltipAlign): 'start' | 'center' | 'end' =>
-  align === 'start' ? 'start' : align === 'end' ? 'end' : 'center';
-
-const ALIGN_Y = (align: TooltipAlign): 'top' | 'center' | 'bottom' =>
-  align === 'start' ? 'top' : align === 'end' ? 'bottom' : 'center';
+export const SIDE_PRIORITY: TooltipSide[] = ["top", "right", "bottom", "left"];
 
 /**
  * Genera la `ConnectedPosition` para un `side` + `align` + `offset`
@@ -26,35 +30,35 @@ export function sideToPosition(
   offset: number,
 ): ConnectedPosition {
   switch (side) {
-    case 'top':
+    case "top":
       return {
         originX: ALIGN_X(align),
-        originY: 'top',
+        originY: "top",
         overlayX: ALIGN_X(align),
-        overlayY: 'bottom',
+        overlayY: "bottom",
         offsetY: -offset,
       };
-    case 'bottom':
+    case "bottom":
       return {
         originX: ALIGN_X(align),
-        originY: 'bottom',
+        originY: "bottom",
         overlayX: ALIGN_X(align),
-        overlayY: 'top',
+        overlayY: "top",
         offsetY: offset,
       };
-    case 'left':
+    case "left":
       return {
-        originX: 'start',
+        originX: "start",
         originY: ALIGN_Y(align),
-        overlayX: 'end',
+        overlayX: "end",
         overlayY: ALIGN_Y(align),
         offsetX: -offset,
       };
-    case 'right':
+    case "right":
       return {
-        originX: 'end',
+        originX: "end",
         originY: ALIGN_Y(align),
-        overlayX: 'start',
+        overlayX: "start",
         overlayY: ALIGN_Y(align),
         offsetX: offset,
       };
@@ -79,6 +83,22 @@ export function buildPositions(
   return order.map((s) => sideToPosition(s, align, offset));
 }
 
+export function createTooltipPositionStrategy(
+  overlay: Overlay,
+  origin: HTMLElement,
+  side: TooltipSide,
+  align: TooltipAlign,
+  offset: number,
+  autoPosition: boolean,
+): FlexibleConnectedPositionStrategy {
+  return overlay
+    .position()
+    .flexibleConnectedTo(origin)
+    .withPositions(buildPositions(side, align, offset, autoPosition))
+    .withFlexibleDimensions(false)
+    .withPush(true);
+}
+
 let nextTooltipId = 0;
 
 /**
@@ -89,3 +109,61 @@ export function nextTooltipDomId(): string {
   nextTooltipId += 1;
   return `ui-tooltip-${nextTooltipId}`;
 }
+
+/**
+ * Clases Tailwind por variante en modo claro del tema.
+ */
+export const LIGHT_VARIANT_CLASSES: Record<TooltipVariantType, string> = {
+  light:
+    "bg-white text-gray-800 border border-gray-200 px-3 py-3 text-sm leading-5",
+  dark: "bg-gray-900 text-white px-2 py-1 text-xs leading-4.5",
+  info:
+    "bg-blue-light-50 text-blue-light-900 border border-blue-light-200 " +
+    "px-2 py-1 text-xs leading-4.5",
+  success:
+    "bg-success-50 text-success-900 border border-success-200 " +
+    "px-2 py-1 text-xs leading-4.5",
+  warning:
+    "bg-warning-50 text-warning-900 border border-warning-200 " +
+    "px-2 py-1 text-xs leading-4.5",
+  error:
+    "bg-error-50 text-error-900 border border-error-200 " +
+    "px-2 py-1 text-xs leading-4.5",
+};
+
+/**
+ * Clases Tailwind por variante en modo oscuro del tema. Se invierten
+ * fondo y texto para mantener el contraste.
+ */
+export const DARK_VARIANT_CLASSES: Record<TooltipVariantType, string> = {
+  light:
+    "bg-gray-800 text-gray-100 border border-gray-700 " +
+    "px-3 py-3 text-sm leading-5",
+  dark: "bg-gray-900 text-white px-2 py-1 text-xs leading-4.5",
+  info:
+    "bg-blue-light-900/30 text-blue-light-100 border border-blue-light-800 " +
+    "px-2 py-1 text-xs leading-4.5",
+  success:
+    "bg-success-900/30 text-success-100 border border-success-800 " +
+    "px-2 py-1 text-xs leading-4.5",
+  warning:
+    "bg-warning-900/30 text-warning-100 border border-warning-800 " +
+    "px-2 py-1 text-xs leading-4.5",
+  error:
+    "bg-error-900/30 text-error-100 border border-error-800 " +
+    "px-2 py-1 text-xs leading-4.5",
+};
+
+/**
+ * Clases de `translate-*` para la animación direccional por lado.
+ * `from` se aplica cuando el tooltip está cerrado y `to` cuando está abierto.
+ */
+export const SIDE_TRANSLATE_CLASSES: Record<
+  TooltipSide,
+  { from: string; to: string }
+> = {
+  top: { from: "-translate-y-1", to: "translate-y-0" },
+  bottom: { from: "translate-y-1", to: "translate-y-0" },
+  left: { from: "-translate-x-1", to: "translate-x-0" },
+  right: { from: "translate-x-1", to: "translate-x-0" },
+};

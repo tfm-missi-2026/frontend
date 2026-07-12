@@ -1,27 +1,23 @@
-<UiSurface
-  [variant]="surfaceVariant()"
-  [padding]="'md'"
-  [dataTestId]="'alert'"
->
-  <UiFlex [alignItems]="'flex-start'" [gap]="'12px'">
+<UiSurface [variant]="surfaceVariant()" [padding]="'md'" [dataTestId]="'alert'">
+  <UiFlex [alignItems]="'start'" [gap]="12">
     <UiIcon [variant]="iconVariant()" [dataTestId]="'alert-icon'">
       @switch (variant()) {
-        @case ('success') {
+        @case ("success") {
           <IconSuccess [size]="24" />
         }
-        @case ('error') {
+        @case ("error") {
           <IconError [size]="24" />
         }
-        @case ('warning') {
+        @case ("warning") {
           <IconWarning [size]="24" />
         }
-        @case ('info') {
+        @case ("info") {
           <IconInfoCircle [size]="24" />
         }
       }
     </UiIcon>
 
-    <UiFlex [direction]="'column'" [gap]="'2px'">
+    <UiFlex [direction]="'column'" [gap]="2">
       @if (title()) {
         <UiLabel
           [type]="'bodyXs'"

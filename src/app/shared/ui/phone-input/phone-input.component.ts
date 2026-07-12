@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   ElementRef,
   forwardRef,
   input,
@@ -17,9 +18,8 @@ import {
 import { IconChevronDownComponent } from "@shared/icons";
 import { UiFormLabelComponent } from "@shared/ui/form-label/form-label.component";
 import { UiLabelComponent } from "@shared/ui/label/label.component";
-import { horizontalPaddingNumber, inputHeight } from "@shared/ui/input/input/common";
 import { getFocusStyling } from "@utils/styling";
-import type { CountryCode, PhoneSelectPosition } from "./types";
+import type { CountryCode, PhoneSelectPosition } from "./phone-input.types";
 
 /**
  * `UiPhoneInput`
@@ -81,9 +81,7 @@ export class UiPhoneInputComponent
   readonly inputEl =
     viewChild.required<ElementRef<HTMLInputElement>>("inputEl");
 
-  /** País actualmente seleccionado (`code`). */
   readonly selectedCountry = signal<string>("");
-  /** Número de teléfono (sin código de país). */
   readonly phoneNumber = signal<string>("");
 
   private onChangeFn: (value: string) => void = () => {};
@@ -117,7 +115,6 @@ export class UiPhoneInputComponent
     this.blurEvt.emit();
   }
 
-  /** Compone el valor completo y emite. */
   private emitValue(): void {
     const full = `${this.selectedCountry()} ${this.phoneNumber()}`.trim();
     this.onChangeFn(full);
@@ -125,14 +122,8 @@ export class UiPhoneInputComponent
     this.phoneChange.emit(this.phoneNumber());
   }
 
-  // ---------------------------------------------------------------------------
-  // ControlValueAccessor
-  // ---------------------------------------------------------------------------
-
   writeValue(value: string | null | undefined): void {
     if (!value) return;
-    // El valor controlado tiene el formato "<código> <número>" —
-    // separamos en el primer espacio.
     const idx = value.indexOf(" ");
     if (idx < 0) {
       this.selectedCountry.set(value);
@@ -158,39 +149,37 @@ export class UiPhoneInputComponent
     if (inp) inp.disabled = isDisabled;
   }
 
-  // ---------------------------------------------------------------------------
-  // Computed styling
-  // ---------------------------------------------------------------------------
+  readonly hasError = computed<boolean>(() => !!this.errorMessage());
+  readonly isEffectivelyDisabled = computed<boolean>(
+    () => this.disabled() || this.readOnly(),
+  );
 
-  readonly hasError = (): boolean => !!this.errorMessage();
-  readonly isEffectivelyDisabled = (): boolean =>
-    this.disabled() || this.readOnly();
-
-  readonly outerClasses = (): string =>
-    ["flex flex-col gap-1 w-full font-outfit", this.className()]
+  readonly outerClasses = computed<string>(() =>
+    [
+      "flex flex-col gap-1 w-full font-outfit",
+      this.className(),
+      this.width() ?? "",
+    ]
       .filter(Boolean)
-      .join(" ");
+      .join(" "),
+  );
 
-  readonly outerStyles = (): Record<string, string> => ({
-    width: this.width() ?? "",
-  });
-
-  readonly selectClasses = (): string => {
+  readonly selectClasses = computed<string>(() => {
     const pos = this.selectPosition();
     const isStart = pos === "start";
     return [
-      "appearance-none bg-none border-0 leading-tight text-gray-700 dark:text-gray-400",
+      "appearance-none bg-none border-0 h-10 py-0 pl-3 pr-8 leading-tight text-gray-700 dark:text-gray-400",
       "focus:outline-hidden",
-      isStart ? "rounded-l-lg border-r border-gray-200 dark:border-gray-800" : "",
-      !isStart ? "rounded-r-lg border-l border-gray-200 dark:border-gray-800" : "",
-      isStart ? "py-3 pl-3.5 pr-8" : "py-3 pl-3.5 pr-8",
+      isStart
+        ? "rounded-l-lg border-r border-gray-200 dark:border-gray-800"
+        : "rounded-r-lg border-l border-gray-200 dark:border-gray-800",
       this.isEffectivelyDisabled() ? "cursor-not-allowed opacity-60" : "",
     ]
       .filter(Boolean)
       .join(" ");
-  };
+  });
 
-  readonly inputClasses = (): string => {
+  readonly inputClasses = computed<string>(() => {
     const pos = this.selectPosition();
     return [
       "h-11 w-full rounded-lg border bg-transparent py-3 px-4 text-sm text-gray-800 shadow-theme-xs",
@@ -204,29 +193,25 @@ export class UiPhoneInputComponent
     ]
       .filter(Boolean)
       .join(" ");
-  };
+  });
 
-  /** Posición del wrapper del selector. */
-  readonly selectWrapperClasses = (): string => {
-    return this.selectPosition() === "start" ? "absolute left-0" : "absolute right-0";
-  };
+  readonly selectWrapperClasses = computed<string>(() =>
+    this.selectPosition() === "start" ? "absolute left-0" : "absolute right-0",
+  );
 
-  /** Focus styling del contenedor global (input + select). */
-  readonly containerClasses = (): string =>
-    ["relative flex", getFocusStyling("within"), "rounded-lg"]
+  readonly containerClasses = computed<string>(() =>
+    [
+      "relative flex h-10",
+      getFocusStyling("within"),
+      "rounded-lg border border-solid",
+      "bg-white dark:bg-gray-900",
+      this.isEffectivelyDisabled() || this.readOnly()
+        ? "bg-gray-50 border-gray-300"
+        : this.hasError()
+          ? "border-error-500"
+          : "border-gray-300",
+    ]
       .filter(Boolean)
-      .join(" ");
-
-  /** Altura común al contenedor (igual a `inputHeight`). */
-  readonly containerStyles = (): Record<string, string> => ({
-    height: inputHeight,
-  });
-
-  /** Estilos para el `<select>` (alto = container). */
-  readonly selectStyles = (): Record<string, string> => ({
-    height: inputHeight,
-    "padding-top": "0",
-    "padding-bottom": "0",
-    "padding-left": `${horizontalPaddingNumber}px`,
-  });
+      .join(" "),
+  );
 }

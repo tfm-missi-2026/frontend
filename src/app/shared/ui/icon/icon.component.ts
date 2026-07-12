@@ -5,7 +5,7 @@ import {
   input,
 } from '@angular/core';
 
-import { ICON_VARIANT_CLASSES, IconVariant } from './icon.variants';
+import { ICON_VARIANT_CLASSES, IconVariant } from './icon.utils';
 
 /**
  * `UiIcon`

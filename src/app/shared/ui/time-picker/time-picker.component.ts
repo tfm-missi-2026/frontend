@@ -22,7 +22,6 @@ import { IconClockComponent } from "@shared/icons";
 import { UiFormLabelComponent } from "@shared/ui/form-label/form-label.component";
 import { UiLabelComponent } from "@shared/ui/label/label.component";
 import { getFocusStyling } from "@utils/styling";
-import { horizontalPaddingNumber, inputHeight } from "@shared/ui/input/input/common";
 
 /**
  * `UiTimePicker`
@@ -120,9 +119,7 @@ export class UiTimePickerComponent
     this.flatpickrInstance?.destroy();
   }
 
-  // ---------------------------------------------------------------------------
   // ControlValueAccessor
-  // ---------------------------------------------------------------------------
 
   writeValue(value: string | null | undefined): void {
     this.internalValue = value ?? "";
@@ -152,28 +149,24 @@ export class UiTimePickerComponent
     this.focusEvt.emit();
   }
 
-  // ---------------------------------------------------------------------------
-  // Computed styling
-  // ---------------------------------------------------------------------------
-
   readonly hasError = computed<boolean>(() => !!this.errorMessage());
   readonly isEffectivelyDisabled = computed<boolean>(
     () => this.disabled() || this.readOnly(),
   );
 
   readonly outerClasses = computed<string>(() =>
-    ["flex flex-col gap-1 w-full font-outfit", this.className()]
+    [
+      "flex flex-col gap-1 w-full font-outfit",
+      this.className(),
+      this.width() ?? "",
+    ]
       .filter(Boolean)
       .join(" "),
   );
 
-  readonly outerStyles = computed<Record<string, string>>(() => ({
-    width: this.width() ?? "",
-  }));
-
   readonly containerClasses = computed<string>(() => {
     const baseLayout = [
-      "flex items-center gap-2 w-full rounded-lg border border-solid",
+      "flex items-center gap-2 w-full h-10 px-3 rounded-lg border border-solid",
       "bg-white dark:bg-gray-900",
       this.isEffectivelyDisabled() || this.readOnly()
         ? "bg-gray-50 border-gray-300"
@@ -184,12 +177,6 @@ export class UiTimePickerComponent
     ];
     return baseLayout.join(" ");
   });
-
-  readonly containerStyles = computed<Record<string, string>>(() => ({
-    height: inputHeight,
-    "padding-left": `${horizontalPaddingNumber}px`,
-    "padding-right": `${horizontalPaddingNumber}px`,
-  }));
 
   readonly inputClasses = computed<string>(() =>
     [

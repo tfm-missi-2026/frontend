@@ -13,7 +13,6 @@
 
 <div
   [class]="outerClasses()"
-  [style]="outerStyles()"
   data-testid="phone-input-wrapper"
 >
   @if (labelText(); as lt) {
@@ -29,7 +28,6 @@
 
   <div
     [class]="containerClasses()"
-    [style]="containerStyles()"
     data-testid="phone-input-container"
   >
     <!-- Selector de país -->
@@ -37,7 +35,6 @@
       <select
         #selectEl
         [class]="selectClasses()"
-        [style]="selectStyles()"
         [value]="selectedCountry()"
         [disabled]="isEffectivelyDisabled()"
         (change)="handleCountryChange($event)"

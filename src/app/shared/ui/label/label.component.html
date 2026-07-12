@@ -16,9 +16,6 @@
     #container
     [attr.for]="for() || null"
     [class]="hostClasses()"
-    [style.font-size]="fontSize()"
-    [style.line-height]="lineHeight()"
-    [style.-webkit-line-clamp]="dynamicLineClamp()"
   >
     @if (text()) {
       {{ text() }}

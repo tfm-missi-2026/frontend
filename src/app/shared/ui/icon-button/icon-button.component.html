@@ -2,7 +2,6 @@
   @if (asLink()) {
     <a
       [class]="buttonClasses()"
-      [style]="widthStyle()"
       [attr.href]="linkProps()?.href || null"
       [attr.target]="linkProps()?.target || null"
       [attr.download]="linkProps()?.download || null"
@@ -18,7 +17,6 @@
   } @else {
     <button
       [class]="buttonClasses()"
-      [style]="widthStyle()"
       [type]="isSubmit() ? 'submit' : 'button'"
       [disabled]="isEffectivelyDisabled()"
       [attr.aria-label]="labelText() || null"

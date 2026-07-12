@@ -101,7 +101,7 @@ const ACTION_CLASS =
         (close)="closeDropdown()"
         [className]="PANEL_CLASS"
       >
-        <UiFlex direction="column" gap="0.125rem" [className]="HEADER_CLASS">
+        <UiFlex direction="column" [gap]="0.5" [className]="HEADER_CLASS">
           <UiLabel
             type="bodyS"
             color="textStrong"

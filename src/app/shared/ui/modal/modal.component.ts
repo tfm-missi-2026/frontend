@@ -53,7 +53,7 @@ import { IconXComponent } from "@shared/icons";
               <IconX
                 [size]="24"
                 color="currentColor"
-                [style]="{ 'stroke-width': '2' }"
+                className="stroke-2"
               />
             </button>
           }
@@ -88,9 +88,12 @@ export class UiModalComponent {
   private readonly platformId = inject(PLATFORM_ID);
 
   constructor() {
-    effect(() => {
+    effect((onCleanup) => {
       if (!isPlatformBrowser(this.platformId)) return;
       document.body.style.overflow = this.isOpen() ? "hidden" : "";
+      onCleanup(() => {
+        document.body.style.overflow = "";
+      });
     });
   }
 

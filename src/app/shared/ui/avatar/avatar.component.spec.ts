@@ -1,4 +1,4 @@
-import { Component, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ViewChild } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { UiAvatarComponent } from "./avatar.component";
@@ -10,6 +10,7 @@ import { AvatarSize, AvatarStatus } from "./avatar.types";
 @Component({
   standalone: true,
   imports: [UiAvatarComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <UiAvatar [src]="src" [alt]="alt" [size]="size" [status]="status" />
   `,

@@ -29,7 +29,7 @@ import {
   ButtonTooltip,
   ButtonVariant,
 } from "@shared/ui/button/button.types";
-import { getVariantClasses } from "@shared/ui/button/button.variants";
+import { getVariantClasses } from "@shared/ui/button/button.utils";
 
 /**
  * Botón cuadrado (aspect-ratio 1:1) con un único ícono. Mismas
@@ -137,6 +137,7 @@ export class UiIconButtonComponent {
       "border border-solid",
       this.compact() ? "p-1" : "p-2",
       aspect,
+      width ?? "",
     ];
 
     if (this.showWrapper()) {
@@ -169,12 +170,6 @@ export class UiIconButtonComponent {
     if (explicit) return explicit;
     if (this.linkProps()?.target === "_blank") return "noopener noreferrer";
     return null;
-  });
-
-  /** Estilo inline para ancho explícito (`[style.width]` evita JIT miss). */
-  readonly widthStyle = computed<{ width?: string }>(() => {
-    const width = this.width();
-    return width !== undefined ? { width } : {};
   });
 
   private getFocusClasses(): string {

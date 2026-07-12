@@ -1,15 +1,13 @@
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   computed,
+  effect,
   ElementRef,
   forwardRef,
   HostListener,
   inject,
   input,
-  OnDestroy,
-  OnInit,
   output,
   signal,
   viewChild,
@@ -20,8 +18,6 @@ import {
   FormsModule,
   NG_VALUE_ACCESSOR,
 } from "@angular/forms";
-import { Subject, Subscription } from "rxjs";
-import { debounceTime, distinctUntilChanged } from "rxjs/operators";
 
 import {
   IconCheckComponent,
@@ -38,11 +34,11 @@ import {
   MessageFn,
   SelectOption,
   SelectValue,
-} from "./select.interface";
+} from "./select.types";
+import { resolveMessage, trackByValue } from "./select.utils";
 
 /**
  * `UiSelect`
- * ----------
  * Select con búsqueda, async, creatable, clearable, single/multi, error,
  * disabled/readOnly, required, etc.
  *
@@ -75,11 +71,7 @@ import {
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UiSelectComponent
-  implements ControlValueAccessor, OnInit, OnDestroy
-{
-  // Inputs
-
+export class UiSelectComponent implements ControlValueAccessor {
   readonly options = input<SelectOption[]>([]);
   readonly placeholder = input<string>("Seleccionar");
   readonly required = input<boolean>(false);
@@ -110,18 +102,11 @@ export class UiSelectComponent
     undefined,
   );
 
-  /** Texto del label. */
   readonly labelText = input<string>("");
-  /** Tooltip mostrado al lado del label. */
   readonly tooltip = input<string | undefined>(undefined);
-  /** Mensaje de error (colorea el borde y muestra un ícono). */
   readonly errorMessage = input<string | undefined>(undefined);
-  /** Si `true`, el menú se abre con focus automático en el input. */
   readonly autoFocus = input<boolean>(false);
-  /** Tiempo de debounce para el modo async (ms). */
   readonly debounceMs = input<number>(300);
-
-  // Outputs
 
   readonly selectionChange = output<unknown>();
   readonly menuOpenChange = output<boolean>();
@@ -130,80 +115,54 @@ export class UiSelectComponent
   readonly blur = output<void>();
   readonly focus = output<void>();
 
-  // Estado interno
-
   readonly searchInputRef =
     viewChild<ElementRef<HTMLInputElement>>("searchInputRef");
   readonly rootRef = viewChild<ElementRef<HTMLElement>>("rootRef");
 
-  /** Valor crudo (puede ser primitivo, array u objeto opción). */
-  value: unknown = null;
-
-  /** Texto de búsqueda inmediato (lo que ve el input). */
-  searchInput = "";
-
-  /** Texto de búsqueda debounced (usado para filtrar y emitir). */
-  search = "";
-
-  /** Estado interno del menú (cuando no se controla con `menuIsOpen`). */
-  private readonly _internalOpen = signal(false);
-
-  /** Estado interno de carga (para `loadOptions` async). */
-  internalLoading = false;
-
-  /** Índice de la opción enfocada en el menú. */
+  readonly value = signal<unknown>(null);
+  readonly searchInput = signal<string>("");
+  readonly search = signal<string>("");
+  readonly internalLoading = signal<boolean>(false);
   focusedIndex = -1;
 
-  /**
-   * Override interno de `options()` (para `createFromInput` y async load).
-   * Si está definido, se usa en lugar del input. El input se ignora.
-   */
+  private readonly _internalOpen = signal(false);
   private readonly _optionsOverride = signal<SelectOption[] | null>(null);
-
-  /**
-   * Override interno de `isDisabled()` (para `setDisabledState`).
-   * Si está definido, se usa en lugar del input.
-   */
   private readonly _isDisabledOverride = signal<boolean | null>(null);
-
-  private searchSubject = new Subject<string>();
-  private searchSub?: Subscription;
-  private cdr = inject(ChangeDetectorRef);
-
-  // ControlValueAccessor
+  private readonly _lastDebouncedTerm = signal<string | null>(null);
 
   private onChangeFn: (value: unknown) => void = () => {};
   private onTouchedFn: () => void = () => {};
 
-  ngOnInit(): void {
-    this.searchSub = this.searchSubject
-      .pipe(debounceTime(this.debounceMs()), distinctUntilChanged())
-      .subscribe((term) => {
-        this.search = term;
+  constructor() {
+    effect((onCleanup) => {
+      const term = this.searchInput();
+      const ms = this.debounceMs();
+      const last = this._lastDebouncedTerm();
+      if (term === last) return;
+
+      const handle = setTimeout(() => {
+        this._lastDebouncedTerm.set(term);
+        this.search.set(term);
         this.searchChange.emit(term);
         if (this.async() && this.loadOptions()) {
           void this.runLoadOptions(term);
         }
-        this.cdr.markForCheck();
-      });
+      }, ms);
 
-    if (this.async() && this.loadOptions() && this.defaultOptions() === true) {
-      void this.runLoadOptions("");
-    }
+      onCleanup(() => clearTimeout(handle));
+    });
+
+    effect(() => {
+      if (this.async() && this.loadOptions() && this.defaultOptions() === true) {
+        void this.runLoadOptions("");
+      }
+    });
   }
 
-  ngOnDestroy(): void {
-    this.searchSub?.unsubscribe();
-  }
-
-  // View bindings (computed)
-
-  /** `options` efectivo (override del CVA si está, sino el input). */
   readonly effectiveOptions = computed<SelectOption[]>(
     () => this._optionsOverride() ?? this.options(),
   );
 
-  /** `isDisabled` efectivo (override del CVA si está, sino el input). */
   readonly effectiveIsDisabled = computed<boolean>(
     () => this._isDisabledOverride() ?? this.isDisabled(),
   );
@@ -215,12 +174,12 @@ export class UiSelectComponent
   );
 
   readonly showLoading = computed<boolean>(
-    () => this.isLoading() || this.internalLoading,
+    () => this.isLoading() || this.internalLoading(),
   );
 
   readonly filteredOptions = computed<SelectOption[]>(() => {
     if (this.async()) return this.effectiveOptions();
-    const term = this.searchInput?.trim().toLowerCase() ?? "";
+    const term = this.searchInput().trim().toLowerCase();
     if (!term) return this.effectiveOptions();
     return this.effectiveOptions().filter((opt) =>
       opt.label.toLowerCase().includes(term),
@@ -229,7 +188,8 @@ export class UiSelectComponent
 
   readonly selectedOptions = computed<SelectOption[]>(() => {
     if (!this.isMulti()) return [];
-    const arr = Array.isArray(this.value) ? this.value : [];
+    const value = this.value();
+    const arr = Array.isArray(value) ? value : [];
     return this.effectiveOptions().filter((o) =>
       (arr as (string | number)[]).includes(o.value as string | number),
     );
@@ -237,14 +197,15 @@ export class UiSelectComponent
 
   readonly selectedOption = computed<SelectOption | null>(() => {
     if (this.isMulti()) return null;
+    const value = this.value();
     if (
-      this.value &&
-      typeof this.value === "object" &&
-      "label" in (this.value as object)
+      value &&
+      typeof value === "object" &&
+      "label" in (value as object)
     ) {
-      return this.value as SelectOption;
+      return value as SelectOption;
     }
-    return this.effectiveOptions().find((o) => o.value === this.value) ?? null;
+    return this.effectiveOptions().find((o) => o.value === value) ?? null;
   });
 
   readonly displayLabel = computed<string>(
@@ -252,10 +213,23 @@ export class UiSelectComponent
   );
 
   readonly hasValue = computed<boolean>(() => {
-    if (this.isMulti())
-      return Array.isArray(this.value) && this.value.length > 0;
-    return this.value !== null && this.value !== undefined && this.value !== "";
+    if (this.isMulti()) {
+      const v = this.value();
+      return Array.isArray(v) && v.length > 0;
+    }
+    const v = this.value();
+    return v !== null && v !== undefined && v !== "";
   });
+
+  readonly widthClass = computed<string>(() => this.width() ?? "w-full");
+
+  readonly minWidthClass = computed<string>(() => {
+    const v = this.minWidth();
+    return v ? `min-w-[${v}]` : "";
+  });
+
+  readonly resolveMessage = resolveMessage;
+  readonly trackByValue = trackByValue;
 
   onChange(value: unknown): void {
     this.onChangeFn(value);
@@ -265,26 +239,18 @@ export class UiSelectComponent
     this.onTouchedFn();
   }
 
-  // ---------------------------------------------------------------------------
-  // Helpers de UI
-  // ---------------------------------------------------------------------------
-
-  resolveMessage(msg: MessageFn | string | undefined): string {
-    if (!msg) return "";
-    return typeof msg === "function" ? (msg as MessageFn)() : (msg as string);
-  }
-
   isSelected(option: SelectOption): boolean {
+    const value = this.value();
     if (this.isMulti()) {
-      const arr = Array.isArray(this.value) ? this.value : [];
+      const arr = Array.isArray(value) ? value : [];
       return (arr as (string | number)[]).includes(
         option.value as string | number,
       );
     }
-    if (this.value && typeof this.value === "object") {
-      return (this.value as SelectOption).value === option.value;
+    if (value && typeof value === "object") {
+      return (value as SelectOption).value === option.value;
     }
-    return this.value === option.value;
+    return value === option.value;
   }
 
   isOptionDisabledFn(option: SelectOption): boolean {
@@ -299,10 +265,6 @@ export class UiSelectComponent
     }
     return false;
   }
-
-  trackByValue = (_: number, opt: SelectOption): unknown => opt.value;
-
-  // Interacción
 
   onControlClick(): void {
     if (this.effectiveIsDisabled() || this.readOnly()) return;
@@ -322,9 +284,8 @@ export class UiSelectComponent
   }
 
   onSearchInput(value: string): void {
-    this.searchInput = value;
+    this.searchInput.set(value);
     if (!this.isOpen()) this.setOpen(true);
-    this.searchSubject.next(value);
   }
 
   setOpen(v: boolean): void {
@@ -351,7 +312,7 @@ export class UiSelectComponent
         event.preventDefault();
         if (
           this.creatable() &&
-          this.searchInput.trim() &&
+          this.searchInput().trim() &&
           this.filteredOptions().length === 0
         ) {
           this.createFromInput();
@@ -380,16 +341,18 @@ export class UiSelectComponent
           this.setOpen(false);
         }
         break;
-      case "Backspace":
+      case "Backspace": {
+        const currentValue = this.value();
         if (
           this.isMulti() &&
-          !this.searchInput &&
-          Array.isArray(this.value) &&
-          this.value.length > 0
+          !this.searchInput() &&
+          Array.isArray(currentValue) &&
+          currentValue.length > 0
         ) {
-          this.removeAt(this.value.length - 1);
+          this.removeAt(currentValue.length - 1);
         }
         break;
+      }
     }
   }
 
@@ -416,14 +379,13 @@ export class UiSelectComponent
     this.focusedIndex = index;
   }
 
-  // Selección
-
   selectOption(option: SelectOption, event?: MouseEvent): void {
     if (event) event.stopPropagation();
     if (this.isOptionDisabledFn(option)) return;
 
     if (this.isMulti()) {
-      const arr = Array.isArray(this.value) ? [...this.value] : [];
+      const current = this.value();
+      const arr = Array.isArray(current) ? [...current] : [];
       const idx = (arr as (string | number)[]).indexOf(
         option.value as string | number,
       );
@@ -432,31 +394,30 @@ export class UiSelectComponent
       } else {
         (arr as (string | number)[]).push(option.value as string | number);
       }
-      this.value = arr;
-      this.onChangeFn(this.value);
-      this.selectionChange.emit(this.value);
-      this.searchInput = "";
-      this.search = "";
-      this.searchSubject.next("");
+      this.value.set(arr);
+      this.onChangeFn(arr);
+      this.selectionChange.emit(arr);
+      this.searchInput.set("");
+      this.search.set("");
     } else {
-      this.value = option.value;
-      this.onChangeFn(this.value);
-      this.selectionChange.emit(this.value);
-      this.searchInput = "";
-      this.search = "";
-      this.searchSubject.next("");
+      this.value.set(option.value);
+      this.onChangeFn(option.value);
+      this.selectionChange.emit(option.value);
+      this.searchInput.set("");
+      this.search.set("");
       if (this.closeOnSelect()) this.setOpen(false);
     }
   }
 
   removeAt(index: number, event?: MouseEvent): void {
     if (event) event.stopPropagation();
-    if (!Array.isArray(this.value)) return;
-    const arr = [...this.value];
+    const current = this.value();
+    if (!Array.isArray(current)) return;
+    const arr = [...current];
     arr.splice(index, 1);
-    this.value = arr;
-    this.onChangeFn(this.value);
-    this.selectionChange.emit(this.value);
+    this.value.set(arr);
+    this.onChangeFn(arr);
+    this.selectionChange.emit(arr);
   }
 
   clearValue(event?: MouseEvent): void {
@@ -465,16 +426,15 @@ export class UiSelectComponent
       event.preventDefault();
     }
     if (this.effectiveIsDisabled() || this.readOnly()) return;
-    this.value = this.isMulti() ? [] : null;
-    this.searchInput = "";
-    this.search = "";
-    this.searchSubject.next("");
-    this.onChangeFn(this.value);
-    this.selectionChange.emit(this.value);
+    this.value.set(this.isMulti() ? [] : null);
+    this.searchInput.set("");
+    this.search.set("");
+    this.onChangeFn(this.value());
+    this.selectionChange.emit(this.value());
   }
 
   createFromInput(): void {
-    const label = this.searchInput.trim();
+    const label = this.searchInput().trim();
     if (!label) return;
     const newOption: SelectOption = { value: label, label };
     this._optionsOverride.set([...this.effectiveOptions(), newOption]);
@@ -482,13 +442,10 @@ export class UiSelectComponent
     this.selectOption(newOption);
   }
 
-  // Async
-
   private async runLoadOptions(term: string): Promise<void> {
     const fn = this.loadOptions();
     if (!fn) return;
-    this.internalLoading = true;
-    this.cdr.markForCheck();
+    this.internalLoading.set(true);
     try {
       const result = await fn(term);
       this._optionsOverride.set(result ?? []);
@@ -496,22 +453,18 @@ export class UiSelectComponent
     } catch {
       this._optionsOverride.set([]);
     } finally {
-      this.internalLoading = false;
-      this.cdr.markForCheck();
+      this.internalLoading.set(false);
     }
   }
 
-  // ControlValueAccessor
-
   writeValue(value: SelectValue): void {
     if (this.isMulti()) {
-      this.value = Array.isArray(value) ? value : [];
+      this.value.set(Array.isArray(value) ? value : []);
     } else if (value && typeof value === "object" && !Array.isArray(value)) {
-      this.value = (value as SelectOption).value;
+      this.value.set((value as SelectOption).value);
     } else {
-      this.value = value ?? null;
+      this.value.set(value ?? null);
     }
-    this.cdr.markForCheck();
   }
 
   registerOnChange(fn: (value: unknown) => void): void {
@@ -524,10 +477,7 @@ export class UiSelectComponent
 
   setDisabledState(isDisabled: boolean): void {
     this._isDisabledOverride.set(isDisabled);
-    this.cdr.markForCheck();
   }
-
-  // Click-outside
 
   @HostListener("document:click", ["$event"])
   onDocumentClick(event: MouseEvent): void {

@@ -1,4 +1,4 @@
-import { Component, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ViewChild } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { UiImageComponent } from "./image.component";
@@ -11,6 +11,7 @@ import {
 @Component({
   standalone: true,
   imports: [UiImageComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <UiImage
       [src]="src"

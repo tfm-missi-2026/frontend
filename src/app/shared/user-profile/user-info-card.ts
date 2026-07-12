@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
 import { UiButtonComponent } from "@shared/ui/button";
 import { UiCardComponent } from "@shared/ui/card";
 import { UiFlexComponent } from "@shared/ui/flex";
+import { UiFormComponent } from "@shared/ui/form";
 import { UiGridComponent } from "@shared/ui/grid";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiInputComponent } from "@shared/ui/input";
@@ -45,6 +46,7 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
     UiButtonComponent,
     UiCardComponent,
     UiFlexComponent,
+    UiFormComponent,
     UiGridComponent,
     UiHeaderComponent,
     UiInputComponent,
@@ -57,10 +59,10 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
       <UiFlex
         direction="column"
         alignItems="stretch"
-        gap="1.5rem"
+        [gap]="6"
         className="lg:flex-row! lg:items-start! lg:justify-between!"
       >
-        <div class="min-w-0">
+        <UiFlex direction="column" [gap]="0" className="min-w-0">
           <UiHeader
             [level]="4"
             text="Personal Information"
@@ -68,7 +70,7 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
           />
 
           <UiGrid [columns]="2" breakpoint="lg" gap="gap-4 lg:gap-7 2xl:gap-x-32" ariaLabel="Personal information fields">
-            <UiFlex direction="column" gap="0.5rem">
+            <UiFlex direction="column" [gap]="2">
               <UiLabel
                 as="p"
                 type="bodyXs"
@@ -83,7 +85,7 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
                 [wrapText]="true"
               >{{ info().firstName }}</UiLabel>
             </UiFlex>
-            <UiFlex direction="column" gap="0.5rem">
+            <UiFlex direction="column" [gap]="2">
               <UiLabel
                 as="p"
                 type="bodyXs"
@@ -98,7 +100,7 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
                 [wrapText]="true"
               >{{ info().lastName }}</UiLabel>
             </UiFlex>
-            <UiFlex direction="column" gap="0.5rem">
+            <UiFlex direction="column" [gap]="2">
               <UiLabel
                 as="p"
                 type="bodyXs"
@@ -113,7 +115,7 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
                 [wrapText]="true"
               >{{ info().email }}</UiLabel>
             </UiFlex>
-            <UiFlex direction="column" gap="0.5rem">
+            <UiFlex direction="column" [gap]="2">
               <UiLabel
                 as="p"
                 type="bodyXs"
@@ -128,7 +130,7 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
                 [wrapText]="true"
               >{{ info().phone }}</UiLabel>
             </UiFlex>
-            <UiFlex direction="column" gap="0.5rem">
+            <UiFlex direction="column" [gap]="2">
               <UiLabel
                 as="p"
                 type="bodyXs"
@@ -144,7 +146,7 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
               >{{ info().bio }}</UiLabel>
             </UiFlex>
           </UiGrid>
-        </div>
+        </UiFlex>
 
         <UiButton
           variant="secondary"
@@ -163,8 +165,8 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
       (close)="closeModal()"
       className="max-w-175 m-4"
     >
-      <div class="no-scrollbar relative w-full max-w-175 overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
-        <div class="px-2 pr-14">
+      <UiFlex direction="column" [gap]="0" className="no-scrollbar relative w-full max-w-175 overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
+        <UiFlex direction="column" [gap]="0" className="px-2 pr-14">
           <UiHeader
             [level]="4"
             text="Edit Personal Information"
@@ -178,10 +180,10 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
             [wrapText]="true"
             className="mb-6 lg:mb-7"
           />
-        </div>
-        <form class="flex flex-col" (submit)="$event.preventDefault(); handleSave()">
-          <div class="custom-scrollbar h-112.5 overflow-y-auto px-2 pb-3">
-            <div>
+        </UiFlex>
+        <UiForm (submit)="handleSave()" className="flex flex-col">
+          <UiFlex direction="column" [gap]="0" className="custom-scrollbar h-112.5 overflow-y-auto px-2 pb-3">
+            <UiFlex direction="column" [gap]="0">
               <UiHeader
                 [level]="5"
                 text="Social Links"
@@ -193,8 +195,8 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
                 <UiInput labelText="Linkedin" type="text" [value]="social().linkedin" />
                 <UiInput labelText="Instagram" type="text" [value]="social().instagram" />
               </UiGrid>
-            </div>
-            <div class="mt-7">
+            </UiFlex>
+            <UiFlex direction="column" [gap]="0" className="mt-7">
               <UiHeader
                 [level]="5"
                 text="Personal Information"
@@ -207,12 +209,12 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
                 <UiInput className="col-span-2 lg:col-span-1" labelText="Phone" type="text" [value]="info().phone" />
                 <UiInput className="col-span-2" labelText="Bio" type="text" [value]="info().bio" />
               </UiGrid>
-            </div>
-          </div>
+            </UiFlex>
+          </UiFlex>
           <UiFlex
             direction="row"
             alignItems="center"
-            gap="0.75rem"
+            [gap]="3"
             className="px-2 mt-6 lg:justify-end"
           >
             <UiButton variant="secondary" [compact]="true" (click)="closeModal()">
@@ -222,8 +224,8 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
               Save Changes
             </UiButton>
           </UiFlex>
-        </form>
-      </div>
+        </UiForm>
+      </UiFlex>
     </UiModal>
   `,
 })

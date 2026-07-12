@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { Component } from "@angular/core";
+import { ChangeDetectionStrategy, Component } from "@angular/core";
 import { By } from "@angular/platform-browser";
 import { provideRouter } from "@angular/router";
 
@@ -9,6 +9,7 @@ import { UiDropdownItemComponent } from "./dropdown-item.component";
   selector: "UiDropdownItemHost",
   standalone: true,
   imports: [UiDropdownItemComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <UiDropdownItem
       [to]="to"

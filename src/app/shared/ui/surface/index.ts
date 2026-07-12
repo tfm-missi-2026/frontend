@@ -10,5 +10,5 @@ export {
   SURFACE_BASE_CLASSES,
   SURFACE_PADDING_CLASSES,
   SURFACE_VARIANT_CLASSES,
-} from './surface.variants';
+} from './surface.utils';
 export type { SurfacePadding, SurfaceVariant } from './surface.types';

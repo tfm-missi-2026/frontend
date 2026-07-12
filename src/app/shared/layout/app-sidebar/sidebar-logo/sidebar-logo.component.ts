@@ -28,7 +28,7 @@ import { UiImageComponent } from "@shared/ui/image";
     <UiFlex
       direction="row"
       alignItems="center"
-      [justifyContent]="isExpandedOrHovered() ? 'flex-start' : 'center'"
+      [justifyContent]="isExpandedOrHovered() ? 'start' : 'center'"
       className="py-8"
     >
       <a routerLink="/" [attr.aria-label]="'Inicio'">
