@@ -64,9 +64,7 @@ export class UiDropdownItemComponent {
   readonly itemClick = output<void>();
 
   /** `true` si debe renderizarse como `<a routerLink>`. */
-  readonly isLink = computed<boolean>(
-    () => this.tag() === "a" || !!this.to(),
-  );
+  readonly isLink = computed<boolean>(() => this.tag() === "a" || !!this.to());
 
   readonly containerClasses = computed<string>(() =>
     [this.baseClassName(), this.className()].filter(Boolean).join(" "),

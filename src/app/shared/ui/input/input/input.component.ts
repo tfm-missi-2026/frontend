@@ -16,10 +16,7 @@ import {
 import { NgComponentOutlet } from "@angular/common";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 
-import {
-  IconEyeOffComponent,
-  IconEyeOpenComponent,
-} from "@shared/icons";
+import { IconEyeOffComponent, IconEyeOpenComponent } from "@shared/icons";
 import { ColorType, COLOR_CLASSES } from "@styles/types/colors";
 import { FontWeightType } from "@styles/types/typography";
 import { getFocusStyling } from "@utils/styling";

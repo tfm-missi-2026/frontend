@@ -1,1 +1,6 @@
-<SigninForm (submitForm)="onSubmit($event)" (signUpRequested)="onSignUp()" />
+<SigninForm
+  [loading]="loading()"
+  [errorMessage]="errorMessage()"
+  (submitForm)="onSubmit($event)"
+  (signUpRequested)="onSignUp()"
+/>

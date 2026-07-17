@@ -9,10 +9,7 @@ import {
 } from "@angular/forms";
 
 import { UiSelectComponent } from "@shared/ui/select/select.component";
-import {
-  SelectOption,
-  LoadOptionsFn,
-} from "@shared/ui/select/select.types";
+import { SelectOption, LoadOptionsFn } from "@shared/ui/select/select.types";
 
 const options: SelectOption[] = [
   { label: "Angular", value: "angular" },

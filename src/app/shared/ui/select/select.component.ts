@@ -153,7 +153,11 @@ export class UiSelectComponent implements ControlValueAccessor {
     });
 
     effect(() => {
-      if (this.async() && this.loadOptions() && this.defaultOptions() === true) {
+      if (
+        this.async() &&
+        this.loadOptions() &&
+        this.defaultOptions() === true
+      ) {
         void this.runLoadOptions("");
       }
     });
@@ -198,11 +202,7 @@ export class UiSelectComponent implements ControlValueAccessor {
   readonly selectedOption = computed<SelectOption | null>(() => {
     if (this.isMulti()) return null;
     const value = this.value();
-    if (
-      value &&
-      typeof value === "object" &&
-      "label" in (value as object)
-    ) {
+    if (value && typeof value === "object" && "label" in (value as object)) {
       return value as SelectOption;
     }
     return this.effectiveOptions().find((o) => o.value === value) ?? null;

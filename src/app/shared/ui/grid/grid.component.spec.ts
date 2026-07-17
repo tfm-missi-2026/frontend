@@ -110,8 +110,6 @@ describe("UiGrid", () => {
   it("forwards ariaLabel to the container", () => {
     host.ariaLabel = "Galería de productos";
     fixture.detectChanges();
-    expect(container().getAttribute("aria-label")).toBe(
-      "Galería de productos",
-    );
+    expect(container().getAttribute("aria-label")).toBe("Galería de productos");
   });
 });

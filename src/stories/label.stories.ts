@@ -146,8 +146,7 @@ export const Alignment: Story = {
 export const NoWrap: Story = {
   args: {
     type: "bodyS",
-    text:
-      "Texto muy largo que no debería hacer wrap porque wrapText está en false. Si no cabe, se recorta con ellipsis.",
+    text: "Texto muy largo que no debería hacer wrap porque wrapText está en false. Si no cabe, se recorta con ellipsis.",
   },
   render: (args) => ({
     props: args,
@@ -162,8 +161,7 @@ export const NoWrap: Story = {
 export const WrapMultiLine: Story = {
   args: {
     type: "bodyS",
-    text:
-      "Este texto sí hace wrap porque wrapText es true. Verás cómo se ajusta a varias líneas respetando el ancho del contenedor padre.",
+    text: "Este texto sí hace wrap porque wrapText es true. Verás cómo se ajusta a varias líneas respetando el ancho del contenedor padre.",
     wrapText: true,
   },
   render: (args) => ({
@@ -181,8 +179,7 @@ export const LineClamp2: Story = {
     type: "bodyS",
     wrapText: true,
     wrapMaxLines: 2,
-    text:
-      "Este es un texto largo que será recortado a 2 líneas gracias a line-clamp-2 de Tailwind. Aunque haya más contenido, el overflow se oculta y se muestra ellipsis al final de la segunda línea.",
+    text: "Este es un texto largo que será recortado a 2 líneas gracias a line-clamp-2 de Tailwind. Aunque haya más contenido, el overflow se oculta y se muestra ellipsis al final de la segunda línea.",
   },
   render: (args) => ({
     props: args,
@@ -204,8 +201,7 @@ export const LineClamp3: Story = {
     type: "bodyS",
     wrapText: true,
     wrapMaxLines: 3,
-    text:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
   },
   render: (args) => ({
     props: args,
@@ -227,8 +223,7 @@ export const LineClampDynamic: Story = {
     type: "bodyS",
     wrapText: true,
     wrapMaxLines: 8,
-    text:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
   },
   render: (args) => ({
     props: args,
@@ -273,8 +268,7 @@ export const WithTooltipClamped: Story = {
     type: "bodyS",
     wrapText: true,
     wrapMaxLines: 2,
-    text:
-      "Texto largo con line-clamp a 2 líneas. Al hacer hover se muestra el Tooltip con el contenido íntegro porque el texto está siendo truncado y cumple la condición de overflow + wrapMaxLines.",
+    text: "Texto largo con line-clamp a 2 líneas. Al hacer hover se muestra el Tooltip con el contenido íntegro porque el texto está siendo truncado y cumple la condición de overflow + wrapMaxLines.",
   },
   render: (args) => ({
     props: args,
@@ -351,8 +345,8 @@ export const DarkMode: Story = {
 // Responsive — el line-clamp + tooltip deben disparar antes en mobile
 export const Responsive: Story = {
   parameters: {
-    viewport: { defaultViewport: 'mobile1' },
-    layout: 'fullscreen',
+    viewport: { defaultViewport: "mobile1" },
+    layout: "fullscreen",
   },
   render: () => ({
     template: `

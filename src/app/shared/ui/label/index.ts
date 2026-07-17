@@ -6,4 +6,4 @@
  * métricas, etc. (no para labels de formulario con asterisco —
  * para eso usar `UiFormLabel`).
  */
-export { UiLabelComponent } from './label.component';
+export { UiLabelComponent } from "./label.component";

@@ -12,10 +12,7 @@ import {
   output,
   viewChild,
 } from "@angular/core";
-import {
-  ControlValueAccessor,
-  NG_VALUE_ACCESSOR,
-} from "@angular/forms";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import flatpickr from "flatpickr";
 
 import { IconClockComponent } from "@shared/icons";
@@ -41,11 +38,7 @@ import { getFocusStyling } from "@utils/styling";
 @Component({
   selector: "UiTimePicker",
   standalone: true,
-  imports: [
-    IconClockComponent,
-    UiFormLabelComponent,
-    UiLabelComponent,
-  ],
+  imports: [IconClockComponent, UiFormLabelComponent, UiLabelComponent],
   templateUrl: "./time-picker.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [

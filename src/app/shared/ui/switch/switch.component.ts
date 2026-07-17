@@ -28,10 +28,7 @@ export type SwitchColor = "brand" | "gray";
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <label
-      [class]="wrapperClasses()"
-      (click)="onToggle()"
-    >
+    <label [class]="wrapperClasses()" (click)="onToggle()">
       <div class="relative">
         <div
           class="block transition duration-150 ease-linear h-6 w-11 rounded-full"
@@ -107,9 +104,7 @@ export class UiSwitchComponent {
         ? "bg-gray-800 dark:bg-white/10"
         : "bg-gray-200 dark:bg-white/10";
     }
-    return this.checked()
-      ? "bg-brand-500"
-      : "bg-gray-200 dark:bg-white/10";
+    return this.checked() ? "bg-brand-500" : "bg-gray-200 dark:bg-white/10";
   });
 
   readonly knobClasses = computed<string>(() =>

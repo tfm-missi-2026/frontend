@@ -16,10 +16,7 @@ import {
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiLabelComponent } from "@shared/ui/label";
 
-import {
-  HeaderUserInfo,
-  HeaderUserMenuItem,
-} from "./header.types";
+import { HeaderUserInfo, HeaderUserMenuItem } from "./header.types";
 
 const TRIGGER_BUTTON_CLASS =
   "flex items-center text-gray-700 dropdown-toggle dark:text-gray-400";
@@ -110,11 +107,7 @@ const ACTION_CLASS =
           >
             {{ user().name }}
           </UiLabel>
-          <UiLabel
-            type="bodyXs"
-            color="textWeak"
-            className="block mt-0.5"
-          >
+          <UiLabel type="bodyXs" color="textWeak" className="block mt-0.5">
             {{ user().email }}
           </UiLabel>
         </UiFlex>
@@ -127,9 +120,7 @@ const ACTION_CLASS =
                 [to]="item.to"
                 [className]="MENU_ITEM_CLASS"
               >
-                <ng-container
-                  *ngComponentOutlet="item.icon"
-                ></ng-container>
+                <ng-container *ngComponentOutlet="item.icon"></ng-container>
                 {{ item.label }}
               </UiDropdownItem>
             </li>
@@ -142,9 +133,7 @@ const ACTION_CLASS =
             [to]="action.to"
             [className]="ACTION_CLASS"
           >
-            <ng-container
-              *ngComponentOutlet="action.icon"
-            ></ng-container>
+            <ng-container *ngComponentOutlet="action.icon"></ng-container>
             {{ action.label }}
           </UiDropdownItem>
         }

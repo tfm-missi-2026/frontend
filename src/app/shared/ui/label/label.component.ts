@@ -10,17 +10,17 @@ import {
   signal,
   TemplateRef,
   viewChild,
-} from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
+} from "@angular/core";
+import { NgTemplateOutlet } from "@angular/common";
 
 import designConstants, {
   ColorType,
   FontWeightType,
   TypographyType,
-} from '@styles/constants';
-import { COLOR_CLASSES } from '@styles/types/colors';
-import { UiTooltipComponent } from '@shared/ui/tooltip/tooltip.component';
-import { TooltipSide } from '@shared/ui/tooltip/tooltip.types';
+} from "@styles/constants";
+import { COLOR_CLASSES } from "@styles/types/colors";
+import { UiTooltipComponent } from "@shared/ui/tooltip/tooltip.component";
+import { TooltipSide } from "@shared/ui/tooltip/tooltip.types";
 
 import {
   ALIGN_CLASS,
@@ -28,7 +28,7 @@ import {
   FONT_WEIGHT_CLASS,
   LINE_CLAMP_CLASS,
   LINE_HEIGHT_CLASS,
-} from './label.utils';
+} from "./label.utils";
 
 /**
  * Etiqueta tipográfica del design system renderizada como `<label>`.
@@ -37,16 +37,16 @@ import {
  * `line-clamp-*`) para soportar light/dark vía `dark:`.
  */
 @Component({
-  selector: 'UiLabel',
+  selector: "UiLabel",
   standalone: true,
   imports: [NgTemplateOutlet, UiTooltipComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './label.component.html',
+  templateUrl: "./label.component.html",
 })
 export class UiLabelComponent {
   readonly for = input<string | undefined>(undefined);
   readonly text = input<string | undefined>(undefined);
-  readonly type = input<TypographyType>('bodyXs');
+  readonly type = input<TypographyType>("bodyXs");
   readonly weight = input<FontWeightType | undefined>(undefined);
   readonly color = input<ColorType | undefined>(undefined);
   readonly wrapText = input<boolean>(false);
@@ -54,24 +54,24 @@ export class UiLabelComponent {
   readonly availableSpaceOffset = input<number>(0);
   readonly italic = input<boolean>(false);
   readonly refreshOnLoad = input<boolean>(false);
-  readonly align = input<'left' | 'right' | 'center' | 'justify' | undefined>(
+  readonly align = input<"left" | "right" | "center" | "justify" | undefined>(
     undefined,
   );
-  readonly className = input<string>('');
-  readonly tooltipSide = input<TooltipSide>('bottom');
+  readonly className = input<string>("");
+  readonly tooltipSide = input<TooltipSide>("bottom");
 
-  readonly containerRef = viewChild<ElementRef<HTMLElement>>('container');
-  readonly labelTpl = viewChild<TemplateRef<unknown>>('labelTpl');
+  readonly containerRef = viewChild<ElementRef<HTMLElement>>("container");
+  readonly labelTpl = viewChild<TemplateRef<unknown>>("labelTpl");
 
   readonly isOverflowing = signal(false);
 
   private overflowTimeout?: ReturnType<typeof setTimeout>;
-  private lastOverflowKey = '';
+  private lastOverflowKey = "";
 
-  readonly resolvedText = computed<string>(() => this.text() ?? '');
+  readonly resolvedText = computed<string>(() => this.text() ?? "");
 
   readonly resolvedColorClass = computed<string>(
-    () => COLOR_CLASSES[this.color() ?? 'textStrong'],
+    () => COLOR_CLASSES[this.color() ?? "textStrong"],
   );
 
   readonly resolvedWeightClass = computed<string>(() => {
@@ -81,9 +81,7 @@ export class UiLabelComponent {
     return FONT_WEIGHT_CLASS[w];
   });
 
-  readonly fontSizeClass = computed<string>(
-    () => FONT_SIZE_CLASS[this.type()],
-  );
+  readonly fontSizeClass = computed<string>(() => FONT_SIZE_CLASS[this.type()]);
 
   readonly lineHeightClass = computed<string>(
     () => LINE_HEIGHT_CLASS[this.type()],
@@ -97,22 +95,22 @@ export class UiLabelComponent {
 
   readonly hostClasses = computed<string>(() => {
     const parts: (string | null | undefined)[] = [
-      'inline-block max-w-full break-words',
+      "inline-block max-w-full break-words",
       this.resolvedColorClass(),
       this.resolvedWeightClass(),
       this.fontSizeClass(),
       this.lineHeightClass(),
       this.className(),
-      this.italic() ? 'italic' : null,
+      this.italic() ? "italic" : null,
       this.align() ? ALIGN_CLASS[this.align()!] : null,
       this.dynamicLineClampClass(),
     ];
     if (!this.wrapText()) {
-      parts.push('whitespace-nowrap overflow-hidden text-ellipsis');
+      parts.push("whitespace-nowrap overflow-hidden text-ellipsis");
     } else if (!this.wrapMaxLines()) {
-      parts.push('overflow-hidden');
+      parts.push("overflow-hidden");
     }
-    return parts.filter(Boolean).join(' ');
+    return parts.filter(Boolean).join(" ");
   });
 
   readonly showTooltip = computed<boolean>(
@@ -146,13 +144,13 @@ export class UiLabelComponent {
     const container = this.containerRef()?.nativeElement;
     if (!container) return;
 
-    const key = `${this.text()}|${this.type()}|${this.wrapText()}|${this.wrapMaxLines() ?? ''}|${this.availableSpaceOffset()}`;
+    const key = `${this.text()}|${this.type()}|${this.wrapText()}|${this.wrapMaxLines() ?? ""}|${this.availableSpaceOffset()}`;
     if (key === this.lastOverflowKey && !this.refreshOnLoad()) return;
     this.lastOverflowKey = key;
 
-    const axis: 'offsetHeight' | 'offsetWidth' = this.wrapText()
-      ? 'offsetHeight'
-      : 'offsetWidth';
+    const axis: "offsetHeight" | "offsetWidth" = this.wrapText()
+      ? "offsetHeight"
+      : "offsetWidth";
     const size = container[axis] as number;
     const scroll = (
       this.wrapText() ? container.scrollHeight : container.scrollWidth

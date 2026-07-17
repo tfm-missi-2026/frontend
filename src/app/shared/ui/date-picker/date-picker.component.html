@@ -9,10 +9,7 @@
     </outer>
 -->
 
-<div
-  [class]="outerClasses()"
-  data-testid="datepicker-wrapper"
->
+<div [class]="outerClasses()" data-testid="datepicker-wrapper">
   @if (labelText(); as lt) {
     <UiFormLabel
       [labelText]="lt"
@@ -24,10 +21,7 @@
     ></UiFormLabel>
   }
 
-  <div
-    [class]="containerClasses()"
-    data-testid="datepicker-container"
-  >
+  <div [class]="containerClasses()" data-testid="datepicker-container">
     <input
       #inputEl
       [id]="id() || null"

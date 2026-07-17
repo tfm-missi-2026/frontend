@@ -11,10 +11,7 @@
     </outer>
 -->
 
-<div
-  [class]="outerClasses()"
-  data-testid="phone-input-wrapper"
->
+<div [class]="outerClasses()" data-testid="phone-input-wrapper">
   @if (labelText(); as lt) {
     <UiFormLabel
       [labelText]="lt"
@@ -26,10 +23,7 @@
     ></UiFormLabel>
   }
 
-  <div
-    [class]="containerClasses()"
-    data-testid="phone-input-container"
-  >
+  <div [class]="containerClasses()" data-testid="phone-input-container">
     <!-- Selector de país -->
     <div [class]="selectWrapperClasses()">
       <select

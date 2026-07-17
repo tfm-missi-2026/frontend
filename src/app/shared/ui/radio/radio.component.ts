@@ -30,10 +30,7 @@ import {
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <label
-      [attr.for]="id()"
-      [class]="wrapperClasses()"
-    >
+    <label [attr.for]="id()" [class]="wrapperClasses()">
       <input
         [id]="id()"
         [name]="name()"
@@ -46,10 +43,7 @@ import {
         data-testid="radio-input"
       />
 
-      <span
-        [class]="circleClasses()"
-        aria-hidden="true"
-      >
+      <span [class]="circleClasses()" aria-hidden="true">
         <span [class]="dotClasses()"></span>
       </span>
 
@@ -109,7 +103,9 @@ export class UiRadioComponent {
       this.checked()
         ? "border-brand-500 bg-brand-500"
         : "bg-transparent border-gray-300 dark:border-gray-700",
-      this.disabled() ? "bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-700" : "",
+      this.disabled()
+        ? "bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-700"
+        : "",
     ]
       .filter(Boolean)
       .join(" ");

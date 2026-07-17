@@ -10,10 +10,7 @@ import {
   signal,
   viewChild,
 } from "@angular/core";
-import {
-  ControlValueAccessor,
-  NG_VALUE_ACCESSOR,
-} from "@angular/forms";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 
 import { IconChevronDownComponent } from "@shared/icons";
 import { UiFormLabelComponent } from "@shared/ui/form-label/form-label.component";
@@ -40,11 +37,7 @@ import type { CountryCode, PhoneSelectPosition } from "./phone-input.types";
 @Component({
   selector: "UiPhoneInput",
   standalone: true,
-  imports: [
-    IconChevronDownComponent,
-    UiFormLabelComponent,
-    UiLabelComponent,
-  ],
+  imports: [IconChevronDownComponent, UiFormLabelComponent, UiLabelComponent],
   templateUrl: "./phone-input.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
@@ -55,9 +48,7 @@ import type { CountryCode, PhoneSelectPosition } from "./phone-input.types";
     },
   ],
 })
-export class UiPhoneInputComponent
-  implements ControlValueAccessor, OnInit
-{
+export class UiPhoneInputComponent implements ControlValueAccessor, OnInit {
   readonly id = input<string | undefined>(undefined);
   readonly labelText = input<string | undefined>(undefined);
   readonly required = input<boolean>(false);

@@ -9,10 +9,7 @@
     </outer>
 -->
 
-<div
-  [class]="outerClasses()"
-  data-testid="textarea-wrapper"
->
+<div [class]="outerClasses()" data-testid="textarea-wrapper">
   @if (labelText(); as lt) {
     <UiFormLabel
       [labelText]="lt"

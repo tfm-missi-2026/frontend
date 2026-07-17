@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, TemplateRef, ViewChild } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  TemplateRef,
+  ViewChild,
+} from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { UiTableComponent } from "./table.component";

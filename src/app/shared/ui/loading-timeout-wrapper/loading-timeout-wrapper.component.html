@@ -1,7 +1,4 @@
-<div
-  [class]="containerClasses()"
-  data-testid="loading-timeout-wrapper"
->
+<div [class]="containerClasses()" data-testid="loading-timeout-wrapper">
   @if (timeout() !== undefined) {
     <div
       [class]="progressClasses()"

@@ -11,7 +11,10 @@ import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
 import { IconEditPencilComponent } from "@shared/icons";
 
-import { UserProfilePersonalInfo, UserProfileSocialLinks } from "./user-profile.types";
+import {
+  UserProfilePersonalInfo,
+  UserProfileSocialLinks,
+} from "./user-profile.types";
 
 const SAMPLE_INFO: UserProfilePersonalInfo = {
   firstName: "Musharof",
@@ -69,7 +72,12 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
             className="mb-2 text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-6"
           />
 
-          <UiGrid [columns]="2" breakpoint="lg" gap="gap-4 lg:gap-7 2xl:gap-x-32" ariaLabel="Personal information fields">
+          <UiGrid
+            [columns]="2"
+            breakpoint="lg"
+            gap="gap-4 lg:gap-7 2xl:gap-x-32"
+            ariaLabel="Personal information fields"
+          >
             <UiFlex direction="column" [gap]="2">
               <UiLabel
                 as="p"
@@ -83,7 +91,8 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
                 type="bodyS"
                 color="textStrong"
                 [wrapText]="true"
-              >{{ info().firstName }}</UiLabel>
+                >{{ info().firstName }}</UiLabel
+              >
             </UiFlex>
             <UiFlex direction="column" [gap]="2">
               <UiLabel
@@ -98,7 +107,8 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
                 type="bodyS"
                 color="textStrong"
                 [wrapText]="true"
-              >{{ info().lastName }}</UiLabel>
+                >{{ info().lastName }}</UiLabel
+              >
             </UiFlex>
             <UiFlex direction="column" [gap]="2">
               <UiLabel
@@ -113,7 +123,8 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
                 type="bodyS"
                 color="textStrong"
                 [wrapText]="true"
-              >{{ info().email }}</UiLabel>
+                >{{ info().email }}</UiLabel
+              >
             </UiFlex>
             <UiFlex direction="column" [gap]="2">
               <UiLabel
@@ -128,7 +139,8 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
                 type="bodyS"
                 color="textStrong"
                 [wrapText]="true"
-              >{{ info().phone }}</UiLabel>
+                >{{ info().phone }}</UiLabel
+              >
             </UiFlex>
             <UiFlex direction="column" [gap]="2">
               <UiLabel
@@ -143,7 +155,8 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
                 type="bodyS"
                 color="textStrong"
                 [wrapText]="true"
-              >{{ info().bio }}</UiLabel>
+                >{{ info().bio }}</UiLabel
+              >
             </UiFlex>
           </UiGrid>
         </UiFlex>
@@ -165,7 +178,11 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
       (close)="closeModal()"
       className="max-w-175 m-4"
     >
-      <UiFlex direction="column" [gap]="0" className="no-scrollbar relative w-full max-w-175 overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
+      <UiFlex
+        direction="column"
+        [gap]="0"
+        className="no-scrollbar relative w-full max-w-175 overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11"
+      >
         <UiFlex direction="column" [gap]="0" className="px-2 pr-14">
           <UiHeader
             [level]="4"
@@ -182,18 +199,39 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
           />
         </UiFlex>
         <UiForm (submit)="handleSave()" className="flex flex-col">
-          <UiFlex direction="column" [gap]="0" className="custom-scrollbar h-112.5 overflow-y-auto px-2 pb-3">
+          <UiFlex
+            direction="column"
+            [gap]="0"
+            className="custom-scrollbar h-112.5 overflow-y-auto px-2 pb-3"
+          >
             <UiFlex direction="column" [gap]="0">
               <UiHeader
                 [level]="5"
                 text="Social Links"
                 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6"
               />
-              <UiGrid [columns]="2" breakpoint="lg" gap="gap-x-6 gap-y-5" ariaLabel="Social links form fields">
-                <UiInput labelText="Facebook" type="text" [value]="social().facebook" />
+              <UiGrid
+                [columns]="2"
+                breakpoint="lg"
+                gap="gap-x-6 gap-y-5"
+                ariaLabel="Social links form fields"
+              >
+                <UiInput
+                  labelText="Facebook"
+                  type="text"
+                  [value]="social().facebook"
+                />
                 <UiInput labelText="X.com" type="text" [value]="social().x" />
-                <UiInput labelText="Linkedin" type="text" [value]="social().linkedin" />
-                <UiInput labelText="Instagram" type="text" [value]="social().instagram" />
+                <UiInput
+                  labelText="Linkedin"
+                  type="text"
+                  [value]="social().linkedin"
+                />
+                <UiInput
+                  labelText="Instagram"
+                  type="text"
+                  [value]="social().instagram"
+                />
               </UiGrid>
             </UiFlex>
             <UiFlex direction="column" [gap]="0" className="mt-7">
@@ -202,12 +240,42 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
                 text="Personal Information"
                 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6"
               />
-              <UiGrid [columns]="2" breakpoint="lg" gap="gap-x-6 gap-y-5" ariaLabel="Personal information form fields">
-                <UiInput className="col-span-2 lg:col-span-1" labelText="First Name" type="text" [value]="info().firstName" />
-                <UiInput className="col-span-2 lg:col-span-1" labelText="Last Name" type="text" [value]="info().lastName" />
-                <UiInput className="col-span-2 lg:col-span-1" labelText="Email Address" type="text" [value]="info().email" />
-                <UiInput className="col-span-2 lg:col-span-1" labelText="Phone" type="text" [value]="info().phone" />
-                <UiInput className="col-span-2" labelText="Bio" type="text" [value]="info().bio" />
+              <UiGrid
+                [columns]="2"
+                breakpoint="lg"
+                gap="gap-x-6 gap-y-5"
+                ariaLabel="Personal information form fields"
+              >
+                <UiInput
+                  className="col-span-2 lg:col-span-1"
+                  labelText="First Name"
+                  type="text"
+                  [value]="info().firstName"
+                />
+                <UiInput
+                  className="col-span-2 lg:col-span-1"
+                  labelText="Last Name"
+                  type="text"
+                  [value]="info().lastName"
+                />
+                <UiInput
+                  className="col-span-2 lg:col-span-1"
+                  labelText="Email Address"
+                  type="text"
+                  [value]="info().email"
+                />
+                <UiInput
+                  className="col-span-2 lg:col-span-1"
+                  labelText="Phone"
+                  type="text"
+                  [value]="info().phone"
+                />
+                <UiInput
+                  className="col-span-2"
+                  labelText="Bio"
+                  type="text"
+                  [value]="info().bio"
+                />
               </UiGrid>
             </UiFlex>
           </UiFlex>
@@ -217,7 +285,11 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
             [gap]="3"
             className="px-2 mt-6 lg:justify-end"
           >
-            <UiButton variant="secondary" [compact]="true" (click)="closeModal()">
+            <UiButton
+              variant="secondary"
+              [compact]="true"
+              (click)="closeModal()"
+            >
               Close
             </UiButton>
             <UiButton [compact]="true" (click)="handleSave()">

@@ -87,7 +87,9 @@
         </span>
       }
 
-      @if (isClearable() && hasValue() && !effectiveIsDisabled() && !readOnly()) {
+      @if (
+        isClearable() && hasValue() && !effectiveIsDisabled() && !readOnly()
+      ) {
         <button
           type="button"
           class="inline-flex items-center justify-center w-4.5 h-4.5 bg-transparent border-0 p-0 cursor-pointer rounded text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:hover:text-white dark:hover:bg-gray-800 transition-colors"
@@ -116,11 +118,15 @@
       [class.fixed]="menuPosition() === 'fixed'"
     >
       @if (showLoading()) {
-        <div class="py-3 px-4 text-sm text-center text-gray-500 dark:text-gray-400">
+        <div
+          class="py-3 px-4 text-sm text-center text-gray-500 dark:text-gray-400"
+        >
           {{ resolveMessage(loadingMessage()) }}
         </div>
       } @else if (filteredOptions().length === 0) {
-        <div class="py-3 px-4 text-sm text-center text-gray-500 dark:text-gray-400 flex flex-col items-center gap-2">
+        <div
+          class="py-3 px-4 text-sm text-center text-gray-500 dark:text-gray-400 flex flex-col items-center gap-2"
+        >
           <span>{{ resolveMessage(noOptionsMessage()) }}</span>
           @if (creatable() && searchInput().trim()) {
             <button

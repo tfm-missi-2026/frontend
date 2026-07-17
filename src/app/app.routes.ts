@@ -3,6 +3,7 @@ import type { Routes } from "@angular/router";
 import { NotFoundComponent } from "./pages/other-page/not-found/not-found.component";
 import { NotImplementedPageComponent } from "./features/users/pages/not-implemented/not-implemented.component";
 import { UsersListComponent } from "./features/users/pages/users-list/users-list.component";
+import { authGuard } from "@core/auth/auth.guard";
 
 export const routes: Routes = [
   {
@@ -17,13 +18,13 @@ export const routes: Routes = [
   },
   {
     path: "app",
+    canActivate: [authGuard],
     loadComponent: () =>
       import("@shared/layout/app-layout/app-layout.component").then(
         (m) => m.AppLayoutComponent,
       ),
     children: [
       {
-        path: "",
         pathMatch: "full",
         redirectTo: "administracion/usuarios",
       },
@@ -66,9 +67,8 @@ export const routes: Routes = [
         title: "SPSRT — Configuración",
       },
     ],
-  },
-  {
-    path: "**",
+    loadChildren: () =>
+      import("./features/users/users.module").then((m) => m.UsersModule),
     component: NotFoundComponent,
     title: "SPSRT — Página no encontrada",
   },

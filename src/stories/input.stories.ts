@@ -1,11 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/angular";
 import { moduleMetadata } from "@storybook/angular";
 import { JsonPipe } from "@angular/common";
-import {
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-} from "@angular/forms";
+import { FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms";
 
 import { UiInputComponent } from "@shared/ui/input/input/input.component";
 import { IconSearchComponent } from "@shared/icons/search-icon";

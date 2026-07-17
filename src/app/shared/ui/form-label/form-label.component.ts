@@ -31,7 +31,9 @@ import { FontWeightType } from "@styles/types/typography";
         [wrapText]="wrapText()"
       ></UiLabel>
       @if (showRequired()) {
-        <span aria-hidden="true" class="text-error-500 dark:text-error-400">*</span>
+        <span aria-hidden="true" class="text-error-500 dark:text-error-400"
+          >*</span
+        >
       }
       @if (tooltip()) {
         <InfoIconWithTooltip [tooltip]="tooltip() ?? ''"></InfoIconWithTooltip>

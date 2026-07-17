@@ -1,5 +1,13 @@
-import { ChangeDetectionStrategy, Component } from "@angular/core";
+import { HttpErrorResponse } from "@angular/common/http";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from "@angular/core";
 import { Router } from "@angular/router";
+
+import { AuthService } from "@core/auth/auth.service";
 
 import {
   SigninFormComponent,
@@ -14,14 +22,35 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SignInComponent {
-  constructor(private readonly router: Router) {}
+  private readonly router = inject(Router);
+  private readonly auth = inject(AuthService);
+
+  protected readonly loading = signal<boolean>(false);
+  protected readonly errorMessage = signal<string | null>(null);
 
   onSubmit(data: SignInFormData): void {
-    console.log("Sign in:", data);
-    void this.router.navigateByUrl("/app/administracion/usuarios");
+    this.loading.set(true);
+    this.errorMessage.set(null);
+
+    this.auth
+      .login({ email: data.email, contrasenia: data.password })
+      .subscribe({
+        next: () => {
+          this.loading.set(false);
+          void this.router.navigateByUrl("/app");
+        },
+        error: (error: HttpErrorResponse) => {
+          this.loading.set(false);
+          this.errorMessage.set(
+            error.status === 401
+              ? "Correo o contraseña incorrectos."
+              : "No se pudo conectar con el servidor. Intenta nuevamente.",
+          );
+        },
+      });
   }
 
   onSignUp(): void {
-    this.router.navigateByUrl("/signup");
+    void this.router.navigateByUrl("/signup");
   }
 }

@@ -15,6 +15,14 @@
 
     <form (ngSubmit)="onSubmit()">
       <UiFlex direction="column" [gap]="20">
+        @if (errorMessage()) {
+          <UiAlert
+            variant="error"
+            title="No se pudo iniciar sesión"
+            [message]="errorMessage() ?? ''"
+          ></UiAlert>
+        }
+
         <UiInput
           id="signin-email"
           name="email"

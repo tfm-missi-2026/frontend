@@ -2,11 +2,7 @@ import { ChangeDetectionStrategy, Component, ViewChild } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { UiImageComponent } from "./image.component";
-import {
-  ImageLoading,
-  ObjectFit,
-  RoundedSize,
-} from "./image.types";
+import { ImageLoading, ObjectFit, RoundedSize } from "./image.types";
 
 @Component({
   standalone: true,

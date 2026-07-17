@@ -60,7 +60,12 @@ const SAMPLE_ADDRESS: UserProfileAddress = {
             className="mb-2 text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-6"
           />
 
-          <UiGrid [columns]="2" breakpoint="lg" gap="gap-4 lg:gap-7 2xl:gap-x-32" ariaLabel="Address fields">
+          <UiGrid
+            [columns]="2"
+            breakpoint="lg"
+            gap="gap-4 lg:gap-7 2xl:gap-x-32"
+            ariaLabel="Address fields"
+          >
             <UiFlex direction="column" [gap]="2">
               <UiLabel
                 as="p"
@@ -74,7 +79,8 @@ const SAMPLE_ADDRESS: UserProfileAddress = {
                 type="bodyS"
                 color="textStrong"
                 [wrapText]="true"
-              >{{ address().country }}</UiLabel>
+                >{{ address().country }}</UiLabel
+              >
             </UiFlex>
             <UiFlex direction="column" [gap]="2">
               <UiLabel
@@ -89,7 +95,8 @@ const SAMPLE_ADDRESS: UserProfileAddress = {
                 type="bodyS"
                 color="textStrong"
                 [wrapText]="true"
-              >{{ address().cityState }}</UiLabel>
+                >{{ address().cityState }}</UiLabel
+              >
             </UiFlex>
             <UiFlex direction="column" [gap]="2">
               <UiLabel
@@ -104,7 +111,8 @@ const SAMPLE_ADDRESS: UserProfileAddress = {
                 type="bodyS"
                 color="textStrong"
                 [wrapText]="true"
-              >{{ address().postalCode }}</UiLabel>
+                >{{ address().postalCode }}</UiLabel
+              >
             </UiFlex>
             <UiFlex direction="column" [gap]="2">
               <UiLabel
@@ -119,7 +127,8 @@ const SAMPLE_ADDRESS: UserProfileAddress = {
                 type="bodyS"
                 color="textStrong"
                 [wrapText]="true"
-              >{{ address().taxId }}</UiLabel>
+                >{{ address().taxId }}</UiLabel
+              >
             </UiFlex>
           </UiGrid>
         </UiFlex>
@@ -141,7 +150,11 @@ const SAMPLE_ADDRESS: UserProfileAddress = {
       (close)="closeModal()"
       className="max-w-175 m-4"
     >
-      <UiFlex direction="column" [gap]="0" className="no-scrollbar relative w-full max-w-175 overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
+      <UiFlex
+        direction="column"
+        [gap]="0"
+        className="no-scrollbar relative w-full max-w-175 overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11"
+      >
         <UiFlex direction="column" [gap]="0" className="px-2 pr-14">
           <UiHeader
             [level]="4"
@@ -158,12 +171,37 @@ const SAMPLE_ADDRESS: UserProfileAddress = {
           />
         </UiFlex>
         <UiForm (submit)="handleSave()" className="flex flex-col">
-          <UiFlex direction="column" [gap]="0" className="px-2 overflow-y-auto custom-scrollbar">
-            <UiGrid [columns]="2" breakpoint="lg" gap="gap-x-6 gap-y-5" ariaLabel="Address form fields">
-              <UiInput labelText="Country" type="text" [value]="address().country" />
-              <UiInput labelText="City/State" type="text" [value]="address().cityState" />
-              <UiInput labelText="Postal Code" type="text" [value]="address().postalCode" />
-              <UiInput labelText="TAX ID" type="text" [value]="address().taxId" />
+          <UiFlex
+            direction="column"
+            [gap]="0"
+            className="px-2 overflow-y-auto custom-scrollbar"
+          >
+            <UiGrid
+              [columns]="2"
+              breakpoint="lg"
+              gap="gap-x-6 gap-y-5"
+              ariaLabel="Address form fields"
+            >
+              <UiInput
+                labelText="Country"
+                type="text"
+                [value]="address().country"
+              />
+              <UiInput
+                labelText="City/State"
+                type="text"
+                [value]="address().cityState"
+              />
+              <UiInput
+                labelText="Postal Code"
+                type="text"
+                [value]="address().postalCode"
+              />
+              <UiInput
+                labelText="TAX ID"
+                type="text"
+                [value]="address().taxId"
+              />
             </UiGrid>
           </UiFlex>
           <UiFlex
@@ -172,7 +210,11 @@ const SAMPLE_ADDRESS: UserProfileAddress = {
             [gap]="3"
             className="px-2 mt-6 lg:justify-end"
           >
-            <UiButton variant="secondary" [compact]="true" (click)="closeModal()">
+            <UiButton
+              variant="secondary"
+              [compact]="true"
+              (click)="closeModal()"
+            >
               Close
             </UiButton>
             <UiButton [compact]="true" (click)="handleSave()">

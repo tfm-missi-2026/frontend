@@ -231,8 +231,8 @@ export const WithThemeSwitch: Story = {
 
 export const Responsive: Story = {
   parameters: {
-    viewport: { defaultViewport: 'mobile1' },
-    layout: 'fullscreen',
+    viewport: { defaultViewport: "mobile1" },
+    layout: "fullscreen",
   },
   render: () => ({
     template: `

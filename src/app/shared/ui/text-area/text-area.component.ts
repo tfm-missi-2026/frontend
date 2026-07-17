@@ -14,7 +14,10 @@ import {
 } from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 
-import { UiFlexComponent, type FlexJustify } from "@shared/ui/flex/flex.component";
+import {
+  UiFlexComponent,
+  type FlexJustify,
+} from "@shared/ui/flex/flex.component";
 import { UiFormLabelComponent } from "@shared/ui/form-label/form-label.component";
 import { UiLabelComponent } from "@shared/ui/label/label.component";
 import { ColorType } from "@styles/types/colors";

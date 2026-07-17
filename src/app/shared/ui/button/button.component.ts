@@ -25,8 +25,8 @@ import { UiLabelComponent } from "@shared/ui/label/label.component";
 import { UiLoadingTimeoutWrapperComponent } from "@shared/ui/loading-timeout-wrapper/loading-timeout-wrapper.component";
 import { getFocusStyling } from "@utils/styling";
 
-import { ButtonStyleType, ButtonTooltip, ButtonVariant } from "./button.types";
 import { getVariantClasses } from "./button.utils";
+import { ButtonStyleType, ButtonTooltip, ButtonVariant } from "./types";
 
 /**
  * Botón del design system.
