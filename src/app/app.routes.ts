@@ -25,6 +25,7 @@ export const routes: Routes = [
       ),
     children: [
       {
+        path: "",
         pathMatch: "full",
         redirectTo: "administracion/usuarios",
       },
@@ -67,8 +68,9 @@ export const routes: Routes = [
         title: "SPSRT — Configuración",
       },
     ],
-    loadChildren: () =>
-      import("./features/users/users.module").then((m) => m.UsersModule),
+  },
+  {
+    path: "**",
     component: NotFoundComponent,
     title: "SPSRT — Página no encontrada",
   },
