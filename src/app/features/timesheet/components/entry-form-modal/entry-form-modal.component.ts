@@ -69,7 +69,6 @@ function computeHours(start: string, end: string): number {
     UiFlexComponent,
     UiFormLabelComponent,
     UiHeaderComponent,
-    UiInputComponent,
     UiLabelComponent,
     UiModalComponent,
     UiSelectComponent,

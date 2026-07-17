@@ -48,6 +48,14 @@ export const routes: Routes = [
           ),
       },
       {
+        path: "seguimiento/mi-bitacora",
+        loadChildren: () =>
+          import("@features/timesheet/timesheet.module").then(
+            (m) => m.TimesheetModule,
+          ),
+        title: "SPSRT — Mi bitácora",
+      },
+      {
         path: "administracion/modulos",
         component: NotImplementedPageComponent,
         title: "SPSRT — Módulos",

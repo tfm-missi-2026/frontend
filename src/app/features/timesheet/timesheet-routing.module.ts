@@ -7,10 +7,6 @@ const routes: Routes = [
   {
     path: "",
     pathMatch: "full",
-    redirectTo: "seguimiento/mi-bitacora",
-  },
-  {
-    path: "seguimiento/mi-bitacora",
     component: MyTimesheetComponent,
     title: "SPSRT — Mi bitácora",
   },

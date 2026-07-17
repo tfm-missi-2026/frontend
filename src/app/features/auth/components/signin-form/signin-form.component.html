@@ -1,6 +1,10 @@
-<UiFlex direction="column" justifyContent="center" className="flex-1 w-full max-w-md mx-auto">
-  <UiFlex direction="column" gap="24px">
-    <UiFlex direction="column" gap="8px">
+<UiFlex
+  direction="column"
+  justifyContent="center"
+  className="flex-1 w-full max-w-md mx-auto"
+>
+  <UiFlex direction="column" [gap]="24">
+    <UiFlex direction="column" [gap]="8">
       <UiHeader [level]="1" text="Iniciar sesión"></UiHeader>
       <UiLabel
         type="bodyS"
@@ -10,7 +14,7 @@
     </UiFlex>
 
     <form (ngSubmit)="onSubmit()">
-      <UiFlex direction="column" gap="20px">
+      <UiFlex direction="column" [gap]="20">
         <UiInput
           id="signin-email"
           name="email"
@@ -34,7 +38,7 @@
           (valueChange)="onPasswordChange($event)"
         ></UiInput>
 
-        <UiFlex justifyContent="flex-end">
+        <UiFlex [justifyContent]="'end'">
           <UiLink
             to="/reset-password"
             size="sm"
@@ -52,7 +56,7 @@
       </UiFlex>
     </form>
 
-    <UiFlex justifyContent="center" gap="6px" className="mt-2">
+    <UiFlex justifyContent="center" [gap]="6" className="mt-2">
       <UiLabel
         type="bodyS"
         color="textWeak"

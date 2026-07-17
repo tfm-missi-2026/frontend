@@ -20,10 +20,7 @@ import { UiGridComponent } from "@shared/ui/grid";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiTableComponent } from "@shared/ui/table";
-import type {
-  TableAction,
-  TableColumn,
-} from "@shared/ui/table/table.types";
+import type { TableAction, TableColumn } from "@shared/ui/table";
 
 import {
   EntryFormModalComponent,
@@ -63,9 +60,6 @@ function todayIso(): string {
   imports: [
     CommonBreadcrumbComponent,
     EntryFormModalComponent,
-    IconEditPencilComponent,
-    IconPlusSimpleComponent,
-    IconTrashComponent,
     TimesheetSummaryComponent,
     TimesheetToolbarComponent,
     UiAlertComponent,
@@ -87,13 +81,12 @@ function todayIso(): string {
         alignItems="end"
         justifyContent="between"
         [gap]="12"
-        className="flex-wrap"
       >
         <UiFlex direction="column" [gap]="0">
           <UiHeader [level]="1" text="Mi bitácora" />
           <UiLabel type="bodyS" color="textWeak" className="mt-1 max-w-200">
-            Registra tu dedicación real en bloques de tiempo. Cada bloque es trabajo
-            en una tarea o participación en una actividad — nunca ambos.
+            Registra tu dedicación real en bloques de tiempo. Cada bloque es
+            trabajo en una tarea o participación en una actividad — nunca ambos.
           </UiLabel>
         </UiFlex>
         <UiButton
@@ -130,7 +123,9 @@ function todayIso(): string {
               {{ headerLabel() }}
             </UiLabel>
             <UiLabel type="HeadingM" weight="bold" color="textStrong">
-              {{ visibleEntries().length }} bloque{{ visibleEntries().length === 1 ? "" : "s" }}
+              {{ visibleEntries().length }} bloque{{
+                visibleEntries().length === 1 ? "" : "s"
+              }}
             </UiLabel>
             <UiLabel type="bodyS" color="textWeak">
               {{ headerSubtitle() }}
@@ -206,58 +201,58 @@ export class MyTimesheetComponent {
     { label: "Mi bitácora" },
   ];
 
-  protected readonly columns: TableColumn[] = [
+  protected readonly columns: TableColumn<EntryRow>[] = [
     {
       key: "startTime",
-      label: "Inicio",
+      header: "Inicio",
       width: "80px",
       cellClassName: "font-mono",
     },
     {
       key: "endTime",
-      label: "Fin",
+      header: "Fin",
       width: "80px",
       cellClassName: "font-mono",
     },
     {
       key: "kindLabel",
-      label: "Tipo",
+      header: "Tipo",
       width: "100px",
     },
     {
       key: "projectLabel",
-      label: "Proyecto",
+      header: "Proyecto",
       width: "140px",
     },
     {
       key: "taskLabel",
-      label: "Tarea / Actividad",
+      header: "Tarea / Actividad",
     },
     {
       key: "hours",
-      label: "Horas",
+      header: "Horas",
       align: "end",
       width: "80px",
     },
     {
       key: "statusLabel",
-      label: "Estado",
+      header: "Estado",
       width: "120px",
     },
   ];
 
-  protected readonly rowActions: TableAction<EntryRow>[] = [
+  protected readonly rowActions: TableAction<unknown>[] = [
     {
       key: "edit",
       label: "Editar bloque",
       icon: IconEditPencilComponent,
-      onClick: (row) => this.onActionEdit(row),
+      onClick: (row) => this.onActionEdit(row as EntryRow),
     },
     {
       key: "delete",
       label: "Eliminar bloque",
       icon: IconTrashComponent,
-      onClick: (row) => this.onActionDelete(row),
+      onClick: (row) => this.onActionDelete(row as EntryRow),
     },
   ];
 
