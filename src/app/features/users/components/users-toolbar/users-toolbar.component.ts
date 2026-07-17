@@ -9,9 +9,7 @@ import { FormsModule } from "@angular/forms";
 import { IconSearchLightComponent } from "@shared/icons";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiInputComponent } from "@shared/ui/input";
-import { UiSelectComponent } from "@shared/ui/select";
-
-import type { SelectOption } from "@shared/ui/select/select.interface";
+import { SelectOption, UiSelectComponent } from "@shared/ui/select";
 
 import type { UserRole, UserStatus } from "../../models/user";
 
