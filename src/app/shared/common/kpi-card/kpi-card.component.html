@@ -1,0 +1,73 @@
+<UiSurface
+  [variant]="alert() ? 'warning' : 'neutral'"
+  padding="md"
+  [className]="
+    alert()
+      ? 'border-2 border-warning-300 min-h-37 cursor-pointer hover:opacity-90 bg-[repeating-linear-gradient(45deg,var(--paper)_0_8px,var(--paper-alt)_8px_9px)] dark:border-warning-700'
+      : 'border-2 border-gray-300 min-h-37 cursor-pointer hover:bg-paper-alt dark:border-gray-700'
+  "
+  (click)="onLinkClick()"
+>
+  <UiFlex direction="column" [gap]="6" className="h-full">
+    <UiLabel
+      type="bodyS"
+      weight="medium"
+      color="textWeak"
+      className="uppercase leading-tight"
+    >
+      {{ label() }}
+    </UiLabel>
+
+    <UiFlex direction="row" alignItems="baseline" [gap]="2">
+      <UiLabel
+        type="HeadingTV"
+        weight="bold"
+        color="textStrong"
+        className="text-5xl leading-none font-mono whitespace-nowrap"
+      >
+        {{ displayValue() }}
+      </UiLabel>
+      @if (valueSuffix()) {
+        <UiLabel type="HeadingS" weight="bold" color="textStrong">
+          {{ valueSuffix() }}
+        </UiLabel>
+      }
+    </UiFlex>
+
+    @if (showProgressBar()) {
+      <UiFlex
+        direction="row"
+        alignItems="center"
+        [gap]="0"
+        className="relative h-4 w-full overflow-hidden rounded border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900"
+      >
+        <UiFlex
+          direction="row"
+          alignItems="center"
+          className="absolute top-0 bottom-0 left-0 bg-gray-400 dark:bg-gray-600"
+          [style.width.%]="minibarFillPct()"
+        />
+        <UiFlex
+          direction="column"
+          className="absolute -top-1 -bottom-1 w-0 border-l border-dashed border-gray-500"
+          [style.left.%]="100"
+        />
+      </UiFlex>
+    }
+
+    <UiLabel type="bodyXs" color="textWeak" className="mt-auto">
+      {{ sub() }}
+    </UiLabel>
+
+    @if (linkLabel()) {
+      <UiLabel
+        type="bodyXs"
+        weight="medium"
+        color="textAction"
+        className="underline cursor-pointer"
+      >
+        {{ linkLabel() }}
+      </UiLabel>
+    }
+  </UiFlex>
+</UiSurface>

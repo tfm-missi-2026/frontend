@@ -5,10 +5,15 @@ import {
   input,
   output,
 } from "@angular/core";
-import { FormsModule } from "@angular/forms";
 
-import { IconArrowLeftComponent, IconArrowRightComponent } from "@shared/icons";
-import { UiButtonComponent } from "@shared/ui/button";
+import {
+  IconChevronLeftComponent,
+  IconChevronRightComponent,
+} from "@shared/icons";
+import {
+  CommonTabGroupComponent,
+  type CommonTabOption,
+} from "@shared/common/tab-group";
 import { UiDatePickerComponent } from "@shared/ui/date-picker";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiIconButtonComponent } from "@shared/ui/icon-button";
@@ -63,110 +68,23 @@ function formatLong(iso: string): string {
   return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
 }
 
+const VIEW_TABS: CommonTabOption<TimesheetViewMode>[] = [
+  { value: "day", label: "Por día" },
+  { value: "range", label: "Por rango" },
+];
+
 @Component({
   selector: "TimesheetToolbar",
   standalone: true,
   imports: [
-    FormsModule,
-    UiButtonComponent,
+    CommonTabGroupComponent,
     UiDatePickerComponent,
     UiFlexComponent,
     UiIconButtonComponent,
     UiLabelComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <UiFlex
-      direction="row"
-      alignItems="center"
-      [gap]="16"
-      className="flex-wrap"
-    >
-      <UiFlex direction="row" alignItems="stretch" [gap]="0">
-        <UiButton
-          variant="tertiary"
-          [compact]="true"
-          labelText="Por día"
-          [className]="
-            mode() === 'day'
-              ? 'rounded-none bg-brand-500 text-white hover:bg-brand-600'
-              : 'rounded-none text-gray-600 dark:text-gray-300'
-          "
-          (click)="modeChange.emit('day')"
-        />
-        <UiButton
-          variant="tertiary"
-          [compact]="true"
-          labelText="Por rango"
-          [className]="
-            mode() === 'range'
-              ? 'rounded-none bg-brand-500 text-white hover:bg-brand-600'
-              : 'rounded-none text-gray-600 dark:text-gray-300'
-          "
-          (click)="modeChange.emit('range')"
-        />
-      </UiFlex>
-
-      <UiFlex direction="row" alignItems="center" [gap]="0">
-        <UiIconButton
-          [Icon]="IconArrowLeftComponent"
-          variant="tertiary"
-          [compact]="true"
-          labelText="Día anterior"
-          (click)="onPrev()"
-        />
-        <UiFlex
-          direction="column"
-          alignItems="center"
-          justifyContent="center"
-          [gap]="0"
-          className="border-x border-gray-200 px-5 py-1 dark:border-gray-700"
-        >
-          @if (mode() === "day") {
-            <UiLabel type="bodyS" weight="semibold" color="textStrong">
-              {{ displayLabel() }}
-            </UiLabel>
-            <UiLabel type="bodyXs" color="textWeak">
-              {{ dowLabel() }}
-            </UiLabel>
-          } @else {
-            <UiLabel type="bodyS" weight="semibold" color="textStrong">
-              {{ rangeLabel() }}
-            </UiLabel>
-          }
-        </UiFlex>
-        <UiIconButton
-          [Icon]="IconArrowRightComponent"
-          variant="tertiary"
-          [compact]="true"
-          labelText="Día siguiente"
-          (click)="onNext()"
-        />
-      </UiFlex>
-
-      @if (mode() === "day") {
-        <UiDatePicker
-          className="w-44"
-          placeholder="Seleccionar fecha"
-          [value]="date()"
-          (valueChange)="dateChange.emit(asString($event))"
-        />
-      } @else {
-        <UiDatePicker
-          className="w-44"
-          mode="range"
-          placeholder="Seleccionar rango"
-          [value]="range()"
-          (valueChange)="rangeChange.emit(asStringArray($event))"
-        />
-      }
-
-      <UiFlex direction="row" [gap]="0" className="flex-1" />
-      <UiLabel type="bodyXs" color="textWeak">
-        Hoy: {{ todayLabel() }}
-      </UiLabel>
-    </UiFlex>
-  `,
+  templateUrl: "./timesheet-toolbar.component.html",
 })
 export class TimesheetToolbarComponent {
   readonly mode = input<TimesheetViewMode>("day");
@@ -176,6 +94,10 @@ export class TimesheetToolbarComponent {
   readonly modeChange = output<TimesheetViewMode>();
   readonly dateChange = output<string>();
   readonly rangeChange = output<string[]>();
+
+  protected readonly viewTabs = VIEW_TABS;
+  protected readonly IconChevronLeftComponent = IconChevronLeftComponent;
+  protected readonly IconChevronRightComponent = IconChevronRightComponent;
 
   protected readonly todayIso = toIsoDate(new Date());
 
@@ -201,9 +123,6 @@ export class TimesheetToolbarComponent {
     if (r.length === 1) return formatLong(r[0]);
     return `${formatLong(r[0])} – ${formatLong(r[r.length - 1])}`;
   });
-
-  protected readonly IconArrowLeftComponent = IconArrowLeftComponent;
-  protected readonly IconArrowRightComponent = IconArrowRightComponent;
 
   protected onPrev(): void {
     if (this.mode() === "day") {
@@ -239,11 +158,6 @@ export class TimesheetToolbarComponent {
       if (end) end.setDate(end.getDate() + 7);
       this.rangeChange.emit([toIsoDate(start), toIsoDate(end ?? start)]);
     }
-  }
-
-  protected asString(value: string | string[]): string {
-    if (Array.isArray(value)) return value[0] ?? "";
-    return value ?? "";
   }
 
   protected asStringArray(value: string | string[]): string[] {

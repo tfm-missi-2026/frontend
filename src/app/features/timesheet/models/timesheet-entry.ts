@@ -1,4 +1,4 @@
-import type { SelectOption } from "@shared/ui/select/select.types";
+import type { SelectOption } from "@shared/ui/select";
 
 export type TimesheetEntryKind = "task" | "activity";
 
@@ -98,6 +98,13 @@ export const TIMESHEET_PROJECT_OPTIONS: SelectOption[] = TIMESHEET_PROJECTS.map(
 export const TIMESHEET_ACTIVITY_OPTIONS: SelectOption[] =
   TIMESHEET_ACTIVITY_CATALOG.map((a) => ({ value: a, label: a }));
 
+export const TIMESHEET_TASK_OPTIONS: SelectOption[] = TIMESHEET_TASKS.map((t) => ({
+  value: t.id,
+  label: `${t.name} · ${t.code}`,
+}));
+
+const INITIAL_TASK = TIMESHEET_TASKS[0];
+
 export function emptyTimesheetEntry(date: string): Omit<TimesheetEntry, "id"> {
   return {
     date,
@@ -105,8 +112,9 @@ export function emptyTimesheetEntry(date: string): Omit<TimesheetEntry, "id"> {
     endTime: "10:00",
     hours: 1,
     kind: "task",
-    project: TIMESHEET_PROJECTS[0].id,
-    task: TIMESHEET_TASKS[0].id,
+    project: INITIAL_TASK.projectId,
+    task: INITIAL_TASK.id,
+    taskCode: INITIAL_TASK.code,
     activity: TIMESHEET_ACTIVITY_CATALOG[0],
     description: "",
     status: "draft",

@@ -9,7 +9,10 @@ import { NgClass, NgComponentOutlet } from "@angular/common";
 import { RouterModule } from "@angular/router";
 
 import {
+  IconAlertWarningComponent,
+  IconArrowUpTrendComponent,
   IconBoxComponent,
+  IconCalendar24Component,
   IconCardComponent,
   IconDotsVerticalComponent,
   IconSettingsComponent,
@@ -111,6 +114,47 @@ export class SidebarLayoutComponent {
           name: "Módulos",
           path: "/app/administracion/modulos",
           pending: true,
+        },
+      ],
+    },
+    {
+      title: "Operación",
+      sectionKey: "operacion",
+      items: [
+        {
+          icon: IconBoxComponent,
+          name: "Dashboard",
+          path: "/app/operacion/dashboard",
+        },
+        {
+          icon: IconUserCircleComponent,
+          name: "Dashboard Jefe",
+          path: "/app/operacion/dashboard-jefe",
+        },
+        {
+          icon: IconBoxComponent,
+          name: "Proyectos",
+          path: "/app/operacion/proyectos",
+        },
+        {
+          icon: IconCalendar24Component,
+          name: "Planificación",
+          path: "/app/operacion/planificacion",
+        },
+        {
+          icon: IconAlertWarningComponent,
+          name: "Variaciones",
+          path: "/app/operacion/variaciones",
+        },
+        {
+          icon: IconUserCircleComponent,
+          name: "Carga del equipo",
+          path: "/app/operacion/carga-equipo",
+        },
+        {
+          icon: IconArrowUpTrendComponent,
+          name: "Avance",
+          path: "/app/operacion/avance",
         },
       ],
     },

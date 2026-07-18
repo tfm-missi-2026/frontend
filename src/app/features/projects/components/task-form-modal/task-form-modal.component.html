@@ -1,0 +1,189 @@
+<UiModal
+  [isOpen]="isOpen()"
+  [showCloseButton]="true"
+  className="max-w-130 p-6 lg:p-8"
+  (close)="onCancel()"
+>
+  <UiFlex direction="column" [gap]="16">
+    <UiFlex direction="column" [gap]="4">
+      <UiLabel type="HeadingM" weight="semibold" color="textStrong">
+        {{ heading() }}
+      </UiLabel>
+      <UiLabel type="bodyS" color="textWeak">
+        {{ subheading() }}
+      </UiLabel>
+    </UiFlex>
+
+    <UiAlert
+      variant="info"
+      message="Una tarea nueva arranca en situación Pendiente. No hay campo de situación editable en el alta."
+    />
+
+    @if (validationMessage(); as msg) {
+      <UiAlert variant="error" [message]="msg" />
+    }
+
+    <UiFlex direction="column" [gap]="6">
+      <UiFormLabel
+        labelText="Nombre"
+        labelFor="task-name"
+        [required]="true"
+        weight="medium"
+      />
+      <UiInput
+        id="task-name"
+        placeholder="p. ej. Diseñar regla de validación de RUC"
+        [value]="form().name"
+        (valueChange)="onNameChange($event)"
+      ></UiInput>
+      @if (nameError(); as msg) {
+        <UiFieldError [message]="msg" />
+      }
+    </UiFlex>
+
+    <UiFlex direction="column" [gap]="6">
+      <UiFormLabel
+        labelText="Descripción"
+        labelFor="task-description"
+        weight="medium"
+      />
+      <UiTextArea
+        id="task-description"
+        [rows]="2"
+        placeholder="Detalle de lo que cubre la tarea."
+        [value]="form().description"
+        (valueChange)="onDescriptionChange($event)"
+      ></UiTextArea>
+    </UiFlex>
+
+    <UiGrid [columns]="3" gap="gap-4">
+      <UiFlex direction="column" [gap]="6">
+        <UiFormLabel
+          labelText="Inicio planif."
+          labelFor="task-start"
+          weight="medium"
+        />
+        <UiDatePicker
+          inputId="task-start"
+          mode="single"
+          dateFormat="d/m/Y"
+          placeholder="dd/mm/aaaa"
+          [value]="form().startDate ?? ''"
+          (valueChange)="onStartDateChange($event)"
+          className="max-w-55"
+        />
+      </UiFlex>
+      <UiFlex direction="column" [gap]="6">
+        <UiFormLabel
+          labelText="Fin planif."
+          labelFor="task-end"
+          weight="medium"
+        />
+        <UiDatePicker
+          inputId="task-end"
+          mode="single"
+          dateFormat="d/m/Y"
+          placeholder="dd/mm/aaaa"
+          [value]="form().endDate ?? ''"
+          (valueChange)="onEndDateChange($event)"
+          className="max-w-55"
+        />
+      </UiFlex>
+      <UiFlex direction="column" [gap]="6">
+        <UiFormLabel
+          labelText="Horas est."
+          labelFor="task-hours"
+          weight="medium"
+        />
+        <UiInput
+          id="task-hours"
+          type="number"
+          placeholder="p. ej. 16"
+          [value]="form().estimatedHours ?? ''"
+          (valueChange)="onHoursChange($event)"
+          className="max-w-30"
+        />
+        @if (hoursError(); as msg) {
+          <UiFieldError [message]="msg" />
+        }
+      </UiFlex>
+    </UiGrid>
+
+    @if (dateRangeError(); as msg) {
+      <UiFieldError [message]="msg" />
+    }
+
+    <UiLabel type="bodyXs" color="textWeak">
+      {{ jornadaLabel() }}
+    </UiLabel>
+
+    <UiSurface variant="neutral" padding="md" className="border-dashed">
+      <UiFlex direction="column" [gap]="12">
+        <UiFlex direction="row" alignItems="center" [gap]="8">
+          <UiBadge variant="light" color="warning" size="sm">
+            propuesta — requiere ajuste de modelo
+          </UiBadge>
+        </UiFlex>
+        <UiLabel type="bodyXs" color="textWeak">
+          Multiselección de otras tareas del subproyecto. Aún no existe en el modelo de datos; se muestra como propuesta para validación.
+        </UiLabel>
+        @if (candidatesList().length === 0) {
+          <UiLabel type="bodyXs" color="textWeak">
+            (sin otras tareas en este subproyecto)
+          </UiLabel>
+        } @else {
+          <UiFlex direction="column" [gap]="6">
+            @for (c of candidatesList(); track c.id) {
+              <UiFlex
+                direction="row"
+                alignItems="center"
+                [gap]="10"
+                className="border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2"
+              >
+                <UiFlex
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="center"
+                  [gap]="0"
+                  className="h-4 w-4 rounded border border-gray-400 dark:border-gray-600"
+                ></UiFlex>
+                <UiLabel
+                  type="bodyS"
+                  weight="semibold"
+                  className="flex-1"
+                >
+                  {{ c.name }}
+                </UiLabel>
+                <UiLabel
+                  type="bodyXs"
+                  color="textWeak"
+                  className="font-mono"
+                >
+                  {{ c.estimatedHours }} h
+                </UiLabel>
+              </UiFlex>
+            }
+          </UiFlex>
+        }
+      </UiFlex>
+    </UiSurface>
+
+    <UiFlex
+      direction="row"
+      justifyContent="end"
+      [gap]="8"
+      className="mt-4 border-t border-dashed border-gray-200 pt-4 dark:border-gray-800"
+    >
+      <UiButton
+        variant="secondary"
+        label="Cancelar"
+        (click)="onCancel()"
+      />
+      <UiButton
+        variant="primary"
+        label="Guardar"
+        (click)="onSave()"
+      />
+    </UiFlex>
+  </UiFlex>
+</UiModal>

@@ -1,0 +1,82 @@
+<UiFlex direction="column" [gap]="20">
+  <CommonBreadcrumb [items]="[{ label: 'Operación' }, { label: 'Dashboard' }]" />
+
+  <UiFlex
+    direction="row"
+    alignItems="end"
+    justifyContent="between"
+    [gap]="12"
+    className="flex-wrap"
+  >
+    <UiFlex direction="column" [gap]="6" className="flex-1 min-w-60">
+      <UiHeader [level]="1" [text]="dashboard().greeting" />
+      <UiLabel type="bodyS" color="textWeak">
+        Tus proyectos · periodo
+        <strong class="font-semibold text-gray-800 dark:text-white/90">
+          {{ currentPeriod().label }}
+        </strong>
+        · {{ dashboard().kpiProjectCount }} proyectos a tu cargo.
+      </UiLabel>
+    </UiFlex>
+    <CommonPeriodSelector
+      [periods]="periods"
+      [periodId]="periodId()"
+      (periodChange)="onPeriodChange($event)"
+    />
+  </UiFlex>
+
+  <UiGrid [columns]="4" gap="gap-4">
+    <CommonKpiCard
+      label="Mis proyectos"
+      [value]="dashboard().kpiProjectCount"
+      sub="proyectos a tu cargo, activos"
+      linkLabel="Ver proyectos →"
+      (linkClick)="onKpiClick('/app/operacion/proyectos')"
+    />
+    <CommonKpiCard
+      label="Avance promedio"
+      [value]="dashboard().kpiAverageProgressPct"
+      valueSuffix="%"
+      sub="de proyectos con línea base"
+      [progressPct]="dashboard().kpiAverageProgressPct"
+      linkLabel="Ver avance →"
+      (linkClick)="onKpiClick('/app/operacion/avance')"
+    />
+    <CommonKpiCard
+      [alert]="true"
+      label="Variaciones por resolver"
+      [value]="dashboard().kpiPendingVariationsCount"
+      sub="debes aprobar o rechazar"
+      linkLabel="Ver variaciones →"
+      (linkClick)="onKpiClick('/app/operacion/variaciones')"
+    />
+    <CommonKpiCard
+      label="Planificación"
+      [value]="dashboard().kpiWithoutBaselineCount"
+      sub="proyectos sin línea base congelada"
+      linkLabel="Ir a Planificación →"
+      (linkClick)="onKpiClick('/app/operacion/planificacion')"
+    />
+  </UiGrid>
+
+  <UiGrid [columns]="2" gap="gap-5">
+    <ManagerProjectsList [projects]="dashboard().projects" />
+    <ManagerTodo
+      [pendingVariations]="dashboard().pendingVariations"
+      [upcomingTasks]="dashboard().upcomingTasks"
+    />
+  </UiGrid>
+
+  <UiSurface
+    variant="neutral"
+    padding="md"
+    className="border-dashed max-w-160"
+  >
+    <UiLabel type="bodyS" color="textWeak">
+      El dashboard
+      <strong class="font-semibold text-gray-800 dark:text-white/90">solo agrega y enlaza</strong>
+      : muestra indicadores de tus proyectos tomados de Avance, Variaciones y
+      Planificación. La gestión ocurre en cada módulo.
+    </UiLabel>
+  </UiSurface>
+</UiFlex>

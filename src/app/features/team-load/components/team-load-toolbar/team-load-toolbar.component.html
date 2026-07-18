@@ -1,0 +1,64 @@
+<UiSurface
+  variant="neutral"
+  padding="md"
+  className="border-2 border-gray-300 dark:border-gray-700"
+>
+  <UiFlex
+    direction="row"
+    alignItems="end"
+    [gap]="16"
+    className="flex-wrap"
+  >
+    <UiFlex direction="column" [gap]="6" className="min-w-40">
+      <UiFormLabel labelText="Desde" labelFor="tl-from" />
+      <UiInput
+        id="tl-from"
+        type="date"
+        [value]="fromIso()"
+        (valueChange)="fromChange.emit($event)"
+      />
+    </UiFlex>
+
+    <UiFlex direction="column" [gap]="6" className="min-w-40">
+      <UiFormLabel labelText="Hasta" labelFor="tl-to" />
+      <UiInput
+        id="tl-to"
+        type="date"
+        [value]="toIso()"
+        (valueChange)="toChange.emit($event)"
+      />
+    </UiFlex>
+
+    <UiFlex direction="column" [gap]="6" className="min-w-50">
+      <UiFormLabel labelText="Proyecto (opcional)" labelFor="tl-project" />
+      <UiSelect
+        inputId="tl-project"
+        [options]="projectOptions()"
+        placeholder="Todos"
+        [searchable]="false"
+        [isClearable]="true"
+        [ngModel]="projectId()"
+        (ngModelChange)="projectChange.emit(asString($event))"
+      />
+    </UiFlex>
+
+    <UiFlex direction="column" [gap]="6">
+      <UiFormLabel labelText=" " labelFor="tl-consult" />
+      <UiButton
+        variant="primary"
+        label="Consultar"
+        (click)="consult.emit()"
+      />
+    </UiFlex>
+
+    <UiFlex className="flex-1 min-w-50" justifyContent="end">
+      <UiLabel
+        type="bodyXs"
+        color="textWeak"
+        className="italic self-end pb-2 text-right"
+      >
+        El filtro por proyecto acota a sus tareas · RF-07
+      </UiLabel>
+    </UiFlex>
+  </UiFlex>
+</UiSurface>

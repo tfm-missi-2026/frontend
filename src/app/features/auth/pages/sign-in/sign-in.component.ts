@@ -8,6 +8,11 @@ import {
 import { Router } from "@angular/router";
 
 import { AuthService } from "@core/auth/auth.service";
+import { UiButtonComponent } from "@shared/ui/button";
+import { UiFlexComponent } from "@shared/ui/flex";
+import { UiHeaderComponent } from "@shared/ui/header";
+import { UiLabelComponent } from "@shared/ui/label";
+import { UiModalComponent } from "@shared/ui/modal";
 
 import {
   SigninFormComponent,
@@ -17,7 +22,14 @@ import {
 @Component({
   selector: "SignIn",
   standalone: true,
-  imports: [SigninFormComponent],
+  imports: [
+    SigninFormComponent,
+    UiButtonComponent,
+    UiFlexComponent,
+    UiHeaderComponent,
+    UiLabelComponent,
+    UiModalComponent,
+  ],
   templateUrl: "./sign-in.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -27,6 +39,7 @@ export class SignInComponent {
 
   protected readonly loading = signal<boolean>(false);
   protected readonly errorMessage = signal<string | null>(null);
+  protected readonly forgotModalOpen = signal<boolean>(false);
 
   onSubmit(data: SignInFormData): void {
     this.loading.set(true);
@@ -48,9 +61,5 @@ export class SignInComponent {
           );
         },
       });
-  }
-
-  onSignUp(): void {
-    void this.router.navigateByUrl("/signup");
   }
 }

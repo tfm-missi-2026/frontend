@@ -1,0 +1,58 @@
+<UiFlex direction="column" [gap]="20">
+  <CommonBreadcrumb [items]="breadcrumbItems" />
+
+  <UiFlex
+    direction="row"
+    alignItems="end"
+    justifyContent="between"
+    [gap]="12"
+    className="flex-wrap"
+  >
+    <UiFlex direction="column" [gap]="4">
+      <UiHeader [level]="1" text="Proyectos" />
+      <UiLabel
+        type="bodyS"
+        color="textWeak"
+        className="max-w-185"
+      >
+        Un proyecto es un
+        <strong class="text-gray-800 dark:text-white/90">sistema</strong>
+        gestionado por el área. Las fechas y la prioridad se definen dentro de
+        cada
+        <strong class="text-gray-800 dark:text-white/90">subproyecto</strong>,
+        no aquí.
+      </UiLabel>
+    </UiFlex>
+    <UiButton
+      variant="primary"
+      label="Nuevo proyecto"
+      labelText="Nuevo proyecto"
+      [LeftIcon]="IconPlusSimpleComponent"
+      (click)="openCreate()"
+    />
+  </UiFlex>
+
+  <ProjectsToolbar
+    [searchTerm]="searchTerm()"
+    [statusValue]="filterStatus()"
+    [statusOptions]="statusOptions"
+    (searchChange)="onSearchChange($event)"
+    (statusChange)="onStatusChange($event)"
+  />
+
+  <ProjectsTable
+    [projects]="filteredProjects()"
+    (view)="onView($event)"
+    (edit)="onEdit($event)"
+    (deactivate)="onDeactivate($event)"
+    (clearFilters)="onClearFilters()"
+  />
+</UiFlex>
+
+<ProjectFormModal
+  [isOpen]="formOpen()"
+  [mode]="formMode()"
+  [project]="selectedProject()"
+  (save)="onSaveProject($event)"
+  (close)="formOpen.set(false)"
+/>

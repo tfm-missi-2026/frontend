@@ -57,6 +57,33 @@ const INITIAL: User[] = [
     role: "recurso_tecnico",
     status: "inactive",
   },
+  {
+    id: "u7",
+    firstName: "Marco",
+    lastNamePaternal: "Ríos",
+    lastNameMaternal: "Peña",
+    email: "m.rios@institucion.gob.pe",
+    role: "recurso_tecnico",
+    status: "active",
+  },
+  {
+    id: "u8",
+    firstName: "Sofía",
+    lastNamePaternal: "Lazo",
+    lastNameMaternal: "Ferrer",
+    email: "s.lazo@institucion.gob.pe",
+    role: "recurso_tecnico",
+    status: "active",
+  },
+  {
+    id: "u9",
+    firstName: "Bruno",
+    lastNamePaternal: "Tello",
+    lastNameMaternal: "Vargas",
+    email: "b.tello@institucion.gob.pe",
+    role: "recurso_tecnico",
+    status: "active",
+  },
 ];
 
 @Injectable({ providedIn: "root" })

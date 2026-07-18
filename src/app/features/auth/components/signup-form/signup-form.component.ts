@@ -1,7 +1,8 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  output,
+  EventEmitter,
+  Output,
   signal,
 } from "@angular/core";
 
@@ -49,8 +50,8 @@ export class SignupFormComponent {
   readonly email = signal<string>("");
   readonly password = signal<string>("");
 
-  readonly submitForm = output<SignUpFormData>();
-  readonly signInRequested = output<void>();
+  @Output() readonly submitForm = new EventEmitter<SignUpFormData>();
+  @Output() readonly signInRequested = new EventEmitter<void>();
 
   onFirstNameChange(value: string): void {
     this.firstName.set(value);

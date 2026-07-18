@@ -1,0 +1,12 @@
+<UiFlex direction="row" alignItems="center" [gap]="8">
+  <UiFormLabel labelText="Proyecto" labelFor="progress-project" />
+  <UiSelect
+    inputId="progress-project"
+    [options]="projectOptions()"
+    placeholder="Selecciona un proyecto…"
+    [searchable]="false"
+    [ngModel]="projectId()"
+    (ngModelChange)="projectChange.emit(asString($event))"
+    className="min-w-70"
+  />
+</UiFlex>

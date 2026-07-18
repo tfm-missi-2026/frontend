@@ -1,0 +1,39 @@
+<UiFlex
+  direction="row"
+  alignItems="center"
+  justifyContent="between"
+  [gap]="12"
+  className="flex-wrap"
+>
+  <UiFlex direction="row" alignItems="center" [gap]="8">
+    <UiLabel
+      type="bodyXs"
+      weight="medium"
+      color="textStrong"
+      className="uppercase"
+    >
+      Proyecto
+    </UiLabel>
+    <UiSelect
+      [options]="projectOptions()"
+      placeholder="Selecciona un proyecto…"
+      [searchable]="false"
+      [ngModel]="projectId()"
+      (ngModelChange)="projectChange.emit(asString($event))"
+      className="min-w-80"
+    ></UiSelect>
+  </UiFlex>
+
+  <UiFlex direction="column" alignItems="end" [gap]="2">
+    <UiButton
+      variant="secondary"
+      label="❄ Congelar línea base"
+      labelText="Congelar línea base"
+      [disabled]="!canFreeze()"
+      (click)="freeze.emit()"
+    />
+    <UiLabel type="bodyXs" color="textWeak">
+      Fija una foto del plan actual · HU-02
+    </UiLabel>
+  </UiFlex>
+</UiFlex>

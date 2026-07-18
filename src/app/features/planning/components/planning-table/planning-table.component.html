@@ -1,0 +1,133 @@
+<UiSurface
+  variant="neutral"
+  padding="none"
+  className="border border-gray-200 dark:border-gray-800"
+  ariaLabel="Tabla de asignaciones del proyecto"
+>
+  <UiFlex
+    direction="row"
+    alignItems="center"
+    [gap]="0"
+    className="border-b border-gray-200 px-4 py-3 text-xs uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400"
+  >
+    @for (label of headerLabels; track label; let i = $index) {
+      <UiFlex
+        [direction]="'row'"
+        alignItems="center"
+        [className]="columnClasses[i]"
+      >
+        <UiLabel type="bodyXs" weight="medium">{{ label }}</UiLabel>
+      </UiFlex>
+    }
+  </UiFlex>
+
+  @for (row of rows(); track row.id; let last = $last) {
+    <UiFlex
+      direction="row"
+      alignItems="center"
+      [gap]="0"
+      [className]="
+        last
+          ? 'px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-white/3'
+          : 'border-b border-gray-100 dark:border-gray-800 px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-white/3'
+      "
+    >
+      <UiFlex
+        direction="row"
+        alignItems="center"
+        [gap]="8"
+        className="flex-1 min-w-0"
+      >
+        <UiSurface
+          variant="neutral"
+          padding="none"
+          className="h-9 w-9 rounded-full shrink-0 bg-gray-100 dark:bg-gray-800"
+          ariaLabel="Avatar del recurso"
+        ></UiSurface>
+        <UiFlex direction="column" [gap]="0" className="min-w-0">
+          <UiLabel
+            type="bodyS"
+            weight="semibold"
+            color="textStrong"
+            [text]="row.resourceName"
+          />
+          <UiLabel
+            type="bodyXs"
+            color="textWeak"
+            [text]="row.resourceRole"
+          />
+        </UiFlex>
+      </UiFlex>
+
+      <UiFlex
+        direction="column"
+        [gap]="0"
+        className="flex-1 min-w-0"
+      >
+        <UiLabel
+          type="bodyS"
+          weight="semibold"
+          color="textStrong"
+          [text]="row.taskName"
+        />
+        <UiLabel
+          type="bodyXs"
+          color="textWeak"
+          [text]="row.taskSubprojectLabel"
+        />
+      </UiFlex>
+
+      <UiFlex
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+        className="w-30 shrink-0"
+      >
+        <UiLabel
+          type="HeadingL"
+          weight="bold"
+          color="textStrong"
+          className="font-mono whitespace-nowrap"
+        >
+          {{ row.plannedHours }} h
+        </UiLabel>
+      </UiFlex>
+
+      <UiFlex direction="row" alignItems="center" className="w-60 shrink-0">
+        <UiLabel
+          type="bodyXs"
+          color="textStrong"
+          className="font-mono whitespace-nowrap"
+        >
+          {{ formatPeriod(row) }}
+        </UiLabel>
+      </UiFlex>
+
+      <UiFlex
+        direction="row"
+        alignItems="center"
+        justifyContent="end"
+        [gap]="8"
+        className="flex-1 shrink-0 whitespace-nowrap"
+      >
+        <UiLink
+          variant="primary"
+          size="sm"
+          labelText="Editar asignación"
+          (click)="edit.emit(row)"
+        >
+          Editar
+        </UiLink>
+        <UiLabel type="bodyXs" color="textWeak">·</UiLabel>
+        <UiLink
+          variant="danger"
+          size="sm"
+          labelText="Quitar asignación"
+          (click)="remove.emit(row)"
+        >
+          Quitar
+        </UiLink>
+      </UiFlex>
+    </UiFlex>
+  }
+</UiSurface>

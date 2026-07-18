@@ -1,0 +1,81 @@
+<UiFlex direction="column" [gap]="20">
+  <CommonBreadcrumb [items]="breadcrumbItems" />
+
+  <UiFlex
+    direction="row"
+    alignItems="end"
+    justifyContent="between"
+    [gap]="12"
+    className="flex-wrap"
+  >
+    <UiFlex direction="column" [gap]="4">
+      <UiHeader [level]="1" text="Mi bitácora" />
+      <UiLabel
+        type="bodyS"
+        color="textWeak"
+        className="max-w-200"
+      >
+        Registra tu dedicación real en
+        <strong class="text-gray-800 dark:text-white/90">bloques</strong>
+        de tiempo. Cada bloque es trabajo en una
+        <strong class="text-gray-800 dark:text-white/90">tarea</strong>
+        o participación en una
+        <strong class="text-gray-800 dark:text-white/90">actividad</strong>
+        — nunca ambos.
+      </UiLabel>
+    </UiFlex>
+    <UiButton
+      variant="primary"
+      label="Registrar bloque"
+      labelText="Registrar bloque"
+      [LeftIcon]="IconPlusSimpleComponent"
+      (click)="openCreate()"
+    />
+  </UiFlex>
+
+  <TimesheetToolbar
+    [mode]="mode()"
+    [date]="date()"
+    [range]="range()"
+    (modeChange)="onModeChange($event)"
+    (dateChange)="onDateChange($event)"
+    (rangeChange)="onRangeChange($event)"
+  />
+
+  @if (showAlert(); as msg) {
+    <UiAlert variant="success" [message]="msg" />
+  }
+
+  <TimesheetTimeline
+    [entries]="visibleEntries()"
+    [heading]="timelineHeading()"
+    [mode]="mode()"
+    (edit)="openEdit($event)"
+    (remove)="onDeleteEntry($event)"
+    (register)="openCreate()"
+  />
+
+  <UiSurface
+    variant="neutral"
+    padding="md"
+    className="max-w-150 border-dashed"
+  >
+    <UiLabel type="bodyS" color="textWeak">
+      Un bloque vincula a una
+      <strong class="text-gray-800 dark:text-white/90">tarea</strong>
+      (vía tu asignación) o a una
+      <strong class="text-gray-800 dark:text-white/90">actividad</strong>
+      (reunión, capacitación, soporte), nunca a las dos. La suma de bloques
+      alimenta tus horas registradas en Carga del equipo.
+    </UiLabel>
+  </UiSurface>
+</UiFlex>
+
+<EntryFormModal
+  [isOpen]="formOpen()"
+  [mode]="formMode()"
+  [entry]="selectedEntry()"
+  [defaultDate]="date()"
+  (save)="onSaveEntry($event)"
+  (close)="formOpen.set(false)"
+/>

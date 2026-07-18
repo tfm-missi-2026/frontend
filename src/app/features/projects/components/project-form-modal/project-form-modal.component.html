@@ -1,0 +1,177 @@
+<UiModal
+  [isOpen]="isOpen()"
+  [showCloseButton]="true"
+  className="max-w-130 p-6 pr-12 lg:p-8 lg:pr-14"
+  (close)="onCancel()"
+>
+  <UiLabel
+    type="HeadingM"
+    color="textStrong"
+    weight="semibold"
+    className="mb-1"
+  >
+    {{ heading() }}
+  </UiLabel>
+  <UiLabel type="bodyS" color="textWeak" className="mb-5">
+    {{ subheading() }}
+  </UiLabel>
+
+  @if (validationMessage()) {
+    <UiAlert
+      variant="error"
+      [message]="validationMessage() ?? ''"
+      className="mb-4"
+    />
+  }
+
+  <div class="mb-4">
+    <UiLabel
+      type="bodyXs"
+      color="textStrong"
+      weight="medium"
+      className="mb-2 block uppercase"
+    >
+      Código
+      <span class="ml-1 font-normal text-gray-500">(nombre corto)</span>
+    </UiLabel>
+    <UiInput
+      placeholder="p. ej. SIGTRAMITES"
+      [value]="form().code"
+      (valueChange)="onCodeChange($event)"
+    />
+    @if (codeError(); as msg) {
+      <UiFieldError [message]="msg" className="mt-1" />
+    }
+    <UiLabel type="bodyXs" color="textWeak" className="mt-2 block">
+      Identificador corto del sistema, en mayúsculas y único.
+    </UiLabel>
+  </div>
+
+  <div class="mb-4">
+    <UiLabel
+      type="bodyXs"
+      color="textStrong"
+      weight="medium"
+      className="mb-2 block uppercase"
+    >
+      Nombre del sistema
+    </UiLabel>
+    <UiInput
+      placeholder="p. ej. Sistema de Gestión de Trámites"
+      [value]="form().name"
+      (valueChange)="onNameChange($event)"
+    />
+    @if (nameError(); as msg) {
+      <UiFieldError [message]="msg" className="mt-1" />
+    }
+  </div>
+
+  <div class="mb-4">
+    <UiLabel
+      type="bodyXs"
+      color="textStrong"
+      weight="medium"
+      className="mb-2 block uppercase"
+    >
+      Descripción
+    </UiLabel>
+    <UiTextArea
+      [rows]="3"
+      placeholder="¿Qué hace este sistema y a quién atiende?"
+      [value]="form().description"
+      (valueChange)="onDescriptionChange($event)"
+    />
+  </div>
+
+  <div class="mb-4">
+    <UiLabel
+      type="bodyXs"
+      color="textStrong"
+      weight="medium"
+      className="mb-2 block uppercase"
+    >
+      Gestor responsable
+    </UiLabel>
+    <UiSelect
+      [options]="managerOptions()"
+      [searchable]="false"
+      placeholder="Selecciona un gestor…"
+      [ngModel]="form().managerId"
+      (ngModelChange)="onManagerChange($event)"
+    />
+    @if (managerError(); as msg) {
+      <UiFieldError [message]="msg" className="mt-1" />
+    }
+    <UiLabel type="bodyXs" color="textWeak" className="mt-1 block">
+      Solo usuarios con rol Gestor de Proyecto.
+    </UiLabel>
+  </div>
+
+  <UiGrid [columns]="2" gap="gap-4" className="mb-4">
+    <div>
+      <UiLabel
+        type="bodyXs"
+        color="textStrong"
+        weight="medium"
+        className="mb-2 block uppercase"
+      >
+        Subproyectos
+      </UiLabel>
+      <UiInput
+        type="number"
+        placeholder="0"
+        [value]="form().subCount"
+        (valueChange)="onSubCountChange($event)"
+      />
+    </div>
+    <div>
+      <UiLabel
+        type="bodyXs"
+        color="textStrong"
+        weight="medium"
+        className="mb-2 block uppercase"
+      >
+        Estado
+      </UiLabel>
+      <UiFlex
+        direction="row"
+        alignItems="center"
+        [gap]="16"
+        className="pt-1.5"
+      >
+        <UiRadio
+          name="project-status"
+          value="active"
+          [checked]="form().status === 'active'"
+          label="Activo"
+          (valueChange)="onStatusChange('active')"
+        />
+        <UiRadio
+          name="project-status"
+          value="inactive"
+          [checked]="form().status === 'inactive'"
+          label="Inactivo"
+          (valueChange)="onStatusChange('inactive')"
+        />
+      </UiFlex>
+    </div>
+  </UiGrid>
+
+  <UiFlex
+    direction="row"
+    [justifyContent]="'end'"
+    [gap]="8"
+    className="mt-4 border-t border-dashed border-gray-200 pt-4 dark:border-gray-800"
+  >
+    <UiButton
+      variant="secondary"
+      label="Cancelar"
+      (click)="onCancel()"
+    />
+    <UiButton
+      variant="primary"
+      label="Guardar"
+      (click)="onSave()"
+    />
+  </UiFlex>
+</UiModal>

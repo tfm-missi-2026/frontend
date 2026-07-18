@@ -1,0 +1,113 @@
+<UiFlex direction="column" [gap]="20">
+  <CommonBreadcrumb [items]="breadcrumbItems" />
+
+  <UiFlex
+    direction="row"
+    alignItems="end"
+    justifyContent="between"
+    [gap]="12"
+    className="flex-wrap"
+  >
+    <UiFlex direction="column" [gap]="4">
+      <UiHeader [level]="1" text="Avance del proyecto" />
+      <UiLabel type="bodyS" color="textWeak" className="max-w-180">
+        Compara lo
+        <strong class="font-semibold text-gray-800 dark:text-white/90">planificado</strong>
+        (horas estimadas de la línea base congelada) con lo
+        <strong class="font-semibold text-gray-800 dark:text-white/90">ejecutado</strong>
+        (horas registradas en bitácora). % Avance = registradas ÷ estimadas;
+        desviación = registradas − estimadas.
+      </UiLabel>
+    </UiFlex>
+    <ProgressToolbar
+      [projectOptions]="projectOptions()"
+      [projectId]="selectedProjectId()"
+      (projectChange)="onProjectChange($event)"
+    />
+  </UiFlex>
+
+  @if (!progress().hasBaseline) {
+    <UiSurface
+      variant="neutral"
+      padding="lg"
+      className="border-dashed text-center"
+    >
+      <UiFlex direction="column" alignItems="center" [gap]="12">
+        <UiFlex
+          direction="row"
+          alignItems="center"
+          justifyContent="center"
+          [gap]="0"
+          className="h-14 w-14 rounded-lg bg-gray-100 dark:bg-gray-800"
+        >
+          <UiLabel type="HeadingM" color="textWeak">∅</UiLabel>
+        </UiFlex>
+        <UiHeader [level]="4" text="Este proyecto aún no tiene una línea base congelada." />
+        <UiLabel type="bodyS" color="textWeak" className="max-w-180">
+          Congélala en Planificación para medir el avance contra lo estimado.
+        </UiLabel>
+        <UiButton
+          variant="primary"
+          label="Ir a Planificación"
+          (click)="onGoToPlanning()"
+        />
+      </UiFlex>
+    </UiSurface>
+  } @else {
+    <ProgressBaseline
+      [baselineLabel]="progress().baselineLabel"
+      [baselineDate]="progress().baselineDate"
+      [estimatedHours]="progress().estimatedHours"
+      [loggedHours]="progress().loggedHours"
+      [progressPct]="progress().progressPct"
+    />
+
+    <ProgressTable [rows]="progress().rows" />
+
+    @if (progress().rows.length > 0) {
+      <UiSurface variant="neutral" padding="md">
+        <UiFlex
+          direction="row"
+          alignItems="center"
+          justifyContent="between"
+          [gap]="12"
+          className="flex-wrap"
+        >
+          <UiFlex direction="row" alignItems="center" [gap]="8" className="flex-wrap">
+            <UiLabel type="bodyXs" color="textWeak">
+              Línea punteada = 100% de lo estimado.
+            </UiLabel>
+            <UiBadge variant="light" color="dark" size="sm">
+              −X por debajo
+            </UiBadge>
+            <UiBadge variant="solid" color="error" size="sm">
+              +X sobre lo estimado
+            </UiBadge>
+          </UiFlex>
+          <UiLabel type="bodyXs" color="textWeak">
+            Total del proyecto:
+            <strong class="font-semibold text-gray-800 dark:text-white/90 font-mono">
+              {{ totalLabel() }}
+            </strong>
+          </UiLabel>
+        </UiFlex>
+      </UiSurface>
+    }
+  }
+
+  <UiSurface
+    variant="neutral"
+    padding="md"
+    className="border-dashed max-w-160"
+  >
+    <UiLabel type="bodyS" color="textWeak">
+      Una desviación
+      <strong class="font-semibold text-gray-800 dark:text-white/90">positiva</strong>
+      (registradas &gt; estimadas) señala posible sobre-esfuerzo; una
+      <strong class="font-semibold text-gray-800 dark:text-white/90">negativa</strong>
+      indica que aún falta ejecutar frente al plan. La línea base se congela en
+      <strong class="font-semibold text-gray-800 dark:text-white/90">Planificación</strong>
+      (HU-02).
+    </UiLabel>
+  </UiSurface>
+</UiFlex>

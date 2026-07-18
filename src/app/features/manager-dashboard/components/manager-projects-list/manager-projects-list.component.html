@@ -1,0 +1,84 @@
+<UiSurface
+  variant="neutral"
+  padding="md"
+  className="border-2 border-gray-300 dark:border-gray-700"
+>
+  <UiFlex direction="column" [gap]="16">
+    <UiFlex direction="column" [gap]="4">
+      <UiHeader [level]="4" text="Avance de mis proyectos" />
+      <UiLabel type="bodyS" color="textWeak">
+        % de avance vs. línea base · estado de la línea base por proyecto.
+      </UiLabel>
+    </UiFlex>
+
+    @if (projects().length === 0) {
+      <UiLabel type="bodyS" color="textWeak" className="italic">
+        No tienes proyectos activos en este período.
+      </UiLabel>
+    } @else {
+      @for (project of projects(); track project.projectId; let last = $last) {
+        <UiFlex
+          direction="row"
+          alignItems="center"
+          [gap]="12"
+          [className]="
+            last
+              ? 'w-full'
+              : 'w-full pb-3 border-b border-dashed border-gray-200 dark:border-gray-800'
+          "
+        >
+          <UiFlex direction="column" [gap]="4" className="w-52 shrink-0">
+            <UiLabel
+              type="bodyS"
+              weight="bold"
+              color="textStrong"
+              className="font-mono inline-flex self-start items-center border-2 border-gray-400 rounded-md px-2 py-0.5 bg-gray-50 dark:bg-gray-800 dark:border-gray-600 tracking-tight"
+            >
+              {{ project.projectCode }}
+            </UiLabel>
+            <UiLabel
+              type="bodyS"
+              weight="semibold"
+              color="textStrong"
+              [wrapText]="true"
+            >
+              {{ project.projectName }}
+            </UiLabel>
+            <UiLabel
+              type="bodyXs"
+              weight="medium"
+              [color]="project.hasBaseline ? 'textSuccess' : 'textWeak'"
+              [className]="
+                project.hasBaseline
+                  ? 'inline-flex self-start items-center border border-success-300 rounded px-1.5 py-0.5'
+                  : 'inline-flex self-start items-center border border-dashed border-gray-400 rounded px-1.5 py-0.5'
+              "
+            >
+              {{ project.baselineLabel }}
+            </UiLabel>
+          </UiFlex>
+
+          <UiFlex direction="row" alignItems="center" [gap]="8" className="flex-1">
+            <CommonProgressBar
+              [progressPct]="project.progressPct"
+              [isOver]="project.progressPct > 100"
+              className="flex-1"
+            />
+            <UiLabel
+              type="HeadingS"
+              weight="bold"
+              color="textStrong"
+              className="min-w-14 text-right font-mono whitespace-nowrap"
+            >
+              {{ project.progressPct }}%
+            </UiLabel>
+          </UiFlex>
+        </UiFlex>
+      }
+    }
+
+    <UiLabel type="bodyXs" color="textWeak">
+      El avance solo se mide contra una línea base congelada (RF-09).
+    </UiLabel>
+  </UiFlex>
+</UiSurface>

@@ -1,0 +1,18 @@
+<UiFlex
+  direction="row"
+  alignItems="center"
+  [gap]="0"
+  className="relative h-5.5 w-full overflow-hidden rounded border-2 border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900"
+>
+  <UiFlex
+    direction="row"
+    alignItems="center"
+    [className]="fillClasses()"
+    [style.width.%]="fillWidthPct()"
+  />
+  <UiFlex
+    direction="column"
+    className="absolute -top-1 -bottom-1 w-0 border-l-2 border-dashed border-gray-500"
+    [style.left.%]="markPos()"
+  />
+</UiFlex>

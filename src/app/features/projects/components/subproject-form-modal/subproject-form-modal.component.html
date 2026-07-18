@@ -1,0 +1,214 @@
+<UiModal
+  [isOpen]="isOpen()"
+  [showCloseButton]="true"
+  className="max-w-130 p-6 pr-12 lg:p-8 lg:pr-14"
+  (close)="onCancel()"
+>
+  <UiLabel
+    type="HeadingM"
+    color="textStrong"
+    weight="semibold"
+    className="mb-1"
+  >
+    {{ heading() }}
+  </UiLabel>
+  <UiLabel type="bodyS" color="textWeak" className="mb-4">
+    {{ subheading() }}
+  </UiLabel>
+
+  <UiAlert
+    variant="info"
+    message="La situación se calcula a partir de las tareas; un subproyecto nuevo arranca en Pendiente. No hay campo de situación editable aquí."
+    className="mb-4"
+  />
+
+  @if (validationMessage()) {
+    <UiAlert
+      variant="error"
+      [message]="validationMessage() ?? ''"
+      className="mb-4"
+    />
+  }
+
+  <UiGrid [columns]="2" gap="gap-4" className="mb-4">
+    <div>
+      <UiLabel
+        type="bodyXs"
+        color="textStrong"
+        weight="medium"
+        className="mb-2 block uppercase"
+      >
+        Tipo
+      </UiLabel>
+      <UiSelect
+        [options]="typeOptions.filter((o) => o.value !== '')"
+        placeholder="Selecciona un tipo…"
+        [searchable]="false"
+        [ngModel]="form().type"
+        (ngModelChange)="onTypeChange($event)"
+      />
+      @if (typeError(); as msg) {
+        <UiFieldError [message]="msg" className="mt-1" />
+      }
+    </div>
+    <div>
+      <UiLabel
+        type="bodyXs"
+        color="textStrong"
+        weight="medium"
+        className="mb-2 block uppercase"
+      >
+        Código de ticket
+        <span class="ml-1 font-normal text-gray-500">(opcional)</span>
+      </UiLabel>
+      <UiInput
+        placeholder="p. ej. SD-4821 / JIRA-117"
+        [value]="form().ticket ?? ''"
+        (valueChange)="onTicketChange($event)"
+        className="font-mono"
+      />
+      @if (ticketError(); as msg) {
+        <UiFieldError [message]="msg" className="mt-1" />
+      }
+      <UiLabel type="bodyXs" color="textWeak" className="mt-1 block">
+        Identificador externo opcional (mesa de ayuda, JIRA…).
+      </UiLabel>
+    </div>
+  </UiGrid>
+
+  <div class="mb-4">
+    <UiLabel
+      type="bodyXs"
+      color="textStrong"
+      weight="medium"
+      className="mb-2 block uppercase"
+    >
+      Descripción
+      <span class="ml-1 font-normal text-gray-500">(obligatoria)</span>
+    </UiLabel>
+    <UiTextArea
+      [rows]="3"
+      placeholder="¿Qué se debe atender en este subproyecto?"
+      [value]="form().description"
+      (valueChange)="onDescriptionChange($event)"
+    />
+    @if (descriptionError(); as msg) {
+      <UiFieldError [message]="msg" className="mt-1" />
+    }
+  </div>
+
+  <UiGrid [columns]="2" gap="gap-4" className="mb-4">
+    <div>
+      <UiLabel
+        type="bodyXs"
+        color="textStrong"
+        weight="medium"
+        className="mb-2 block uppercase"
+      >
+        Prioridad
+      </UiLabel>
+      <UiSelect
+        [options]="priorityOptions"
+        placeholder="Selecciona una prioridad…"
+        [searchable]="false"
+        [ngModel]="form().priority"
+        (ngModelChange)="onPriorityChange($event)"
+      />
+      @if (priorityError(); as msg) {
+        <UiFieldError [message]="msg" className="mt-1" />
+      }
+    </div>
+    <div>
+      <UiLabel
+        type="bodyXs"
+        color="textStrong"
+        weight="medium"
+        className="mb-2 block uppercase"
+      >
+        Solicitante
+      </UiLabel>
+      <UiSelect
+        [options]="requesterOptions"
+        placeholder="Selecciona un solicitante…"
+        [searchable]="false"
+        [ngModel]="form().requester"
+        (ngModelChange)="onRequesterChange($event)"
+      />
+      @if (requesterError(); as msg) {
+        <UiFieldError [message]="msg" className="mt-1" />
+      }
+    </div>
+  </UiGrid>
+
+  <div class="mb-4">
+    <UiLabel
+      type="bodyXs"
+      color="textStrong"
+      weight="medium"
+      className="mb-2 block uppercase"
+    >
+      Fecha de solicitud
+    </UiLabel>
+    <UiDatePicker
+      mode="single"
+      dateFormat="d/m/Y"
+      placeholder="dd/mm/aaaa"
+      [value]="form().requestDate"
+      (valueChange)="onDateChange($event)"
+      className="max-w-55"
+    />
+    @if (dateError(); as msg) {
+      <UiFieldError [message]="msg" className="mt-1" />
+    }
+  </div>
+
+  @if (showRejectionBlock()) {
+    <UiSurface
+      variant="neutral"
+      padding="md"
+      className="mb-4 border-dashed"
+    >
+      <UiFlex direction="row" alignItems="center" [gap]="8" className="mb-2">
+        <UiBadge variant="light" color="warning" size="sm">
+          Solo si Situación = Rechazado
+        </UiBadge>
+      </UiFlex>
+      <UiLabel
+        type="bodyXs"
+        color="textStrong"
+        weight="medium"
+        className="mb-2 block uppercase"
+      >
+        Justificación del rechazo
+      </UiLabel>
+      <UiTextArea
+        [rows]="2"
+        placeholder="Motivo por el que el subproyecto fue rechazado."
+        [value]="form().rejectionReason ?? ''"
+        (valueChange)="onRejectionReasonChange($event)"
+      />
+      <UiLabel type="bodyXs" color="textWeak" className="mt-1 block">
+        Aparece únicamente cuando la situación derivada es Rechazado; queda
+        como registro de la decisión.
+      </UiLabel>
+    </UiSurface>
+  }
+
+  <UiFlex
+    direction="row"
+    [justifyContent]="'end'"
+    [gap]="8"
+    className="mt-4 border-t border-dashed border-gray-200 pt-4 dark:border-gray-800"
+  >
+    <UiButton
+      variant="secondary"
+      label="Cancelar"
+      (click)="onCancel()"
+    />
+    <UiButton
+      variant="primary"
+      label="Guardar"
+      (click)="onSave()"
+    />
+  </UiFlex>
+</UiModal>

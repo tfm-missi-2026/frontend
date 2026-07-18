@@ -1,0 +1,155 @@
+<UiModal
+  [isOpen]="isOpen()"
+  [showCloseButton]="true"
+  className="max-w-140 p-6 lg:p-8"
+  (close)="onCancel()"
+>
+  <UiFlex direction="column" [gap]="16">
+    <UiFlex direction="column" [gap]="4">
+      <UiLabel type="HeadingM" weight="semibold" color="textStrong">
+        Reportar variación
+      </UiLabel>
+      <UiLabel type="bodyS" color="textWeak">
+        Un cambio formal sobre el plan. La justificación es obligatoria y
+        queda en el histórico.
+      </UiLabel>
+    </UiFlex>
+
+    @if (validationMessage(); as msg) {
+      <UiAlert variant="error" [message]="msg" />
+    }
+
+    <UiGrid [columns]="2" gap="gap-3">
+      <UiFlex direction="column" [gap]="6">
+        <UiFormLabel
+          labelText="Tarea afectada"
+          labelFor="report-target"
+        />
+        <UiSelect
+          inputId="report-target"
+          [options]="targetSelectOptions()"
+          placeholder="Selecciona una tarea o subproyecto…"
+          [searchable]="false"
+          [ngModel]="selectedTargetValue()"
+          (ngModelChange)="onTargetChange($event)"
+        />
+        <UiLabel type="bodyXs" color="textWeak">
+          Puede dejarse a nivel de subproyecto.
+        </UiLabel>
+      </UiFlex>
+      <UiFlex direction="column" [gap]="6">
+        <UiFormLabel
+          labelText="Tipo"
+          labelFor="report-type"
+          [required]="true"
+        />
+        <UiSelect
+          inputId="report-type"
+          [options]="VARIATION_TYPE_OPTIONS"
+          placeholder="Selecciona el tipo…"
+          [searchable]="false"
+          [ngModel]="form().type"
+          (ngModelChange)="onTypeChange($event)"
+        />
+        <UiLabel type="bodyXs" color="textWeak">
+          Alcance · Plazo · Recursos.
+        </UiLabel>
+      </UiFlex>
+    </UiGrid>
+
+    <UiFlex direction="column" [gap]="6">
+      <UiFormLabel
+        labelText="Descripción"
+        labelFor="report-description"
+      />
+      <UiTextArea
+        inputId="report-description"
+        placeholder="¿Qué cambia respecto al plan?"
+        [rows]="2"
+        [value]="form().description"
+        (valueChange)="onDescriptionChange($event)"
+      ></UiTextArea>
+    </UiFlex>
+
+    <UiSurface
+      variant="neutral"
+      padding="md"
+      className="border-2 border-gray-300 dark:border-gray-700"
+    >
+      <UiFlex direction="column" [gap]="6">
+        <UiFormLabel
+          labelText="Justificación"
+          labelFor="report-justification"
+          [required]="true"
+        />
+        <UiTextArea
+          inputId="report-justification"
+          placeholder="¿Por qué es necesaria esta variación?"
+          [rows]="2"
+          [value]="form().justification"
+          (valueChange)="onJustificationChange($event)"
+        ></UiTextArea>
+        <UiLabel type="bodyXs" color="textWeak">
+          <strong class="font-semibold">Campo obligatorio.</strong>
+          Sin justificación no se puede reportar.
+        </UiLabel>
+      </UiFlex>
+    </UiSurface>
+
+    <UiGrid [columns]="2" gap="gap-3">
+      <UiFlex direction="column" [gap]="6">
+        <UiFormLabel
+          labelText="Valor anterior"
+          labelFor="report-prev"
+        />
+        <UiInput
+          id="report-prev"
+          placeholder="p. ej. fin 30/05/2026"
+          [value]="form().previousValue"
+          (valueChange)="onPreviousValueChange($event)"
+        />
+      </UiFlex>
+      <UiFlex direction="column" [gap]="6">
+        <UiFormLabel
+          labelText="Valor nuevo"
+          labelFor="report-new"
+        />
+        <UiInput
+          id="report-new"
+          placeholder="p. ej. fin 06/06/2026"
+          [value]="form().newValue"
+          (valueChange)="onNewValueChange($event)"
+        />
+      </UiFlex>
+    </UiGrid>
+
+    <UiFlex direction="column" [gap]="6">
+      <UiFormLabel
+        labelText="Fecha de detección"
+        labelFor="report-detection"
+      />
+      <UiInput
+        id="report-detection"
+        type="date"
+        [value]="form().detectionDate"
+        (valueChange)="onDetectionDateChange($event)"
+        className="max-w-55"
+      />
+    </UiFlex>
+
+    <UiFlex
+      direction="row"
+      justifyContent="end"
+      [gap]="8"
+      className="mt-2 border-t border-dashed border-gray-200 pt-4 dark:border-gray-800"
+    >
+      <UiButton variant="secondary" label="Cancelar" (click)="onCancel()" />
+      <UiButton
+        variant="primary"
+        label="Reportar"
+        [disabled]="!canSubmit()"
+        (click)="onSave()"
+      />
+    </UiFlex>
+  </UiFlex>
+</UiModal>

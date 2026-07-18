@@ -1,0 +1,135 @@
+<UiSurface
+  variant="neutral"
+  padding="none"
+  className="border border-gray-200 dark:border-gray-800"
+  ariaLabel="Tabla de avance por tarea"
+>
+  <UiFlex
+    direction="row"
+    alignItems="center"
+    [gap]="0"
+    className="border-b border-gray-200 px-4 py-3 text-xs uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400"
+  >
+    @for (label of headerLabels; track label; let i = $index) {
+      <UiFlex
+        [direction]="'row'"
+        alignItems="center"
+        [className]="columnClasses[i]"
+      >
+        <UiLabel type="bodyXs" weight="medium">{{ label }}</UiLabel>
+      </UiFlex>
+    }
+  </UiFlex>
+
+  @for (row of rows(); track row.taskId; let last = $last) {
+    <UiFlex
+      direction="row"
+      alignItems="center"
+      [gap]="0"
+      [className]="
+        last
+          ? 'px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-white/3'
+          : 'border-b border-gray-100 dark:border-gray-800 px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-white/3'
+      "
+    >
+      <UiFlex direction="column" [gap]="0" className="min-w-0 pr-3">
+        <UiLabel
+          type="bodyS"
+          weight="semibold"
+          color="textStrong"
+          [text]="row.taskName"
+        />
+        <UiLabel
+          type="bodyXs"
+          weight="medium"
+          color="textWeak"
+          className="font-mono"
+          [text]="row.taskRef"
+        />
+      </UiFlex>
+
+      <UiFlex
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <UiLabel
+          type="bodyS"
+          weight="semibold"
+          color="textStrong"
+          className="font-mono whitespace-nowrap"
+        >
+          {{ row.estimatedHours }} h
+        </UiLabel>
+      </UiFlex>
+
+      <UiFlex
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <UiLabel
+          type="bodyS"
+          weight="semibold"
+          color="textStrong"
+          className="font-mono whitespace-nowrap"
+        >
+          {{ row.loggedHours }} h
+        </UiLabel>
+      </UiFlex>
+
+      <UiFlex direction="row" alignItems="center" [gap]="8" className="pr-3 w-full min-w-30">
+        <UiFlex
+          direction="row"
+          alignItems="center"
+          [gap]="0"
+          className="relative h-5 flex-1 min-w-30 overflow-hidden rounded border-2 border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900"
+        >
+          <UiFlex
+            direction="row"
+            [className]="fillClasses(row.isOverExecuted)"
+            [style.width.%]="fillWidthPct(row.progressPct, row.isOverExecuted)"
+          />
+          <UiFlex
+            direction="column"
+            className="absolute -top-1 -bottom-1 w-0 border-l-2 border-dashed border-gray-500"
+            [style.left.%]="70"
+          />
+        </UiFlex>
+        <UiLabel
+          type="bodyS"
+          weight="semibold"
+          color="textStrong"
+          className="min-w-14 whitespace-nowrap font-mono"
+        >
+          {{ row.progressPct }}%
+        </UiLabel>
+      </UiFlex>
+
+      <UiFlex
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+      >
+        @if (row.deviationHours === 0) {
+          <UiBadge
+            variant="light"
+            color="light"
+            size="md"
+            className="border border-dashed border-gray-400 dark:border-gray-600"
+          >
+            0 h
+          </UiBadge>
+        } @else if (row.isOverExecuted) {
+          <UiBadge variant="solid" color="error" size="md">
+            {{ formatDeviation(row.deviationHours, true) }}
+          </UiBadge>
+        } @else {
+          <UiBadge variant="light" color="dark" size="md">
+            {{ formatDeviation(row.deviationHours, false) }}
+          </UiBadge>
+        }
+      </UiFlex>
+    </UiFlex>
+  }
+</UiSurface>

@@ -1,0 +1,138 @@
+<UiFlex direction="column" [gap]="20">
+  <UiFlex
+    direction="row"
+    alignItems="center"
+    justifyContent="between"
+    [gap]="12"
+    className="flex-wrap"
+  >
+    <CommonBreadcrumb [items]="breadcrumbItems()" />
+    <UiButton
+      variant="tertiary"
+      label="Volver a proyectos"
+      labelText="Volver a proyectos"
+      [LeftIcon]="IconArrowLeftComponent"
+      (click)="goBack()"
+    />
+  </UiFlex>
+
+  @if (project(); as p) {
+    <ProjectsSubprojectsHeader
+      [project]="p"
+      [managerName]="managerName()"
+      [subCount]="visibleSubprojects().length"
+    />
+
+    <UiFlex
+      direction="row"
+      alignItems="end"
+      justifyContent="between"
+      [gap]="12"
+      className="flex-wrap"
+    >
+      <UiHeader [level]="2" text="Subproyectos" />
+      <UiButton
+        variant="primary"
+        label="Nuevo subproyecto"
+        labelText="Nuevo subproyecto"
+        [LeftIcon]="IconPlusSimpleComponent"
+        (click)="openCreate()"
+      />
+    </UiFlex>
+
+    <ProjectsSubprojectsToolbar
+      [searchTerm]="searchTerm()"
+      [typeValue]="filterType()"
+      [typeOptions]="typeOptions"
+      [situationValue]="filterSituation()"
+      [situationOptions]="situationOptions"
+      (searchChange)="onSearchChange($event)"
+      (typeChange)="onTypeChange($event)"
+      (situationChange)="onSituationChange($event)"
+      (clearFilters)="onClearFilters()"
+    />
+
+    @if (visibleSubprojects().length === 0) {
+      <UiSurface
+        variant="neutral"
+        padding="lg"
+        className="border-dashed text-center"
+      >
+        <UiFlex
+          direction="column"
+          alignItems="center"
+          [gap]="12"
+        >
+          <UiFlex
+            direction="row"
+            alignItems="center"
+            justifyContent="center"
+            [gap]="0"
+            className="h-14 w-14 rounded-lg bg-gray-100 dark:bg-gray-800"
+          >
+            <span class="text-2xl text-gray-400">∅</span>
+          </UiFlex>
+          <UiHeader [level]="4" text="Este proyecto aún no tiene subproyectos." />
+          <UiLabel type="bodyS" color="textWeak">
+            Crea el primero: una incidencia, un requerimiento o un desarrollo modular.
+          </UiLabel>
+          <UiButton
+            variant="primary"
+            label="Nuevo subproyecto"
+            labelText="Nuevo subproyecto"
+            [LeftIcon]="IconPlusSimpleComponent"
+            (click)="openCreate()"
+          />
+        </UiFlex>
+      </UiSurface>
+    } @else {
+      <ProjectsSubprojectsTable
+        [subprojects]="visibleSubprojects()"
+        (view)="onView($event)"
+        (edit)="onEdit($event)"
+        (deactivate)="onDeactivate($event)"
+        (clearFilters)="onClearFilters()"
+      />
+    }
+
+    <UiSurface
+      variant="neutral"
+      padding="md"
+      className="border-dashed max-w-140"
+    >
+      <UiLabel type="bodyS" color="textWeak">
+        La
+        <strong class="text-gray-800 dark:text-white/90">situación</strong>
+        no se edita a mano: se calcula a partir del estado de las tareas
+        (Pendiente · En atención · Culminado · Rechazado). "Ver tareas" abre el
+        detalle del subproyecto.
+      </UiLabel>
+    </UiSurface>
+  } @else {
+    <UiSurface variant="neutral" padding="lg" className="text-center">
+      <UiFlex direction="column" alignItems="center" [gap]="12">
+        <UiHeader [level]="4" text="Proyecto no encontrado." />
+        <UiLabel type="bodyS" color="textWeak">
+          El proyecto solicitado no existe o fue dado de baja.
+        </UiLabel>
+        <UiButton
+          variant="secondary"
+          label="Volver a proyectos"
+          labelText="Volver a proyectos"
+          [LeftIcon]="IconArrowLeftComponent"
+          (click)="goBack()"
+        />
+      </UiFlex>
+    </UiSurface>
+  }
+</UiFlex>
+
+<SubprojectFormModal
+  [isOpen]="formOpen()"
+  [mode]="formMode()"
+  [projectCode]="project()?.code ?? ''"
+  [projectId]="projectId() ?? ''"
+  [subproject]="selectedSub()"
+  (save)="onSave($event)"
+  (close)="formOpen.set(false)"
+/>

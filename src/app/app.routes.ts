@@ -30,6 +30,22 @@ export const routes: Routes = [
         redirectTo: "administracion/usuarios",
       },
       {
+        path: "operacion/dashboard",
+        loadChildren: () =>
+          import(
+            "@features/manager-dashboard/manager-dashboard.module"
+          ).then((m) => m.ManagerDashboardModule),
+        title: "SPSRT — Dashboard del Gestor",
+      },
+      {
+        path: "operacion/dashboard-jefe",
+        loadChildren: () =>
+          import("@features/area-dashboard/area-dashboard.module").then(
+            (m) => m.AreaDashboardModule,
+          ),
+        title: "SPSRT — Dashboard del Jefe de Área",
+      },
+      {
         path: "administracion/usuarios",
         component: UsersListComponent,
         title: "SPSRT — Gestión de usuarios",
@@ -56,6 +72,46 @@ export const routes: Routes = [
             (m) => m.TimesheetModule,
           ),
         title: "SPSRT — Mi bitácora",
+      },
+      {
+        path: "operacion/proyectos",
+        loadChildren: () =>
+          import("@features/projects/projects.module").then(
+            (m) => m.ProjectsModule,
+          ),
+        title: "SPSRT — Proyectos",
+      },
+      {
+        path: "operacion/planificacion",
+        loadChildren: () =>
+          import("@features/planning/planning.module").then(
+            (m) => m.PlanningModule,
+          ),
+        title: "SPSRT — Planificación",
+      },
+      {
+        path: "operacion/variaciones",
+        loadChildren: () =>
+          import("@features/variations/variations.module").then(
+            (m) => m.VariationsModule,
+          ),
+        title: "SPSRT — Variaciones",
+      },
+      {
+        path: "operacion/carga-equipo",
+        loadChildren: () =>
+          import("@features/team-load/team-load.module").then(
+            (m) => m.TeamLoadModule,
+          ),
+        title: "SPSRT — Carga del equipo",
+      },
+      {
+        path: "operacion/avance",
+        loadChildren: () =>
+          import("@features/progress/progress.module").then(
+            (m) => m.ProgressModule,
+          ),
+        title: "SPSRT — Avance",
       },
       {
         path: "administracion/modulos",
