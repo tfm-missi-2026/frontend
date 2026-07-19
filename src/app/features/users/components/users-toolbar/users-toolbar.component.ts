@@ -28,38 +28,7 @@ import type { UserRole, UserStatus } from "../../models/user";
   standalone: true,
   imports: [FormsModule, UiFlexComponent, UiInputComponent, UiSelectComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <UiFlex direction="row" alignItems="center" [gap]="3" className="flex-wrap">
-      <UiInput
-        className="flex-1 min-w-70"
-        type="text"
-        placeholder="Buscar por nombre o correo…"
-        [leftIcon]="searchIcon"
-        [value]="searchTerm()"
-        (valueChange)="searchChange.emit($event)"
-      />
-
-      <UiSelect
-        [options]="rolOptions()"
-        [searchable]="false"
-        [isClearable]="true"
-        placeholder="Rol: Todos"
-        [width]="'170px'"
-        [ngModel]="rolValue()"
-        (ngModelChange)="rolChange.emit(asString($event))"
-      />
-
-      <UiSelect
-        [options]="statusOptions()"
-        [searchable]="false"
-        [isClearable]="true"
-        placeholder="Estado: Todos"
-        [width]="'160px'"
-        [ngModel]="statusValue()"
-        (ngModelChange)="statusChange.emit(asString($event))"
-      />
-    </UiFlex>
-  `,
+  templateUrl: "./users-toolbar.component.html",
 })
 export class UsersToolbarComponent {
   readonly searchTerm = input<string>("");

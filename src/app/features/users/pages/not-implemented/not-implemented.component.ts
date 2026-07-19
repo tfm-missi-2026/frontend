@@ -25,28 +25,7 @@ import { UiLabelComponent } from "@shared/ui/label";
     UiLabelComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <UiFlex
-      direction="column"
-      alignItems="center"
-      justifyContent="center"
-      [gap]="16"
-      className="min-h-96 px-6 py-20 text-center"
-    >
-      <UiHeader [level]="2" text="Funcionalidad pendiente" />
-      <UiLabel
-        type="bodyS"
-        color="textWeak"
-        text="Esta sección aún no está implementada en el sistema."
-      />
-      <UiButton
-        variant="secondary"
-        [LeftIcon]="homeIcon"
-        labelText="Volver al inicio"
-        (click)="goHome()"
-      />
-    </UiFlex>
-  `,
+  templateUrl: "./not-implemented.component.html",
 })
 export class NotImplementedPageComponent {
   private readonly router = inject(Router);

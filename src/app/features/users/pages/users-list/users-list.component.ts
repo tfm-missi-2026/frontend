@@ -35,62 +35,7 @@ import { UsersMockService } from "../../services/users-mock.service";
     UsersToolbarComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <UiFlex direction="column" [gap]="5">
-      <CommonBreadcrumb [items]="breadcrumbItems" />
-
-      <UiFlex
-        direction="row"
-        alignItems="center"
-        justifyContent="between"
-        [gap]="3"
-        className="flex-wrap"
-      >
-        <UiHeader [level]="1" text="Gestión de usuarios" />
-        <UiButton
-          variant="primary"
-          [LeftIcon]="plusIcon"
-          labelText="Nuevo usuario"
-          (click)="openCreate()"
-        />
-      </UiFlex>
-
-      <UsersToolbar
-        [searchTerm]="searchTerm()"
-        [rolValue]="filterRol()"
-        [statusValue]="filterStatus()"
-        [rolOptions]="rolOptions"
-        [statusOptions]="statusOptions"
-        (searchChange)="searchTerm.set($event)"
-        (rolChange)="onRolChange($event)"
-        (statusChange)="onStatusChange($event)"
-      />
-
-      <UsersTable
-        [users]="filteredUsers()"
-        (edit)="openEdit($event)"
-        (resetPassword)="openResetPassword($event)"
-        (deactivate)="onDeactivate($event)"
-        (clearFilters)="onClearFilters()"
-        (create)="openCreate()"
-      />
-    </UiFlex>
-
-    <UserFormModal
-      [isOpen]="formOpen()"
-      [mode]="formMode()"
-      [user]="selectedUser()"
-      (save)="onSaveUser($event)"
-      (close)="formOpen.set(false)"
-    />
-
-    <ResetPasswordModal
-      [isOpen]="resetOpen()"
-      [user]="resetUser()"
-      (confirm)="onConfirmReset($event)"
-      (close)="resetOpen.set(false)"
-    />
-  `,
+  templateUrl: "./users-list.component.html",
 })
 export class UsersListComponent {
   private readonly usersService = inject(UsersMockService);

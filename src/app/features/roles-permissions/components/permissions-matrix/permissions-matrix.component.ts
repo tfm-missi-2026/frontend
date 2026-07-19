@@ -16,38 +16,7 @@ import { SYSTEM_MODULES } from "../../models/role";
   standalone: true,
   imports: [UiCheckboxComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div
-      class="grid grid-cols-1 gap-2.5 sm:grid-cols-2 md:gap-x-6"
-      role="group"
-      aria-label="Módulos visibles / permisos"
-    >
-      @for (m of modules; track m.id) {
-        <label
-          class="flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-2.5 text-sm transition-colors"
-          [class]="cellClasses(m.id)"
-        >
-          <UiCheckbox
-            [checked]="isEnabled(m.id)"
-            [disabled]="readonly()"
-            (checkedChange)="onToggle(m.id, $event)"
-          />
-          <span
-            class="flex-1 font-medium text-gray-800 dark:text-white/90"
-          >
-            {{ m.label }}
-          </span>
-          @if (m.adminOnly) {
-            <span
-              class="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500 dark:bg-white/5 dark:text-gray-400"
-            >
-              solo Admin
-            </span>
-          }
-        </label>
-      }
-    </div>
-  `,
+  templateUrl: "./permissions-matrix.component.html",
 })
 export class PermissionsMatrixComponent {
   /** IDs de módulos actualmente habilitados. */

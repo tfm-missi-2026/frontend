@@ -15,23 +15,7 @@ import { UiInputComponent } from "@shared/ui/input";
   standalone: true,
   imports: [UiFlexComponent, UiInputComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <UiFlex
-      direction="row"
-      alignItems="center"
-      [gap]="12"
-      className="flex-wrap"
-    >
-      <UiInput
-        className="flex-1 min-w-70"
-        type="text"
-        placeholder="Buscar por código o nombre…"
-        [leftIcon]="searchIcon"
-        [value]="searchTerm()"
-        (valueChange)="searchChange.emit($event)"
-      />
-    </UiFlex>
-  `,
+  templateUrl: "./catalog-toolbar.component.html",
 })
 export class CatalogToolbarComponent {
   readonly searchTerm = input<string>("");

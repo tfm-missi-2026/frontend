@@ -132,6 +132,11 @@ export class SidebarLayoutComponent {
           path: "/app/operacion/dashboard-jefe",
         },
         {
+          icon: IconUserCircleComponent,
+          name: "Dashboard Recurso",
+          path: "/app/operacion/dashboard-recurso",
+        },
+        {
           icon: IconBoxComponent,
           name: "Proyectos",
           path: "/app/operacion/proyectos",

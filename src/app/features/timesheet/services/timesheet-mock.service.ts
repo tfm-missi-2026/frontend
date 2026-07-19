@@ -11,6 +11,7 @@ export const TIMESHEET_INITIAL_DATE = "2026-06-02";
 const INITIAL: TimesheetEntry[] = [
   {
     id: "ts-001",
+    resourceId: "u7",
     date: TIMESHEET_INITIAL_DATE,
     startTime: "08:30",
     endTime: "09:00",
@@ -25,6 +26,7 @@ const INITIAL: TimesheetEntry[] = [
   },
   {
     id: "ts-002",
+    resourceId: "u7",
     date: TIMESHEET_INITIAL_DATE,
     startTime: "09:00",
     endTime: "12:00",
@@ -39,6 +41,7 @@ const INITIAL: TimesheetEntry[] = [
   },
   {
     id: "ts-003",
+    resourceId: "u7",
     date: TIMESHEET_INITIAL_DATE,
     startTime: "13:00",
     endTime: "15:00",
@@ -53,6 +56,7 @@ const INITIAL: TimesheetEntry[] = [
   },
   {
     id: "ts-004",
+    resourceId: "u7",
     date: TIMESHEET_INITIAL_DATE,
     startTime: "15:00",
     endTime: "18:00",
@@ -67,6 +71,7 @@ const INITIAL: TimesheetEntry[] = [
   },
   {
     id: "ts-005",
+    resourceId: "u7",
     date: "2026-06-03",
     startTime: "09:00",
     endTime: "12:30",
@@ -81,6 +86,7 @@ const INITIAL: TimesheetEntry[] = [
   },
   {
     id: "ts-006",
+    resourceId: "u7",
     date: "2026-06-03",
     startTime: "14:00",
     endTime: "17:00",
@@ -95,6 +101,7 @@ const INITIAL: TimesheetEntry[] = [
   },
   {
     id: "ts-007",
+    resourceId: "u7",
     date: "2026-06-04",
     startTime: "08:30",
     endTime: "09:00",
@@ -109,6 +116,7 @@ const INITIAL: TimesheetEntry[] = [
   },
   {
     id: "ts-008",
+    resourceId: "u7",
     date: "2026-06-04",
     startTime: "09:00",
     endTime: "13:00",
@@ -123,6 +131,7 @@ const INITIAL: TimesheetEntry[] = [
   },
   {
     id: "ts-009",
+    resourceId: "u7",
     date: "2026-06-05",
     startTime: "09:00",
     endTime: "12:00",
@@ -137,6 +146,7 @@ const INITIAL: TimesheetEntry[] = [
   },
   {
     id: "ts-010",
+    resourceId: "u7",
     date: "2026-06-05",
     startTime: "14:00",
     endTime: "17:30",
@@ -151,6 +161,7 @@ const INITIAL: TimesheetEntry[] = [
   },
   {
     id: "ts-011",
+    resourceId: "u7",
     date: "2026-06-08",
     startTime: "10:00",
     endTime: "13:00",
@@ -165,6 +176,7 @@ const INITIAL: TimesheetEntry[] = [
   },
   {
     id: "ts-012",
+    resourceId: "u7",
     date: "2026-06-08",
     startTime: "15:00",
     endTime: "17:00",
@@ -175,6 +187,52 @@ const INITIAL: TimesheetEntry[] = [
     taskCode: "#REQ-027",
     activity: "",
     description: "Cierre de bugs reportados en QA.",
+    status: "draft",
+  },
+  {
+    id: "ts-101",
+    resourceId: "u5",
+    date: "2026-06-12",
+    startTime: "08:30",
+    endTime: "09:00",
+    hours: 0.5,
+    kind: "activity",
+    project: "",
+    task: "",
+    taskCode: undefined,
+    activity: "Reunión",
+    description: "Daily del equipo; revisión de pendientes del sprint.",
+    status: "approved",
+  },
+  {
+    id: "ts-102",
+    resourceId: "u5",
+    date: "2026-06-12",
+    startTime: "09:00",
+    endTime: "12:00",
+    hours: 3,
+    kind: "task",
+    project: "p-sigtramites",
+    task: "t-spsrt-003",
+    taskCode: "#REQ-014",
+    activity: "",
+    description:
+      "Implementación de la regla de validación del RUC en el formulario de expediente.",
+    status: "approved",
+  },
+  {
+    id: "ts-103",
+    resourceId: "u5",
+    date: "2026-06-12",
+    startTime: "13:00",
+    endTime: "14:30",
+    hours: 1.5,
+    kind: "task",
+    project: "p-sigtramites",
+    task: "t-spsrt-004",
+    taskCode: "#REQ-014",
+    activity: "",
+    description: "Pruebas con casos reales de la regla de validación.",
     status: "draft",
   },
 ];
@@ -215,6 +273,37 @@ export class TimesheetMockService {
 
   countForDate(date: string): number {
     return this._entries().filter((e) => e.date === date).length;
+  }
+
+  entriesForResourceInRange(
+    resourceId: string,
+    fromIso: string,
+    toIso: string,
+  ): TimesheetEntry[] {
+    return this._entries().filter(
+      (e) =>
+        e.resourceId === resourceId && e.date >= fromIso && e.date <= toIso,
+    );
+  }
+
+  entriesForResourceOnDate(
+    resourceId: string,
+    date: string,
+  ): TimesheetEntry[] {
+    return this._entries()
+      .filter((e) => e.resourceId === resourceId && e.date === date)
+      .sort((a, b) => a.startTime.localeCompare(b.startTime));
+  }
+
+  totalHoursForResourceInRange(
+    resourceId: string,
+    fromIso: string,
+    toIso: string,
+  ): number {
+    return this.entriesForResourceInRange(resourceId, fromIso, toIso).reduce(
+      (acc, e) => acc + e.hours,
+      0,
+    );
   }
 }
 

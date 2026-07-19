@@ -1,0 +1,80 @@
+<UiModal
+  [isOpen]="isOpen()"
+  [showCloseButton]="false"
+  className="max-w-120 p-6 lg:p-8"
+  (close)="onCancel()"
+>
+  <h2 class="mb-1 text-xl font-semibold text-gray-800 dark:text-white/90">
+    Nuevo rol
+  </h2>
+  <p class="mb-5 text-sm text-gray-500 dark:text-gray-400">
+    Define un rol. Sus permisos de módulo se configuran después de crearlo.
+  </p>
+
+  <div class="mb-4">
+    <UiFormLabel
+      labelText="Código"
+      [required]="true"
+      [labelFor]="'role-code'"
+    />
+    <UiInput
+      id="role-code"
+      placeholder="p. ej. GP — corto, único"
+      [value]="form().code"
+      (valueChange)="patch({ code: $event })"
+      [errorMessage]="errors().code"
+    />
+    @if (!errors().code) {
+      <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+        Identificador corto del rol (2–4 letras).
+      </p>
+    }
+    <UiFieldError [message]="errors().code" />
+  </div>
+
+  <div class="mb-4">
+    <UiFormLabel
+      labelText="Nombre"
+      [required]="true"
+      [labelFor]="'role-name'"
+    />
+    <UiInput
+      id="role-name"
+      placeholder="p. ej. Gestor de Proyecto"
+      [value]="form().name"
+      (valueChange)="patch({ name: $event })"
+      [errorMessage]="errors().name"
+    />
+    <UiFieldError [message]="errors().name" />
+  </div>
+
+  <div class="mb-4">
+    <UiFormLabel labelText="Descripción" [labelFor]="'role-desc'" />
+    <UiTextArea
+      id="role-desc"
+      [rows]="3"
+      placeholder="¿Qué hace este rol dentro de SPSRT?"
+      [value]="form().description"
+      (valueChange)="patch({ description: $event })"
+    />
+  </div>
+
+  <UiFlex
+    direction="row"
+    justifyContent="end"
+    [gap]="2"
+    className="mt-4 border-t border-dashed border-gray-200 pt-4 dark:border-gray-800"
+  >
+    <UiButton
+      variant="secondary"
+      labelText="Cancelar"
+      (click)="onCancel()"
+    />
+    <UiButton
+      variant="primary"
+      labelText="Crear rol"
+      [disabled]="!isValid()"
+      (click)="onSave()"
+    />
+  </UiFlex>
+</UiModal>

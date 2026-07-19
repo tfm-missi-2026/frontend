@@ -59,6 +59,28 @@ const SEED: Assignment[] = [
     frozen: false,
     active: true,
   },
+  {
+    id: "a-006",
+    projectId: "p-sigtramites",
+    taskId: "t-spsrt-001",
+    resourceId: "u5",
+    plannedHours: 8,
+    startDate: "2026-05-19",
+    endDate: "2026-05-20",
+    frozen: false,
+    active: true,
+  },
+  {
+    id: "a-007",
+    projectId: "p-sigtramites",
+    taskId: "t-spsrt-005",
+    resourceId: "u5",
+    plannedHours: 12,
+    startDate: "2026-06-04",
+    endDate: "2026-06-05",
+    frozen: false,
+    active: true,
+  },
 ];
 
 @Injectable({ providedIn: "root" })

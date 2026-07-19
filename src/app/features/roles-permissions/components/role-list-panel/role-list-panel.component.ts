@@ -16,56 +16,7 @@ import { ROLE_KIND_LABELS, SYSTEM_MODULES } from "../../models/role";
   standalone: true,
   imports: [UiBadgeComponent, UiLabelComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <p
-      class="mb-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-    >
-      Roles del sistema
-    </p>
-
-    <div class="flex flex-col gap-2.5">
-      @for (r of roles(); track r.id) {
-        <button
-          type="button"
-          (click)="select.emit(r.id)"
-          [class]="itemClasses(r.id)"
-          [attr.aria-pressed]="r.id === selectedId()"
-        >
-          <UiBadge
-            [variant]="r.id === selectedId() ? 'solid' : 'light'"
-            [color]="r.id === selectedId() ? 'dark' : 'light'"
-            size="sm"
-          >
-            {{ r.code }}
-          </UiBadge>
-          <div class="min-w-0 flex-1 text-left">
-            <UiLabel
-              type="bodyS"
-              color="textStrong"
-              weight="semibold"
-              [text]="r.name"
-            />
-            <UiLabel
-              type="bodyXs"
-              color="textWeak"
-              [text]="metaLine(r)"
-            />
-          </div>
-          @if (r.id === selectedId()) {
-            <span class="text-base text-brand-500" aria-hidden="true">
-              ›
-            </span>
-          }
-        </button>
-      } @empty {
-        <UiLabel
-          type="bodyS"
-          color="textWeak"
-          text="No hay roles definidos."
-        />
-      }
-    </div>
-  `,
+  templateUrl: "./role-list-panel.component.html",
 })
 export class RoleListPanelComponent {
   readonly roles = input<Role[]>([]);

@@ -6,6 +6,7 @@ export type TimesheetEntryStatus = "draft" | "submitted" | "approved" | "rejecte
 
 export interface TimesheetEntry {
   id: string;
+  resourceId: string;
   date: string;
   startTime: string;
   endTime: string;
@@ -105,8 +106,12 @@ export const TIMESHEET_TASK_OPTIONS: SelectOption[] = TIMESHEET_TASKS.map((t) =>
 
 const INITIAL_TASK = TIMESHEET_TASKS[0];
 
-export function emptyTimesheetEntry(date: string): Omit<TimesheetEntry, "id"> {
+export function emptyTimesheetEntry(
+  date: string,
+  resourceId = "u5",
+): Omit<TimesheetEntry, "id"> {
   return {
+    resourceId,
     date,
     startTime: "09:00",
     endTime: "10:00",

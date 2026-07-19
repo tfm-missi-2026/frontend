@@ -46,6 +46,14 @@ export const routes: Routes = [
         title: "SPSRT — Dashboard del Jefe de Área",
       },
       {
+        path: "operacion/dashboard-recurso",
+        loadChildren: () =>
+          import(
+            "@features/resource-dashboard/resource-dashboard.module"
+          ).then((m) => m.ResourceDashboardModule),
+        title: "SPSRT — Dashboard del Recurso Técnico",
+      },
+      {
         path: "administracion/usuarios",
         component: UsersListComponent,
         title: "SPSRT — Gestión de usuarios",
