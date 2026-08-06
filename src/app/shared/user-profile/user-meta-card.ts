@@ -113,7 +113,6 @@ const SOCIAL_LINK_CLASS = "rounded-full! shadow-xs! shadow-theme-xs";
               [gap]="1"
               className="xl:flex-row! xl:gap-3!"
             >
-              <UiLabel as="p" type="bodyS" color="textWeak" [wrapText]="true">{{
                 user().role
               }}</UiLabel>
               <UiFlex
@@ -121,7 +120,6 @@ const SOCIAL_LINK_CLASS = "rounded-full! shadow-xs! shadow-theme-xs";
                 [gap]="0"
                 className="hidden h-3.5 w-px bg-gray-300 dark:bg-gray-700 xl:flex"
               />
-              <UiLabel as="p" type="bodyS" color="textWeak" [wrapText]="true">{{
                 user().location
               }}</UiLabel>
             </UiFlex>
@@ -211,7 +209,6 @@ const SOCIAL_LINK_CLASS = "rounded-full! shadow-xs! shadow-theme-xs";
             type="bodyS"
             color="textWeak"
             text="Update your details to keep your profile up-to-date."
-            [wrapText]="true"
             className="mb-6 lg:mb-7"
           />
         </div>

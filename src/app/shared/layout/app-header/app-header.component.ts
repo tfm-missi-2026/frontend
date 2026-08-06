@@ -177,6 +177,10 @@ export class AppHeaderComponent {
   protected handleToggle(): void {
     if (window.innerWidth >= 1280) {
       this.sidebarService.toggleExpanded();
+      // Garantiza que el cambio sea visible de inmediato aunque haya
+      // hover residual sobre el aside (e.g. el cursor quedó encima
+      // mientras el usuario iba al botón del header).
+      this.sidebarService.setHovered(false);
     } else {
       this.sidebarService.toggleMobileOpen();
     }

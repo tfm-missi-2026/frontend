@@ -2,9 +2,11 @@ import { HttpErrorResponse } from "@angular/common/http";
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   inject,
   signal,
 } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Router } from "@angular/router";
 
 import { AuthService } from "@core/auth/auth.service";
@@ -13,6 +15,7 @@ import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
+import { UiToastComponent } from "@shared/ui/toast";
 
 import {
   SigninFormComponent,
@@ -29,6 +32,7 @@ import {
     UiHeaderComponent,
     UiLabelComponent,
     UiModalComponent,
+    UiToastComponent,
   ],
   templateUrl: "./sign-in.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,6 +40,7 @@ import {
 export class SignInComponent {
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly loading = signal<boolean>(false);
   protected readonly errorMessage = signal<string | null>(null);
@@ -47,6 +52,7 @@ export class SignInComponent {
 
     this.auth
       .login({ email: data.email, contrasenia: data.password })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.loading.set(false);

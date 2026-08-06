@@ -6,11 +6,12 @@ import {
   signal,
 } from "@angular/core";
 
-import { UiAlertComponent } from "@shared/ui/alert";
 import { UiButtonComponent } from "@shared/ui/button";
 import { UiFlexComponent } from "@shared/ui/flex";
+import { UiFormComponent } from "@shared/ui/form";
 import { UiInputComponent } from "@shared/ui/input";
 import { UiLabelComponent } from "@shared/ui/label";
+import { UiLinkComponent } from "@shared/ui/link";
 
 export interface SignInFormData {
   email: string;
@@ -22,10 +23,11 @@ export interface SignInFormData {
   standalone: true,
   host: { class: "w-full max-w-80 mx-auto flex flex-col" },
   imports: [
-    UiAlertComponent,
     UiButtonComponent,
+    UiFormComponent,
     UiInputComponent,
     UiLabelComponent,
+    UiLinkComponent,
     UiFlexComponent,
   ],
   templateUrl: "./signin-form.component.html",

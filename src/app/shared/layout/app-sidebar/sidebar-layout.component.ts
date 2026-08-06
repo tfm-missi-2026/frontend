@@ -5,7 +5,7 @@ import {
   inject,
 } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { NgClass, NgComponentOutlet } from "@angular/common";
+import { NgClass } from "@angular/common";
 import { RouterModule } from "@angular/router";
 
 import {
@@ -19,12 +19,10 @@ import {
   IconUserCircleComponent,
 } from "@shared/icons";
 import { UiFlexComponent } from "@shared/ui/flex";
-import { UiImageComponent } from "@shared/ui/image";
 
 import { SidebarService } from "../../services/sidebar.service";
 import { SidebarLayoutLogoComponent } from "./sidebar-logo";
 import { SidebarLayoutSectionComponent } from "./sidebar-section";
-import { SidebarLayoutWidgetComponent } from "./sidebar-layout-widget.component";
 import {
   SidebarLayoutNavSectionComponent,
   type NavItem,
@@ -57,7 +55,6 @@ interface SidebarSectionConfig {
     RouterModule,
     SidebarLayoutLogoComponent,
     SidebarLayoutSectionComponent,
-    SidebarLayoutWidgetComponent,
     UiFlexComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

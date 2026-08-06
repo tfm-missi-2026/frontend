@@ -8,7 +8,12 @@
   @if (labelRender()) {
     <ng-container *ngTemplateOutlet="labelRender()"></ng-container>
   } @else if (label(); as lbl) {
-    <UiLabel [type]="fontSize()" [text]="lbl" weight="medium"></UiLabel>
+    <UiLabel
+      [type]="fontSize()"
+      [text]="lbl"
+      weight="medium"
+      className="text-current!"
+    ></UiLabel>
   } @else {
     <ng-content></ng-content>
   }
@@ -55,7 +60,7 @@
     [fullWidth]="fullWidth()"
     [transparent]="transparent()"
     [timeout]="hasActiveTimeout() ? timeout() : undefined"
-    [className]="className()"
+    [className]="wrapperClassName()"
   >
     @if (tooltip() !== undefined && tooltip() !== null) {
       <UiTooltip

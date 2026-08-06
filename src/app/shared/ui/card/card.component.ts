@@ -74,36 +74,38 @@ const DESCRIPTION_CLASSES = "mt-1 text-sm text-gray-500 dark:text-gray-400";
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (hasHeader()) {
-      <div class="mb-3 flex items-start justify-between gap-3">
-        <div class="min-w-0 flex-1">
-          @if (title()) {
-            <UiHeader
-              [level]="3"
-              [text]="title()"
-              [className]="titleClasses()"
-            ></UiHeader>
-          }
-          @if (description()) {
-            <UiLabel
-              as="p"
-              type="bodyS"
-              [text]="description()"
-              [className]="descriptionClasses()"
-            ></UiLabel>
+    <div [class]="containerClasses()">
+      @if (hasHeader()) {
+        <div class="mb-3 flex items-start justify-between gap-3">
+          <div class="min-w-0 flex-1">
+            @if (title()) {
+              <UiHeader
+                [level]="3"
+                [text]="title()"
+                [className]="titleClasses()"
+              ></UiHeader>
+            }
+            @if (description()) {
+              <UiLabel
+                as="p"
+                type="bodyS"
+                [text]="description()"
+                [className]="descriptionClasses()"
+              ></UiLabel>
+            }
+          </div>
+          @if (badge()) {
+            <UiBadge [variant]="badgeVariant()" [color]="badgeColor()">
+              {{ badge() }}
+            </UiBadge>
           }
         </div>
-        @if (badge()) {
-          <UiBadge [variant]="badgeVariant()" [color]="badgeColor()">
-            {{ badge() }}
-          </UiBadge>
-        }
-      </div>
-    }
-    @if (divider() && hasHeader()) {
-      <UiSeparator spacing="sm" className="mb-3"></UiSeparator>
-    }
-    <ng-content></ng-content>
+      }
+      @if (divider() && hasHeader()) {
+        <UiSeparator spacing="sm" className="mb-3"></UiSeparator>
+      }
+      <ng-content></ng-content>
+    </div>
   `,
 })
 export class UiCardComponent {

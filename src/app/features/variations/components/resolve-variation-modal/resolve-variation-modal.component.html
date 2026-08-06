@@ -1,39 +1,27 @@
-<UiModal
-  [isOpen]="isOpen()"
-  [showCloseButton]="true"
-  className="max-w-140 p-6 lg:p-8"
-  (close)="onCancel()"
->
+<UiModal [isOpen]="isOpen()" [showCloseButton]="true" className="max-w-140 p-6 lg:p-8" (close)="onCancel()">
   <UiFlex direction="column" [gap]="16">
     <UiFlex direction="column" [gap]="6">
       <UiLabel type="HeadingM" weight="semibold" color="textStrong">
         Resolver variación
       </UiLabel>
       <UiFlex direction="row" alignItems="center" [gap]="10" className="flex-wrap">
+        <UiLabel type="bodyS" color="textWeak" className="max-w-prose">
         @if (mode() === 'view' && resolvedDecisionLabel(); as dec) {
-          <UiBadge
-            [variant]="dec === 'Aprobada' ? 'solid' : 'solid'"
-            [color]="dec === 'Aprobada' ? 'success' : 'error'"
-            size="md"
-          >
-            {{ dec }}
-          </UiBadge>
+        <UiBadge [variant]="dec === 'Aprobada' ? 'solid' : 'solid'" [color]="dec === 'Aprobada' ? 'success' : 'error'"
+          size="md">
+          {{ dec }}
+        </UiBadge>
         } @else {
-          <UiBadge
-            variant="light"
-            color="warning"
-            size="md"
-            className="border border-dashed border-warning-300 dark:border-warning-700"
-          >
-            {{ variation().status }}
-          </UiBadge>
+        <UiBadge variant="light" color="warning" size="md"
+          className="border border-dashed border-warning-300 dark:border-warning-700">
+          {{ variation().status }}
+        </UiBadge>
         }
-        <UiLabel type="bodyS" color="textWeak" [wrapText]="true" className="max-w-prose">
-          @if (mode() === "view") {
-            Detalle de la variación. La decisión ya quedó registrada.
-          } @else {
-            Decisión del Gestor o Jefe de Área. Queda registrada con autor y fecha.
-          }
+        @if (mode() === "view") {
+        Detalle de la variación. La decisión ya quedó registrada.
+        } @else {
+        Decisión del Gestor o Jefe de Área. Queda registrada con autor y fecha.
+        }
         </UiLabel>
       </UiFlex>
     </UiFlex>
@@ -41,115 +29,76 @@
     <VariationReadOnlyBlock [variation]="variation()" />
 
     @if (mode() === "resolve") {
-      <UiFlex direction="column" [gap]="6">
-        <UiFormLabel labelText="Decisión" labelFor="resolve-decision" [required]="true" />
-        <UiGrid [columns]="2" gap="gap-4">
-          <UiSurface
-            variant="neutral"
-            padding="md"
-            [className]="
+    <UiFlex direction="column" [gap]="6">
+      <UiFormLabel labelText="Decisión" labelFor="resolve-decision" [required]="true" />
+      <UiGrid [columns]="2" gap="gap-4">
+        <UiSurface variant="neutral" padding="md" [className]="
               form().decision === 'Aprobada'
                 ? 'border-2 border-brand-500'
                 : 'border border-gray-300 dark:border-gray-700'
-            "
-          >
-            <UiFlex direction="row" alignItems="center" [gap]="10">
-              <UiRadio
-                inputId="dec-aprobar"
-                name="dec"
-                value="Aprobada"
-                [checked]="form().decision === 'Aprobada'"
-                (valueChange)="onDecisionChange($event)"
-              ></UiRadio>
-              <UiLabel type="bodyS" weight="semibold" color="textStrong">
-                Aprobar
-              </UiLabel>
-            </UiFlex>
-          </UiSurface>
-          <UiSurface
-            variant="neutral"
-            padding="md"
-            [className]="
+            ">
+          <UiFlex direction="row" alignItems="center" [gap]="10">
+            <UiRadio inputId="dec-aprobar" name="dec" value="Aprobada" [checked]="form().decision === 'Aprobada'"
+              (valueChange)="onDecisionChange($event)"></UiRadio>
+            <UiLabel type="bodyS" weight="semibold" color="textStrong">
+              Aprobar
+            </UiLabel>
+          </UiFlex>
+        </UiSurface>
+        <UiSurface variant="neutral" padding="md" [className]="
               form().decision === 'Rechazada'
                 ? 'border-2 border-brand-500'
                 : 'border border-gray-300 dark:border-gray-700'
-            "
-          >
-            <UiFlex direction="row" alignItems="center" [gap]="10">
-              <UiRadio
-                inputId="dec-rechazar"
-                name="dec"
-                value="Rechazada"
-                [checked]="form().decision === 'Rechazada'"
-                (valueChange)="onDecisionChange($event)"
-              ></UiRadio>
-              <UiLabel type="bodyS" weight="semibold" color="textStrong">
-                Rechazar
-              </UiLabel>
-            </UiFlex>
-          </UiSurface>
-        </UiGrid>
-      </UiFlex>
+            ">
+          <UiFlex direction="row" alignItems="center" [gap]="10">
+            <UiRadio inputId="dec-rechazar" name="dec" value="Rechazada" [checked]="form().decision === 'Rechazada'"
+              (valueChange)="onDecisionChange($event)"></UiRadio>
+            <UiLabel type="bodyS" weight="semibold" color="textStrong">
+              Rechazar
+            </UiLabel>
+          </UiFlex>
+        </UiSurface>
+      </UiGrid>
+    </UiFlex>
 
-      <UiFlex direction="column" [gap]="6">
-        <UiFormLabel
-          labelText="Observación de resolución"
-          labelFor="resolve-observation"
-        />
-        <UiTextArea
-          inputId="resolve-observation"
-          placeholder="Motivo de la decisión (queda en el histórico)."
-          [rows]="2"
-          [value]="form().observation"
-          (valueChange)="onObservationChange($event)"
-        ></UiTextArea>
-      </UiFlex>
+    <UiFlex direction="column" [gap]="6">
+      <UiFormLabel labelText="Observación de resolución" labelFor="resolve-observation" />
+      <UiTextArea inputId="resolve-observation" placeholder="Motivo de la decisión (queda en el histórico)." [rows]="2"
+        [value]="form().observation" (valueChange)="onObservationChange($event)"></UiTextArea>
+    </UiFlex>
     }
 
     @if (mode() === "view" && variation().resolution; as res) {
-      <UiSurface
-        variant="neutral"
-        padding="md"
-        className="border-2 border-gray-300 dark:border-gray-700"
-      >
-        <UiFlex direction="column" [gap]="6">
-          <UiLabel type="bodyXs" weight="medium" color="textWeak" className="uppercase">
-            Resolución
+    <UiSurface variant="neutral" padding="md" className="border-2 border-gray-300 dark:border-gray-700">
+      <UiFlex direction="column" [gap]="6">
+        <UiLabel type="bodyXs" weight="medium" color="textWeak" className="uppercase">
+          Resolución
+        </UiLabel>
+        <UiFlex direction="row" alignItems="center" [gap]="8" className="flex-wrap">
+          <UiLabel type="bodyXs" weight="medium" color="textStrong">
+            Por
+            <strong class="font-semibold text-gray-800 dark:text-white/90">
+              {{ res.resolvedBy }}
+            </strong>
+            · {{ res.resolvedAt }}
           </UiLabel>
-          <UiFlex direction="row" alignItems="center" [gap]="8" className="flex-wrap">
-            <UiLabel type="bodyXs" weight="medium" color="textStrong">
-              Por
-              <strong class="font-semibold text-gray-800 dark:text-white/90">
-                {{ res.resolvedBy }}
-              </strong>
-              · {{ res.resolvedAt }}
-            </UiLabel>
-          </UiFlex>
-          @if (res.observation) {
-            <UiLabel type="bodyS" color="textStrong" [wrapText]="true">
-              {{ res.observation }}
-            </UiLabel>
-          }
         </UiFlex>
-      </UiSurface>
+        @if (res.observation) {
+          <UiLabel type="bodyS" color="textStrong">
+            {{ res.observation }}
+          </UiLabel>
+        }
+      </UiFlex>
+    </UiSurface>
     }
 
-    <UiFlex
-      direction="row"
-      justifyContent="end"
-      [gap]="8"
-      className="mt-2 border-t border-dashed border-gray-200 pt-4 dark:border-gray-800"
-    >
+    <UiFlex direction="row" justifyContent="end" [gap]="8"
+      className="mt-2 border-t border-dashed border-gray-200 pt-4 dark:border-gray-800">
       @if (mode() === "view") {
-        <UiButton variant="secondary" label="Cerrar" (click)="onCloseOnly()" />
+      <UiButton variant="secondary" label="Cerrar" (click)="onCloseOnly()" />
       } @else {
-        <UiButton variant="secondary" label="Cancelar" (click)="onCancel()" />
-        <UiButton
-          variant="primary"
-          label="Guardar decisión"
-          [disabled]="!canSubmit()"
-          (click)="onSaveDecision()"
-        />
+      <UiButton variant="secondary" label="Cancelar" (click)="onCancel()" />
+      <UiButton variant="primary" label="Guardar decisión" [disabled]="!canSubmit()" (click)="onSaveDecision()" />
       }
     </UiFlex>
   </UiFlex>

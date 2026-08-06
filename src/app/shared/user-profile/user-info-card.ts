@@ -84,13 +84,11 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
                 type="bodyXs"
                 color="textWeak"
                 text="First Name"
-                [wrapText]="true"
               />
               <UiLabel
                 as="p"
                 type="bodyS"
                 color="textStrong"
-                [wrapText]="true"
                 >{{ info().firstName }}</UiLabel
               >
             </UiFlex>
@@ -100,13 +98,11 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
                 type="bodyXs"
                 color="textWeak"
                 text="Last Name"
-                [wrapText]="true"
               />
               <UiLabel
                 as="p"
                 type="bodyS"
                 color="textStrong"
-                [wrapText]="true"
                 >{{ info().lastName }}</UiLabel
               >
             </UiFlex>
@@ -116,13 +112,11 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
                 type="bodyXs"
                 color="textWeak"
                 text="Email address"
-                [wrapText]="true"
               />
               <UiLabel
                 as="p"
                 type="bodyS"
                 color="textStrong"
-                [wrapText]="true"
                 >{{ info().email }}</UiLabel
               >
             </UiFlex>
@@ -132,13 +126,11 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
                 type="bodyXs"
                 color="textWeak"
                 text="Phone"
-                [wrapText]="true"
               />
               <UiLabel
                 as="p"
                 type="bodyS"
                 color="textStrong"
-                [wrapText]="true"
                 >{{ info().phone }}</UiLabel
               >
             </UiFlex>
@@ -148,13 +140,11 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
                 type="bodyXs"
                 color="textWeak"
                 text="Bio"
-                [wrapText]="true"
               />
               <UiLabel
                 as="p"
                 type="bodyS"
                 color="textStrong"
-                [wrapText]="true"
                 >{{ info().bio }}</UiLabel
               >
             </UiFlex>
@@ -194,7 +184,6 @@ const SAMPLE_SOCIAL: UserProfileSocialLinks = {
             type="bodyS"
             color="textWeak"
             text="Update your details to keep your profile up-to-date."
-            [wrapText]="true"
             className="mb-6 lg:mb-7"
           />
         </UiFlex>

@@ -60,7 +60,6 @@ type Story = StoryObj<UiFlexComponent>;
 export const Default: Story = {
   args: {
     direction: "row",
-    gap: "16px",
   },
 
   render: (args) => ({
@@ -96,7 +95,6 @@ export const Default: Story = {
 export const Column: Story = {
   args: {
     direction: "row",
-    gap: "12px",
   },
 
   render: (args) => ({
@@ -127,7 +125,6 @@ export const Centered: Story = {
   args: {
     justifyContent: "center",
     alignItems: "center",
-    gap: "20px",
   },
 
   render: (args) => ({
@@ -158,7 +155,6 @@ export const NoWrap: Story = {
   args: {
     noWrap: true,
     overflow: "auto",
-    gap: "12px",
   },
 
   render: (args) => ({
@@ -196,7 +192,6 @@ export const Shrinkable: Story = {
   args: {
     direction: "row",
     shrinkable: true,
-    gap: "12px",
   },
 
   render: (args) => ({

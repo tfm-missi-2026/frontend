@@ -72,13 +72,11 @@ const SAMPLE_ADDRESS: UserProfileAddress = {
                 type="bodyXs"
                 color="textWeak"
                 text="Country"
-                [wrapText]="true"
               />
               <UiLabel
                 as="p"
                 type="bodyS"
                 color="textStrong"
-                [wrapText]="true"
                 >{{ address().country }}</UiLabel
               >
             </UiFlex>
@@ -88,13 +86,11 @@ const SAMPLE_ADDRESS: UserProfileAddress = {
                 type="bodyXs"
                 color="textWeak"
                 text="City/State"
-                [wrapText]="true"
               />
               <UiLabel
                 as="p"
                 type="bodyS"
                 color="textStrong"
-                [wrapText]="true"
                 >{{ address().cityState }}</UiLabel
               >
             </UiFlex>
@@ -104,13 +100,11 @@ const SAMPLE_ADDRESS: UserProfileAddress = {
                 type="bodyXs"
                 color="textWeak"
                 text="Postal Code"
-                [wrapText]="true"
               />
               <UiLabel
                 as="p"
                 type="bodyS"
                 color="textStrong"
-                [wrapText]="true"
                 >{{ address().postalCode }}</UiLabel
               >
             </UiFlex>
@@ -120,13 +114,11 @@ const SAMPLE_ADDRESS: UserProfileAddress = {
                 type="bodyXs"
                 color="textWeak"
                 text="TAX ID"
-                [wrapText]="true"
               />
               <UiLabel
                 as="p"
                 type="bodyS"
                 color="textStrong"
-                [wrapText]="true"
                 >{{ address().taxId }}</UiLabel
               >
             </UiFlex>
@@ -166,7 +158,6 @@ const SAMPLE_ADDRESS: UserProfileAddress = {
             type="bodyS"
             color="textWeak"
             text="Update your details to keep your profile up-to-date."
-            [wrapText]="true"
             className="mb-6 lg:mb-7"
           />
         </UiFlex>

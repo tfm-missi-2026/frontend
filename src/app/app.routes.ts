@@ -1,6 +1,5 @@
 import type { Routes } from "@angular/router";
 
-import { NotFoundComponent } from "./pages/other-page/not-found/not-found.component";
 import { NotImplementedPageComponent } from "./features/users/pages/not-implemented/not-implemented.component";
 import { UsersListComponent } from "./features/users/pages/users-list/users-list.component";
 import { authGuard } from "@core/auth/auth.guard";
@@ -135,7 +134,7 @@ export const routes: Routes = [
   },
   {
     path: "**",
-    component: NotFoundComponent,
+    component: NotImplementedPageComponent,
     title: "SPSRT — Página no encontrada",
   },
 ];

@@ -143,14 +143,18 @@ export class UiButtonComponent {
       "cursor-pointer select-none",
       "border border-solid",
       this.compact() ? "px-2 py-1" : "px-3 py-2",
-      this.fullWidth() && !this.showWrapper() ? "w-full" : "",
+      this.fullWidth() ? "w-full" : "",
     ];
 
     if (this.showWrapper()) {
+      // Durante loading/timeout el wrapper provee el styling visual (bg, border,
+      // color). El inner button cede esos estilos y hereda el color del wrapper
+      // para que el label siga siendo legible sin aplicar opacity-0 (el bug
+      // original que hacía desaparecer el texto).
       return [
         ...baseLayout,
         "bg-transparent border-transparent",
-        "disabled:opacity-0",
+        "text-current",
         this.getFocusClasses(),
       ].join(" ");
     }
@@ -158,6 +162,7 @@ export class UiButtonComponent {
     return [
       ...baseLayout,
       getVariantClasses(this.variant(), this.styleType(), this.transparent()),
+      this.className(),
       this.getFocusClasses(),
     ].join(" ");
   });
@@ -200,4 +205,7 @@ export class UiButtonComponent {
   readonly hasActiveTimeout = computed<boolean>(
     () => this.timeout() !== undefined && this._runningTimeout(),
   );
+
+  /** Clases aplicadas al wrapper de loading (`UiLoadingTimeoutWrapper`). */
+  readonly wrapperClassName = computed<string>(() => this.className());
 }

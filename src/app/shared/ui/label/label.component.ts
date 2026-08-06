@@ -49,7 +49,7 @@ export class UiLabelComponent {
   readonly type = input<TypographyType>("bodyXs");
   readonly weight = input<FontWeightType | undefined>(undefined);
   readonly color = input<ColorType | undefined>(undefined);
-  readonly wrapText = input<boolean>(false);
+  readonly wrapText = input<boolean>(true);
   readonly wrapMaxLines = input<number | undefined>(undefined);
   readonly availableSpaceOffset = input<number>(0);
   readonly italic = input<boolean>(false);
@@ -95,7 +95,7 @@ export class UiLabelComponent {
 
   readonly hostClasses = computed<string>(() => {
     const parts: (string | null | undefined)[] = [
-      "inline-block max-w-full break-words",
+      "inline-block break-words",
       this.resolvedColorClass(),
       this.resolvedWeightClass(),
       this.fontSizeClass(),
@@ -106,9 +106,19 @@ export class UiLabelComponent {
       this.dynamicLineClampClass(),
     ];
     if (!this.wrapText()) {
-      parts.push("whitespace-nowrap overflow-hidden text-ellipsis");
+      // wrapText=false: el contenedor crece con el texto (sin tope
+      // de `max-width` ni `overflow-hidden`). Si el padre necesita
+      // truncar, lo hace él con su propio `max-width` + `overflow-hidden`.
+      parts.push("whitespace-nowrap max-w-none");
     } else if (!this.wrapMaxLines()) {
-      parts.push("overflow-hidden");
+      // wrapText=true sin clamp: envuelve dentro del ancho del padre.
+      // `overflow-hidden` previene crecimiento vertical si el padre
+      // tiene `max-height` propio.
+      parts.push("max-w-full overflow-hidden");
+    } else {
+      // wrapText=true con clamp: el line-clamp-* ya trunca; alcanza
+      // con capear el ancho.
+      parts.push("max-w-full");
     }
     return parts.filter(Boolean).join(" ");
   });

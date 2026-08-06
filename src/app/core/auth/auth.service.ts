@@ -1,10 +1,14 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, computed, inject, signal } from "@angular/core";
-import { Observable, tap } from "rxjs";
+import { Observable, defer, of, tap } from "rxjs";
 
 import { environment } from "@env/environment";
 
 import type { LoginRequest, LoginResponse, UsuarioInfo } from "./auth.models";
+import {
+  buildMockLoginResponse,
+  findMockUser,
+} from "./mock-users";
 
 const TOKEN_KEY = "spsrt.token";
 const USER_KEY = "spsrt.usuario";
@@ -25,6 +29,14 @@ export class AuthService {
   readonly rolId = computed(() => this._usuario()?.rol?.id ?? null);
 
   login(credenciales: LoginRequest): Observable<LoginResponse> {
+    const mock = findMockUser(credenciales.email, credenciales.contrasenia);
+    if (mock) {
+      const respuesta = buildMockLoginResponse(mock);
+      return defer(() => of(respuesta)).pipe(
+        tap((r) => this.establecerSesion(r)),
+      );
+    }
+
     return this.http
       .post<LoginResponse>(`${this.baseUrl}/login`, credenciales)
       .pipe(tap((respuesta) => this.establecerSesion(respuesta)));

@@ -1,168 +1,82 @@
-<UiSurface
-  variant="neutral"
-  padding="none"
-  className="border border-gray-200 dark:border-gray-800"
-  ariaLabel="Tabla de variaciones"
->
-  <UiFlex
-    direction="row"
-    alignItems="center"
-    [gap]="0"
-    className="border-b border-gray-200 px-4 py-3 text-xs uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400"
-  >
+<UiSurface variant="neutral" padding="none" className="border border-gray-200 dark:border-gray-800"
+  ariaLabel="Tabla de variaciones">
+  <UiFlex direction="row" alignItems="center" [gap]="0"
+    className="border-b border-gray-200 px-4 py-3 text-xs uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400">
     @for (label of headerLabels; track label; let i = $index) {
-      <UiFlex
-        [direction]="'row'"
-        alignItems="center"
-        [className]="columnClasses[i]"
-      >
-        <UiLabel type="bodyXs" weight="medium">{{ label }}</UiLabel>
-      </UiFlex>
+    <UiFlex [direction]="'row'" alignItems="center" [className]="columnClasses[i]">
+      <UiLabel type="bodyXs" weight="medium">{{ label }}</UiLabel>
+    </UiFlex>
     }
   </UiFlex>
 
   @for (row of rows(); track row.id; let last = $last) {
-    <UiFlex
-      direction="row"
-      alignItems="center"
-      [gap]="0"
-      [className]="
+  <UiFlex direction="row" alignItems="center" [gap]="0" [className]="
         last
           ? 'px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-white/3'
           : 'border-b border-gray-100 dark:border-gray-800 px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-white/3'
-      "
-    >
-      <UiFlex direction="column" [gap]="0" className="min-w-0">
-        <UiLabel
-          type="bodyS"
-          weight="semibold"
-          color="textStrong"
-          [text]="row.targetLabel"
-          [wrapText]="true"
-        />
-        @if (row.targetRef) {
-          <UiLabel
-            type="bodyXs"
-            weight="medium"
-            color="textWeak"
-            className="font-mono whitespace-nowrap"
-          >
-            {{ row.targetRef }}
-          </UiLabel>
-        }
-      </UiFlex>
+      ">
+    <UiFlex direction="column" [gap]="0" className="min-w-0">
+      <UiLabel type="bodyS" weight="semibold" color="textStrong" [text]="row.targetLabel" />
+      @if (row.targetRef) {
+      <UiLabel type="bodyXs" weight="medium" color="textWeak" className="font-mono whitespace-nowrap">
+        {{ row.targetRef }}
+      </UiLabel>
+      }
+    </UiFlex>
 
-      <UiFlex
-        direction="row"
-        justifyContent="center"
-        alignItems="center"
-      >
-        <UiBadge
-          variant="solid"
-          color="dark"
-          size="sm"
-          [className]="
+    <UiFlex direction="row" justifyContent="center" alignItems="center">
+      <UiBadge variant="solid" color="dark" size="sm" [className]="
             row.type === 'Plazo'
               ? 'min-w-16 justify-center'
               : row.type === 'Alcance'
                 ? 'min-w-16 justify-center'
                 : 'min-w-20 justify-center'
-          "
-        >
-          {{ row.type }}
-        </UiBadge>
-      </UiFlex>
-
-      <UiFlex direction="column" [gap]="0" className="min-w-0 pr-3">
-        <UiLabel
-          type="bodyS"
-          color="textWeak"
-          [text]="row.description"
-          [wrapText]="true"
-          className="max-w-prose"
-        />
-      </UiFlex>
-
-      <UiFlex direction="row" alignItems="center">
-        <UiLabel
-          type="bodyS"
-          color="textStrong"
-          [text]="row.reportedBy"
-          [wrapText]="true"
-        />
-      </UiFlex>
-
-      <UiFlex direction="row" alignItems="center">
-        <UiLabel
-          type="bodyXs"
-          color="textStrong"
-          className="font-mono whitespace-nowrap"
-        >
-          {{ formatDate(row.detectionDate) }}
-        </UiLabel>
-      </UiFlex>
-
-      <UiFlex
-        direction="row"
-        justifyContent="center"
-        alignItems="center"
-      >
-        @if (isPending(row)) {
-          <UiBadge
-            variant="light"
-            color="warning"
-            size="md"
-            [className]="pendingBadgeClass()"
-          >
-            {{ row.status }}
-          </UiBadge>
-        } @else {
-          <UiBadge
-            [variant]="statusBadgeVariant(row.status)"
-            [color]="statusBadgeColor(row.status)"
-            size="md"
-          >
-            {{ row.status }}
-          </UiBadge>
-        }
-      </UiFlex>
-
-      <UiFlex
-        direction="row"
-        alignItems="center"
-        justifyContent="end"
-        [gap]="8"
-        className="whitespace-nowrap"
-      >
-        <UiLink
-          variant="primary"
-          size="sm"
-          labelText="Ver variación"
-          (click)="view.emit(row)"
-        >
-          Ver
-        </UiLink>
-        <UiLabel type="bodyXs" color="textWeak">·</UiLabel>
-        @if (isPending(row)) {
-          <UiLink
-            variant="primary"
-            size="sm"
-            labelText="Resolver variación"
-            (click)="resolve.emit(row)"
-          >
-            Resolver
-          </UiLink>
-        } @else {
-          <UiLabel
-            type="bodyS"
-            color="textWeak"
-            className="cursor-not-allowed"
-            title="Solo en variaciones Pendientes"
-          >
-            Resolver
-          </UiLabel>
-        }
-      </UiFlex>
+          ">
+        {{ row.type }}
+      </UiBadge>
     </UiFlex>
+
+    <UiFlex direction="column" [gap]="0" className="min-w-0 pr-3">
+      <UiLabel type="bodyS" color="textWeak" [text]="row.description" className="max-w-prose" />
+    </UiFlex>
+
+    <UiFlex direction="row" alignItems="center">
+      <UiLabel type="bodyS" color="textStrong" [text]="row.reportedBy" />
+    </UiFlex>
+
+    <UiFlex direction="row" alignItems="center">
+      <UiLabel type="bodyXs" color="textStrong" className="font-mono whitespace-nowrap">
+        {{ formatDate(row.detectionDate) }}
+      </UiLabel>
+    </UiFlex>
+
+    <UiFlex direction="row" justifyContent="center" alignItems="center">
+      @if (isPending(row)) {
+      <UiBadge variant="light" color="warning" size="md" [className]="pendingBadgeClass()">
+        {{ row.status }}
+      </UiBadge>
+      } @else {
+      <UiBadge [variant]="statusBadgeVariant(row.status)" [color]="statusBadgeColor(row.status)" size="md">
+        {{ row.status }}
+      </UiBadge>
+      }
+    </UiFlex>
+
+    <UiFlex direction="row" alignItems="center" justifyContent="end" [gap]="8" className="whitespace-nowrap">
+      <UiLink variant="primary" size="sm" labelText="Ver variación" (click)="view.emit(row)">
+        Ver
+      </UiLink>
+      <UiLabel type="bodyXs" color="textWeak">·</UiLabel>
+      @if (isPending(row)) {
+      <UiLink variant="primary" size="sm" labelText="Resolver variación" (click)="resolve.emit(row)">
+        Resolver
+      </UiLink>
+      } @else {
+      <UiLabel type="bodyS" color="textWeak" className="cursor-not-allowed" title="Solo en variaciones Pendientes">
+        Resolver
+      </UiLabel>
+      }
+    </UiFlex>
+  </UiFlex>
   }
 </UiSurface>
