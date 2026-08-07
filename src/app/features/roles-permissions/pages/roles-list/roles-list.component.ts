@@ -4,6 +4,7 @@ import {
   computed,
   effect,
   inject,
+  OnInit,
   signal,
 } from "@angular/core";
 
@@ -25,7 +26,7 @@ import { RoleFormModalComponent } from "../../components/role-form-modal/role-fo
 import { RoleListPanelComponent } from "../../components/role-list-panel/role-list-panel.component";
 import type { Role, RoleFormData } from "../../models/role";
 import { SYSTEM_MODULES } from "../../models/role";
-import { RolesMockService } from "../../services/roles-mock.service";
+import { RolesService } from "../../services/roles.service";
 
 @Component({
   selector: "RolesListPage",
@@ -46,8 +47,12 @@ import { RolesMockService } from "../../services/roles-mock.service";
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./roles-list.component.html",
 })
-export class RolesListComponent {
-  private readonly rolesService = inject(RolesMockService);
+export class RolesListComponent implements OnInit {
+  private readonly rolesService = inject(RolesService);
+
+  ngOnInit(): void {
+    void this.rolesService.cargar();
+  }
 
   protected readonly plusIcon = IconPlusSimpleComponent;
   protected readonly checkIcon = IconCheckLargeComponent;
@@ -68,11 +73,13 @@ export class RolesListComponent {
     return this.roles().find((r) => r.id === id) ?? null;
   });
 
-  /** Permisos efectivos (en edición) o los actuales del rol. */
+  /** Permisos efectivos (en edición) o los actuales del rol (cache local). */
   protected readonly effectivePermissions = computed<string[]>(() => {
     const draft = this.draftPermissions();
     if (draft) return draft;
-    return this.selectedRole()?.permissions ?? [];
+    const id = this.selectedId();
+    if (!id) return [];
+    return this.rolesService.getPermissionsForRole(id);
   });
 
   protected readonly moduleCount = computed<number>(() => SYSTEM_MODULES.length);
@@ -100,6 +107,7 @@ export class RolesListComponent {
   protected onSelectRole(id: string): void {
     this.selectedId.set(id);
     this.draftPermissions.set(null);
+    void this.rolesService.loadPermissionsForRole(id);
   }
 
   protected onPermissionsChange(next: string[]): void {
@@ -107,13 +115,15 @@ export class RolesListComponent {
     this.draftPermissions.set(next);
   }
 
-  protected onSavePermissions(): void {
+  protected async onSavePermissions(): Promise<void> {
     const id = this.selectedId();
     const draft = this.draftPermissions();
     if (!id || !draft) return;
-    this.rolesService.updatePermissions(id, draft);
-    this.draftPermissions.set(null);
-    this.successAlert.set("Permisos guardados correctamente.");
+    const ok = await this.rolesService.updatePermissions(id, draft);
+    if (ok) {
+      this.draftPermissions.set(null);
+      this.successAlert.set("Permisos guardados correctamente.");
+    }
   }
 
   protected onCancelPermissions(): void {
@@ -124,17 +134,22 @@ export class RolesListComponent {
     this.createOpen.set(true);
   }
 
-  protected onSaveRole(payload: { data: RoleFormData }): void {
-    const created = this.rolesService.create({
+  protected async onSaveRole(payload: { data: RoleFormData }): Promise<void> {
+    const created = await this.rolesService.create({
       code: payload.data.code.trim().toUpperCase(),
       name: payload.data.name.trim(),
       description: payload.data.description.trim(),
       permissions: [],
     });
-    this.createOpen.set(false);
-    this.selectedId.set(created.id);
-    this.draftPermissions.set(null);
-    this.successAlert.set(`Rol "${created.name}" creado. Asigna sus permisos.`);
+    if (created) {
+      this.createOpen.set(false);
+      this.selectedId.set(created.id);
+      this.draftPermissions.set(null);
+      this.successAlert.set(
+        `Rol "${created.name}" creado. Asigna sus permisos.`,
+      );
+      void this.rolesService.loadPermissionsForRole(created.id);
+    }
   }
 
   protected onDismissAlert(): void {

@@ -5,18 +5,12 @@ import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiSurfaceComponent } from "@shared/ui/surface";
+import { formatShortDate } from "@utils/date";
 
 import type {
   TodoDueTask,
   TodoVariation,
 } from "../../services/manager-dashboard.service";
-
-function formatShortDate(iso: string): string {
-  if (!iso) return "—";
-  const [y, m, d] = iso.split("-");
-  if (!y || !m || !d) return iso;
-  return `${d}/${m}/${y}`;
-}
 
 @Component({
   selector: "ManagerTodo",

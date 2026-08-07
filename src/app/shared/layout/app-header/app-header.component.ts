@@ -175,7 +175,12 @@ export class AppHeaderComponent {
   );
 
   protected handleToggle(): void {
-    if (window.innerWidth >= 1280) {
+    // `matchMedia` es más confiable que `window.innerWidth` para
+    // detectar el breakpoint xl (1280px). Evita falsos negativos
+    // cuando hay zoom no-100%, DevTools abierto a un lado, iframes,
+    // o scrollbars que reducen el viewport efectivo.
+    const isDesktop = window.matchMedia('(min-width: 1280px)').matches;
+    if (isDesktop) {
       this.sidebarService.toggleExpanded();
       // Garantiza que el cambio sea visible de inmediato aunque haya
       // hover residual sobre el aside (e.g. el cursor quedó encima

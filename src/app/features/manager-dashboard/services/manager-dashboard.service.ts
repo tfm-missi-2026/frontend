@@ -1,13 +1,16 @@
-import { Injectable, inject } from "@angular/core";
+import { Injectable, inject, signal } from "@angular/core";
 
 import { ProgressService } from "@features/progress/services/progress.service";
-import { SubprojectsMockService } from "@features/projects/services/subprojects-mock.service";
-import { TasksMockService } from "@features/projects/services/tasks-mock.service";
-import { ProjectsMockService } from "@features/projects/services/projects-mock.service";
-import { VariationsMockService } from "@features/variations/services/variations-mock.service";
+import { SubprojectsService } from "@features/projects/services/subprojects.service";
+import { TasksService } from "@features/projects/services/tasks.service";
+import { ProjectsService } from "@features/projects/services/projects.service";
+import { VariationsService } from "@features/variations/services/variations.service";
 
 import type { ManagerPeriod } from "@shared/common";
 import type { VariationType } from "@features/variations/models/variation";
+import { formatShortDate } from "@utils/date";
+import { extractProblemMessage } from "@utils/problem-detail";
+import { compareIsoDateAsc } from "@utils/collections";
 
 export interface ProjectProgressItem {
   projectId: string;
@@ -60,22 +63,74 @@ function todayUtc(): number {
   return isoDays(TODAY_ISO);
 }
 
-function formatShortDate(iso: string): string {
-  if (!iso) return "—";
-  const [y, m, d] = iso.split("-");
-  if (!y || !m || !d) return iso;
-  return `${d}/${m}/${y}`;
-}
-
 @Injectable({ providedIn: "root" })
 export class ManagerDashboardService {
-  private readonly projectsService = inject(ProjectsMockService);
-  private readonly subprojectsService = inject(SubprojectsMockService);
-  private readonly tasksService = inject(TasksMockService);
-  private readonly variationsService = inject(VariationsMockService);
+  private readonly projectsService = inject(ProjectsService);
+  private readonly subprojectsService = inject(SubprojectsService);
+  private readonly tasksService = inject(TasksService);
+  private readonly variationsService = inject(VariationsService);
   private readonly progressService = inject(ProgressService);
 
-  computeDashboard(managerId: string, period: ManagerPeriod): DashboardData {
+  // Cache local de progress por projectId, refrescado en cargar().
+  private readonly _progressByProject = signal<
+    Record<string, import("@features/progress/models/project-progress").ProjectProgress>
+  >({});
+  readonly progressByProject = this._progressByProject.asReadonly();
+
+  private readonly _loading = signal<boolean>(false);
+  private readonly _error = signal<string | null>(null);
+  readonly loading = this._loading.asReadonly();
+  readonly error = this._error.asReadonly();
+
+  async cargar(): Promise<void> {
+    if (this._loading()) return;
+    this._loading.set(true);
+    this._error.set(null);
+    try {
+      await Promise.all([
+        this.projectsService.count() === 0
+          ? this.projectsService.cargar()
+          : Promise.resolve(),
+        this.subprojectsService.count() === 0
+          ? this.subprojectsService.cargar()
+          : Promise.resolve(),
+        this.tasksService.count() === 0
+          ? this.tasksService.cargar()
+          : Promise.resolve(),
+        this.variationsService.count() === 0
+          ? this.variationsService.cargar()
+          : Promise.resolve(),
+      ]);
+      // Cargar progreso real del backend para cada proyecto del gestor.
+      const projects = this.projectsService.projects();
+      const progressEntries = await Promise.all(
+        projects.map(async (p) => {
+          try {
+            const progress = await this.progressService.refreshProjectProgress(p.id);
+            return [p.id, progress] as const;
+          } catch {
+            return [p.id, null] as const;
+          }
+        }),
+      );
+      const map: Record<string, any> = {};
+      for (const [id, prog] of progressEntries) {
+        if (prog) map[id] = prog;
+      }
+      this._progressByProject.set(map);
+    } catch (err) {
+      this._error.set(extractProblemMessage(err));
+    } finally {
+      this._loading.set(false);
+    }
+  }
+
+
+  computeDashboard(
+    managerId: string,
+    managerFirstName: string,
+    period: ManagerPeriod,
+  ): DashboardData {
     const periodStart = period.startIso;
     const periodEnd = period.endIso;
 
@@ -90,7 +145,18 @@ export class ManagerDashboardService {
       );
 
     const projectProgress: ProjectProgressItem[] = projects.map((p) => {
-      const progress = this.progressService.computeProjectProgress(p.id);
+      const progress =
+        this._progressByProject()[p.id] ??
+        ({
+          projectId: p.id,
+          hasBaseline: false,
+          baselineLabel: "",
+          baselineDate: "",
+          estimatedHours: 0,
+          loggedHours: 0,
+          progressPct: 0,
+          rows: [],
+        });
       const hasBaseline = progress.hasBaseline;
       return {
         projectId: p.id,
@@ -142,7 +208,7 @@ export class ManagerDashboardService {
         if (!task) return false;
         return managerSubIds.has(task.subprojectId);
       })
-      .sort((a, b) => (a.detectionDate < b.detectionDate ? -1 : 1))
+      .sort((a, b) => compareIsoDateAsc(a.detectionDate, b.detectionDate))
       .map((v) => ({
         id: v.id,
         type: v.type,
@@ -175,13 +241,15 @@ export class ManagerDashboardService {
         return d >= today && d <= upcomingLimit;
       })
       .map((t) => ({ ...t, isSoon: isoDays(t.endDate) <= soonLimit }))
-      .sort((a, b) => (a.endDate < b.endDate ? -1 : 1))
+      .sort((a, b) => compareIsoDateAsc(a.endDate, b.endDate))
       .slice(0, 5);
 
     return {
       managerId,
-      managerName: "Lucía Fernández",
-      greeting: "Buenos días, Lucía",
+      managerName: managerFirstName,
+      greeting: managerFirstName
+        ? `Buenos días, ${managerFirstName}`
+        : "Buenos días",
       period,
       projects: projectProgress,
       kpiProjectCount: projectProgress.length,

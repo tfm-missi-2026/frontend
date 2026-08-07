@@ -15,7 +15,8 @@ import { UiFlexComponent } from "@shared/ui/flex";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiLinkComponent } from "@shared/ui/link";
 
-import { UsersMockService } from "@features/users/services/users-mock.service";
+import { UsersService } from "@features/users/services/users.service";
+import { range } from "@utils/collections";
 
 import {
   PROJECT_STATUS_LABELS,
@@ -42,7 +43,7 @@ interface ProjectRow extends Project {
   templateUrl: "./projects-table.component.html",
 })
 export class ProjectsTableComponent {
-  private readonly usersService = inject(UsersMockService);
+  private readonly usersService = inject(UsersService);
 
   readonly projects = input<Project[]>([]);
 
@@ -84,8 +85,7 @@ export class ProjectsTableComponent {
   );
 
   protected readonly pageNumbers = computed<number[]>(() => {
-    const total = this.totalPages();
-    return Array.from({ length: total }, (_, i) => i + 1);
+    return range(this.totalPages());
   });
 
   constructor() {

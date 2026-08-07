@@ -22,7 +22,7 @@ import { UiRadioComponent } from "@shared/ui/radio";
 import { UiSelectComponent } from "@shared/ui/select";
 import { UiTextAreaComponent } from "@shared/ui/text-area";
 
-import { UsersMockService } from "@features/users/services/users-mock.service";
+import { UsersService } from "@features/users/services/users.service";
 
 import {
   emptyProjectForm,
@@ -55,7 +55,7 @@ const CODE_REGEX = /^[A-Z0-9-]+$/;
   templateUrl: "./project-form-modal.component.html",
 })
 export class ProjectFormModalComponent {
-  private readonly usersService = inject(UsersMockService);
+  private readonly usersService = inject(UsersService);
 
   readonly isOpen = input<boolean>(false);
   readonly mode = input<ProjectFormMode>("create");

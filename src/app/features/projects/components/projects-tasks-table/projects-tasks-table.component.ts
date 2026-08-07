@@ -12,15 +12,9 @@ import { UiFlexComponent } from "@shared/ui/flex";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiLinkComponent } from "@shared/ui/link";
 import { UiSurfaceComponent } from "@shared/ui/surface";
+import { formatShortDate } from "@utils/date";
 
 import type { Task, TaskSituation } from "../../models/task";
-
-function formatShortDate(iso: string | null): string {
-  if (!iso) return "—";
-  const [y, m, d] = iso.split("-");
-  if (!y || !m || !d) return iso;
-  return `${d}/${m}/${y}`;
-}
 
 const SITUATION_COLOR: Record<TaskSituation, BadgeColor> = {
   Pendiente: "light",

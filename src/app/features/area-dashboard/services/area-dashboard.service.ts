@@ -1,17 +1,19 @@
-import { Injectable, inject } from "@angular/core";
+import { Injectable, inject, signal } from "@angular/core";
 
 import {
   DEFAULT_PERIOD_ID,
   type ManagerPeriod,
 } from "@shared/common";
-import { ProjectsMockService } from "@features/projects/services/projects-mock.service";
-import { SubprojectsMockService } from "@features/projects/services/subprojects-mock.service";
-import { TasksMockService } from "@features/projects/services/tasks-mock.service";
-import { UsersMockService } from "@features/users/services/users-mock.service";
-import { VariationsMockService } from "@features/variations/services/variations-mock.service";
+import { ProjectsService } from "@features/projects/services/projects.service";
+import { SubprojectsService } from "@features/projects/services/subprojects.service";
+import { TasksService } from "@features/projects/services/tasks.service";
+import { UsersService } from "@features/users/services/users.service";
+import { VariationsService } from "@features/variations/services/variations.service";
 import { TeamLoadService } from "@features/team-load/services/team-load.service";
 
 import type { VariationType } from "@features/variations/models/variation";
+import { extractProblemMessage } from "@utils/problem-detail";
+import { compareIsoDateAsc, compareKeys } from "@utils/collections";
 
 export interface AreaProjectStatus {
   projectId: string;
@@ -34,6 +36,7 @@ export interface AreaTodoVariation {
 }
 
 export interface AreaDashboardData {
+  managerId: string;
   managerName: string;
   greeting: string;
   period: ManagerPeriod;
@@ -52,14 +55,66 @@ export interface AreaDashboardData {
 
 @Injectable({ providedIn: "root" })
 export class AreaDashboardService {
-  private readonly projectsService = inject(ProjectsMockService);
-  private readonly subprojectsService = inject(SubprojectsMockService);
-  private readonly tasksService = inject(TasksMockService);
-  private readonly usersService = inject(UsersMockService);
-  private readonly variationsService = inject(VariationsMockService);
+  private readonly projectsService = inject(ProjectsService);
+  private readonly subprojectsService = inject(SubprojectsService);
+  private readonly tasksService = inject(TasksService);
+  private readonly usersService = inject(UsersService);
+  private readonly variationsService = inject(VariationsService);
   private readonly teamLoadService = inject(TeamLoadService);
 
-  computeDashboard(period: ManagerPeriod): AreaDashboardData {
+  // Cache local de workloads (periodo actual). Se llena en cargar().
+  private readonly _workloads = this.teamLoadService.workloads;
+
+  private readonly _loading = signal<boolean>(false);
+  private readonly _error = signal<string | null>(null);
+  private _ultimoPeriodoCarga: { startIso: string; endIso: string } | null =
+    null;
+  readonly loading = this._loading.asReadonly();
+  readonly error = this._error.asReadonly();
+
+  async cargar(): Promise<void> {
+    if (this._loading()) return;
+    this._loading.set(true);
+    this._error.set(null);
+    try {
+      const period = this._periodoPorDefecto();
+      await Promise.all([
+        this.projectsService.count() === 0
+          ? this.projectsService.cargar()
+          : Promise.resolve(),
+        this.subprojectsService.count() === 0
+          ? this.subprojectsService.cargar()
+          : Promise.resolve(),
+        this.tasksService.count() === 0
+          ? this.tasksService.cargar()
+          : Promise.resolve(),
+        this.variationsService.count() === 0
+          ? this.variationsService.cargar()
+          : Promise.resolve(),
+      ]);
+      // Carga inicial de carga del equipo con el periodo por defecto.
+      await this.teamLoadService.computeWorkloads({
+        fromIso: period.startIso,
+        toIso: period.endIso,
+      });
+    } catch (err) {
+      this._error.set(extractProblemMessage(err));
+    } finally {
+      this._loading.set(false);
+    }
+  }
+
+  private _periodoPorDefecto(): { startIso: string; endIso: string } {
+    // Coincide con DEFAULT_PERIODS del toolbar; aqui usamos 2026-05 (mes actual del wireframe).
+    return { startIso: "2026-05-01", endIso: "2026-05-31" };
+  }
+
+
+  computeDashboard(
+    managerId: string,
+    managerFirstName: string,
+    period: ManagerPeriod,
+  ): AreaDashboardData {
     const periodStart = period.startIso;
     const periodEnd = period.endIso;
 
@@ -69,7 +124,7 @@ export class AreaDashboardService {
     const projects = this.projectsService
       .projects()
       .filter((p) => p.status === "active")
-      .sort((a, b) => a.startDate.localeCompare(b.startDate));
+      .sort((a, b) => compareIsoDateAsc(a.startDate, b.startDate));
 
     const projectStatuses: AreaProjectStatus[] = projects.map((p, idx) => {
       const tag: AreaProjectStatus["statusTag"] =
@@ -92,10 +147,19 @@ export class AreaDashboardService {
       (p) => p.statusTag === "Retrasado",
     ).length;
 
-    const workloads = this.teamLoadService.computeWorkloads({
-      fromIso: periodStart,
-      toIso: periodEnd,
-    });
+    // Si el periodo del dashboard difiere del periodo cacheado, refrescar.
+    if (
+      this.teamLoadService.workloads().length === 0 ||
+      this._ultimoPeriodoCarga?.startIso !== periodStart ||
+      this._ultimoPeriodoCarga?.endIso !== periodEnd
+    ) {
+      this._ultimoPeriodoCarga = { startIso: periodStart, endIso: periodEnd };
+      void this.teamLoadService.computeWorkloads({
+        fromIso: periodStart,
+        toIso: periodEnd,
+      });
+    }
+    const workloads = this.teamLoadService.workloads();
 
     const withPlan = workloads.filter((w) => w.hasPlan);
     const teamAverageUtilizationPct =
@@ -108,7 +172,7 @@ export class AreaDashboardService {
 
     const overloads: AlertOverload[] = workloads
       .filter((w) => w.isOverload)
-      .sort((a, b) => b.utilizationPct - a.utilizationPct)
+      .sort((a, b) => compareKeys(b.utilizationPct, a.utilizationPct))
       .map((w) => ({
         resourceId: w.resourceId,
         resourceName: w.resourceName,
@@ -119,7 +183,7 @@ export class AreaDashboardService {
 
     const teamWorkloadsAll: AlertOverload[] = workloads
       .slice()
-      .sort((a, b) => b.utilizationPct - a.utilizationPct)
+      .sort((a, b) => compareKeys(b.utilizationPct, a.utilizationPct))
       .map((w) => ({
         resourceId: w.resourceId,
         resourceName: w.resourceName,
@@ -145,7 +209,7 @@ export class AreaDashboardService {
         if (!task) return false;
         return managerSubIds.has(task.subprojectId);
       })
-      .sort((a, b) => a.detectionDate.localeCompare(b.detectionDate))
+      .sort((a, b) => compareIsoDateAsc(a.detectionDate, b.detectionDate))
       .map((v) => ({
         id: v.id,
         type: v.type,
@@ -154,8 +218,11 @@ export class AreaDashboardService {
       }));
 
     return {
-      managerName: "Carlos Vega",
-      greeting: "Buenos días, Carlos",
+      managerId,
+      managerName: managerFirstName,
+      greeting: managerFirstName
+        ? `Buenos días, ${managerFirstName}`
+        : "Buenos días",
       period,
       totalUsersActive,
       overloadResourcesCount,

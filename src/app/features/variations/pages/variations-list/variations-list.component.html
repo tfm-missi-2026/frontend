@@ -128,7 +128,7 @@
 <ReportVariationModal
   [isOpen]="reportOpen()"
   [targetOptions]="targetOptions()"
-  [reportedBy]="currentReporter"
+  [reportedBy]="currentReporter()"
   (save)="onReportSubmit($event)"
   (close)="closeReport()"
 />
@@ -138,7 +138,7 @@
     [isOpen]="resolveOpen()"
     [mode]="resolveMode()"
     [variation]="v"
-    [resolvedBy]="currentResolver"
+    [resolvedBy]="currentResolver()"
     (resolve)="onResolveSubmit($event)"
     (close)="closeResolve()"
   />

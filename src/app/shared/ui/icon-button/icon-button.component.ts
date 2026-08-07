@@ -46,6 +46,9 @@ import { getVariantClasses } from "@shared/ui/button/button.utils";
     UiTooltipComponent,
     UiLoadingTimeoutWrapperComponent,
   ],
+  host: {
+    '[class]': 'className()',
+  },
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./icon-button.component.html",
 })
@@ -102,6 +105,12 @@ export class UiIconButtonComponent {
       event.stopPropagation();
       return;
     }
+    // Detener la propagación del evento nativo evita que cualquier
+    // listener ancestral (template/hijos re-proyectados, wrappers, etc.)
+    // reciba el mismo click y termine invocando el `click` output
+    // dos veces. El output emite el evento al consumidor del
+    // `<UiIconButton>` y nada más.
+    event.stopPropagation();
     this.click.emit(event);
   }
 

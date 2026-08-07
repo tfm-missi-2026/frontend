@@ -1,18 +1,20 @@
-import { Injectable, inject } from "@angular/core";
+import { Injectable, inject, signal } from "@angular/core";
 
 import { type ManagerPeriod } from "@shared/common";
-import { AssignmentsMockService } from "@features/planning/services/assignments-mock.service";
-import { SubprojectsMockService } from "@features/projects/services/subprojects-mock.service";
-import { TasksMockService } from "@features/projects/services/tasks-mock.service";
-import { UsersMockService } from "@features/users/services/users-mock.service";
-import { VariationsMockService } from "@features/variations/services/variations-mock.service";
-import { LoggedHoursMockService } from "@features/team-load/services/logged-hours-mock.service";
+import { AssignmentsService } from "@features/planning/services/assignments.service";
+import { SubprojectsService } from "@features/projects/services/subprojects.service";
+import { TasksService } from "@features/projects/services/tasks.service";
+import { UsersService } from "@features/users/services/users.service";
+import { VariationsService } from "@features/variations/services/variations.service";
 
 import type { TimesheetEntry } from "@features/timesheet/models/timesheet-entry";
-import { TimesheetMockService } from "@features/timesheet/services/timesheet-mock.service";
+import { TimesheetService } from "@features/timesheet/services/timesheet.service";
 
 import type { TaskSituation } from "@features/projects/models/task";
 import type { VariationType } from "@features/variations/models/variation";
+import { extractProblemMessage } from "@utils/problem-detail";
+import { compareIsoDateAsc } from "@utils/collections";
+import { matchesSearch } from "@utils/strings";
 
 export interface ResourceMyTask {
   assignmentId: string;
@@ -65,13 +67,44 @@ const SPANISH_DAY_NAMES = [
 
 @Injectable({ providedIn: "root" })
 export class ResourceDashboardService {
-  private readonly usersService = inject(UsersMockService);
-  private readonly assignmentsService = inject(AssignmentsMockService);
-  private readonly tasksService = inject(TasksMockService);
-  private readonly subprojectsService = inject(SubprojectsMockService);
-  private readonly variationsService = inject(VariationsMockService);
-  private readonly loggedHoursService = inject(LoggedHoursMockService);
-  private readonly timesheetService = inject(TimesheetMockService);
+  private readonly usersService = inject(UsersService);
+  private readonly assignmentsService = inject(AssignmentsService);
+  private readonly tasksService = inject(TasksService);
+  private readonly subprojectsService = inject(SubprojectsService);
+  private readonly variationsService = inject(VariationsService);
+  private readonly timesheetService = inject(TimesheetService);
+
+  private readonly _loading = signal<boolean>(false);
+  private readonly _error = signal<string | null>(null);
+  readonly loading = this._loading.asReadonly();
+  readonly error = this._error.asReadonly();
+
+  async cargar(): Promise<void> {
+    if (this._loading()) return;
+    this._loading.set(true);
+    this._error.set(null);
+    try {
+      await Promise.all([
+        this.tasksService.count() === 0
+          ? this.tasksService.cargar()
+          : Promise.resolve(),
+        this.subprojectsService.count() === 0
+          ? this.subprojectsService.cargar()
+          : Promise.resolve(),
+        this.timesheetService.count() === 0
+          ? this.timesheetService.cargar()
+          : Promise.resolve(),
+        this.variationsService.count() === 0
+          ? this.variationsService.cargar()
+          : Promise.resolve(),
+      ]);
+    } catch (err) {
+      this._error.set(extractProblemMessage(err));
+    } finally {
+      this._loading.set(false);
+    }
+  }
+
 
   computeDashboard(
     resourceId: string,
@@ -85,7 +118,7 @@ export class ResourceDashboardService {
 
     const assignments = this.assignmentsService
       .getByResourceInRange(resourceId, period.startIso, period.endIso)
-      .sort((a, b) => a.startDate.localeCompare(b.startDate));
+      .sort((a, b) => compareIsoDateAsc(a.startDate, b.startDate));
 
     const allSubs = this.subprojectsService.subs();
 
@@ -98,7 +131,7 @@ export class ResourceDashboardService {
         ? `#REQ-${sub.ticket.replace(/^[A-Z]+-/, "")}`
         : `#${task?.subprojectId ?? a.taskId}`;
       const loggedHours = task
-        ? this.loggedHoursService.totalForResourceInRange(
+        ? this.timesheetService.totalHoursForResourceInRange(
             resourceId,
             a.startDate,
             a.endDate,
@@ -119,7 +152,7 @@ export class ResourceDashboardService {
       assignments.filter((a) => a.active).map((a) => a.taskId),
     ).size;
 
-    const loggedHoursTotal = this.loggedHoursService.totalForResourceInRange(
+    const loggedHoursTotal = this.timesheetService.totalHoursForResourceInRange(
       resourceId,
       period.startIso,
       period.endIso,
@@ -136,9 +169,7 @@ export class ResourceDashboardService {
 
     const myVariations: ResourceMyVariation[] = this.variationsService
       .items()
-      .filter((v) =>
-        v.reportedBy.toLowerCase().includes(fullName.toLowerCase()),
-      )
+      .filter((v) => matchesSearch(fullName, v.reportedBy))
       .map((v) => ({
         id: v.id,
         type: v.type,

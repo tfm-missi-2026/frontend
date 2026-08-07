@@ -19,6 +19,7 @@ import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
 import { UiRadioComponent } from "@shared/ui/radio";
 import { UiSelectComponent } from "@shared/ui/select";
+import { UiSurfaceComponent } from "@shared/ui/surface";
 
 import {
   emptyUserForm,
@@ -44,6 +45,7 @@ export type UserFormMode = "create" | "edit";
     UiModalComponent,
     UiRadioComponent,
     UiSelectComponent,
+    UiSurfaceComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./user-form-modal.component.html",

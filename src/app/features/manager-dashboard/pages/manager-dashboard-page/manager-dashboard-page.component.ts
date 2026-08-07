@@ -3,10 +3,12 @@ import {
   Component,
   computed,
   inject,
+  OnInit,
   signal,
 } from "@angular/core";
 import { Router } from "@angular/router";
 
+import { AuthService } from "@core/auth/auth.service";
 import { CommonBreadcrumbComponent } from "@shared/common/page-breadcrumb";
 import {
   CommonKpiCardComponent,
@@ -29,8 +31,6 @@ import {
 } from "../../components/manager-todo/manager-todo.component";
 import { ManagerDashboardService } from "../../services/manager-dashboard.service";
 
-const CURRENT_MANAGER_ID = "u3";
-
 @Component({
   selector: "ManagerDashboardPage",
   standalone: true,
@@ -49,9 +49,14 @@ const CURRENT_MANAGER_ID = "u3";
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./manager-dashboard-page.component.html",
 })
-export class ManagerDashboardPageComponent {
+export class ManagerDashboardPageComponent implements OnInit {
   private readonly dashboardService = inject(ManagerDashboardService);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+
+  ngOnInit(): void {
+    void this.dashboardService.cargar();
+  }
 
   protected readonly periods = DEFAULT_PERIODS;
   protected readonly periodId = signal<string>(DEFAULT_PERIOD_ID);
@@ -60,12 +65,15 @@ export class ManagerDashboardPageComponent {
     () => this.periods.find((p) => p.id === this.periodId()) ?? this.periods[0],
   );
 
-  protected readonly dashboard = computed(() =>
-    this.dashboardService.computeDashboard(
-      CURRENT_MANAGER_ID,
+  protected readonly dashboard = computed(() => {
+    const u = this.auth.usuario();
+    const firstName = u?.nombreCompleto?.split(" ")[0] ?? "";
+    return this.dashboardService.computeDashboard(
+      u?.id ?? "",
+      firstName,
       this.currentPeriod(),
-    ),
-  );
+    );
+  });
 
   protected onPeriodChange(periodId: string): void {
     if (periodId) this.periodId.set(periodId);

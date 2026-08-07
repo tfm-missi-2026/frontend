@@ -11,13 +11,7 @@ import { UiButtonComponent } from "@shared/ui/button";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
-
-function formatShortDate(iso: string): string {
-  if (!iso) return "—";
-  const [y, m, d] = iso.split("-");
-  if (!y || !m || !d) return iso;
-  return `${d}/${m}/${y}`;
-}
+import { formatDateRange, formatShortDate } from "@utils/date";
 
 const WIDTH_BUCKETS = [
   { max: 5, cls: "w-0" },
@@ -86,10 +80,7 @@ export class OverloadDialogComponent {
   });
 
   protected readonly periodLabel = computed<string>(
-    () =>
-      `${formatShortDate(this.periodStart())} – ${formatShortDate(
-        this.periodEnd(),
-      )}`,
+    () => formatDateRange(this.periodStart(), this.periodEnd()),
   );
 
   protected readonly explanationLabel = computed<string>(

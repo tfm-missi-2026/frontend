@@ -2,7 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
+  OnInit,
   signal,
 } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
@@ -20,6 +22,7 @@ import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiSurfaceComponent } from "@shared/ui/surface";
+import { matchesSearch } from "@utils/strings";
 
 import {
   ProjectsTasksHeaderComponent,
@@ -39,9 +42,9 @@ import {
   type TaskSituation,
 } from "../../models/task";
 import type { TaskFormSavePayload } from "../../models/task-form";
-import { ProjectsMockService } from "../../services/projects-mock.service";
-import { SubprojectsMockService } from "../../services/subprojects-mock.service";
-import { TasksMockService } from "../../services/tasks-mock.service";
+import { ProjectsService } from "../../services/projects.service";
+import { SubprojectsService } from "../../services/subprojects.service";
+import { TasksService } from "../../services/tasks.service";
 
 @Component({
   selector: "ProjectsTasksListPage",
@@ -62,12 +65,28 @@ import { TasksMockService } from "../../services/tasks-mock.service";
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./projects-tasks-list.component.html",
 })
-export class ProjectsTasksListComponent {
+export class ProjectsTasksListComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly projectsService = inject(ProjectsMockService);
-  private readonly subprojectsService = inject(SubprojectsMockService);
-  private readonly tasksService = inject(TasksMockService);
+  private readonly projectsService = inject(ProjectsService);
+  private readonly subprojectsService = inject(SubprojectsService);
+  private readonly tasksService = inject(TasksService);
+
+  ngOnInit(): void {
+    void this.projectsService.cargar();
+    void this.subprojectsService.cargar();
+    void this.tasksService.cargar();
+  }
+
+  constructor() {
+    // Recarga tareas del subproyecto cuando cambia el subId en la URL.
+    effect(() => {
+      const sid = this.subId();
+      if (sid) {
+        void this.tasksService.cargarPorSubproyecto(sid);
+      }
+    });
+  }
 
   protected readonly IconArrowLeftComponent = IconArrowLeftComponent;
   protected readonly IconPlusSimpleComponent = IconPlusSimpleComponent;
@@ -108,12 +127,11 @@ export class ProjectsTasksListComponent {
 
   protected readonly visibleTasks = computed<Task[]>(() => {
     const list = this.tasks();
-    const term = this.searchTerm().trim().toLowerCase();
+    const term = this.searchTerm();
     const sit = this.filterSituation();
     return list.filter((t) => {
       if (sit && t.situation !== sit) return false;
-      if (!term) return true;
-      return t.name.toLowerCase().includes(term);
+      return matchesSearch(term, t.name);
     });
   });
 
@@ -176,20 +194,24 @@ export class ProjectsTasksListComponent {
   protected onDeactivate(t: Task): void {
     const subId = this.subId();
     if (!subId) return;
-    this.tasksService.deactivate(subId, t.id);
+    void this.tasksService.deactivate(subId, t.id);
   }
 
-  protected onSave(payload: TaskFormSavePayload): void {
+  protected async onSave(payload: TaskFormSavePayload): Promise<void> {
     if (payload.mode === "create") {
-      this.tasksService.create(payload.subprojectId, payload.data);
+      const created = await this.tasksService.create(
+        payload.subprojectId,
+        payload.data,
+      );
+      if (created) this.formOpen.set(false);
     } else {
-      this.tasksService.update(
+      const updated = await this.tasksService.update(
         payload.subprojectId,
         payload.id,
         payload.data,
       );
+      if (updated) this.formOpen.set(false);
     }
-    this.formOpen.set(false);
   }
 
   protected onSearchChange(value: string): void {

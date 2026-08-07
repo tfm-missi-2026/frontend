@@ -23,7 +23,7 @@ import { UiModalComponent } from "@shared/ui/modal";
 import { UiSelectComponent } from "@shared/ui/select";
 import type { SelectOption } from "@shared/ui/select";
 
-import { AssignmentsMockService } from "../../services/assignments-mock.service";
+import { AssignmentsService } from "../../services/assignments.service";
 import {
   computeCapacityHours,
   computeCommittedHours,
@@ -63,7 +63,7 @@ const WORKDAY_HOURS = 8;
   templateUrl: "./assignment-form-modal.component.html",
 })
 export class AssignmentFormModalComponent {
-  private readonly assignmentsService = inject(AssignmentsMockService);
+  private readonly assignmentsService = inject(AssignmentsService);
 
   readonly isOpen = input<boolean>(false);
   readonly mode = input<AssignmentFormMode>("create");

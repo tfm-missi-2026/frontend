@@ -17,6 +17,7 @@ import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiSeparatorComponent } from "@shared/ui/separator";
 import { UiSurfaceComponent } from "@shared/ui/surface";
+import { compareKeys } from "@utils/collections";
 import type { TimesheetViewMode } from "../timesheet-toolbar/timesheet-toolbar.component";
 import {
   TIMESHEET_TASKS,
@@ -77,7 +78,7 @@ export class TimesheetTimelineComponent {
 
   protected readonly sortedEntries = computed<TimesheetEntry[]>(() => {
     return [...this.entries()].sort((a, b) =>
-      a.startTime.localeCompare(b.startTime),
+      compareKeys(a.startTime, b.startTime),
     );
   });
 

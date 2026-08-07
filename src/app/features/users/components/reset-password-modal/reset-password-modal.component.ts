@@ -18,9 +18,10 @@ import { UiFlexComponent } from "@shared/ui/flex";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
 
-import { UsersMockService } from "../../services/users-mock.service";
 import type { User } from "../../models/user";
 import { userFullName } from "../../models/user";
+import { generateTempPassword } from "../../services/temp-password.util";
+import { UsersService } from "../../services/users.service";
 
 @Component({
   selector: "ResetPasswordModal",
@@ -37,7 +38,7 @@ import { userFullName } from "../../models/user";
 })
 export class ResetPasswordModalComponent {
   private readonly platformId = inject(PLATFORM_ID);
-  private readonly usersService = inject(UsersMockService);
+  private readonly usersService = inject(UsersService);
 
   readonly isOpen = input<boolean>(false);
   readonly user = input<User | null>(null);
@@ -60,7 +61,7 @@ export class ResetPasswordModalComponent {
       const open = this.isOpen();
       if (open) {
         this.copyFeedback.set(null);
-        this.generatedPassword.set(this.usersService.generateTempPassword());
+        this.generatedPassword.set(generateTempPassword());
       }
     });
   }
@@ -76,8 +77,13 @@ export class ResetPasswordModalComponent {
     }
   }
 
-  protected onConfirm(): void {
-    this.confirm.emit(this.generatedPassword());
+  protected async onConfirm(): Promise<void> {
+    const u = this.user();
+    if (!u) return;
+    const ok = await this.usersService.resetPassword(u.id, this.generatedPassword());
+    if (ok) {
+      this.confirm.emit(this.generatedPassword());
+    }
   }
 
   protected onCancel(): void {

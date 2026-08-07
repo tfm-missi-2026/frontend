@@ -2,7 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
+  OnInit,
   signal,
 } from "@angular/core";
 
@@ -13,7 +15,8 @@ import { UiLabelComponent } from "@shared/ui/label";
 import { UiSurfaceComponent } from "@shared/ui/surface";
 import type { SelectOption } from "@shared/ui/select";
 
-import { ProjectsMockService } from "@features/projects/services/projects-mock.service";
+import { ProjectsService } from "@features/projects/services/projects.service";
+import { formatDateRange } from "@utils/date";
 
 import {
   TeamLoadSummaryComponent,
@@ -27,16 +30,7 @@ import {
 import type { ResourceWorkload } from "../../models/resource-workload";
 import { TeamLoadService } from "../../services/team-load.service";
 
-const PROJECT_ALL_VALUE = "";
-
-function formatShortDate(iso: string): string {
-  if (!iso) return "—";
-  const [y, m, d] = iso.split("-");
-  if (!y || !m || !d) return iso;
-  return `${d}/${m}/${y}`;
-}
-
-@Component({
+const PROJECT_ALL_VALUE = "";@Component({
   selector: "TeamLoadListPage",
   standalone: true,
   imports: [
@@ -52,8 +46,8 @@ function formatShortDate(iso: string): string {
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./team-load-list.component.html",
 })
-export class TeamLoadListComponent {
-  private readonly projectsService = inject(ProjectsMockService);
+export class TeamLoadListComponent implements OnInit {
+  private readonly projectsService = inject(ProjectsService);
   private readonly teamLoadService = inject(TeamLoadService);
 
   protected readonly breadcrumbItems = [
@@ -64,7 +58,6 @@ export class TeamLoadListComponent {
   protected readonly fromIso = signal<string>("2026-05-01");
   protected readonly toIso = signal<string>("2026-05-31");
   protected readonly projectId = signal<string | null>(null);
-  protected readonly queryCounter = signal<number>(0);
 
   protected readonly projectOptions = computed<SelectOption[]>(() => {
     const opts: SelectOption[] = this.projectsService
@@ -75,14 +68,26 @@ export class TeamLoadListComponent {
     return opts;
   });
 
-  protected readonly workloads = computed<ResourceWorkload[]>(() => {
-    this.queryCounter();
-    return this.teamLoadService.computeWorkloads({
-      fromIso: this.fromIso(),
-      toIso: this.toIso(),
-      projectId: this.projectId(),
+  // Carga async disparada por effect cuando cambian los filtros.
+  protected readonly workloads = this.teamLoadService.workloads;
+
+  ngOnInit(): void {
+    void this.projectsService.cargar();
+  }
+
+  constructor() {
+    effect(() => {
+      // Re-leer filtros (no usamos el valor, solo dispara el effect).
+      this.fromIso();
+      this.toIso();
+      this.projectId();
+      void this.teamLoadService.computeWorkloads({
+        fromIso: this.fromIso(),
+        toIso: this.toIso(),
+        projectId: this.projectId(),
+      });
     });
-  });
+  }
 
   protected readonly totalResources = computed<number>(
     () => this.workloads().length,
@@ -100,8 +105,7 @@ export class TeamLoadListComponent {
   });
 
   protected readonly rangeLabel = computed<string>(
-    () =>
-      `${formatShortDate(this.fromIso())} – ${formatShortDate(this.toIso())}`,
+    () => formatDateRange(this.fromIso(), this.toIso()),
   );
 
   protected onFromChange(value: string): void {
@@ -117,6 +121,13 @@ export class TeamLoadListComponent {
   }
 
   protected onConsult(): void {
-    this.queryCounter.update((n) => n + 1);
+    // El effect() detecta cambios via signals y dispara la consulta.
+    // Solo necesitamos forzar un bump para re-disparar si el usuario
+    // hace click sin haber cambiado ningun filtro.
+    void this.teamLoadService.computeWorkloads({
+      fromIso: this.fromIso(),
+      toIso: this.toIso(),
+      projectId: this.projectId(),
+    });
   }
 }

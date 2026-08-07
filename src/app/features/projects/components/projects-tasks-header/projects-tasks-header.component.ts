@@ -11,6 +11,7 @@ import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiSurfaceComponent } from "@shared/ui/surface";
+import { formatShortDate } from "@utils/date";
 
 import {
   SUBPROJECT_PRIORITY_LABELS,
@@ -18,13 +19,6 @@ import {
   type SubprojectPriority,
 } from "../../models/subproject";
 import type { TaskSituation } from "../../models/task";
-
-function formatShortDate(iso: string): string {
-  if (!iso) return "—";
-  const [y, m, d] = iso.split("-");
-  if (!y || !m || !d) return iso;
-  return `${d}/${m}/${y}`;
-}
 
 const PRIORITY_COLOR: Record<SubprojectPriority, BadgeColor> = {
   Alta: "error",

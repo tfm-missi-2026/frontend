@@ -1,22 +1,15 @@
+import { parseIsoDate, toIsoDate } from "@utils/date";
+
 import type { Assignment } from "../models/assignment";
 
 const DAY_MS = 1000 * 60 * 60 * 24;
-
-function parseIso(iso: string): Date | null {
-  if (!iso) return null;
-  const parts = iso.split("-");
-  if (parts.length !== 3) return null;
-  const [y, m, d] = parts.map(Number);
-  if (!y || !m || !d) return null;
-  return new Date(y, m - 1, d);
-}
 
 export function countBusinessDays(
   isoStart: string,
   isoEnd: string,
 ): number {
-  const start = parseIso(isoStart);
-  const end = parseIso(isoEnd);
+  const start = parseIsoDate(isoStart);
+  const end = parseIsoDate(isoEnd);
   if (!start || !end) return 0;
   if (end < start) return 0;
 
@@ -25,7 +18,7 @@ export function countBusinessDays(
   while (cursor <= end) {
     const day = cursor.getDay();
     if (day !== 0 && day !== 6) {
-      days.push(cursor.toISOString().slice(0, 10));
+      days.push(toIsoDate(cursor));
     }
     cursor.setTime(cursor.getTime() + DAY_MS);
   }

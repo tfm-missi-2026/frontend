@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   inject,
+  OnInit,
   signal,
 } from "@angular/core";
 import { Router } from "@angular/router";
@@ -45,9 +46,13 @@ const CURRENT_RESOURCE_ID = "u5";
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./resource-dashboard-page.component.html",
 })
-export class ResourceDashboardPageComponent {
+export class ResourceDashboardPageComponent implements OnInit {
   private readonly dashboardService = inject(ResourceDashboardService);
   private readonly router = inject(Router);
+
+  ngOnInit(): void {
+    void this.dashboardService.cargar();
+  }
 
   protected readonly periods = DEFAULT_PERIODS;
   protected readonly periodId = signal<string>(DEFAULT_PERIOD_ID);

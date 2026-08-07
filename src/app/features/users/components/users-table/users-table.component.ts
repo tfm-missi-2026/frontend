@@ -16,6 +16,7 @@ import { UiLinkComponent } from "@shared/ui/link";
 
 import type { User } from "../../models/user";
 import { USER_ROLE_LABELS } from "../../models/user";
+import { range } from "@utils/collections";
 
 const PAGE_SIZE = 6;
 
@@ -63,8 +64,7 @@ export class UsersTableComponent {
   );
 
   protected readonly pageNumbers = computed<number[]>(() => {
-    const total = this.totalPages();
-    return Array.from({ length: total }, (_, i) => i + 1);
+    return range(this.totalPages());
   });
 
   constructor() {

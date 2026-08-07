@@ -4,19 +4,9 @@ import { UiFlexComponent } from "@shared/ui/flex";
 import { UiGridComponent } from "@shared/ui/grid";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiSurfaceComponent } from "@shared/ui/surface";
+import { formatShortDate, isIsoDate } from "@utils/date";
 
 import type { Variation } from "../../models/variation";
-
-function formatShortDate(iso: string): string {
-  if (!iso) return "—";
-  const [y, m, d] = iso.split("-");
-  if (!y || !m || !d) return iso;
-  return `${d}/${m}/${y}`;
-}
-
-function isIsoDate(value: string): boolean {
-  return /^\d{4}-\d{2}-\d{2}$/.test(value);
-}
 
 @Component({
   selector: "VariationReadOnlyBlock",

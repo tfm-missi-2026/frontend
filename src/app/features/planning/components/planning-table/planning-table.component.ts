@@ -9,6 +9,7 @@ import { UiFlexComponent } from "@shared/ui/flex";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiLinkComponent } from "@shared/ui/link";
 import { UiSurfaceComponent } from "@shared/ui/surface";
+import { formatDateRange } from "@utils/date";
 
 import type { Assignment } from "../../models/assignment";
 
@@ -17,13 +18,6 @@ export interface AssignmentRowViewModel extends Assignment {
   resourceRole: string;
   taskName: string;
   taskSubprojectLabel: string;
-}
-
-function formatShortDate(iso: string): string {
-  if (!iso) return "—";
-  const [y, m, d] = iso.split("-");
-  if (!y || !m || !d) return iso;
-  return `${d}/${m}/${y}`;
 }
 
 const COLUMN_CLASSES = [
@@ -64,6 +58,6 @@ export class PlanningTableComponent {
   protected readonly headerLabels = HEADER_LABELS;
 
   protected formatPeriod(row: AssignmentRowViewModel): string {
-    return `${formatShortDate(row.startDate)} – ${formatShortDate(row.endDate)}`;
+    return formatDateRange(row.startDate, row.endDate);
   }
 }

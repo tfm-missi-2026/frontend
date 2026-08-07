@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   inject,
+  OnInit,
   signal,
 } from "@angular/core";
 
@@ -20,6 +21,8 @@ import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiIconButtonComponent } from "@shared/ui/icon-button";
 import { UiLabelComponent } from "@shared/ui/label";
+import { sortBy } from "@utils/collections";
+import { matchesSearch } from "@utils/strings";
 
 import { ItemFormModalComponent } from "../../components/item-form-modal/item-form-modal.component";
 import type { ItemFormSavePayload } from "../../components/item-form-modal/item-form-modal.component";
@@ -30,7 +33,7 @@ import {
   type CatalogGroupCode,
   type CatalogItem,
 } from "../../models/catalog-item";
-import { CatalogMockService } from "../../services/catalog-mock.service";
+import { CatalogService } from "../../services/catalog.service";
 
 @Component({
   selector: "CatalogListPage",
@@ -86,8 +89,12 @@ import { CatalogMockService } from "../../services/catalog-mock.service";
     `,
   ],
 })
-export class CatalogListComponent {
-  private readonly catalogService = inject(CatalogMockService);
+export class CatalogListComponent implements OnInit {
+  private readonly catalogService = inject(CatalogService);
+
+  ngOnInit(): void {
+    void this.catalogService.cargar();
+  }
 
   protected readonly groups = CATALOG_GROUPS;
 
@@ -108,19 +115,17 @@ export class CatalogListComponent {
 
   protected readonly itemsInGroup = computed<CatalogItem[]>(() => {
     const code = this.selectedGroup();
-    return this.items()
-      .filter((i) => i.groupCode === code)
-      .sort((a, b) => a.order - b.order);
+    return sortBy(
+      this.items().filter((i) => i.groupCode === code),
+      (i) => i.order,
+    );
   });
 
   protected readonly filteredItems = computed<CatalogItem[]>(() => {
-    const term = this.searchTerm().trim().toLowerCase();
-    if (!term) return this.itemsInGroup();
-    return this.itemsInGroup().filter(
-      (i) =>
-        i.code.toLowerCase().includes(term) ||
-        i.name.toLowerCase().includes(term) ||
-        i.description.toLowerCase().includes(term),
+    const term = this.searchTerm();
+    if (!term.trim()) return this.itemsInGroup();
+    return this.itemsInGroup().filter((i) =>
+      matchesSearch(term, i.code, i.name, i.description),
     );
   });
 
@@ -174,18 +179,26 @@ export class CatalogListComponent {
   }
 
   protected onDeactivate(item: CatalogItem): void {
-    this.catalogService.deactivate(item.id);
+    void this.catalogService.deactivate(item.id);
     this.closeActions();
   }
 
-  protected onSaveItem(payload: ItemFormSavePayload): void {
+  protected async onSaveItem(payload: ItemFormSavePayload): Promise<void> {
     if (payload.mode === "create") {
-      this.catalogService.create(payload.data);
-      this.selectedGroup.set(payload.data.groupCode);
+      const created = await this.catalogService.create(payload.data);
+      if (created) {
+        this.selectedGroup.set(payload.data.groupCode);
+        this.formOpen.set(false);
+      }
     } else {
-      this.catalogService.update(payload.id, payload.data);
+      const updated = await this.catalogService.update(
+        payload.id,
+        payload.data,
+      );
+      if (updated) {
+        this.formOpen.set(false);
+      }
     }
-    this.formOpen.set(false);
   }
 
   protected onNewGroup(): void {

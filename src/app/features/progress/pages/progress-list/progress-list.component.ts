@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   signal,
 } from "@angular/core";
@@ -16,7 +17,7 @@ import { UiLabelComponent } from "@shared/ui/label";
 import { UiSurfaceComponent } from "@shared/ui/surface";
 import type { SelectOption } from "@shared/ui/select";
 
-import { ProjectsMockService } from "@features/projects/services/projects-mock.service";
+import { ProjectsService } from "@features/projects/services/projects.service";
 
 import {
   ProgressBaselineComponent,
@@ -48,7 +49,7 @@ import { ProgressService } from "../../services/progress.service";
   templateUrl: "./progress-list.component.html",
 })
 export class ProgressListComponent {
-  private readonly projectsService = inject(ProjectsMockService);
+  private readonly projectsService = inject(ProjectsService);
   private readonly progressService = inject(ProgressService);
   private readonly router = inject(Router);
 
@@ -66,9 +67,33 @@ export class ProgressListComponent {
       .map((p) => ({ value: p.id, label: `${p.code} · ${p.name}` })),
   );
 
-  protected readonly progress = computed(() =>
-    this.progressService.computeProjectProgress(this.selectedProjectId()),
-  );
+  private readonly _progress = signal<
+    import("../../models/project-progress").ProjectProgress
+  >({
+    projectId: "",
+    hasBaseline: false,
+    baselineLabel: "",
+    baselineDate: "",
+    estimatedHours: 0,
+    loggedHours: 0,
+    progressPct: 0,
+    rows: [],
+  });
+  protected readonly progress = this._progress.asReadonly();
+
+  constructor() {
+    void this.projectsService.cargar();
+    effect(() => {
+      const id = this.selectedProjectId();
+      if (!id) return;
+      void this.progressService
+        .refreshProjectProgress(id)
+        .then((p) => this._progress.set(p))
+        .catch(() => {
+          // El error interceptor ya muestra el toast.
+        });
+    });
+  }
 
   protected readonly totalDeviationHours = computed<number>(() =>
     this.progress().rows.reduce((acc, r) => acc + r.deviationHours, 0),

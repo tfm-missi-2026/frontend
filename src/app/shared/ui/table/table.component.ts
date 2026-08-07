@@ -13,6 +13,7 @@ import { NgTemplateOutlet } from "@angular/common";
 
 import { UiFlexComponent } from "@shared/ui/flex/flex.component";
 import { UiLabelComponent } from "@shared/ui/label/label.component";
+import { matchesSearch } from "@utils/strings";
 import { UiCheckboxComponent } from "@shared/ui/input/checkbox/checkbox.component";
 import { UiInputComponent } from "@shared/ui/input/input/input.component";
 import { UiIconButtonComponent } from "@shared/ui/icon-button/icon-button.component";
@@ -103,19 +104,20 @@ export class UiTableComponent implements OnInit {
 
   /** Filas tras aplicar la búsqueda. */
   protected readonly filteredData = computed<unknown[]>(() => {
-    const term = this.searchTerm().trim().toLowerCase();
-    if (!term || !this.searchable()) return this.data();
+    const term = this.searchTerm();
+    if (!term.trim() || !this.searchable()) return this.data();
 
     const cols = this.columns().filter((c) => c.searchable !== false && c.key);
     if (!cols.length) return this.data();
 
-    return this.data().filter((row) =>
-      cols.some((c) => {
+    return this.data().filter((row) => {
+      for (const c of cols) {
         const value = (row as Record<string, unknown>)[c.key];
-        if (value === null || value === undefined) return false;
-        return String(value).toLowerCase().includes(term);
-      }),
-    );
+        if (value === null || value === undefined) continue;
+        if (matchesSearch(term, String(value))) return true;
+      }
+      return false;
+    });
   });
 
   /** Filas visibles en la página actual. */

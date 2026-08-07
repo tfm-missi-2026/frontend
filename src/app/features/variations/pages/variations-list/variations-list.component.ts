@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   inject,
+  OnInit,
   signal,
 } from "@angular/core";
 
@@ -14,10 +15,12 @@ import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiSurfaceComponent } from "@shared/ui/surface";
+import { matchesSearch } from "@utils/strings";
 
-import { ProjectsMockService } from "@features/projects/services/projects-mock.service";
-import { SubprojectsMockService } from "@features/projects/services/subprojects-mock.service";
-import { TasksMockService } from "@features/projects/services/tasks-mock.service";
+import { ProjectsService } from "@features/projects/services/projects.service";
+import { SubprojectsService } from "@features/projects/services/subprojects.service";
+import { TasksService } from "@features/projects/services/tasks.service";
+import { AuthService } from "@core/auth/auth.service";
 
 import {
   VariationsToolbarComponent,
@@ -45,10 +48,15 @@ import {
   type VariationStatus,
   type VariationType,
 } from "../../models/variation";
-import { VariationsMockService } from "../../services/variations-mock.service";
+import { VariationsService } from "../../services/variations.service";
 
-const CURRENT_REPORTER = "Lucía Fernández Torres";
-const CURRENT_RESOLVER = "Ricardo Salazar Núñez";
+// Placeholder mientras el backend no devuelve reportadaPor/resueltoPor como
+// nombres. Ahora se calcula del usuario autenticado via AuthService.
+function nombreActual(auth: AuthService): string {
+  const u = auth.usuario();
+  if (!u) return "Usuario actual";
+  return u.nombreCompleto || u.email;
+}
 
 @Component({
   selector: "VariationsListPage",
@@ -69,11 +77,21 @@ const CURRENT_RESOLVER = "Ricardo Salazar Núñez";
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./variations-list.component.html",
 })
-export class VariationsListComponent {
-  private readonly projectsService = inject(ProjectsMockService);
-  private readonly subprojectsService = inject(SubprojectsMockService);
-  private readonly tasksService = inject(TasksMockService);
-  private readonly variationsService = inject(VariationsMockService);
+export class VariationsListComponent implements OnInit {
+  private readonly projectsService = inject(ProjectsService);
+  private readonly subprojectsService = inject(SubprojectsService);
+  private readonly tasksService = inject(TasksService);
+  private readonly variationsService = inject(VariationsService);
+  private readonly auth = inject(AuthService);
+
+  protected readonly currentReporter = computed(() => nombreActual(this.auth));
+
+  ngOnInit(): void {
+    void this.projectsService.cargar();
+    void this.subprojectsService.cargar();
+    void this.tasksService.cargar();
+    void this.variationsService.cargar();
+  }
 
   protected readonly IconPlusSimpleComponent = IconPlusSimpleComponent;
 
@@ -136,7 +154,7 @@ export class VariationsListComponent {
   });
 
   protected readonly rows = computed<VariationRowViewModel[]>(() => {
-    const term = this.searchTerm().trim().toLowerCase();
+    const term = this.searchTerm();
     const type = this.filterType();
     const status = this.filterStatus();
 
@@ -145,17 +163,14 @@ export class VariationsListComponent {
       .filter((v) => {
         if (type && v.type !== type) return false;
         if (status && v.status !== status) return false;
-        if (!term) return true;
-        const haystack = [
-          v.target?.label ?? "",
-          v.target?.ref ?? "",
+        return matchesSearch(
+          term,
+          v.target?.label,
+          v.target?.ref,
           v.description,
           v.justification,
           v.reportedBy,
-        ]
-          .join(" ")
-          .toLowerCase();
-        return haystack.includes(term);
+        );
       })
       .map((v) => ({
         ...v,
@@ -205,15 +220,25 @@ export class VariationsListComponent {
     this.resolveOpen.set(true);
   }
 
-  protected onReportSubmit(payload: ReportVariationPayload): void {
-    this.variationsService.create(payload.reportedBy || CURRENT_REPORTER, payload.data);
-    this.reportOpen.set(false);
+  protected async onReportSubmit(payload: ReportVariationPayload): Promise<void> {
+    // El reportadaPor del backend debe ser el UUID del usuario actual.
+    // El mapper del FE lo usa para resolver a nombre via UsersService.
+    const authUsuario = this.auth.usuario();
+    const userId = authUsuario?.id ?? "";
+    const created = await this.variationsService.create(
+      userId || payload.reportedBy,
+      payload.data,
+    );
+    if (created) this.reportOpen.set(false);
   }
 
-  protected onResolveSubmit(payload: ResolveVariationPayload): void {
-    this.variationsService.resolve(payload.id, payload);
-    this.resolveOpen.set(false);
-    this.selectedVariation.set(null);
+  protected async onResolveSubmit(payload: ResolveVariationPayload): Promise<void> {
+    // resueltoPor lo setea el backend desde CurrentUserResolver (del JWT).
+    const resolved = await this.variationsService.resolve(payload.id, payload);
+    if (resolved) {
+      this.resolveOpen.set(false);
+      this.selectedVariation.set(null);
+    }
   }
 
   protected closeReport(): void {
@@ -225,6 +250,5 @@ export class VariationsListComponent {
     this.selectedVariation.set(null);
   }
 
-  protected readonly currentReporter = CURRENT_REPORTER;
-  protected readonly currentResolver = CURRENT_RESOLVER;
+  protected readonly currentResolver = computed(() => nombreActual(this.auth));
 }

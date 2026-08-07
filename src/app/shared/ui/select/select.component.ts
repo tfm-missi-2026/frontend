@@ -19,6 +19,8 @@ import {
   NG_VALUE_ACCESSOR,
 } from "@angular/forms";
 
+import { matchesSearch } from "@utils/strings";
+
 import {
   IconCheckComponent,
   IconChevronDownComponent,
@@ -183,10 +185,10 @@ export class UiSelectComponent implements ControlValueAccessor {
 
   readonly filteredOptions = computed<SelectOption[]>(() => {
     if (this.async()) return this.effectiveOptions();
-    const term = this.searchInput().trim().toLowerCase();
-    if (!term) return this.effectiveOptions();
+    const term = this.searchInput();
+    if (!term.trim()) return this.effectiveOptions();
     return this.effectiveOptions().filter((opt) =>
-      opt.label.toLowerCase().includes(term),
+      matchesSearch(term, opt.label),
     );
   });
 

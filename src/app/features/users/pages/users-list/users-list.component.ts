@@ -19,7 +19,8 @@ import { UsersToolbarComponent } from "../../components/users-toolbar/users-tool
 import type { UserFormSavePayload } from "../../models/user-form";
 import type { User, UserRole, UserStatus } from "../../models/user";
 import { USER_ROLE_OPTIONS, USER_STATUS_OPTIONS } from "../../models/user";
-import { UsersMockService } from "../../services/users-mock.service";
+import { UsersService } from "../../services/users.service";
+import { matchesSearch } from "@utils/strings";
 
 @Component({
   selector: "UsersListPage",
@@ -38,7 +39,7 @@ import { UsersMockService } from "../../services/users-mock.service";
   templateUrl: "./users-list.component.html",
 })
 export class UsersListComponent {
-  private readonly usersService = inject(UsersMockService);
+  private readonly usersService = inject(UsersService);
 
   protected readonly plusIcon = IconPlusSimpleComponent;
 
@@ -51,22 +52,23 @@ export class UsersListComponent {
   protected readonly statusOptions = USER_STATUS_OPTIONS;
 
   protected readonly users = this.usersService.users;
+  protected readonly loading = this.usersService.loading;
+  protected readonly errorMessage = this.usersService.error;
 
   protected readonly searchTerm = signal<string>("");
   protected readonly filterRol = signal<UserRole | null>(null);
   protected readonly filterStatus = signal<UserStatus | null>(null);
 
   protected readonly filteredUsers = computed<User[]>(() => {
-    const term = this.searchTerm().trim().toLowerCase();
+    const term = this.searchTerm();
     const rol = this.filterRol();
     const status = this.filterStatus();
     return this.users().filter((u) => {
       if (rol && u.role !== rol) return false;
       if (status && u.status !== status) return false;
-      if (!term) return true;
       const fullName =
-        `${u.firstName} ${u.lastNamePaternal} ${u.lastNameMaternal}`.toLowerCase();
-      return fullName.includes(term) || u.email.toLowerCase().includes(term);
+        `${u.firstName} ${u.lastNamePaternal} ${u.lastNameMaternal}`;
+      return matchesSearch(term, fullName, u.email);
     });
   });
 
@@ -76,6 +78,10 @@ export class UsersListComponent {
 
   protected readonly resetOpen = signal<boolean>(false);
   protected readonly resetUser = signal<User | null>(null);
+
+  constructor() {
+    void this.usersService.cargar();
+  }
 
   protected openCreate(): void {
     this.formMode.set("create");
@@ -96,22 +102,34 @@ export class UsersListComponent {
 
   protected onSaveUser(payload: UserFormSavePayload): void {
     if (payload.mode === "create") {
-      this.usersService.create({
-        firstName: payload.data.firstName,
-        lastNamePaternal: payload.data.lastNamePaternal,
-        lastNameMaternal: payload.data.lastNameMaternal,
-        email: payload.data.email,
-        role: payload.data.role,
-        status: payload.data.status,
+      void this.usersService.crear({
+        data: {
+          firstName: payload.data.firstName,
+          lastNamePaternal: payload.data.lastNamePaternal,
+          lastNameMaternal: payload.data.lastNameMaternal,
+          email: payload.data.email,
+          role: payload.data.role,
+          status: payload.data.status,
+        },
+        initialPassword: payload.data.initialPassword,
       });
     } else {
-      this.usersService.update(payload.id, payload.data);
+      void this.usersService.actualizar(payload.id, {
+        data: {
+          firstName: payload.data.firstName,
+          lastNamePaternal: payload.data.lastNamePaternal,
+          lastNameMaternal: payload.data.lastNameMaternal,
+          email: payload.data.email,
+          role: payload.data.role,
+          status: payload.data.status,
+        },
+      });
     }
     this.formOpen.set(false);
   }
 
   protected onDeactivate(u: User): void {
-    this.usersService.deactivate(u.id);
+    void this.usersService.desactivar(u.id);
   }
 
   protected onConfirmReset(_password: string): void {

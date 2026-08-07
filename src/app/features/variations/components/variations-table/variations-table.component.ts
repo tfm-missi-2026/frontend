@@ -11,6 +11,7 @@ import { UiFlexComponent } from "@shared/ui/flex";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiLinkComponent } from "@shared/ui/link";
 import { UiSurfaceComponent } from "@shared/ui/surface";
+import { formatShortDate } from "@utils/date";
 
 import type { Variation } from "../../models/variation";
 
@@ -37,13 +38,6 @@ const HEADER_LABELS = [
 export interface VariationRowViewModel extends Variation {
   targetLabel: string;
   targetRef: string | null;
-}
-
-function formatShortDate(iso: string): string {
-  if (!iso) return "—";
-  const [y, m, d] = iso.split("-");
-  if (!y || !m || !d) return iso;
-  return `${d}/${m}/${y}`;
 }
 
 @Component({

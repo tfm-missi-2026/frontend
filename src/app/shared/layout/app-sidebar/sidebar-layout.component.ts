@@ -2,45 +2,29 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
+  effect,
   inject,
 } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { NgClass } from "@angular/common";
 import { RouterModule } from "@angular/router";
 
-import {
-  IconAlertWarningComponent,
-  IconArrowUpTrendComponent,
-  IconBoxComponent,
-  IconCalendar24Component,
-  IconCardComponent,
-  IconDotsVerticalComponent,
-  IconSettingsComponent,
-  IconUserCircleComponent,
-} from "@shared/icons";
+import { ModulosService } from "@core/modulos/modulos.service";
+import { IconDotsVerticalComponent } from "@shared/icons";
 import { UiFlexComponent } from "@shared/ui/flex";
 
 import { SidebarService } from "../../services/sidebar.service";
 import { SidebarLayoutLogoComponent } from "./sidebar-logo";
 import { SidebarLayoutSectionComponent } from "./sidebar-section";
-import {
-  SidebarLayoutNavSectionComponent,
-  type NavItem,
-} from "./sidebar-nav-section";
-
-interface SidebarSectionConfig {
-  title: string;
-  sectionKey: string;
-  items: NavItem[];
-}
+import { construirNavDesdeModulos } from "./sidebar-nav.builder";
 
 /**
  * `SidebarLayoutComponent`
  * ------------------------
- * Sidebar autenticado del shell del SPSRT. Renderiza el logo, las
- * secciones de navegación (`Administración` y `Cuenta`) vía
- * `<SidebarLayoutNavSection>` y el widget inferior con el CTA del
- * sistema.
+ * Sidebar autenticado del SPSRT. Renderiza el logo y la sección de
+ * navegación derivada de los módulos autorizados para el rol del
+ * usuario (`/api/modulos/por-rol/{rolId}`).
  *
  * Standalone + `OnPush` + signal API. El estado del sidebar
  * (expandido / hover / mobile-open) se lee del `SidebarService` vía
@@ -61,7 +45,9 @@ interface SidebarSectionConfig {
   templateUrl: "./sidebar-layout.component.html",
 })
 export class SidebarLayoutComponent {
-  protected readonly sidebarService = inject(SidebarService);
+  private readonly sidebarService = inject(SidebarService);
+  private readonly modulosService = inject(ModulosService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly isExpanded = toSignal(this.sidebarService.isExpanded$, {
     initialValue: true,
@@ -86,93 +72,29 @@ export class SidebarLayoutComponent {
 
   protected readonly sectionIcon = IconDotsVerticalComponent;
 
-  protected readonly sections: SidebarSectionConfig[] = [
-    {
-      title: "Administración",
-      sectionKey: "administracion",
-      items: [
-        {
-          icon: IconUserCircleComponent,
-          name: "Usuarios",
-          path: "/app/administracion/usuarios",
-        },
-        {
-          icon: IconSettingsComponent,
-          name: "Roles",
-          path: "/app/administracion/roles",
-        },
-        {
-          icon: IconBoxComponent,
-          name: "Catálogo",
-          path: "/app/administracion/catalogo",
-        },
-        {
-          icon: IconCardComponent,
-          name: "Módulos",
-          path: "/app/administracion/modulos",
-          pending: true,
-        },
-      ],
-    },
-    {
-      title: "Operación",
-      sectionKey: "operacion",
-      items: [
-        {
-          icon: IconBoxComponent,
-          name: "Dashboard",
-          path: "/app/operacion/dashboard",
-        },
-        {
-          icon: IconUserCircleComponent,
-          name: "Dashboard Jefe",
-          path: "/app/operacion/dashboard-jefe",
-        },
-        {
-          icon: IconUserCircleComponent,
-          name: "Dashboard Recurso",
-          path: "/app/operacion/dashboard-recurso",
-        },
-        {
-          icon: IconBoxComponent,
-          name: "Proyectos",
-          path: "/app/operacion/proyectos",
-        },
-        {
-          icon: IconCalendar24Component,
-          name: "Planificación",
-          path: "/app/operacion/planificacion",
-        },
-        {
-          icon: IconAlertWarningComponent,
-          name: "Variaciones",
-          path: "/app/operacion/variaciones",
-        },
-        {
-          icon: IconUserCircleComponent,
-          name: "Carga del equipo",
-          path: "/app/operacion/carga-equipo",
-        },
-        {
-          icon: IconArrowUpTrendComponent,
-          name: "Avance",
-          path: "/app/operacion/avance",
-        },
-      ],
-    },
-    {
-      title: "Cuenta",
-      sectionKey: "cuenta",
-      items: [
-        {
-          icon: IconSettingsComponent,
-          name: "Configuración",
-          path: "/app/cuenta/configuracion",
-          pending: true,
-        },
-      ],
-    },
-  ];
+  // Recalcula el árbol de navegación cada vez que cambian los módulos.
+  // Si el rol no devolvió módulos (cache vacía o 401) → array vacío.
+  private readonly navConfig = computed(() =>
+    construirNavDesdeModulos(this.modulosService.modulos()),
+  );
+
+  protected readonly navSection = computed(() => {
+    const cfg = this.navConfig();
+    return {
+      title: cfg.title,
+      sectionKey: cfg.sectionKey,
+      items: cfg.items,
+    };
+  });
+
+  constructor() {
+    // Asegura el reset de módulos cuando el sidebar se destruye (logout
+    // navega a /signin y desmonta este árbol). Evita servir módulos del
+    // rol anterior a un usuario distinto en la misma sesión.
+    effect(() => {
+      this.destroyRef.onDestroy(() => this.modulosService.reset());
+    });
+  }
 
   protected onSidebarMouseEnter(): void {
     if (!this.isExpanded()) {

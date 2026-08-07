@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   inject,
+  OnInit,
   signal,
 } from "@angular/core";
 
@@ -27,7 +28,7 @@ import {
   TIMESHEET_DAY_NAMES,
 } from "../../components/timesheet-toolbar/timesheet-toolbar.component";
 import type { TimesheetEntry } from "../../models/timesheet-entry";
-import { TimesheetMockService, TIMESHEET_INITIAL_DATE } from "../../services/timesheet-mock.service";
+import { TIMESHEET_INITIAL_DATE, TimesheetService } from "../../services/timesheet.service";
 
 @Component({
   selector: "MyTimesheetPage",
@@ -47,8 +48,12 @@ import { TimesheetMockService, TIMESHEET_INITIAL_DATE } from "../../services/tim
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./my-timesheet.component.html",
 })
-export class MyTimesheetComponent {
-  private readonly timesheetService = inject(TimesheetMockService);
+export class MyTimesheetComponent implements OnInit {
+  private readonly timesheetService = inject(TimesheetService);
+
+  ngOnInit(): void {
+    void this.timesheetService.cargar();
+  }
 
   protected readonly IconPlusSimpleComponent = IconPlusSimpleComponent;
 
@@ -130,20 +135,23 @@ export class MyTimesheetComponent {
     this.formOpen.set(true);
   }
 
-  protected onSaveEntry(payload: EntryFormPayload): void {
+  protected async onSaveEntry(payload: EntryFormPayload): Promise<void> {
     if (payload.mode === "create") {
-      this.timesheetService.create(payload.data);
-      this.flashAlert("Bloque registrado correctamente.");
+      const created = await this.timesheetService.create(payload.data);
+      if (created) this.flashAlert("Bloque registrado correctamente.");
     } else if (payload.id) {
-      this.timesheetService.update(payload.id, payload.data);
-      this.flashAlert("Bloque actualizado correctamente.");
+      const updated = await this.timesheetService.update(
+        payload.id,
+        payload.data,
+      );
+      if (updated) this.flashAlert("Bloque actualizado correctamente.");
     }
     this.formOpen.set(false);
   }
 
-  protected onDeleteEntry(entry: TimesheetEntry): void {
-    this.timesheetService.remove(entry.id);
-    this.flashAlert("Bloque eliminado.");
+  protected async onDeleteEntry(entry: TimesheetEntry): Promise<void> {
+    const ok = await this.timesheetService.remove(entry.id);
+    if (ok) this.flashAlert("Bloque eliminado.");
   }
 
   private flashAlert(message: string): void {

@@ -15,15 +15,13 @@
   <UiFlex direction="column" overflow="auto" className="flex-1 no-scrollbar">
     <nav>
       <UiFlex direction="column" [gap]="16">
-        @for (s of sections; track s.sectionKey) {
-          <SidebarLayoutSection
-            [title]="s.title"
-            [items]="s.items"
-            [sectionKey]="s.sectionKey"
-            [isExpandedOrHovered]="isVisible()"
-            [sectionIcon]="sectionIcon"
-          />
-        }
+        <SidebarLayoutSection
+          [title]="navSection().title"
+          [items]="navSection().items"
+          [sectionKey]="navSection().sectionKey"
+          [isExpandedOrHovered]="isVisible()"
+          [sectionIcon]="sectionIcon"
+        />
       </UiFlex>
     </nav>
   </UiFlex>

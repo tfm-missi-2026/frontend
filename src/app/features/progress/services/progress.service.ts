@@ -1,14 +1,18 @@
 import { Injectable, inject } from "@angular/core";
+import { firstValueFrom } from "rxjs";
 
-import { AssignmentsMockService } from "@features/planning/services/assignments-mock.service";
-import { SubprojectsMockService } from "@features/projects/services/subprojects-mock.service";
-import { TasksMockService } from "@features/projects/services/tasks-mock.service";
+import {
+  AssignmentsService,
+} from "@features/planning/services/assignments.service";
+import { SubprojectsService } from "@features/projects/services/subprojects.service";
+import { TasksService } from "@features/projects/services/tasks.service";
 
 import type {
   ProjectProgress,
   TaskProgressRow,
 } from "../models/project-progress";
-import { TaskEffortMockService } from "./task-effort-mock.service";
+import type { AvanceProyectoApi, AvanceTareaApi } from "../models/progress-api";
+import { AvanceApiService } from "./avance-api.service";
 
 const EMPTY_PROGRESS: ProjectProgress = {
   projectId: "",
@@ -21,65 +25,88 @@ const EMPTY_PROGRESS: ProjectProgress = {
   rows: [],
 };
 
+// Ahora el progreso real viene del backend (/api/avance/por-proyecto/{id}).
+// El service solo ensambla refs (subproyecto.ticket) y adapta al shape UI.
 @Injectable({ providedIn: "root" })
 export class ProgressService {
-  private readonly assignmentsService = inject(AssignmentsMockService);
-  private readonly subprojectsService = inject(SubprojectsMockService);
-  private readonly tasksService = inject(TasksMockService);
-  private readonly taskEffortService = inject(TaskEffortMockService);
+  private readonly avanceApi = inject(AvanceApiService);
+  private readonly assignmentsService = inject(AssignmentsService);
+  private readonly subprojectsService = inject(SubprojectsService);
+  private readonly tasksService = inject(TasksService);
 
-  computeProjectProgress(projectId: string): ProjectProgress {
+  async computeProjectProgress(
+    projectId: string,
+  ): Promise<ProjectProgress> {
     if (!projectId) return EMPTY_PROGRESS;
 
-    const assignments = this.assignmentsService.getByProject(projectId);
-    const hasBaseline = assignments.some((a) => a.frozen);
+    // Asegurar subproyectos y tasks para resolver refs locales.
+    if (this.tasksService.count() === 0) {
+      await this.tasksService.cargar();
+    }
+    if (this.subprojectsService.count() === 0) {
+      await this.subprojectsService.cargar();
+    }
+
+    const avance = await firstValueFrom(
+      this.avanceApi.porProyecto(projectId),
+    );
 
     const subprojects = this.subprojectsService
       .subs()
       .filter((s) => s.projectId === projectId && s.active);
-    const tasks = subprojects.flatMap((s) =>
-      this.tasksService.getBySubproject(s.id),
+    const subById = new Map(subprojects.map((s) => [s.id, s]));
+
+    const rows: TaskProgressRow[] = (avance.tareas ?? []).map(
+      (t: AvanceTareaApi) => {
+        const task = this.tasksService.getById(t.tareaId);
+        const sub = task ? subById.get(task.subprojectId) : undefined;
+        const ref = sub?.ticket
+          ? `#${sub.ticket}`
+          : `#${task?.subprojectId ?? t.tareaId}`;
+        return {
+          taskId: t.tareaId,
+          taskName: t.nombre,
+          taskRef: ref,
+          estimatedHours: t.horasEstimadas,
+          loggedHours: t.horasRegistradas,
+          progressPct: t.porcentajeAvance,
+          deviationHours: t.desviacionHoras,
+          isOverExecuted: t.horasRegistradas > t.horasEstimadas,
+        };
+      },
     );
 
-    const rows: TaskProgressRow[] = tasks.map((t) => {
-      const sub = subprojects.find((s) => s.id === t.subprojectId);
-      const ref = sub?.ticket ? `#${sub.ticket}` : `#${t.subprojectId}`;
-      const estimatedHours = t.estimatedHours;
-      const loggedHours = this.taskEffortService.totalForTask(t.id);
-      const progressPct =
-        estimatedHours > 0
-          ? Math.round((loggedHours / estimatedHours) * 100)
-          : 0;
-      const deviationHours = loggedHours - estimatedHours;
-      const isOverExecuted = loggedHours > estimatedHours;
-      return {
-        taskId: t.id,
-        taskName: t.name,
-        taskRef: ref,
-        estimatedHours,
-        loggedHours,
-        progressPct,
-        deviationHours,
-        isOverExecuted,
-      };
-    });
-
-    const estimatedHours = rows.reduce((acc, r) => acc + r.estimatedHours, 0);
-    const loggedHours = rows.reduce((acc, r) => acc + r.loggedHours, 0);
-    const progressPct =
-      estimatedHours > 0
-        ? Math.round((loggedHours / estimatedHours) * 100)
-        : 0;
+    const hasBaseline = avance.lineaBaseId !== null;
+    const baselineLabel = hasBaseline
+      ? `Línea base v${avance.version ?? "?"}`
+      : "Sin línea base congelada";
+    const baselineDate = ""; // backend no expone fecha_congelacion en este DTO
 
     return {
       projectId,
       hasBaseline,
-      baselineLabel: "Línea base v2",
-      baselineDate: "18/05/2026",
-      estimatedHours,
-      loggedHours,
-      progressPct,
+      baselineLabel,
+      baselineDate,
+      estimatedHours: avance.horasEstimadasTotal,
+      loggedHours: avance.horasRegistradasTotal,
+      progressPct: avance.porcentajeAvance,
       rows,
     };
+  }
+
+  // API sincrona legacy para callers existentes. Internamente dispara
+  // el computo async y devuelve el progreso cacheado por projectId. Si el
+  // caller necesita datos frescos, debe usar computeProjectProgress async.
+  private readonly _cache = new Map<string, ProjectProgress>();
+
+  computeProjectProgressSync(projectId: string): ProjectProgress {
+    return this._cache.get(projectId) ?? EMPTY_PROGRESS;
+  }
+
+  // Wrapper: ejecuta computeProjectProgress y guarda en cache.
+  async refreshProjectProgress(projectId: string): Promise<ProjectProgress> {
+    const result = await this.computeProjectProgress(projectId);
+    this._cache.set(projectId, result);
+    return result;
   }
 }

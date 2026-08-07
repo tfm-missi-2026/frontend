@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   inject,
+  OnInit,
   signal,
 } from "@angular/core";
 
@@ -15,6 +16,7 @@ import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiSurfaceComponent } from "@shared/ui/surface";
 import type { SelectOption } from "@shared/ui/select";
+import { todayIso } from "@utils/date";
 
 import {
   AssignmentFormModalComponent,
@@ -34,11 +36,12 @@ import type {
   AssignmentFormSavePayload,
   OverloadRequest,
 } from "../../models/assignment-form";
-import { AssignmentsMockService } from "../../services/assignments-mock.service";
-import { ProjectsMockService } from "@features/projects/services/projects-mock.service";
-import { SubprojectsMockService } from "@features/projects/services/subprojects-mock.service";
-import { TasksMockService } from "@features/projects/services/tasks-mock.service";
-import { UsersMockService } from "@features/users/services/users-mock.service";
+import { AssignmentsService } from "../../services/assignments.service";
+import { LineaBaseService } from "../../services/linea-base.service";
+import { ProjectsService } from "@features/projects/services/projects.service";
+import { SubprojectsService } from "@features/projects/services/subprojects.service";
+import { TasksService } from "@features/projects/services/tasks.service";
+import { UsersService } from "@features/users/services/users.service";
 
 const WORKDAY_HOURS = 8;
 
@@ -61,12 +64,23 @@ const WORKDAY_HOURS = 8;
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./planning-list.component.html",
 })
-export class PlanningListComponent {
-  private readonly projectsService = inject(ProjectsMockService);
-  private readonly subprojectsService = inject(SubprojectsMockService);
-  private readonly tasksService = inject(TasksMockService);
-  private readonly usersService = inject(UsersMockService);
-  private readonly assignmentsService = inject(AssignmentsMockService);
+export class PlanningListComponent implements OnInit {
+  private readonly projectsService = inject(ProjectsService);
+  private readonly subprojectsService = inject(SubprojectsService);
+  private readonly tasksService = inject(TasksService);
+  private readonly usersService = inject(UsersService);
+  private readonly assignmentsService = inject(AssignmentsService);
+  private readonly lineaBaseService = inject(LineaBaseService);
+
+  ngOnInit(): void {
+    void this.projectsService.cargar();
+    void this.subprojectsService.cargar();
+    void this.tasksService.cargar();
+    void this.usersService.cargar();
+    void this.assignmentsService.cargar();
+    const pid = this.selectedProjectId();
+    if (pid) void this.lineaBaseService.cargarPorProyecto(pid);
+  }
 
   protected readonly IconPlusSimpleComponent = IconPlusSimpleComponent;
 
@@ -190,11 +204,18 @@ export class PlanningListComponent {
     this.formOpen.set(false);
   }
 
-  protected onFreeze(): void {
+  protected async onFreeze(): Promise<void> {
     const id = this.selectedProjectId();
     if (!id) return;
-    this.assignmentsService.freeze(id);
-    this.flashAlert("Línea base congelada.");
+    const ok = await this.lineaBaseService.congelar(
+      id,
+      `Snapshot ${todayIso()}`,
+    );
+    if (ok) {
+      this.flashAlert(
+        `Línea base v${ok.version} congelada correctamente.`,
+      );
+    }
   }
 
   protected onSearchClear(): void {}
@@ -214,20 +235,24 @@ export class PlanningListComponent {
   protected onRemove(a: Assignment): void {
     const id = this.selectedProjectId();
     if (!id) return;
-    this.assignmentsService.deactivate(id, a.id);
+    void this.assignmentsService.deactivate(id, a.id);
   }
 
-  protected onSave(payload: AssignmentFormSavePayload): void {
+  protected async onSave(payload: AssignmentFormSavePayload): Promise<void> {
     if (payload.mode === "create") {
-      this.assignmentsService.create(payload.projectId, payload.data);
+      const created = await this.assignmentsService.create(
+        payload.projectId,
+        payload.data,
+      );
+      if (created) this.formOpen.set(false);
     } else {
-      this.assignmentsService.update(
+      const updated = await this.assignmentsService.update(
         payload.projectId,
         payload.id,
         payload.data,
       );
+      if (updated) this.formOpen.set(false);
     }
-    this.formOpen.set(false);
   }
 
   protected onOverloadRequest(req: OverloadRequest): void {
@@ -236,7 +261,7 @@ export class PlanningListComponent {
     this.overloadOpen.set(true);
   }
 
-  protected onOverloadConfirm(): void {
+  protected async onOverloadConfirm(): Promise<void> {
     const req = this.pendingOverload();
     if (!req) {
       this.overloadOpen.set(false);
@@ -244,12 +269,18 @@ export class PlanningListComponent {
     }
     const p = req.payload;
     if (p.mode === "create") {
-      this.assignmentsService.create(p.projectId, p.data);
+      await this.assignmentsService.create(p.projectId, p.data, true);
     } else {
-      this.assignmentsService.update(p.projectId, p.id, p.data);
+      await this.assignmentsService.update(
+        p.projectId,
+        p.id,
+        p.data,
+        true,
+      );
     }
     this.pendingOverload.set(null);
     this.overloadOpen.set(false);
+    this.formOpen.set(false);
   }
 
   protected onOverloadCancel(): void {

@@ -1,10 +1,11 @@
-import { Injectable, inject } from "@angular/core";
+import { Injectable, computed, inject, signal } from "@angular/core";
+import { firstValueFrom } from "rxjs";
 
-import { AssignmentsMockService } from "@features/planning/services/assignments-mock.service";
-import { UsersMockService } from "@features/users/services/users-mock.service";
+import { UsersService } from "@features/users/services/users.service";
 
-import { LoggedHoursMockService } from "./logged-hours-mock.service";
 import type { ResourceWorkload } from "../models/resource-workload";
+import { CargaApiService } from "./carga-api.service";
+import { extractProblemMessage } from "@utils/problem-detail";
 
 export interface ComputeWorkloadsOptions {
   fromIso: string;
@@ -14,49 +15,58 @@ export interface ComputeWorkloadsOptions {
 
 @Injectable({ providedIn: "root" })
 export class TeamLoadService {
-  private readonly usersService = inject(UsersMockService);
-  private readonly assignmentsService = inject(AssignmentsMockService);
-  private readonly loggedHoursService = inject(LoggedHoursMockService);
+  private readonly cargaApi = inject(CargaApiService);
+  private readonly usersService = inject(UsersService);
 
-  computeWorkloads(opts: ComputeWorkloadsOptions): ResourceWorkload[] {
-    const { fromIso, toIso, projectId } = opts;
-    const resources = this.usersService
-      .users()
-      .filter((u) => u.role === "recurso_tecnico" && u.status === "active");
+  private readonly _workloads = signal<ResourceWorkload[]>([]);
+  private readonly _loading = signal<boolean>(false);
+  private readonly _error = signal<string | null>(null);
 
-    return resources.map((u) => {
-      const assignments = this.assignmentsService
-        .getByResourceInRange(u.id, fromIso, toIso)
-        .filter((a) => !projectId || a.projectId === projectId);
+  readonly workloads = this._workloads.asReadonly();
+  readonly loading = this._loading.asReadonly();
+  readonly error = this._error.asReadonly();
+  readonly count = computed(() => this._workloads().length);
 
-      const plannedHours = assignments.reduce(
-        (acc, a) => acc + a.plannedHours,
-        0,
+  async computeWorkloads(
+    opts: ComputeWorkloadsOptions,
+  ): Promise<ResourceWorkload[]> {
+    const { fromIso, toIso } = opts;
+    this._loading.set(true);
+    this._error.set(null);
+    try {
+      // Asegurar usuarios cargados para resolver nombres.
+      if (this.usersService.count() === 0) {
+        await this.usersService.cargar();
+      }
+      const data = await firstValueFrom(
+        this.cargaApi.equipo(fromIso, toIso),
       );
-      const loggedHours = this.loggedHoursService.totalForResourceInRange(
-        u.id,
-        fromIso,
-        toIso,
-      );
-      const activeTaskIds = new Set(assignments.map((a) => a.taskId));
-      const activeTaskCount = activeTaskIds.size;
-      const hasPlan = plannedHours > 0;
-      const utilizationPct = hasPlan
-        ? Math.round((loggedHours / plannedHours) * 100)
-        : 0;
-      const isOverload = hasPlan && loggedHours > plannedHours;
-
-      return {
-        resourceId: u.id,
-        resourceName: `${u.firstName} ${u.lastNamePaternal} ${u.lastNameMaternal}`,
-        resourceRole: "Recurso Técnico",
-        plannedHours,
-        loggedHours,
-        activeTaskCount,
-        utilizationPct,
-        hasPlan,
-        isOverload,
-      };
-    });
+      const users = this.usersService.users();
+      const workloads: ResourceWorkload[] = data.map((c) => {
+        const u = users.find((x) => x.id === c.usuarioId);
+        const name = u
+          ? `${u.firstName} ${u.lastNamePaternal} ${u.lastNameMaternal}`.trim()
+          : c.usuarioId.slice(0, 8);
+        return {
+          resourceId: c.usuarioId,
+          resourceName: name,
+          resourceRole: "Recurso Técnico",
+          plannedHours: c.horasPlanificadas,
+          loggedHours: c.horasRegistradas,
+          activeTaskCount: c.numeroTareasActivas,
+          utilizationPct: c.porcentajeUtilizacion,
+          hasPlan: c.horasPlanificadas > 0,
+          isOverload: c.sobrecarga,
+        };
+      });
+      this._workloads.set(workloads);
+      return workloads;
+    } catch (err) {
+      this._error.set(extractProblemMessage(err));
+      return [];
+    } finally {
+      this._loading.set(false);
+    }
   }
+
 }

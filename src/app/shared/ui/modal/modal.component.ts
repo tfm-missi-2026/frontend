@@ -39,7 +39,7 @@ import { IconXComponent } from "@shared/icons";
       >
         @if (!isFullscreen()) {
           <div
-            class="fixed inset-0 h-full w-full bg-gray-400/50 backdrop-blur-[32px]"
+            class="fixed inset-0 h-full w-full bg-black/15 backdrop-blur-[1px]"
             (click)="onBackdropClick($event)"
           ></div>
         }
@@ -76,7 +76,7 @@ export class UiModalComponent {
   readonly contentClasses = computed<string>(() => {
     const base = this.isFullscreen()
       ? "w-full h-full"
-      : "relative w-full rounded-3xl bg-white dark:bg-gray-900";
+      : "relative w-full rounded-3xl bg-white shadow-theme-xl ring-1 ring-black/5 dark:bg-gray-900 dark:ring-white/10";
     const extra = this.className();
     return extra ? `${base} ${extra}` : base;
   });

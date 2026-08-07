@@ -12,6 +12,8 @@ import { UiBadgeComponent, type BadgeColor } from "@shared/ui/badge";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiLinkComponent } from "@shared/ui/link";
+import { formatShortDate } from "@utils/date";
+import { range } from "@utils/collections";
 
 import {
   SUBPROJECT_PRIORITY_LABELS,
@@ -23,13 +25,6 @@ import {
 } from "../../models/subproject";
 
 const PAGE_SIZE = 6;
-
-function formatShortDate(iso: string): string {
-  if (!iso) return "—";
-  const [y, m, d] = iso.split("-");
-  if (!y || !m || !d) return iso;
-  return `${d}/${m}/${y}`;
-}
 
 const PRIORITY_COLOR: Record<SubprojectPriority, BadgeColor> = {
   Alta: "error",
@@ -100,8 +95,7 @@ export class ProjectsSubprojectsTableComponent {
   );
 
   protected readonly pageNumbers = computed<number[]>(() => {
-    const total = this.totalPages();
-    return Array.from({ length: total }, (_, i) => i + 1);
+    return range(this.totalPages());
   });
 
   constructor() {

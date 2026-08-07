@@ -9,4 +9,15 @@
       <router-outlet></router-outlet>
     </div>
   </div>
+  <UiIconButton
+    variant="secondary"
+    [compact]="true"
+    [Icon]="toggleIcon()"
+    [iconProps]="{ width: 18, height: 18 }"
+    [tooltip]="toggleTooltip()"
+    tooltipSide="right"
+    [style.left]="toggleLeft()"
+    className="fixed top-20 z-50 rounded-full border border-gray-200 bg-white shadow-theme-sm dark:border-gray-700 dark:bg-gray-800 hidden xl:inline-flex transition-all duration-300 ease-in-out"
+    (click)="handleToggle()"
+  />
 </div>

@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   inject,
+  OnInit,
   signal,
 } from "@angular/core";
 import { Router } from "@angular/router";
@@ -13,6 +14,7 @@ import { UiButtonComponent } from "@shared/ui/button";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
+import { matchesSearch } from "@utils/strings";
 
 import {
   ProjectFormModalComponent,
@@ -22,7 +24,7 @@ import { ProjectsToolbarComponent } from "../../components/projects-toolbar/proj
 import type { Project, ProjectStatus } from "../../models/project";
 import { PROJECT_STATUS_OPTIONS } from "../../models/project";
 import type { ProjectFormSavePayload } from "../../models/project-form";
-import { ProjectsMockService } from "../../services/projects-mock.service";
+import { ProjectsService } from "../../services/projects.service";
 
 @Component({
   selector: "ProjectsListPage",
@@ -40,9 +42,13 @@ import { ProjectsMockService } from "../../services/projects-mock.service";
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./projects-list.component.html",
 })
-export class ProjectsListComponent {
+export class ProjectsListComponent implements OnInit {
   private readonly router = inject(Router);
-  private readonly projectsService = inject(ProjectsMockService);
+  private readonly projectsService = inject(ProjectsService);
+
+  ngOnInit(): void {
+    void this.projectsService.cargar();
+  }
 
   protected readonly IconPlusSimpleComponent = IconPlusSimpleComponent;
 
@@ -59,15 +65,11 @@ export class ProjectsListComponent {
   protected readonly filterStatus = signal<ProjectStatus | null>(null);
 
   protected readonly filteredProjects = computed<Project[]>(() => {
-    const term = this.searchTerm().trim().toLowerCase();
+    const term = this.searchTerm();
     const status = this.filterStatus();
     return this.projects().filter((p) => {
       if (status && p.status !== status) return false;
-      if (!term) return true;
-      return (
-        p.code.toLowerCase().includes(term) ||
-        p.name.toLowerCase().includes(term)
-      );
+      return matchesSearch(term, p.code, p.name);
     });
   });
 
@@ -92,16 +94,20 @@ export class ProjectsListComponent {
   }
 
   protected onDeactivate(p: Project): void {
-    this.projectsService.deactivate(p.id);
+    void this.projectsService.deactivate(p.id);
   }
 
-  protected onSaveProject(payload: ProjectFormSavePayload): void {
+  protected async onSaveProject(payload: ProjectFormSavePayload): Promise<void> {
     if (payload.mode === "create") {
-      this.projectsService.create(payload.data);
+      const created = await this.projectsService.create(payload.data);
+      if (created) this.formOpen.set(false);
     } else {
-      this.projectsService.update(payload.id, payload.data);
+      const updated = await this.projectsService.update(
+        payload.id,
+        payload.data,
+      );
+      if (updated) this.formOpen.set(false);
     }
-    this.formOpen.set(false);
   }
 
   protected onSearchChange(value: string): void {

@@ -18,6 +18,7 @@ import { UiDatePickerComponent } from "@shared/ui/date-picker";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiIconButtonComponent } from "@shared/ui/icon-button";
 import { UiLabelComponent } from "@shared/ui/label";
+import { parseIsoDate, toIsoDate } from "@utils/date";
 
 export type TimesheetViewMode = "day" | "range";
 
@@ -45,22 +46,6 @@ const MONTH_NAMES_ES = [
   "noviembre",
   "diciembre",
 ];
-
-function parseIsoDate(iso: string): Date | null {
-  if (!iso) return null;
-  const parts = iso.split("-");
-  if (parts.length !== 3) return null;
-  const [y, m, d] = parts.map(Number);
-  if (!y || !m || !d) return null;
-  return new Date(y, m - 1, d);
-}
-
-function toIsoDate(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
 
 function formatLong(iso: string): string {
   const d = parseIsoDate(iso);

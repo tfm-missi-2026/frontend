@@ -2,7 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
+  OnInit,
   signal,
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -36,9 +38,9 @@ import {
   type SubprojectType,
 } from "../../models/subproject";
 import type { SubprojectFormSavePayload } from "../../models/subproject-form";
-import { ProjectsMockService } from "../../services/projects-mock.service";
-import { SubprojectsMockService } from "../../services/subprojects-mock.service";
-import { UsersMockService } from "@features/users/services/users-mock.service";
+import { ProjectsService } from "../../services/projects.service";
+import { SubprojectsService } from "../../services/subprojects.service";
+import { UsersService } from "@features/users/services/users.service";
 
 @Component({
   selector: "ProjectsSubprojectsListPage",
@@ -58,12 +60,27 @@ import { UsersMockService } from "@features/users/services/users-mock.service";
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./projects-subprojects-list.component.html",
 })
-export class ProjectsSubprojectsListComponent {
+export class ProjectsSubprojectsListComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly projectsService = inject(ProjectsMockService);
-  private readonly subprojectsService = inject(SubprojectsMockService);
-  private readonly usersService = inject(UsersMockService);
+  private readonly projectsService = inject(ProjectsService);
+  private readonly subprojectsService = inject(SubprojectsService);
+  private readonly usersService = inject(UsersService);
+
+  ngOnInit(): void {
+    void this.projectsService.cargar();
+    void this.subprojectsService.cargar();
+  }
+
+  constructor() {
+    // Recarga subproyectos del proyecto cuando cambia el projectId en la URL.
+    effect(() => {
+      const pid = this.projectId();
+      if (pid) {
+        void this.subprojectsService.cargarPorProyecto(pid);
+      }
+    });
+  }
 
   protected readonly IconArrowLeftComponent = IconArrowLeftComponent;
   protected readonly IconPlusSimpleComponent = IconPlusSimpleComponent;
@@ -153,20 +170,24 @@ export class ProjectsSubprojectsListComponent {
   protected onDeactivate(s: Subproject): void {
     const pid = this.projectId();
     if (!pid) return;
-    this.subprojectsService.deactivate(pid, s.id);
+    void this.subprojectsService.deactivate(pid, s.id);
   }
 
-  protected onSave(payload: SubprojectFormSavePayload): void {
+  protected async onSave(payload: SubprojectFormSavePayload): Promise<void> {
     if (payload.mode === "create") {
-      this.subprojectsService.create(payload.projectId, payload.data);
+      const created = await this.subprojectsService.create(
+        payload.projectId,
+        payload.data,
+      );
+      if (created) this.formOpen.set(false);
     } else {
-      this.subprojectsService.update(
+      const updated = await this.subprojectsService.update(
         payload.projectId,
         payload.id,
         payload.data,
       );
+      if (updated) this.formOpen.set(false);
     }
-    this.formOpen.set(false);
   }
 
   protected onSearchChange(value: string): void {
