@@ -9,6 +9,7 @@ import { VariationsService } from "@features/variations/services/variations.serv
 import type { ManagerPeriod } from "@shared/common";
 import type { VariationType } from "@features/variations/models/variation";
 import { formatShortDate } from "@utils/date";
+import { todayIso } from "@utils/date";
 import { extractProblemMessage } from "@utils/problem-detail";
 import { compareIsoDateAsc } from "@utils/collections";
 
@@ -50,7 +51,6 @@ export interface DashboardData {
   upcomingTasks: TodoDueTask[];
 }
 
-const TODAY_ISO = "2026-06-12";
 const SOON_DAYS = 7;
 const UPCOMING_WINDOW_DAYS = 21;
 
@@ -60,7 +60,7 @@ function isoDays(iso: string): number {
 }
 
 function todayUtc(): number {
-  return isoDays(TODAY_ISO);
+  return isoDays(todayIso());
 }
 
 @Injectable({ providedIn: "root" })

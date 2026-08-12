@@ -58,9 +58,24 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((raw: unknown) => {
       const err = raw instanceof HttpErrorResponse ? raw : null;
       if (!err) return throwError(() => raw);
-      const problem = parseProblem(err);
       const isSilent = SILENT_PATHS.some((p) => req.url.includes(p));
-      if (problem && !isSilent) {
+      if (!isSilent && err.status === 0) {
+        // Sin respuesta del servidor (red caida, gateway caido, CORS
+        // bloqueado). `retryInterceptor` ya agoto sus reintentos; aca
+        // solo notificamos al usuario una vez.
+        void import("./toast.service").then(({ ToastService }) => {
+          try {
+            inject(ToastService).error(
+              "No se pudo conectar con el servidor. Verifica tu conexión e intenta nuevamente.",
+              "Sin conexión",
+            );
+          } catch {
+            // Si ToastService no esta disponible (ej. tests), noop.
+          }
+        });
+      }
+      const problem = parseProblem(err);
+      if (problem && !isSilent && err.status !== 0) {
         // Lazy import para no romper el bootstrap si ngx-toastr no esta listo.
         void import("./toast.service").then(({ ToastService }) => {
           try {

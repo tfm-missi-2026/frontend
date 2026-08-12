@@ -84,13 +84,14 @@
         <CommonThemeToggle variant="subtle" />
         <HeaderNotificationDropdown
           [items]="notifications"
-          [notifying]="true"
+          [notifying]="false"
         />
       </UiFlex>
       <HeaderUserDropdown
-        [user]="currentUser"
+        [user]="currentUser()"
         [menuItems]="userMenuItems"
         [actionItem]="signOutItem"
+        (actionClick)="handleSignOut()"
       />
     </div>
   </div>

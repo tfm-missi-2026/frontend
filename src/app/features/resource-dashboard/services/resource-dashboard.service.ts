@@ -15,6 +15,7 @@ import type { VariationType } from "@features/variations/models/variation";
 import { extractProblemMessage } from "@utils/problem-detail";
 import { compareIsoDateAsc } from "@utils/collections";
 import { matchesSearch } from "@utils/strings";
+import { todayIso } from "@utils/date";
 
 export interface ResourceMyTask {
   assignmentId: string;
@@ -52,8 +53,6 @@ export interface ResourceDashboardData {
   todayEntries: TimesheetEntry[];
   todayTotalHours: number;
 }
-
-const TODAY_ISO = "2026-06-12";
 
 const SPANISH_DAY_NAMES = [
   "domingo",
@@ -177,9 +176,10 @@ export class ResourceDashboardService {
         ref: v.target?.ref ?? "",
       }));
 
+    const today = todayIso();
     const todayEntries = this.timesheetService.entriesForResourceOnDate(
       resourceId,
-      TODAY_ISO,
+      today,
     );
     const todayTotalHours = todayEntries.reduce(
       (acc, e) => acc + e.hours,
@@ -191,8 +191,8 @@ export class ResourceDashboardService {
       resourceFullName: fullName,
       firstName,
       greeting: `Buenos días, ${firstName}`,
-      todayIso: TODAY_ISO,
-      todayLabel: this.formatTodayLabel(TODAY_ISO),
+      todayIso: today,
+      todayLabel: this.formatTodayLabel(today),
       period,
       activeTaskCount,
       loggedHoursTotal,

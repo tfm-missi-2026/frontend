@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   input,
+  output,
   signal,
 } from "@angular/core";
 import { NgComponentOutlet } from "@angular/common";
@@ -129,7 +130,7 @@ const ACTION_CLASS =
 
         @if (actionItem(); as action) {
           <UiDropdownItem
-            (itemClick)="closeDropdown()"
+            (itemClick)="handleActionClick(action)"
             [to]="action.to"
             [className]="ACTION_CLASS"
           >
@@ -157,6 +158,9 @@ export class HeaderUserDropdownComponent {
    * renderiza ninguna acción.
    */
   readonly actionItem = input<HeaderUserMenuItem | undefined>(undefined);
+
+  /** Se emite cuando el usuario hace clic en la accion al pie del panel. */
+  readonly actionClick = output<HeaderUserMenuItem>();
 
   /** Estado interno de visibilidad del dropdown. */
   protected readonly isOpen = signal(false);
@@ -186,5 +190,10 @@ export class HeaderUserDropdownComponent {
 
   protected closeDropdown(): void {
     this.isOpen.set(false);
+  }
+
+  protected handleActionClick(action: HeaderUserMenuItem): void {
+    this.closeDropdown();
+    this.actionClick.emit(action);
   }
 }

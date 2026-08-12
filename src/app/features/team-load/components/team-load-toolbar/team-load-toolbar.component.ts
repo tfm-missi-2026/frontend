@@ -14,6 +14,19 @@ import { UiLabelComponent } from "@shared/ui/label";
 import { UiSelectComponent } from "@shared/ui/select";
 import { UiSurfaceComponent } from "@shared/ui/surface";
 import type { SelectOption } from "@shared/ui/select";
+import { todayIso } from "@utils/date";
+
+function mesActual(): { inicio: string; fin: string } {
+  const [y, m] = todayIso().split("-").map(Number);
+  const ultimoDia = new Date(y, m, 0).getDate();
+  const mm = String(m).padStart(2, "0");
+  return {
+    inicio: `${y}-${mm}-01`,
+    fin: `${y}-${mm}-${String(ultimoDia).padStart(2, "0")}`,
+  };
+}
+
+const MES = mesActual();
 
 @Component({
   selector: "TeamLoadToolbar",
@@ -32,8 +45,8 @@ import type { SelectOption } from "@shared/ui/select";
   templateUrl: "./team-load-toolbar.component.html",
 })
 export class TeamLoadToolbarComponent {
-  readonly fromIso = input<string>("2026-05-01");
-  readonly toIso = input<string>("2026-05-31");
+  readonly fromIso = input<string>(MES.inicio);
+  readonly toIso = input<string>(MES.fin);
   readonly projectOptions = input<SelectOption[]>([]);
   readonly projectId = input<string | null>(null);
 

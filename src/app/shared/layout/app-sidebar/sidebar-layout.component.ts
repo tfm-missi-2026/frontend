@@ -101,4 +101,8 @@ export class SidebarLayoutComponent {
       this.sidebarService.setHovered(true);
     }
   }
+
+  protected onSidebarMouseLeave(): void {
+    this.sidebarService.setHovered(false);
+  }
 }

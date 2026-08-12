@@ -14,6 +14,7 @@ import { TeamLoadService } from "@features/team-load/services/team-load.service"
 import type { VariationType } from "@features/variations/models/variation";
 import { extractProblemMessage } from "@utils/problem-detail";
 import { compareIsoDateAsc, compareKeys } from "@utils/collections";
+import { todayIso } from "@utils/date";
 
 export interface AreaProjectStatus {
   projectId: string;
@@ -105,8 +106,15 @@ export class AreaDashboardService {
   }
 
   private _periodoPorDefecto(): { startIso: string; endIso: string } {
-    // Coincide con DEFAULT_PERIODS del toolbar; aqui usamos 2026-05 (mes actual del wireframe).
-    return { startIso: "2026-05-01", endIso: "2026-05-31" };
+    // Mes calendario actual como rango default del dashboard del jefe de area.
+    const hoy = todayIso();
+    const [y, m] = hoy.split("-").map(Number);
+    const ultimoDia = new Date(y, m, 0).getDate();
+    const mm = String(m).padStart(2, "0");
+    return {
+      startIso: `${y}-${mm}-01`,
+      endIso: `${y}-${mm}-${String(ultimoDia).padStart(2, "0")}`,
+    };
   }
 
 

@@ -5,25 +5,34 @@ export interface ManagerPeriod {
   endIso: string;
 }
 
-export const DEFAULT_PERIODS: ManagerPeriod[] = [
-  {
-    id: "2026-q2",
-    label: "2T 2026 · abr–jun",
-    startIso: "2026-04-01",
-    endIso: "2026-06-30",
-  },
-  {
-    id: "2026-q1",
-    label: "1T 2026 · ene–mar",
-    startIso: "2026-01-01",
-    endIso: "2026-03-31",
-  },
-  {
-    id: "2026-q3",
-    label: "3T 2026 · jul–sep",
-    startIso: "2026-07-01",
-    endIso: "2026-09-30",
-  },
-];
+function trimestresCercanos(): ManagerPeriod[] {
+  const hoy = new Date();
+  const mesActual = hoy.getMonth();
+  const trimestreActual = Math.floor(mesActual / 3);
+  const anio = hoy.getFullYear();
 
-export const DEFAULT_PERIOD_ID = "2026-q2";
+  const rangos = [1, 0, 2].map((offset) => {
+    const t = trimestreActual - offset;
+    const ajusteAnio = Math.floor(t / 4);
+    const tAbs = ((t % 4) + 4) % 4;
+    const y = anio + ajusteAnio;
+    const inicioMes = tAbs * 3;
+    const finMes = inicioMes + 2;
+    const mesInicio = String(inicioMes + 1).padStart(2, "0");
+    const mesFin = String(finMes + 1).padStart(2, "0");
+    const finDia = new Date(y, finMes + 1, 0).getDate();
+    const nombreTrimestre = ["1T", "2T", "3T", "4T"][tAbs];
+    return {
+      id: `${y}-q${tAbs + 1}`,
+      label: `${nombreTrimestre} ${y} · ${mesInicio}–${mesFin}`,
+      startIso: `${y}-${mesInicio}-01`,
+      endIso: `${y}-${mesFin}-${String(finDia).padStart(2, "0")}`,
+    };
+  });
+
+  return rangos;
+}
+
+export const DEFAULT_PERIODS: ManagerPeriod[] = trimestresCercanos();
+
+export const DEFAULT_PERIOD_ID = DEFAULT_PERIODS[0].id;

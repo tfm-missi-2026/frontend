@@ -25,8 +25,7 @@ import { UiSurfaceComponent } from "@shared/ui/surface";
 import { MyBitacoraComponent } from "../../components/my-bitacora/my-bitacora.component";
 import { MyTasksListComponent } from "../../components/my-tasks-list/my-tasks-list.component";
 import { ResourceDashboardService } from "../../services/resource-dashboard.service";
-
-const CURRENT_RESOURCE_ID = "u5";
+import { AuthService } from "@core/auth/auth.service";
 
 @Component({
   selector: "ResourceDashboardPage",
@@ -48,6 +47,7 @@ const CURRENT_RESOURCE_ID = "u5";
 })
 export class ResourceDashboardPageComponent implements OnInit {
   private readonly dashboardService = inject(ResourceDashboardService);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
   ngOnInit(): void {
@@ -63,7 +63,7 @@ export class ResourceDashboardPageComponent implements OnInit {
 
   protected readonly dashboard = computed(() =>
     this.dashboardService.computeDashboard(
-      CURRENT_RESOURCE_ID,
+      this.auth.usuario()?.id ?? "",
       this.currentPeriod(),
     ),
   );

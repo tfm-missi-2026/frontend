@@ -16,7 +16,7 @@ import { UiSurfaceComponent } from "@shared/ui/surface";
 import type { SelectOption } from "@shared/ui/select";
 
 import { ProjectsService } from "@features/projects/services/projects.service";
-import { formatDateRange } from "@utils/date";
+import { formatDateRange, todayIso } from "@utils/date";
 
 import {
   TeamLoadSummaryComponent,
@@ -30,7 +30,19 @@ import {
 import type { ResourceWorkload } from "../../models/resource-workload";
 import { TeamLoadService } from "../../services/team-load.service";
 
-const PROJECT_ALL_VALUE = "";@Component({
+const PROJECT_ALL_VALUE = "";
+
+function mesActual(): { inicio: string; fin: string } {
+  const [y, m] = todayIso().split("-").map(Number);
+  const ultimoDia = new Date(y, m, 0).getDate();
+  const mm = String(m).padStart(2, "0");
+  return {
+    inicio: `${y}-${mm}-01`,
+    fin: `${y}-${mm}-${String(ultimoDia).padStart(2, "0")}`,
+  };
+}
+
+@Component({
   selector: "TeamLoadListPage",
   standalone: true,
   imports: [
@@ -55,8 +67,8 @@ export class TeamLoadListComponent implements OnInit {
     { label: "Carga del equipo" },
   ];
 
-  protected readonly fromIso = signal<string>("2026-05-01");
-  protected readonly toIso = signal<string>("2026-05-31");
+  protected readonly fromIso = signal<string>(mesActual().inicio);
+  protected readonly toIso = signal<string>(mesActual().fin);
   protected readonly projectId = signal<string | null>(null);
 
   protected readonly projectOptions = computed<SelectOption[]>(() => {
