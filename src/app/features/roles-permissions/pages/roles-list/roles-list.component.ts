@@ -9,8 +9,6 @@ import {
 
 import { CommonBreadcrumbComponent } from "@shared/common/page-breadcrumb";
 import {
-  IconCheckLargeComponent,
-  IconChevronRightComponent,
   IconEditPencilComponent,
   IconPlusSimpleComponent,
   IconTrashComponent,
@@ -69,10 +67,8 @@ export class RolesListComponent implements OnInit {
   }
 
   protected readonly plusIcon = IconPlusSimpleComponent;
-  protected readonly checkIcon = IconCheckLargeComponent;
   protected readonly pencilIcon = IconEditPencilComponent;
   protected readonly trashIcon = IconTrashComponent;
-  protected readonly chevronIcon = IconChevronRightComponent;
 
   protected readonly breadcrumbItems = [
     { label: "Administración" },
@@ -85,7 +81,6 @@ export class RolesListComponent implements OnInit {
   protected readonly error = this.rolesService.error;
 
   protected readonly selectedId = signal<string | null>(null);
-  protected readonly draftPermissions = signal<string[] | null>(null);
   protected readonly deleteTargetId = signal<string | null>(null);
   protected readonly editTargetId = signal<string | null>(null);
 
@@ -95,9 +90,7 @@ export class RolesListComponent implements OnInit {
     return this.roles().find((r) => r.id === id) ?? null;
   });
 
-  protected readonly effectivePermissions = computed<string[]>(() => {
-    const draft = this.draftPermissions();
-    if (draft) return draft;
+  protected readonly selectedPermissions = computed<string[]>(() => {
     const id = this.selectedId();
     if (!id) return [];
     return this.rolesService.getPermissionsForRole(id);
@@ -112,37 +105,12 @@ export class RolesListComponent implements OnInit {
     return !!r && !r.sistema;
   });
 
-  protected readonly hasChanges = computed<boolean>(
-    () => this.draftPermissions() !== null,
-  );
-
   protected readonly createOpen = signal<boolean>(false);
   protected readonly successAlert = signal<string | null>(null);
 
   protected onSelectRole(id: string): void {
     this.selectedId.set(id);
-    this.draftPermissions.set(null);
     void this.rolesService.loadPermissionsForRole(id);
-  }
-
-  protected onPermissionsChange(next: string[]): void {
-    if (!this.canEditSelected()) return;
-    this.draftPermissions.set(next);
-  }
-
-  protected async onSavePermissions(): Promise<void> {
-    const id = this.selectedId();
-    const draft = this.draftPermissions();
-    if (!id || !draft) return;
-    const ok = await this.rolesService.updatePermissions(id, draft);
-    if (ok) {
-      this.draftPermissions.set(null);
-      this.successAlert.set("Permisos guardados correctamente.");
-    }
-  }
-
-  protected onCancelPermissions(): void {
-    this.draftPermissions.set(null);
   }
 
   protected onCreate(): void {
@@ -159,9 +127,8 @@ export class RolesListComponent implements OnInit {
     if (created) {
       this.createOpen.set(false);
       this.selectedId.set(created.id);
-      this.draftPermissions.set(null);
       this.successAlert.set(
-        `Rol "${created.name}" creado. Asigna sus permisos.`,
+        `Rol "${created.name}" creado. Asigna sus permisos desde Editar.`,
       );
       void this.rolesService.loadPermissionsForRole(created.id);
     }
@@ -178,16 +145,37 @@ export class RolesListComponent implements OnInit {
     nombre: string;
     descripcion: string;
     paginaInicioId: string;
+    permisos: string[];
   }): Promise<void> {
-    const updated = await this.rolesService.update(payload.id, {
-      nombre: payload.nombre,
-      descripcion: payload.descripcion,
-      paginaInicioId: payload.paginaInicioId,
-    });
-    if (updated) {
-      this.editTargetId.set(null);
-      this.successAlert.set(`Rol "${updated.name}" actualizado.`);
+    const id = payload.id;
+    const role = this.selectedRole();
+    if (!role) return;
+    const camposCambiados =
+      payload.nombre !== role.name ||
+      payload.descripcion !== role.description ||
+      payload.paginaInicioId !== (role.paginaInicioId ?? "");
+    const initialPerms = this.selectedPermissions();
+    const permisosCambiados =
+      initialPerms.length !== payload.permisos.length ||
+      initialPerms.some((c) => !payload.permisos.includes(c)) ||
+      payload.permisos.some((c) => !initialPerms.includes(c));
+
+    let updatedName = role.name;
+    if (camposCambiados) {
+      const updated = await this.rolesService.update(id, {
+        nombre: payload.nombre,
+        descripcion: payload.descripcion,
+        paginaInicioId: payload.paginaInicioId,
+      });
+      if (!updated) return;
+      updatedName = updated.name;
     }
+    if (permisosCambiados) {
+      const ok = await this.rolesService.updatePermissions(id, payload.permisos);
+      if (!ok) return;
+    }
+    this.editTargetId.set(null);
+    this.successAlert.set(`Rol "${updatedName}" actualizado.`);
   }
 
   protected onRequestDelete(): void {
@@ -222,7 +210,7 @@ export class RolesListComponent implements OnInit {
   }
 
   protected permissionCountLabel(): string {
-    const count = this.effectivePermissions().length;
+    const count = this.selectedPermissions().length;
     return `${count} de ${this.totalModules()} módulos`;
   }
 }

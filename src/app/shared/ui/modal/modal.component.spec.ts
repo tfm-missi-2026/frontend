@@ -112,7 +112,7 @@ describe("UiModal", () => {
     host.isOpen = true;
     host.className = "max-w-[600px] p-5";
     fixture.detectChanges();
-    expect(host.modal.contentClasses()).toContain("rounded-3xl");
+    expect(host.modal.contentClasses()).toContain("rounded-xl");
     expect(host.modal.contentClasses()).toContain("max-w-[600px]");
   });
 
@@ -121,6 +121,14 @@ describe("UiModal", () => {
     host.isFullscreen = true;
     fixture.detectChanges();
     expect(host.modal.contentClasses()).toContain("h-full");
-    expect(host.modal.contentClasses()).not.toContain("rounded-3xl");
+    expect(host.modal.contentClasses()).not.toContain("rounded-xl");
+  });
+
+  it("respects a custom rounded size when provided", () => {
+    host.isOpen = true;
+    host.className = "rounded-2xl";
+    fixture.detectChanges();
+    expect(host.modal.contentClasses()).toContain("rounded-2xl");
+    expect(host.modal.contentClasses()).not.toContain("rounded-xl");
   });
 });

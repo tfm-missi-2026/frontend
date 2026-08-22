@@ -23,6 +23,9 @@ export interface RoleDeletePayload {
   motivoEliminacion: string;
 }
 
+const MOTIVO_MIN = 5;
+const MOTIVO_MAX = 500;
+
 @Component({
   selector: "RoleConfirmDeleteModal",
   standalone: true,
@@ -47,13 +50,23 @@ export class RoleConfirmDeleteModalComponent {
   readonly confirm = output<RoleDeletePayload>();
 
   protected readonly motivo = signal<string>("");
+  protected readonly motivoTouched = signal<boolean>(false);
+  protected readonly submitAttempted = signal<boolean>(false);
 
   protected readonly motivoError = computed<string | undefined>(() => {
     const m = this.motivo().trim();
-    if (m.length < 5) return "El motivo debe tener al menos 5 caracteres.";
-    if (m.length > 500) return "El motivo no puede superar 500 caracteres.";
+    if (m.length < MOTIVO_MIN)
+      return `El motivo debe tener al menos ${MOTIVO_MIN} caracteres.`;
+    if (m.length > MOTIVO_MAX)
+      return `El motivo no puede superar ${MOTIVO_MAX} caracteres.`;
     return undefined;
   });
+
+  protected readonly visibleMotivoError = computed<string | undefined>(() =>
+    this.motivoTouched() || this.submitAttempted()
+      ? this.motivoError()
+      : undefined,
+  );
 
   protected readonly isValid = computed<boolean>(
     () => this.motivoError() === undefined,
@@ -63,12 +76,19 @@ export class RoleConfirmDeleteModalComponent {
     this.motivo.set(value);
   }
 
+  protected onMotivoBlur(): void {
+    this.motivoTouched.set(true);
+  }
+
   protected onCancel(): void {
     this.motivo.set("");
+    this.motivoTouched.set(false);
+    this.submitAttempted.set(false);
     this.close.emit();
   }
 
   protected onConfirm(): void {
+    this.submitAttempted.set(true);
     const r = this.role();
     if (!r || !this.isValid()) return;
     this.confirm.emit({
@@ -76,5 +96,7 @@ export class RoleConfirmDeleteModalComponent {
       motivoEliminacion: this.motivo().trim(),
     });
     this.motivo.set("");
+    this.motivoTouched.set(false);
+    this.submitAttempted.set(false);
   }
 }

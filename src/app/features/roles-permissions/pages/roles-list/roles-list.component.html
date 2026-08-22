@@ -12,7 +12,7 @@
     <UiButton
       variant="primary"
       [LeftIcon]="plusIcon"
-      labelText="Nuevo rol"
+      label="Nuevo rol"
       (click)="onCreate()"
     />
   </UiFlex>
@@ -30,7 +30,10 @@
     <UiAlert variant="error" [message]="errMsg" />
   }
 
-  <div class="grid grid-cols-1 gap-5 lg:grid-cols-[280px_1fr]">
+  <UiFlex
+    alignItems="start"
+    className="grid gap-5 lg:grid-cols-[280px_1fr]"
+  >
     <div>
       @if (loading()) {
         <UiCard variant="default" padding="lg">
@@ -69,8 +72,8 @@
               <UiLabel
                 type="bodyS"
                 color="textWeak"
-                [text]="role.description"
-                className="mt-2 block max-w-prose"
+                [text]="role.description || 'Sin descripción.'"
+                className="mt-1 block max-w-prose"
               />
             </div>
             <UiFlex direction="row" [gap]="2" alignItems="center">
@@ -84,84 +87,53 @@
               @if (!role.sistema) {
                 <UiButton
                   variant="secondary"
-                  size="sm"
                   [LeftIcon]="pencilIcon"
-                  labelText="Editar"
+                  label="Editar"
                   (click)="onEditRole()"
                 />
                 <UiButton
                   variant="secondary"
-                  size="sm"
                   [LeftIcon]="trashIcon"
-                  labelText="Eliminar"
+                  label="Eliminar"
                   (click)="onRequestDelete()"
                 />
               }
             </UiFlex>
           </UiFlex>
 
-          <div
-            class="mt-6 flex flex-col gap-2 border-t border-dashed border-gray-200 pt-4 dark:border-gray-800 sm:flex-row sm:items-center sm:justify-between"
+          <UiFlex
+            direction="column"
+            [gap]="3"
+            className="mt-5 border-t border-gray-200 pt-4 dark:border-gray-800"
           >
-            <UiLabel
-              type="bodyXs"
-              color="textWeak"
-              weight="medium"
-              className="uppercase tracking-wider"
-              text="Modulos visibles / permisos"
-            />
-            <UiLabel
-              type="bodyXs"
-              color="textWeak"
-              [text]="permissionCountLabel()"
-            />
-          </div>
-          <UiLabel
-            type="bodyS"
-            color="textWeak"
-            className="mt-2 block"
-            text="Marca los modulos del sidebar a los que este rol puede acceder."
-          />
-
-          <div class="mt-4">
-            <PermissionsMatrix
-              [modules]="modulosRaiz()"
-              [selected]="effectivePermissions()"
-              [readonly]="!canEditSelected()"
-              [landingCodigo]="selectedRole()?.paginaInicioCodigo ?? null"
-              (selectedChange)="onPermissionsChange($event)"
-            />
-          </div>
-
-          @if (canEditSelected()) {
-            <UiFlex
-              direction="row"
-              justifyContent="end"
-              [gap]="2"
-              className="mt-6 border-t border-dashed border-gray-200 pt-4 dark:border-gray-800"
-            >
-              <UiButton
-                variant="secondary"
-                labelText="Cancelar"
-                [disabled]="!hasChanges()"
-                (click)="onCancelPermissions()"
+            <UiFlex direction="row" alignItems="center" justifyContent="between">
+              <UiLabel
+                type="bodyXs"
+                color="textWeak"
+                weight="medium"
+                className="uppercase tracking-wider"
+                text="Permisos de módulos"
               />
-              <UiButton
-                variant="primary"
-                [LeftIcon]="checkIcon"
-                labelText="Guardar cambios"
-                [disabled]="!hasChanges()"
-                (click)="onSavePermissions()"
+              <UiLabel
+                type="bodyXs"
+                color="textWeak"
+                [text]="permissionCountLabel()"
               />
             </UiFlex>
-          } @else {
-            <UiLabel
-              type="bodyXs"
-              color="textWeak"
-              className="mt-6 block border-t border-dashed border-gray-200 pt-4 dark:border-gray-800"
-              text="Los roles del sistema son de solo lectura."
+            <PermissionsMatrix
+              [modules]="modulosRaiz()"
+              [selected]="selectedPermissions()"
+              [readonly]="true"
+              [landingCodigo]="selectedRole()?.paginaInicioCodigo ?? null"
             />
-          }
+            @if (role.sistema) {
+              <UiLabel
+                type="bodyXs"
+                color="textWeak"
+                text="Los roles del sistema son de solo lectura."
+              />
+            }
+          </UiFlex>
         </UiCard>
       } @else {
         <UiCard variant="default" padding="lg">
@@ -173,7 +145,7 @@
         </UiCard>
       }
     </div>
-  </div>
+  </UiFlex>
 </UiFlex>
 
 <RoleFormModal
@@ -184,6 +156,8 @@
 
 <RoleEditModal
   [role]="selectedRole()"
+  [modules]="modulosRaiz()"
+  [permisosIniciales]="selectedPermissions()"
   [isOpen]="editTargetId() !== null"
   (close)="editTargetId.set(null)"
   (save)="onSaveEdit($event)"

@@ -13,6 +13,18 @@ import { isPlatformBrowser } from "@angular/common";
 
 import { IconXComponent } from "@shared/icons";
 
+export type UiModalRounded = "none" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
+
+const ROUNDED_CLASS_MAP: Record<UiModalRounded, string> = {
+  none: "",
+  sm: "rounded-sm",
+  md: "rounded-md",
+  lg: "rounded-lg",
+  xl: "rounded-xl",
+  "2xl": "rounded-2xl",
+  "3xl": "rounded-3xl",
+};
+
 /**
  * `UiModal`
  * --------
@@ -70,13 +82,19 @@ export class UiModalComponent {
   readonly showCloseButton = input<boolean>(true);
   /** Modal a pantalla completa (sin backdrop, ocupa el viewport). */
   readonly isFullscreen = input<boolean>(false);
+  /**
+   * Radio de las esquinas del modal. Default: `'xl'` (12px). Usar
+   * `'lg'` (8px) o `'2xl'` (16px) si se necesita otro tamaño.
+   */
+  readonly rounded = input<UiModalRounded>("xl");
 
   readonly close = output<void>();
 
   readonly contentClasses = computed<string>(() => {
+    const radiusClass = ROUNDED_CLASS_MAP[this.rounded()];
     const base = this.isFullscreen()
       ? "w-full h-full"
-      : "relative w-full rounded-3xl bg-white shadow-theme-xl ring-1 ring-black/5 dark:bg-gray-900 dark:ring-white/10";
+      : `relative w-full ${radiusClass} bg-white shadow-theme-xl ring-1 ring-black/5 dark:bg-gray-900 dark:ring-white/10`;
     const extra = this.className();
     return extra ? `${base} ${extra}` : base;
   });
