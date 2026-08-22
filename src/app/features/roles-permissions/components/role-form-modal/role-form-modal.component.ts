@@ -12,11 +12,10 @@ import { FormsModule } from "@angular/forms";
 
 import { LookupsService } from "@core/lookups/lookups.service";
 import { resolverRegistroModulo } from "@core/modulos/modulo.registry";
-import { UiButtonComponent } from "@shared/ui/button";
+import { IconCheckComponent, IconXComponent } from "@shared/icons";
 import { UiFieldErrorComponent } from "@shared/ui/field-error";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiFormLabelComponent } from "@shared/ui/form-label";
-import { UiHeaderComponent } from "@shared/ui/header";
 import { UiInputComponent } from "@shared/ui/input";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
@@ -40,11 +39,11 @@ const DESCRIPTION_MAX = 500;
   standalone: true,
   imports: [
     FormsModule,
-    UiButtonComponent,
+    IconCheckComponent,
+    IconXComponent,
     UiFieldErrorComponent,
     UiFlexComponent,
     UiFormLabelComponent,
-    UiHeaderComponent,
     UiInputComponent,
     UiLabelComponent,
     UiModalComponent,
@@ -59,6 +58,9 @@ export class RoleFormModalComponent {
 
   readonly close = output<void>();
   readonly save = output<RoleFormSavePayload>();
+
+  protected readonly IconCheck = IconCheckComponent;
+  protected readonly IconX = IconXComponent;
 
   private readonly lookups = inject(LookupsService);
 
@@ -200,6 +202,14 @@ export class RoleFormModalComponent {
 
   protected onCancel(): void {
     this.close.emit();
+  }
+
+  protected onAction(side: "left" | "right"): void {
+    if (side === "left") {
+      this.onCancel();
+    } else {
+      this.onSave();
+    }
   }
 
   protected onSave(): void {

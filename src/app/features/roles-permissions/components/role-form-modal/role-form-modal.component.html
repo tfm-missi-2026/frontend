@@ -1,19 +1,25 @@
 <UiModal
   [isOpen]="isOpen()"
-  [showCloseButton]="false"
-  className="max-w-[640px] p-6 lg:p-8"
+  [showCloseButton]="true"
+  [showFooter]="true"
+  [size]="'lg'"
+  title="Nuevo rol"
+  subtitle="Define un rol. Sus permisos de módulo se configuran después de crearlo."
+  [leftAction]="{
+    label: 'Cancelar',
+    variant: 'secondary',
+    icon: IconX
+  }"
+  [rightAction]="{
+    label: 'Crear rol',
+    variant: 'primary',
+    icon: IconCheck,
+    disabled: !isValid()
+  }"
   (close)="onCancel()"
+  (action)="onAction($event)"
 >
   <UiFlex direction="column" [gap]="3">
-    <UiFlex direction="column" [gap]="1">
-      <UiHeader [level]="2" text="Nuevo rol" />
-      <UiLabel
-        type="bodyS"
-        color="textWeak"
-        text="Define un rol. Sus permisos de módulo se configuran después de crearlo."
-      />
-    </UiFlex>
-
     <UiFlex direction="column" [gap]="1">
       <UiFormLabel
         labelText="Código"
@@ -93,21 +99,6 @@
         (blurEvt)="onDescriptionBlur()"
       />
       <UiFieldError [message]="visibleErrors().description" />
-    </UiFlex>
-
-    <UiFlex
-      direction="row"
-      justifyContent="end"
-      [gap]="2"
-      className="mt-2 border-t border-gray-200 pt-3 dark:border-gray-800"
-    >
-      <UiButton variant="secondary" label="Cancelar" (click)="onCancel()" />
-      <UiButton
-        variant="primary"
-        label="Crear rol"
-        [disabled]="!isValid()"
-        (click)="onSave()"
-      />
     </UiFlex>
   </UiFlex>
 </UiModal>

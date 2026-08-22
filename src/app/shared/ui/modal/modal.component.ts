@@ -3,7 +3,6 @@ import {
   Component,
   computed,
   effect,
-  HostListener,
   input,
   output,
   PLATFORM_ID,
@@ -13,91 +12,91 @@ import { isPlatformBrowser } from "@angular/common";
 
 import { IconXComponent } from "@shared/icons";
 
-export type UiModalRounded = "none" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
+import { UiButtonComponent } from "@shared/ui/button";
+import { UiFlexComponent } from "@shared/ui/flex";
+import { UiHeaderComponent } from "@shared/ui/header";
+import { UiLabelComponent } from "@shared/ui/label";
 
-const ROUNDED_CLASS_MAP: Record<UiModalRounded, string> = {
-  none: "",
-  sm: "rounded-sm",
-  md: "rounded-md",
-  lg: "rounded-lg",
-  xl: "rounded-xl",
-  "2xl": "rounded-2xl",
-  "3xl": "rounded-3xl",
-};
+import { UiModalBackdropComponent } from "./modal-backdrop.component";
+import { UiModalShellComponent } from "./modal-shell.component";
+import {
+  MODAL_BODY_CLASSES,
+  MODAL_CLOSE_BUTTON_CLASSES,
+  MODAL_CONTENT_CLASSES,
+  MODAL_FOOTER_CLASSES,
+  MODAL_HEADER_CLASSES,
+  ROUNDED_CLASS_MAP,
+  SIZE_MIN_CLASS_MAP,
+} from "./modal.constants";
+import type {
+  UiModalAction,
+  UiModalFooterAlign,
+  UiModalRounded,
+  UiModalSize,
+} from "./modal.types";
 
-/**
- * `UiModal`
- * --------
- * Modal genérico con backdrop, escape, content projection y botón
- * de cierre opcional. Standalone + OnPush + signal APIs.
- *
- * Características:
- * - Se renderiza solo cuando `isOpen` es `true`.
- * - Si `isFullscreen` es `true`, ocupa toda la pantalla y no tiene
- *   backdrop (no cierra al click fuera).
- * - `showCloseButton` renderiza la X en la esquina superior derecha.
- * - Cierra al pulsar `Escape` o al hacer click en el backdrop.
- * - Maneja `document.body.style.overflow` cuando se abre/cierra.
- */
 @Component({
   selector: "UiModal",
   standalone: true,
-  imports: [IconXComponent],
+  imports: [
+    UiButtonComponent,
+    UiFlexComponent,
+    UiHeaderComponent,
+    UiLabelComponent,
+    UiModalBackdropComponent,
+    UiModalShellComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    @if (isOpen()) {
-      <div
-        class="fixed inset-0 flex items-center justify-center overflow-y-auto modal z-99999"
-      >
-        @if (!isFullscreen()) {
-          <div
-            class="fixed inset-0 h-full w-full bg-black/15 backdrop-blur-[1px]"
-            (click)="onBackdropClick($event)"
-          ></div>
-        }
-        <div [class]="contentClasses()" (click)="onContentClick($event)">
-          @if (showCloseButton()) {
-            <button
-              type="button"
-              (click)="close.emit()"
-              class="absolute right-3 top-3 z-999 flex h-9.5 w-9.5 items-center justify-center rounded-full bg-gray-100 text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white sm:right-6 sm:top-6 sm:h-11 sm:w-11"
-            >
-              <IconX [size]="24" color="currentColor" className="stroke-2" />
-            </button>
-          }
-          <div>
-            <ng-content></ng-content>
-          </div>
-        </div>
-      </div>
-    }
-  `,
+  templateUrl: "./modal.component.html",
 })
 export class UiModalComponent {
-  /** Estado de visibilidad del modal. */
   readonly isOpen = input<boolean>(false);
-  /** Clases extra aplicadas al contenedor del contenido. */
   readonly className = input<string>("");
-  /** Renderiza el botón de cerrar en la esquina. */
   readonly showCloseButton = input<boolean>(true);
-  /** Modal a pantalla completa (sin backdrop, ocupa el viewport). */
   readonly isFullscreen = input<boolean>(false);
-  /**
-   * Radio de las esquinas del modal. Default: `'xl'` (12px). Usar
-   * `'lg'` (8px) o `'2xl'` (16px) si se necesita otro tamaño.
-   */
   readonly rounded = input<UiModalRounded>("xl");
+  readonly size = input<UiModalSize>("lg");
+
+  readonly title = input<string>("");
+  readonly subtitle = input<string>("");
+
+  readonly showFooter = input<boolean>(false);
+  readonly footerAlign = input<UiModalFooterAlign>("between");
+  readonly leftAction = input<UiModalAction | null>(null);
+  readonly rightAction = input<UiModalAction | null>(null);
 
   readonly close = output<void>();
+  readonly action = output<"left" | "right">();
 
   readonly contentClasses = computed<string>(() => {
     const radiusClass = ROUNDED_CLASS_MAP[this.rounded()];
-    const base = this.isFullscreen()
-      ? "w-full h-full"
-      : `relative w-full ${radiusClass} bg-white shadow-theme-xl ring-1 ring-black/5 dark:bg-gray-900 dark:ring-white/10`;
+    const sizeClass = SIZE_MIN_CLASS_MAP[this.size()];
+    const base = [
+      ...MODAL_CONTENT_CLASSES,
+      radiusClass,
+      sizeClass,
+    ].join(" ");
     const extra = this.className();
     return extra ? `${base} ${extra}` : base;
   });
+
+  readonly closeButtonClasses = computed<string>(() =>
+    MODAL_CLOSE_BUTTON_CLASSES.join(" "),
+  );
+
+  readonly headerClasses = computed<string>(() => MODAL_HEADER_CLASSES.join(" "));
+
+  readonly bodyClasses = computed<string>(() => MODAL_BODY_CLASSES.join(" "));
+
+  readonly footerClasses = computed<string>(() => MODAL_FOOTER_CLASSES.join(" "));
+
+  readonly hasFooter = computed<boolean>(
+    () =>
+      this.showFooter() &&
+      (this.leftAction() !== null || this.rightAction() !== null),
+  );
+
+  protected readonly IconX = IconXComponent;
 
   private readonly platformId = inject(PLATFORM_ID);
 
@@ -111,7 +110,7 @@ export class UiModalComponent {
     });
   }
 
-  onBackdropClick(event: MouseEvent): void {
+  onBackdropClick(): void {
     if (!this.isFullscreen()) {
       this.close.emit();
     }
@@ -121,10 +120,11 @@ export class UiModalComponent {
     event.stopPropagation();
   }
 
-  @HostListener("document:keydown.escape")
-  onEscape(): void {
-    if (this.isOpen()) {
-      this.close.emit();
-    }
+  protected onLeftAction(): void {
+    this.action.emit("left");
+  }
+
+  protected onRightAction(): void {
+    this.action.emit("right");
   }
 }

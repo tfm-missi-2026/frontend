@@ -62,8 +62,9 @@ export class UiTableComponent implements OnInit {
   readonly title = input<string | undefined>(undefined);
   readonly description = input<string | undefined>(undefined);
   readonly variant = input<"card" | "flat">("card");
-  readonly searchPlaceholder = input<string>("Search...");
-  readonly emptyText = input<string>("No results found.");
+  readonly searchPlaceholder = input<string>("Buscar…");
+  readonly emptyText = input<string>("Sin resultados.");
+  readonly rangeLabelTemplate = input<string>("Mostrando {from}–{to} de {total}");
   readonly className = input<string>("");
 
   readonly searchable = input<boolean>(false);
@@ -160,16 +161,31 @@ export class UiTableComponent implements OnInit {
     };
   });
 
-  /** Rango "Showing X–Y of Z". */
+  /** Rango "Mostrando X–Y de Z" con plantilla localizable. */
   protected readonly rangeLabel = computed<string>(() => {
     if (!this.paginated()) return "";
     const total = this.total() ?? this.filteredData().length;
-    if (!total) return "Showing 0 of 0";
+    if (!total) return this.rangeLabelTemplate()
+      .replace("{from}", "0")
+      .replace("{to}", "0")
+      .replace("{total}", "0");
     const size = Math.max(1, this.pageSize());
     const start = (this.currentPage() - 1) * size + 1;
     const end = Math.min(start + size - 1, total);
-    return `Showing ${start}–${end} of ${total}`;
+    return this.rangeLabelTemplate()
+      .replace("{from}", String(start))
+      .replace("{to}", String(end))
+      .replace("{total}", String(total));
   });
+
+  /** Etiqueta de página actual, p.ej. "Página 1 de 3". */
+  readonly pageLabelTemplate = input<string>("Página {page} de {total}");
+
+  protected readonly pageLabel = computed<string>(() =>
+    this.pageLabelTemplate()
+      .replace("{page}", String(this.currentPage()))
+      .replace("{total}", String(this.totalPages())),
+  );
 
   ngOnInit(): void {
     this.searchTerm.set(this.initialSearchTerm());
@@ -195,9 +211,11 @@ export class UiTableComponent implements OnInit {
   /** Clases del header de una columna. */
   protected thClass(col: TableColumn): string {
     return [
-      "px-4 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400",
+      "px-4 py-3 font-semibold text-gray-700 uppercase tracking-wider text-xs text-start",
+      "bg-gray-50 border-b border-gray-200 dark:bg-white/[0.02] dark:border-white/[0.05] dark:text-gray-300",
       col.align === "center" ? "text-center" : "",
       col.align === "end" ? "text-end" : "",
+      col.sortable ? "cursor-pointer select-none hover:text-brand-600 dark:hover:text-brand-400" : "",
       this.widthClass(col.width),
       col.headerClassName ?? "",
     ]

@@ -109,15 +109,27 @@ export class RolesService {
 
   async loadPermissionsForRole(rolId: string): Promise<string[]> {
     if (this.lookups.getModulosPorRol(rolId).length > 0) {
-      return this.getPermissionsForRole(rolId);
+      const codigos = this.getPermissionsForRole(rolId);
+      this.syncRolePermissions(rolId, codigos);
+      return codigos;
     }
     try {
       const modulos = await this.lookups.loadModulesForRole(rolId);
-      return modulos.map((m) => m.codigo);
+      const codigos = modulos
+        .filter((m) => m.tipo !== "SECTION")
+        .map((m) => m.codigo);
+      this.syncRolePermissions(rolId, codigos);
+      return codigos;
     } catch {
       this._error.set("Error al cargar permisos del rol");
       return [];
     }
+  }
+
+  private syncRolePermissions(rolId: string, codigos: string[]): void {
+    this._roles.update((arr) =>
+      arr.map((r) => (r.id === rolId ? { ...r, permissions: codigos } : r)),
+    );
   }
 
   async create(data: RoleFormData): Promise<Role | null> {
@@ -213,6 +225,7 @@ export class RolesService {
   getPermissionsForRole(rolId: string): string[] {
     return this.lookups
       .getModulosPorRol(rolId)
+      .filter((m) => m.tipo !== "SECTION")
       .map((m) => m.codigo);
   }
 

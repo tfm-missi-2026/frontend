@@ -34,7 +34,7 @@
     alignItems="start"
     className="grid gap-5 lg:grid-cols-[280px_1fr]"
   >
-    <div>
+    <UiFlex direction="column" [gap]="3" className="min-w-0">
       @if (loading()) {
         <UiCard variant="default" padding="lg">
           <UiLabel
@@ -51,9 +51,9 @@
           (select)="onSelectRole($event)"
         />
       }
-    </div>
+    </UiFlex>
 
-    <div>
+    <UiFlex direction="column" [gap]="3" className="min-w-0">
       @if (selectedRole(); as role) {
         <UiCard variant="default" padding="lg" className="h-full">
           <UiFlex
@@ -63,7 +63,13 @@
             [gap]="3"
             className="flex-wrap"
           >
-            <div class="min-w-0 flex-1">
+            <UiFlex
+              direction="column"
+              [gap]="1"
+              [flex]="'1'"
+              [shrinkable]="true"
+              className="min-w-0"
+            >
               <UiHeader
                 [level]="2"
                 [text]="role.name"
@@ -75,7 +81,7 @@
                 [text]="role.description || 'Sin descripción.'"
                 className="mt-1 block max-w-prose"
               />
-            </div>
+            </UiFlex>
             <UiFlex direction="row" [gap]="2" alignItems="center">
               <UiBadge
                 [variant]="role.sistema ? 'light' : 'light'"
@@ -84,7 +90,7 @@
               >
                 {{ role.code }}
               </UiBadge>
-              @if (!role.sistema) {
+              @if (canEditCamposSelected()) {
                 <UiButton
                   variant="secondary"
                   [LeftIcon]="pencilIcon"
@@ -97,15 +103,20 @@
                   label="Eliminar"
                   (click)="onRequestDelete()"
                 />
+              } @else if (canEditPermisosSelected()) {
+                <UiButton
+                  variant="secondary"
+                  [LeftIcon]="pencilIcon"
+                  label="Editar permisos"
+                  (click)="onEditRole()"
+                />
               }
             </UiFlex>
           </UiFlex>
 
-          <UiFlex
-            direction="column"
-            [gap]="3"
-            className="mt-5 border-t border-gray-200 pt-4 dark:border-gray-800"
-          >
+          <UiSeparator className="mt-5" />
+
+          <UiFlex direction="column" [gap]="3">
             <UiFlex direction="row" alignItems="center" justifyContent="between">
               <UiLabel
                 type="bodyXs"
@@ -130,7 +141,7 @@
               <UiLabel
                 type="bodyXs"
                 color="textWeak"
-                text="Los roles del sistema son de solo lectura."
+                text="Los roles del sistema son de solo lectura en sus datos (nombre, descripción, página de inicio), pero puedes ajustar los módulos del sidebar desde 'Editar permisos'."
               />
             }
           </UiFlex>
@@ -144,7 +155,7 @@
           />
         </UiCard>
       }
-    </div>
+    </UiFlex>
   </UiFlex>
 </UiFlex>
 
@@ -158,6 +169,7 @@
   [role]="selectedRole()"
   [modules]="modulosRaiz()"
   [permisosIniciales]="selectedPermissions()"
+  [camposReadonly]="!canEditCamposSelected()"
   [isOpen]="editTargetId() !== null"
   (close)="editTargetId.set(null)"
   (save)="onSaveEdit($event)"

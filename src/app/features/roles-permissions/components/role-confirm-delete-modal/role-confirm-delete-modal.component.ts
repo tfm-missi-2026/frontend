@@ -7,11 +7,10 @@ import {
   signal,
 } from "@angular/core";
 
-import { UiButtonComponent } from "@shared/ui/button";
+import { IconTrashComponent, IconXComponent } from "@shared/icons";
 import { UiFieldErrorComponent } from "@shared/ui/field-error";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiFormLabelComponent } from "@shared/ui/form-label";
-import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
 import { UiTextAreaComponent } from "@shared/ui/text-area";
@@ -30,11 +29,11 @@ const MOTIVO_MAX = 500;
   selector: "RoleConfirmDeleteModal",
   standalone: true,
   imports: [
-    UiButtonComponent,
+    IconTrashComponent,
+    IconXComponent,
     UiFieldErrorComponent,
     UiFlexComponent,
     UiFormLabelComponent,
-    UiHeaderComponent,
     UiLabelComponent,
     UiModalComponent,
     UiTextAreaComponent,
@@ -48,6 +47,16 @@ export class RoleConfirmDeleteModalComponent {
 
   readonly close = output<void>();
   readonly confirm = output<RoleDeletePayload>();
+
+  protected readonly IconTrash = IconTrashComponent;
+  protected readonly IconX = IconXComponent;
+
+  protected readonly subtitleText = computed<string>(() => {
+    const r = this.role();
+    return r
+      ? `Vas a eliminar el rol ${r.name}. Esta acción no se puede deshacer.`
+      : "";
+  });
 
   protected readonly motivo = signal<string>("");
   protected readonly motivoTouched = signal<boolean>(false);
@@ -85,6 +94,14 @@ export class RoleConfirmDeleteModalComponent {
     this.motivoTouched.set(false);
     this.submitAttempted.set(false);
     this.close.emit();
+  }
+
+  protected onAction(side: "left" | "right"): void {
+    if (side === "left") {
+      this.onCancel();
+    } else {
+      this.onConfirm();
+    }
   }
 
   protected onConfirm(): void {

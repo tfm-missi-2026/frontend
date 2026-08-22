@@ -17,26 +17,82 @@
     />
   </UiFlex>
 
-  <UsersToolbar
-    [searchTerm]="searchTerm()"
-    [rolValue]="filterRol()"
-    [statusValue]="filterStatus()"
-    [rolOptions]="rolOptions"
-    [statusOptions]="statusOptions"
-    (searchChange)="searchTerm.set($event)"
-    (rolChange)="onRolChange($event)"
-    (statusChange)="onStatusChange($event)"
-  />
+  @if (successAlert(); as msg) {
+    <UiAlert
+      variant="success"
+      [message]="msg"
+      className="cursor-pointer"
+      (click)="onDismissAlert()"
+    />
+  }
 
-  <UsersTable
-    [users]="filteredUsers()"
-    (edit)="openEdit($event)"
-    (resetPassword)="openResetPassword($event)"
-    (deactivate)="onDeactivate($event)"
-    (clearFilters)="onClearFilters()"
-    (create)="openCreate()"
-  />
+  @if (errorMessage(); as msg) {
+    <UiAlert variant="error" [message]="msg" />
+  }
+
+  <UiFlex direction="row" [gap]="3" className="flex-wrap">
+    <UiSelect
+      inputId="filtro-rol"
+      [options]="rolOptions"
+      [searchable]="false"
+      [isClearable]="true"
+      placeholder="Rol: Todos"
+      [width]="'180px'"
+      [ngModel]="filterRol()"
+      (ngModelChange)="onRolChange($event)"
+    />
+    <UiSelect
+      inputId="filtro-estado"
+      [options]="statusOptions"
+      [searchable]="false"
+      [isClearable]="true"
+      placeholder="Estado: Todos"
+      [width]="'170px'"
+      [ngModel]="filterStatus()"
+      (ngModelChange)="onStatusChange($event)"
+    />
+  </UiFlex>
+
+  <UiTable
+    [columns]="tableColumns()"
+    [data]="filteredUsers()"
+    [searchable]="true"
+    [searchPlaceholder]="'Buscar por nombre o correo…'"
+    [paginated]="true"
+    [pageSize]="8"
+    [emptyText]="'No hay usuarios que coincidan con los filtros.'"
+    (searchChange)="searchTerm.set($event)"
+  ></UiTable>
 </UiFlex>
+
+<!-- Templates de celda para UiTable (referenciados por tableColumns) -->
+<ng-template #nombreCell let-u>
+  <span class="font-semibold text-gray-800 dark:text-white/90">
+    {{ fullName(u) }}
+  </span>
+</ng-template>
+
+<ng-template #rolCell let-u>
+  <UiBadge variant="light" color="primary" size="sm">
+    {{ roleLabel(u.role) }}
+  </UiBadge>
+</ng-template>
+
+<ng-template #estadoCell let-u>
+  @if (u.status === "active") {
+    <UiBadge variant="light" color="success" size="sm">
+      <span class="mr-1 text-success-500">●</span> Activo
+    </UiBadge>
+  } @else {
+    <UiBadge variant="light" color="error" size="sm">
+      <span class="mr-1 text-error-500">○</span> Inactivo
+    </UiBadge>
+  }
+</ng-template>
+
+<ng-template #emptyCell>
+  <UiLabel type="bodyS" color="textWeak" text="—" />
+</ng-template>
 
 <UserFormModal
   [isOpen]="formOpen()"

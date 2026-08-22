@@ -20,6 +20,7 @@ import { UiCardComponent } from "@shared/ui/card";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
+import { UiSeparatorComponent } from "@shared/ui/separator";
 
 import { PermissionsMatrixComponent } from "../../components/permissions-matrix/permissions-matrix.component";
 import { RoleConfirmDeleteModalComponent } from "../../components/role-confirm-delete-modal/role-confirm-delete-modal.component";
@@ -46,6 +47,7 @@ import { RolesService } from "../../services/roles.service";
     UiFlexComponent,
     UiHeaderComponent,
     UiLabelComponent,
+    UiSeparatorComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./roles-list.component.html",
@@ -100,9 +102,13 @@ export class RolesListComponent implements OnInit {
     () => this.modulosRaiz().length,
   );
 
-  protected readonly canEditSelected = computed<boolean>(() => {
+  protected readonly canEditCamposSelected = computed<boolean>(() => {
     const r = this.selectedRole();
     return !!r && !r.sistema;
+  });
+
+  protected readonly canEditPermisosSelected = computed<boolean>(() => {
+    return !!this.selectedRole();
   });
 
   protected readonly createOpen = signal<boolean>(false);
@@ -136,7 +142,7 @@ export class RolesListComponent implements OnInit {
 
   protected onEditRole(): void {
     const r = this.selectedRole();
-    if (!r || r.sistema) return;
+    if (!r || !this.canEditPermisosSelected()) return;
     this.editTargetId.set(r.id);
   }
 
@@ -150,10 +156,11 @@ export class RolesListComponent implements OnInit {
     const id = payload.id;
     const role = this.selectedRole();
     if (!role) return;
-    const camposCambiados =
-      payload.nombre !== role.name ||
-      payload.descripcion !== role.description ||
-      payload.paginaInicioId !== (role.paginaInicioId ?? "");
+    const camposReadonly = !this.canEditCamposSelected();
+    const camposCambiados = !camposReadonly &&
+      (payload.nombre !== role.name ||
+        payload.descripcion !== role.description ||
+        payload.paginaInicioId !== (role.paginaInicioId ?? ""));
     const initialPerms = this.selectedPermissions();
     const permisosCambiados =
       initialPerms.length !== payload.permisos.length ||
@@ -175,7 +182,11 @@ export class RolesListComponent implements OnInit {
       if (!ok) return;
     }
     this.editTargetId.set(null);
-    this.successAlert.set(`Rol "${updatedName}" actualizado.`);
+    this.successAlert.set(
+      camposReadonly
+        ? `Permisos del rol "${updatedName}" actualizados.`
+        : `Rol "${updatedName}" actualizado.`,
+    );
   }
 
   protected onRequestDelete(): void {
