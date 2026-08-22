@@ -1,0 +1,79 @@
+<UiSurface
+  variant="neutral"
+  padding="md"
+  className="border-2 border-gray-300 dark:border-gray-700"
+>
+  <UiFlex direction="column" [gap]="12">
+    <UiFlex direction="column" [gap]="4">
+      <UiHeader [level]="4" text="Mi bitácora" />
+      <UiLabel type="bodyS" color="textWeak" [text]="todayLabel()" />
+    </UiFlex>
+
+    @if (!hasEntries()) {
+      <UiLabel type="bodyS" color="textWeak" className="italic">
+        Sin bloques registrados hoy.
+      </UiLabel>
+    } @else {
+      @for (e of entries(); track e.id; let last = $last) {
+        <UiFlex
+          direction="row"
+          alignItems="center"
+          [gap]="12"
+          [className]="
+            last
+              ? 'w-full'
+              : 'w-full pb-2 border-b border-dashed border-gray-200 dark:border-gray-800'
+          "
+        >
+          <UiLabel
+            type="bodyXs"
+            weight="bold"
+            color="textWeak"
+            className="font-mono whitespace-nowrap min-w-20"
+            [text]="blockTime(e)"
+          />
+          <UiBadge
+            variant="light"
+            [color]="e.kind === 'task' ? 'info' : 'light'"
+            size="sm"
+          >
+            {{ kindLabel(e) }}
+          </UiBadge>
+          <UiLabel
+            type="bodyS"
+            weight="semibold"
+            color="textStrong"
+            className="flex-1 min-w-0 truncate"
+            [text]="blockTitle(e)"
+          />
+          <UiLabel
+            type="bodyXs"
+            weight="medium"
+            color="textWeak"
+            className="font-mono whitespace-nowrap"
+          >
+            {{ e.hours }}h
+          </UiLabel>
+        </UiFlex>
+      }
+    }
+
+    <UiFlex direction="row" alignItems="center" [gap]="4" className="pt-2">
+      <IconClock [size]="14" />
+      <UiLabel type="bodyXs" weight="bold" color="textStrong">
+        Total del día:
+      </UiLabel>
+      <UiLabel type="bodyXs" weight="bold" color="textStrong" className="font-mono">
+        {{ totalHours() }}h
+      </UiLabel>
+    </UiFlex>
+
+    <UiButton
+      variant="primary"
+      label="Registrar bloque"
+      labelText="Registrar bloque"
+      [LeftIcon]="IconPlusSimpleComponent"
+      (click)="onRegister()"
+    />
+  </UiFlex>
+</UiSurface>

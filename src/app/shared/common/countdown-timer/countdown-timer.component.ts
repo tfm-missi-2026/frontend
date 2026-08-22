@@ -13,6 +13,7 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { interval } from "rxjs";
 
 import { UiFlexComponent } from "@shared/ui/flex";
+import { UiLabelComponent } from "@shared/ui/label";
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 const MS_PER_HOUR = 1000 * 60 * 60;
@@ -69,42 +70,42 @@ function computeTimeLeft(target: Date): CommonCountdownTime {
 @Component({
   selector: "CommonCountdown",
   standalone: true,
-  imports: [UiFlexComponent],
+  imports: [UiFlexComponent, UiLabelComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <UiFlex
       [noWrap]="true"
       alignItems="center"
-      gap="0.75rem"
+      [gap]="3"
       className="rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900"
     >
-      <div class="text-center">
-        <div class="text-3xl font-semibold text-gray-800 dark:text-white/90">
+      <UiFlex direction="column" alignItems="center" [gap]="0">
+        <UiLabel type="HeadingL" color="textStrong" className="font-semibold">
           {{ timeLeft().days }}
-        </div>
-        <div class="text-xs text-gray-500 dark:text-gray-400">days</div>
-      </div>
-      <span class="text-2xl text-gray-300">:</span>
-      <div class="text-center">
-        <div class="text-3xl font-semibold text-gray-800 dark:text-white/90">
+        </UiLabel>
+        <UiLabel type="bodyXs" color="textWeak">days</UiLabel>
+      </UiFlex>
+      <UiLabel type="HeadingM" color="textWeak">:</UiLabel>
+      <UiFlex direction="column" alignItems="center" [gap]="0">
+        <UiLabel type="HeadingL" color="textStrong" className="font-semibold">
           {{ timeLeft().hours }}
-        </div>
-        <div class="text-xs text-gray-500 dark:text-gray-400">hours</div>
-      </div>
-      <span class="text-2xl text-gray-300">:</span>
-      <div class="text-center">
-        <div class="text-3xl font-semibold text-gray-800 dark:text-white/90">
+        </UiLabel>
+        <UiLabel type="bodyXs" color="textWeak">hours</UiLabel>
+      </UiFlex>
+      <UiLabel type="HeadingM" color="textWeak">:</UiLabel>
+      <UiFlex direction="column" alignItems="center" [gap]="0">
+        <UiLabel type="HeadingL" color="textStrong" className="font-semibold">
           {{ timeLeft().minutes }}
-        </div>
-        <div class="text-xs text-gray-500 dark:text-gray-400">min</div>
-      </div>
-      <span class="text-2xl text-gray-300">:</span>
-      <div class="text-center">
-        <div class="text-3xl font-semibold text-gray-800 dark:text-white/90">
+        </UiLabel>
+        <UiLabel type="bodyXs" color="textWeak">min</UiLabel>
+      </UiFlex>
+      <UiLabel type="HeadingM" color="textWeak">:</UiLabel>
+      <UiFlex direction="column" alignItems="center" [gap]="0">
+        <UiLabel type="HeadingL" color="textStrong" className="font-semibold">
           {{ timeLeft().seconds }}
-        </div>
-        <div class="text-xs text-gray-500 dark:text-gray-400">sec</div>
-      </div>
+        </UiLabel>
+        <UiLabel type="bodyXs" color="textWeak">sec</UiLabel>
+      </UiFlex>
     </UiFlex>
   `,
 })

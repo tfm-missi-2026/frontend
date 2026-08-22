@@ -1,0 +1,85 @@
+<UiFlex direction="column" [gap]="20">
+  <CommonBreadcrumb
+    [items]="[{ label: 'Operación' }, { label: 'Dashboard Recurso' }]"
+  />
+
+  <UiFlex
+    direction="row"
+    alignItems="end"
+    justifyContent="between"
+    [gap]="12"
+    className="flex-wrap"
+  >
+    <UiFlex direction="column" [gap]="6" className="flex-1 min-w-60">
+      <UiHeader [level]="1" [text]="dashboard().greeting" />
+      <UiLabel type="bodyS" color="textWeak">
+        Mi trabajo · periodo
+        <strong class="font-semibold text-gray-800 dark:text-white/90">
+          {{ currentPeriod().label }}
+        </strong>
+        · {{ dashboard().activeTaskCount }} tareas activas.
+      </UiLabel>
+    </UiFlex>
+    <CommonPeriodSelector
+      [periods]="periods"
+      [periodId]="periodId()"
+      (periodChange)="onPeriodChange($event)"
+    />
+  </UiFlex>
+
+  <UiGrid [columns]="4" gap="gap-4">
+    <CommonKpiCard
+      label="Mis tareas activas"
+      [value]="dashboard().activeTaskCount"
+      sub="asignadas en el período"
+      linkLabel="Ir a Seguimiento →"
+      (linkClick)="onKpiClick('/app/seguimiento/mi-bitacora')"
+    />
+    <CommonKpiCard
+      label="Horas registradas"
+      [value]="dashboard().loggedHoursTotal"
+      valueSuffix="h"
+      sub="en el período"
+      linkLabel="Ver mi bitácora →"
+      (linkClick)="onKpiClick('/app/seguimiento/mi-bitacora')"
+    />
+    <CommonKpiCard
+      [alert]="dashboard().isOverload"
+      label="Mi utilización"
+      [value]="dashboard().utilizationPct"
+      valueSuffix="%"
+      sub="registradas ÷ planificadas · línea = 100%"
+      [progressPct]="dashboard().utilizationPct"
+    />
+    <CommonKpiCard
+      label="Variaciones reportadas"
+      [value]="dashboard().variationsTotal"
+      sub="reportadas por mí"
+      linkLabel="Ver variaciones →"
+      (linkClick)="onKpiClick('/app/operacion/variaciones')"
+    />
+  </UiGrid>
+
+  <UiGrid [columns]="2" gap="gap-5">
+    <MyTasksList [tasks]="dashboard().myTasks" />
+    <MyBitacora
+      [todayLabel]="dashboard().todayLabel"
+      [entries]="dashboard().todayEntries"
+      [totalHours]="dashboard().todayTotalHours"
+      (registerBlock)="onRegisterBlock()"
+    />
+  </UiGrid>
+
+  <UiSurface
+    variant="neutral"
+    padding="md"
+    className="border-dashed max-w-160"
+  >
+    <UiLabel type="bodyS" color="textWeak">
+      El dashboard
+      <strong class="font-semibold text-gray-800 dark:text-white/90">solo agrega y enlaza</strong>
+      : muestra indicadores tomados de Planificación, Bitácora y Variaciones.
+      La captura y edición ocurre en cada módulo.
+    </UiLabel>
+  </UiSurface>
+</UiFlex>

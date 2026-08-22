@@ -1,0 +1,91 @@
+<UiFlex
+  direction="row"
+  alignItems="center"
+  [gap]="16"
+  className="flex-wrap"
+>
+  <CommonTabGroup
+    [tabs]="viewTabs"
+    [selectedId]="mode()"
+    [fullWidth]="false"
+    size="sm"
+    ariaLabel="Vista de bitácora"
+    (selectedChange)="modeChange.emit($event)"
+  />
+
+  @if (mode() === "day") {
+    <UiFlex direction="row" alignItems="center" [gap]="0">
+      <UiIconButton
+        [Icon]="IconChevronLeftComponent"
+        variant="tertiary"
+        [compact]="true"
+        labelText="Día anterior"
+        (click)="onPrev()"
+      />
+      <UiFlex
+        direction="column"
+        alignItems="center"
+        justifyContent="center"
+        [gap]="0"
+        className="border-x border-gray-200 px-5 py-1 dark:border-gray-700 min-w-30"
+      >
+        <UiLabel type="bodyS" weight="semibold" color="textStrong">
+          {{ displayLabel() }}
+        </UiLabel>
+        <UiLabel type="bodyXs" color="textWeak">
+          {{ dowLabel() }}
+        </UiLabel>
+      </UiFlex>
+      <UiIconButton
+        [Icon]="IconChevronRightComponent"
+        variant="tertiary"
+        [compact]="true"
+        labelText="Día siguiente"
+        (click)="onNext()"
+      />
+    </UiFlex>
+  } @else {
+    <UiFlex direction="row" alignItems="center" [gap]="0">
+      <UiIconButton
+        [Icon]="IconChevronLeftComponent"
+        variant="tertiary"
+        [compact]="true"
+        labelText="Rango anterior"
+        (click)="onPrev()"
+      />
+      <UiFlex
+        direction="column"
+        alignItems="center"
+        justifyContent="center"
+        [gap]="0"
+        className="border-x border-gray-200 px-5 py-1 dark:border-gray-700 min-w-45"
+      >
+        <UiLabel type="bodyS" weight="semibold" color="textStrong">
+          {{ rangeLabel() }}
+        </UiLabel>
+      </UiFlex>
+      <UiIconButton
+        [Icon]="IconChevronRightComponent"
+        variant="tertiary"
+        [compact]="true"
+        labelText="Rango siguiente"
+        (click)="onNext()"
+      />
+    </UiFlex>
+  }
+
+  @if (mode() === "range") {
+    <UiDatePicker
+      className="w-44"
+      mode="range"
+      placeholder="Seleccionar rango"
+      [value]="range()"
+      (valueChange)="rangeChange.emit(asStringArray($event))"
+    />
+  }
+
+  <UiFlex direction="row" [gap]="0" className="flex-1" />
+  <UiLabel type="bodyXs" color="textWeak">
+    Hoy: {{ todayLabel() }}
+  </UiLabel>
+</UiFlex>

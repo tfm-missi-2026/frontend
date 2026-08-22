@@ -1,0 +1,26 @@
+<div
+  class="grid grid-cols-1 gap-2.5 sm:grid-cols-2 md:gap-x-6"
+  role="group"
+  aria-label="Módulos visibles / permisos"
+>
+  @for (m of modules(); track m.id) {
+    <label
+      class="flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-2.5 text-sm transition-colors"
+      [class]="cellClasses(m.codigo)"
+    >
+      <UiCheckbox
+        [checked]="isEnabled(m.codigo)"
+        [disabled]="readonly()"
+        (checkedChange)="onToggle(m.codigo, $event)"
+      />
+      <span
+        class="flex-1 font-medium text-gray-800 dark:text-white/90"
+      >
+        {{ m.nombre }}
+      </span>
+      @if (isLanding(m.codigo)) {
+        <UiBadge variant="light" color="primary" size="sm">Inicio</UiBadge>
+      }
+    </label>
+  }
+</div>

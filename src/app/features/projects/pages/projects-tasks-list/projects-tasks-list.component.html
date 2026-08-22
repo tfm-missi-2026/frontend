@@ -1,0 +1,184 @@
+<UiFlex direction="column" [gap]="20">
+  <UiFlex
+    direction="row"
+    alignItems="center"
+    justifyContent="between"
+    [gap]="12"
+    className="flex-wrap"
+  >
+    <CommonBreadcrumb [items]="breadcrumbItems()" />
+    <UiButton
+      variant="tertiary"
+      label="Volver a subproyectos"
+      labelText="Volver a subproyectos"
+      [LeftIcon]="IconArrowLeftComponent"
+      (click)="goBack()"
+    />
+  </UiFlex>
+
+  @if (subproject(); as s) {
+    <ProjectsTasksHeader
+      [subproject]="s"
+      [projectName]="project()?.name ?? ''"
+    />
+
+    <UiFlex
+      direction="row"
+      alignItems="end"
+      justifyContent="between"
+      [gap]="12"
+      className="flex-wrap"
+    >
+      <UiHeader [level]="2" text="Tareas" />
+      <UiButton
+        variant="primary"
+        label="Nueva tarea"
+        labelText="Nueva tarea"
+        [LeftIcon]="IconPlusSimpleComponent"
+        (click)="openCreate()"
+      />
+    </UiFlex>
+
+    <ProjectsTasksToolbar
+      [searchTerm]="searchTerm()"
+      [situationValue]="filterSituation()"
+      [situationOptions]="situationOptions"
+      (searchChange)="onSearchChange($event)"
+      (situationChange)="onSituationChange($event)"
+      (clearFilters)="onClearFilters()"
+    />
+
+    @if (visibleTasks().length === 0) {
+      <UiSurface
+        variant="neutral"
+        padding="lg"
+        className="border-dashed text-center"
+      >
+        <UiFlex
+          direction="column"
+          alignItems="center"
+          [gap]="12"
+        >
+          <UiFlex
+            direction="row"
+            alignItems="center"
+            justifyContent="center"
+            [gap]="0"
+            className="h-14 w-14 rounded-lg bg-gray-100 dark:bg-gray-800"
+          >
+            <UiLabel type="HeadingM" color="textWeak">∅</UiLabel>
+          </UiFlex>
+          <UiHeader [level]="4" text="Este subproyecto aún no tiene tareas." />
+          <UiLabel type="bodyS" color="textWeak">
+            Crea la primera tarea con sus fechas planificadas y horas estimadas.
+          </UiLabel>
+          <UiButton
+            variant="primary"
+            label="Nueva tarea"
+            labelText="Nueva tarea"
+            [LeftIcon]="IconPlusSimpleComponent"
+            (click)="openCreate()"
+          />
+        </UiFlex>
+      </UiSurface>
+    } @else {
+      <ProjectsTasksTable
+        [tasks]="visibleTasks()"
+        (edit)="onEdit($event)"
+        (deactivate)="onDeactivate($event)"
+      />
+
+      <UiSurface
+        variant="neutral"
+        padding="md"
+        className="border-dashed"
+      >
+        <UiFlex
+          direction="row"
+          alignItems="center"
+          justifyContent="between"
+          [gap]="12"
+          className="flex-wrap"
+        >
+          <UiFlex
+            direction="row"
+            alignItems="center"
+            [gap]="8"
+            className="flex-wrap"
+          >
+            <UiLabel type="bodyXs" color="textWeak">Situación:</UiLabel>
+            <UiBadge variant="light" color="light" size="sm">
+              <UiLabel type="bodyXs" className="mr-1">○</UiLabel>
+              Pendiente
+            </UiBadge>
+            <UiBadge variant="light" color="info" size="sm">
+              <UiLabel type="bodyXs" className="mr-1">◐</UiLabel>
+              En atención
+            </UiBadge>
+            <UiBadge variant="light" color="success" size="sm">
+              <UiLabel type="bodyXs" className="mr-1">●</UiLabel>
+              Culminado
+            </UiBadge>
+            <UiBadge variant="light" color="error" size="sm">
+              <UiLabel type="bodyXs" className="mr-1">✕</UiLabel>
+              Rechazado
+            </UiBadge>
+          </UiFlex>
+
+          <UiFlex direction="row" alignItems="center" [gap]="6">
+            <UiLabel type="bodyXs" color="textWeak">
+              Total horas estimadas:
+            </UiLabel>
+            <UiLabel
+              className="font-mono font-bold text-sm px-3 py-1 rounded-md border border-gray-300 bg-gray-50 text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+            >
+              {{ totalHoursLabel() }}
+            </UiLabel>
+            <UiLabel type="bodyXs" color="textWeak">
+              ≈ {{ workdaysLabel() }}
+            </UiLabel>
+          </UiFlex>
+        </UiFlex>
+      </UiSurface>
+    }
+
+    <UiSurface variant="neutral" padding="md" className="border-dashed max-w-140">
+      <UiFlex direction="row" [gap]="4" className="flex-wrap">
+        <UiLabel type="bodyS" color="textWeak">Una tarea nace de la</UiLabel>
+        <UiLabel type="bodyS" weight="semibold" color="textStrong">línea base</UiLabel>
+        <UiLabel type="bodyS" color="textWeak">del subproyecto o tiene origen en una</UiLabel>
+        <UiLabel type="bodyS" weight="semibold" color="textStrong">variación</UiLabel>
+        <UiLabel type="bodyS" color="textWeak">(#V-###). Jornada base de cálculo:</UiLabel>
+        <UiLabel type="bodyS" weight="semibold" color="textStrong">8 h/día</UiLabel>
+        <UiLabel type="bodyS" color="textWeak">. La situación de cada tarea alimenta la del subproyecto.</UiLabel>
+      </UiFlex>
+    </UiSurface>
+  } @else {
+    <UiSurface variant="neutral" padding="lg" className="text-center">
+      <UiFlex direction="column" alignItems="center" [gap]="12">
+        <UiHeader [level]="4" text="Subproyecto no encontrado." />
+        <UiLabel type="bodyS" color="textWeak">
+          El subproyecto solicitado no existe o fue dado de baja.
+        </UiLabel>
+        <UiButton
+          variant="secondary"
+          label="Volver a proyectos"
+          labelText="Volver a proyectos"
+          [LeftIcon]="IconArrowLeftComponent"
+          (click)="goBack()"
+        />
+      </UiFlex>
+    </UiSurface>
+  }
+</UiFlex>
+
+<TaskFormModal
+  [isOpen]="formOpen()"
+  [mode]="formMode()"
+  [subprojectCode]="subproject()?.ticket ?? ''"
+  [subprojectId]="subId() ?? ''"
+  [task]="selectedTask()"
+  [candidates]="candidates()"
+  (save)="onSave($event)"
+  (close)="formOpen.set(false)"
+/>

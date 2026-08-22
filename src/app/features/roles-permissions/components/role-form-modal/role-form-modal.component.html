@@ -1,0 +1,113 @@
+<UiModal
+  [isOpen]="isOpen()"
+  [showCloseButton]="false"
+  className="max-w-[640px] p-6 lg:p-8"
+  (close)="onCancel()"
+>
+  <UiFlex direction="column" [gap]="3">
+    <UiFlex direction="column" [gap]="1">
+      <UiHeader [level]="2" text="Nuevo rol" />
+      <UiLabel
+        type="bodyS"
+        color="textWeak"
+        text="Define un rol. Sus permisos de módulo se configuran después de crearlo."
+      />
+    </UiFlex>
+
+    <UiFlex direction="column" [gap]="1">
+      <UiFormLabel
+        labelText="Código"
+        [required]="true"
+        [labelFor]="'role-code'"
+      />
+      <UiInput
+        id="role-code"
+        placeholder="p. ej. GP — corto, único"
+        [value]="form().code"
+        (valueChange)="patch({ code: $event })"
+        (blurEvt)="onCodeBlur()"
+        [errorMessage]="visibleErrors().code"
+        [maxLength]="4"
+      />
+      @if (!visibleErrors().code) {
+        <UiLabel
+          type="bodyXs"
+          color="textWeak"
+          text="Identificador corto del rol (2–4 caracteres alfanuméricos)."
+        />
+      }
+      <UiFieldError [message]="visibleErrors().code" />
+    </UiFlex>
+
+    <UiFlex direction="column" [gap]="1">
+      <UiFormLabel
+        labelText="Nombre"
+        [required]="true"
+        [labelFor]="'role-name'"
+      />
+      <UiInput
+        id="role-name"
+        placeholder="p. ej. Gestor de Proyecto"
+        [value]="form().name"
+        (valueChange)="patch({ name: $event })"
+        (blurEvt)="onNameBlur()"
+        [errorMessage]="visibleErrors().name"
+        [maxLength]="100"
+      />
+      <UiFieldError [message]="visibleErrors().name" />
+    </UiFlex>
+
+    <UiFlex direction="column" [gap]="1">
+      <UiFormLabel
+        labelText="Página de inicio (tras el login)"
+        [required]="true"
+        [labelFor]="'role-pagina-inicio'"
+      />
+      <UiSelect
+        inputId="role-pagina-inicio"
+        [options]="moduloOpciones()"
+        [searchable]="true"
+        placeholder="Selecciona el módulo que ve el rol tras el login"
+        [ngModel]="form().paginaInicioId"
+        (ngModelChange)="onPaginaInicioChange($event)"
+        (blur)="onPaginaInicioBlur()"
+      />
+      @if (!visibleErrors().paginaInicioId) {
+        <UiLabel
+          type="bodyXs"
+          color="textWeak"
+          text="El rol siempre debe tener una página de inicio configurada."
+        />
+      }
+      <UiFieldError [message]="visibleErrors().paginaInicioId" />
+    </UiFlex>
+
+    <UiFlex direction="column" [gap]="1">
+      <UiFormLabel labelText="Descripción" [labelFor]="'role-desc'" />
+      <UiTextArea
+        id="role-desc"
+        [rows]="2"
+        placeholder="¿Qué hace este rol dentro de SPSRT?"
+        [value]="form().description"
+        (valueChange)="patch({ description: $event })"
+        (blurEvt)="onDescriptionBlur()"
+      />
+      <UiFieldError [message]="visibleErrors().description" />
+    </UiFlex>
+
+    <UiFlex
+      direction="row"
+      justifyContent="end"
+      [gap]="2"
+      className="mt-2 border-t border-gray-200 pt-3 dark:border-gray-800"
+    >
+      <UiButton variant="secondary" label="Cancelar" (click)="onCancel()" />
+      <UiButton
+        variant="primary"
+        label="Crear rol"
+        [disabled]="!isValid()"
+        (click)="onSave()"
+      />
+    </UiFlex>
+  </UiFlex>
+</UiModal>

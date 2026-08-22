@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { Component } from "@angular/core";
+import { ChangeDetectionStrategy, Component } from "@angular/core";
 import { By } from "@angular/platform-browser";
 
 import { UiSeparatorComponent } from "./separator.component";
@@ -8,6 +8,7 @@ import { UiSeparatorComponent } from "./separator.component";
   selector: "UiSeparatorHost",
   standalone: true,
   imports: [UiSeparatorComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <UiSeparator
       [orientation]="orientation"

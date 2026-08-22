@@ -11,11 +11,7 @@
     </outer>
 -->
 
-<div
-  [class]="outerClasses()"
-  [style]="outerStyles()"
-  data-testid="phone-input-wrapper"
->
+<div [class]="outerClasses()" data-testid="phone-input-wrapper">
   @if (labelText(); as lt) {
     <UiFormLabel
       [labelText]="lt"
@@ -27,17 +23,12 @@
     ></UiFormLabel>
   }
 
-  <div
-    [class]="containerClasses()"
-    [style]="containerStyles()"
-    data-testid="phone-input-container"
-  >
+  <div [class]="containerClasses()" data-testid="phone-input-container">
     <!-- Selector de país -->
     <div [class]="selectWrapperClasses()">
       <select
         #selectEl
         [class]="selectClasses()"
-        [style]="selectStyles()"
         [value]="selectedCountry()"
         [disabled]="isEffectivelyDisabled()"
         (change)="handleCountryChange($event)"

@@ -1,5 +1,5 @@
 <aside
-  class="fixed flex flex-col top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200"
+  class="fixed flex flex-col top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 overflow-hidden"
   [ngClass]="{
     'w-72.5': isVisible(),
     'w-22.5': !isVisible(),
@@ -8,31 +8,28 @@
     'xl:translate-x-0': true,
   }"
   (mouseenter)="onSidebarMouseEnter()"
-  (mouseleave)="sidebarService.setHovered(false)"
+  (mouseleave)="onSidebarMouseLeave()"
 >
   <SidebarLayoutLogo [isExpandedOrHovered]="isVisible()" />
 
-  <UiFlex
-    direction="column"
-    overflow="auto"
-    className="flex-1 no-scrollbar"
-  >
-    <nav class="mb-6">
-      <UiFlex direction="column" gap="16px">
-        @for (s of sections(); track s.sectionKey) {
-          <SidebarLayoutSection
-            [title]="s.title"
-            [items]="s.items"
-            [sectionKey]="s.sectionKey"
-            [isExpandedOrHovered]="isVisible()"
-            [sectionIcon]="sectionIcon"
-          />
+  <UiFlex direction="column" overflow="auto" className="flex-1 no-scrollbar">
+    <nav class="flex flex-col gap-6">
+      @for (section of navSections(); track section.sectionKey) {
+        @if (isVisible()) {
+          <UiFlex direction="column" [gap]="2">
+            <h3
+              class="px-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+            >
+              {{ section.title }}
+            </h3>
+            <hr class="border-t border-gray-200 dark:border-gray-800" />
+          </UiFlex>
         }
-      </UiFlex>
+        <SidebarLayoutNavSection
+          [items]="section.items"
+          [sectionKey]="section.sectionKey"
+        />
+      }
     </nav>
-
-    @if (isVisible()) {
-      <SidebarLayoutWidget />
-    }
   </UiFlex>
 </aside>

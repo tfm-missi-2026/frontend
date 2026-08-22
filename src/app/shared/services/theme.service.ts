@@ -3,6 +3,9 @@ import { BehaviorSubject } from 'rxjs';
 
 type Theme = 'light' | 'dark';
 
+const STORAGE_KEY = 'theme';
+const VALID_THEMES = new Set<Theme>(['light', 'dark']);
+
 @Injectable({ providedIn: 'root' })
 
 export class ThemeService {
@@ -10,8 +13,18 @@ export class ThemeService {
   theme$ = this.themeSubject.asObservable();
 
   constructor() {
-    const savedTheme = (localStorage.getItem('theme') as Theme) || 'light';
-    this.setTheme(savedTheme);
+    let saved: Theme = 'light';
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw && VALID_THEMES.has(raw as Theme)) {
+          saved = raw as Theme;
+        }
+      } catch {
+        // SecurityError en incognito; cae a 'light'.
+      }
+    }
+    this.setTheme(saved);
   }
 
   toggleTheme() {
@@ -21,7 +34,13 @@ export class ThemeService {
 
   setTheme(theme: Theme) {
     this.themeSubject.next(theme);
-    localStorage.setItem('theme', theme);
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(STORAGE_KEY, theme);
+      } catch {
+        // QuotaExceededError / SecurityError; ignora.
+      }
+    }
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
       document.body.classList.add('dark:bg-gray-900');

@@ -1,0 +1,154 @@
+<UiModal
+  [isOpen]="isOpen()"
+  [showCloseButton]="false"
+  className="max-w-130 p-6 lg:p-8"
+  (close)="onCancel()"
+>
+  <UiLabel
+    type="HeadingM"
+    color="textStrong"
+    weight="semibold"
+    className="mb-1"
+  >
+    {{ heading() }}
+  </UiLabel>
+  <UiLabel type="bodyS" color="textWeak" className="mb-5">
+    {{ subheading() }}
+  </UiLabel>
+
+  <div class="mb-4">
+    <UiFormLabel
+      labelText="Grupo"
+      [required]="true"
+      [labelFor]="'catalog-group'"
+      className="mb-2 block"
+    />
+    <UiSelect
+      inputId="catalog-group"
+      [options]="groupOptions"
+      [searchable]="false"
+      [ngModel]="form().groupCode"
+      (ngModelChange)="onGroupChange($event)"
+    />
+  </div>
+
+  <UiGrid [columns]="2" gap="gap-3.5" className="mb-4">
+    <div>
+      <UiFormLabel
+        labelText="Código"
+        [required]="true"
+        [labelFor]="'catalog-code'"
+        className="mb-2 block"
+      />
+      <UiInput
+        id="catalog-code"
+        placeholder="p. ej. REU — corto, único"
+        [value]="form().code"
+        (valueChange)="patch({ code: $event })"
+        [errorMessage]="errors().code"
+      />
+      <UiFieldError
+        [message]="errors().code"
+        className="mt-1"
+      />
+    </div>
+    <div>
+      <UiFormLabel
+        labelText="Orden"
+        [required]="true"
+        [labelFor]="'catalog-order'"
+        className="mb-2 block"
+      />
+      <UiInput
+        id="catalog-order"
+        type="number"
+        placeholder="p. ej. 1"
+        [value]="form().order"
+        (valueChange)="onOrderChange($event)"
+        [errorMessage]="errors().order"
+      />
+      <UiFieldError
+        [message]="errors().order"
+        className="mt-1"
+      />
+    </div>
+  </UiGrid>
+
+  <div class="mb-4">
+    <UiFormLabel
+      labelText="Nombre"
+      [required]="true"
+      [labelFor]="'catalog-name'"
+      className="mb-2 block"
+    />
+    <UiInput
+      id="catalog-name"
+      placeholder="p. ej. Reunión"
+      [value]="form().name"
+      (valueChange)="patch({ name: $event })"
+      [errorMessage]="errors().name"
+    />
+    <UiFieldError [message]="errors().name" className="mt-1" />
+  </div>
+
+  <div class="mb-4">
+    <UiFormLabel
+      labelText="Descripción"
+      [labelFor]="'catalog-description'"
+      className="mb-2 block"
+    />
+    <UiTextArea
+      id="catalog-description"
+      [rows]="2"
+      placeholder="Texto de ayuda opcional para el administrador."
+      [value]="form().description"
+      (valueChange)="patch({ description: $event })"
+    />
+  </div>
+
+  <div class="mb-4">
+    <UiFormLabel
+      labelText="Estado"
+      [labelFor]="'catalog-status'"
+      className="mb-2 block"
+    />
+    <UiFlex direction="row" alignItems="center" [gap]="16" className="pt-1.5">
+      <UiRadio
+        name="catalog-status"
+        value="Activo"
+        [checked]="form().status === 'Activo'"
+        label="Activo"
+        (valueChange)="patch({ status: 'Activo' })"
+      />
+      <UiRadio
+        name="catalog-status"
+        value="Inactivo"
+        [checked]="form().status === 'Inactivo'"
+        label="Inactivo"
+        (valueChange)="patch({ status: 'Inactivo' })"
+      />
+    </UiFlex>
+    <UiLabel type="bodyXs" color="textWeak" className="mt-2 block">
+      Los ítems inactivos no aparecen en los desplegables, pero se
+      conservan en registros antiguos.
+    </UiLabel>
+  </div>
+
+  @if (errors().general) {
+    <UiAlert
+      variant="error"
+      [message]="errors().general ?? ''"
+      className="mb-4"
+    />
+  }
+
+  <UiFlex
+    direction="row"
+    justifyContent="end"
+    [gap]="8"
+    className="mt-4 border-t border-dashed border-gray-200 pt-4 dark:border-gray-800"
+  >
+    <UiButton variant="secondary" labelText="Cancelar" (click)="onCancel()" />
+    <UiButton variant="primary" labelText="Guardar" (click)="onSave()" />
+  </UiFlex>
+</UiModal>

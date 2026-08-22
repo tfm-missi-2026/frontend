@@ -9,7 +9,7 @@ import { UiButtonComponent } from "@shared/ui/button";
 import { UiIconButtonComponent } from "@shared/ui/icon-button";
 import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiImageComponent } from "@shared/ui/image";
-import { UiAvatarTextComponent } from "@shared/ui/avatar";
+import { UiAvatarComponent } from "@shared/ui/avatar";
 import { UiSeparatorComponent } from "@shared/ui/separator";
 import {
   IconArrowRightComponent,
@@ -35,7 +35,7 @@ const meta: Meta<UiCardComponent> = {
         UiIconButtonComponent,
         UiBadgeComponent,
         UiImageComponent,
-        UiAvatarTextComponent,
+        UiAvatarComponent,
         UiSeparatorComponent,
         IconBoxComponent,
         IconArrowRightComponent,
@@ -262,7 +262,12 @@ export const UserProfile: Story = {
         [description]="description"
       >
         <div class="mt-4 flex items-center gap-3">
-          <UiAvatarText name="Ada Lovelace" />
+          <UiAvatar
+            src="/images/user/user-01.jpg"
+            alt="Ada Lovelace"
+            size="medium"
+            status="online"
+          />
           <div class="flex-1 text-sm text-gray-500 dark:text-gray-400">
             Se unió en marzo de 2024
           </div>

@@ -32,7 +32,6 @@ const meta: Meta<UiFileInputComponent> = {
     disabled: { control: "boolean" },
     buttonText: { control: "text" },
     ariaLabel: { control: "text" },
-    width: { control: "text" },
     className: { control: "text" },
     valueChange: { action: "valueChange" },
     change: { action: "change" },

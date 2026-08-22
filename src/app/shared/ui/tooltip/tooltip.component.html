@@ -1,0 +1,16 @@
+<ng-content></ng-content>
+
+<ng-template #contentTpl>
+  <div
+    [id]="tooltipId"
+    class="pointer-events-auto whitespace-normal rounded-md shadow-tooltip max-w-125"
+    [class]="contentClasses()"
+    role="tooltip"
+  >
+    @if (isStringContent()) {
+      {{ content() }}
+    } @else {
+      <ng-container *ngTemplateOutlet="$any(content())"></ng-container>
+    }
+  </div>
+</ng-template>

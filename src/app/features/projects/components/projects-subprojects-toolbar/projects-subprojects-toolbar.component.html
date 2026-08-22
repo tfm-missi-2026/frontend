@@ -1,0 +1,38 @@
+<UiFlex
+  direction="row"
+  alignItems="center"
+  [gap]="12"
+  className="flex-wrap"
+>
+  <UiFlex direction="row" alignItems="center" [gap]="6" className="flex-1 min-w-60">
+    <UiInput
+      type="text"
+      placeholder="Buscar por ticket o descripción…"
+      [leftIcon]="IconSearchLightComponent"
+      [value]="searchTerm()"
+      (valueChange)="searchChange.emit($event)"
+    ></UiInput>
+  </UiFlex>
+
+  <UiFlex direction="row" alignItems="center" className="min-w-37.5">
+    <UiSelect
+      [options]="typeOptions()"
+      placeholder="Tipo: Todos"
+      [searchable]="false"
+      [isClearable]="true"
+      [ngModel]="typeValue()"
+      (ngModelChange)="typeChange.emit(asType($event))"
+    ></UiSelect>
+  </UiFlex>
+
+  <UiFlex direction="row" alignItems="center" className="min-w-42.5">
+    <UiSelect
+      [options]="situationOptions()"
+      placeholder="Situación: Todas"
+      [searchable]="false"
+      [isClearable]="true"
+      [ngModel]="situationValue()"
+      (ngModelChange)="situationChange.emit(asSituation($event))"
+    ></UiSelect>
+  </UiFlex>
+</UiFlex>

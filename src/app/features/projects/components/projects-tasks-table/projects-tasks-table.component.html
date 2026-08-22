@@ -1,0 +1,142 @@
+<UiSurface
+  variant="neutral"
+  padding="none"
+  className="border border-gray-200 dark:border-gray-800"
+  ariaLabel="Tabla de tareas del subproyecto"
+>
+  <UiFlex
+    direction="row"
+    alignItems="center"
+    [gap]="0"
+    className="border-b border-gray-200 px-4 py-3 text-xs uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400"
+  >
+    @for (label of headerLabels; track label; let i = $index) {
+      <UiFlex
+        [direction]="'row'"
+        alignItems="center"
+        [className]="columnClasses[i]"
+      >
+        <UiLabel type="bodyXs" weight="medium">{{ label }}</UiLabel>
+      </UiFlex>
+    }
+  </UiFlex>
+
+  @for (t of tasks(); track t.id; let last = $last; let i = $index) {
+    <UiFlex
+      direction="row"
+      alignItems="center"
+      [gap]="0"
+      [className]="
+        last
+          ? 'px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-white/3'
+          : 'border-b border-gray-100 dark:border-gray-800 px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-white/3'
+      "
+    >
+      <UiFlex [direction]="'row'" [className]="columnClasses[0]">
+        <UiLabel
+          type="bodyS"
+          weight="semibold"
+          color="textStrong"
+          className="min-w-0"
+        >
+          {{ t.name }}
+        </UiLabel>
+      </UiFlex>
+
+      <UiFlex [direction]="'row'" [className]="columnClasses[1]">
+        <UiLabel
+          type="bodyXs"
+          color="textWeak"
+          className="font-mono text-xs whitespace-nowrap"
+        >
+          {{ formatDate(t.startDate) }}
+        </UiLabel>
+      </UiFlex>
+
+      <UiFlex [direction]="'row'" [className]="columnClasses[2]">
+        <UiLabel
+          type="bodyXs"
+          color="textWeak"
+          className="font-mono text-xs whitespace-nowrap"
+        >
+          {{ formatDate(t.endDate) }}
+        </UiLabel>
+      </UiFlex>
+
+      <UiFlex [direction]="'row'" [className]="columnClasses[3]">
+        <UiLabel
+          type="HeadingM"
+          weight="semibold"
+          color="textStrong"
+          className="font-mono whitespace-nowrap"
+        >
+          {{ t.estimatedHours ? t.estimatedHours + " h" : "—" }}
+        </UiLabel>
+      </UiFlex>
+
+      <UiFlex [direction]="'row'" [className]="columnClasses[4]">
+        <UiBadge
+          variant="light"
+          [color]="situationColor(t.situation)"
+          size="sm"
+        >
+          <UiLabel type="bodyXs" className="mr-1">
+            {{ situationPrefix(t.situation) }}
+          </UiLabel>
+          {{ t.situation }}
+        </UiBadge>
+      </UiFlex>
+
+      <UiFlex [direction]="'row'" [className]="columnClasses[5]">
+        @if (t.origin === "base") {
+          <UiLabel
+            type="bodyXs"
+            className="inline-flex items-center justify-center gap-1 rounded-full font-medium leading-none whitespace-nowrap transition-colors px-2.5 py-0.5 border border-dashed border-gray-300 bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-white/80 dark:border-white/10"
+          >
+            {{ t.originLabel }}
+          </UiLabel>
+        } @else {
+          <UiBadge variant="solid" color="dark" size="sm">
+            {{ t.originLabel }}
+          </UiBadge>
+        }
+      </UiFlex>
+
+      <UiFlex [direction]="'row'" [className]="columnClasses[6]">
+        <UiLabel
+          type="bodyXs"
+          color="textWeak"
+          className="font-mono text-xs"
+        >
+          {{ dependsLabel(t, tasks()) }}
+        </UiLabel>
+      </UiFlex>
+
+      <UiFlex
+        direction="row"
+        alignItems="center"
+        justifyContent="end"
+        [gap]="8"
+        className="flex-1 shrink-0 whitespace-nowrap"
+      >
+        <UiLink
+          variant="primary"
+          size="sm"
+          (click)="edit.emit(t)"
+          labelText="Editar tarea"
+        >
+          Editar
+        </UiLink>
+        <UiLabel type="bodyXs" color="textWeak">·</UiLabel>
+        <UiLink
+          variant="danger"
+          size="sm"
+          (click)="deactivate.emit(t)"
+          labelText="Dar de baja tarea"
+        >
+          Dar de baja
+        </UiLink>
+      </UiFlex>
+    </UiFlex>
+  }
+</UiSurface>

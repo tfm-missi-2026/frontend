@@ -1,0 +1,116 @@
+<UiSurface
+  variant="neutral"
+  padding="md"
+  className="border-2 border-gray-300 dark:border-gray-700"
+>
+  <UiFlex direction="column" [gap]="20">
+    <UiHeader [level]="4" text="Por hacer" />
+
+    <UiFlex direction="column" [gap]="8">
+      <UiLabel
+        type="bodyXs"
+        weight="medium"
+        color="textWeak"
+        className="uppercase"
+      >
+        Variaciones por resolver
+      </UiLabel>
+
+      @if (pendingVariations().length === 0) {
+        <UiLabel type="bodyS" color="textWeak" className="italic">
+          Sin variaciones pendientes en tus proyectos.
+        </UiLabel>
+      } @else {
+        @for (v of pendingVariations(); track v.id; let last = $last) {
+          <UiFlex
+            direction="row"
+            alignItems="center"
+            [gap]="8"
+            [className]="
+              last ? 'w-full' : 'w-full pb-3 border-b border-dashed border-gray-200 dark:border-gray-800'
+            "
+          >
+            <UiBadge variant="solid" color="dark" size="sm">
+              {{ v.type }}
+            </UiBadge>
+            <UiLabel
+              type="bodyS"
+              weight="semibold"
+              color="textStrong"
+            >
+              {{ v.taskName }}{{ v.ref ? ' · ' + v.ref : '' }}
+            </UiLabel>
+          </UiFlex>
+        }
+      }
+
+      <UiLabel
+        type="bodyXs"
+        weight="medium"
+        color="textAction"
+        className="underline cursor-pointer"
+      >
+        Ir a Variaciones →
+      </UiLabel>
+    </UiFlex>
+
+    <UiFlex direction="column" [gap]="8">
+      <UiLabel
+        type="bodyXs"
+        weight="medium"
+        color="textWeak"
+        className="uppercase border-t border-dashed border-gray-200 pt-3 dark:border-gray-800"
+      >
+        Tareas próximas a vencer
+      </UiLabel>
+
+      @if (upcomingTasks().length === 0) {
+        <UiLabel type="bodyS" color="textWeak" className="italic">
+          Sin tareas próximas a vencer en este período.
+        </UiLabel>
+      } @else {
+        @for (t of upcomingTasks(); track t.taskId; let last = $last) {
+          <UiFlex
+            direction="row"
+            alignItems="center"
+            justifyContent="between"
+            [gap]="8"
+            [className]="
+              last ? 'w-full' : 'w-full pb-3 border-b border-dashed border-gray-200 dark:border-gray-800'
+            "
+          >
+            <UiLabel
+              type="bodyS"
+              weight="semibold"
+              color="textStrong"
+              className="flex-1 min-w-0"
+            >
+              {{ t.taskName }}{{ t.ref ? ' · ' + t.ref : '' }}
+            </UiLabel>
+            <UiLabel
+              type="bodyXs"
+              weight="bold"
+              color="textStrong"
+              [className]="
+                t.isSoon
+                  ? 'font-mono inline-flex items-center border-2 border-gray-700 rounded-md px-2 py-0.5 bg-gray-700 text-white whitespace-nowrap dark:bg-gray-300 dark:text-gray-800'
+                  : 'font-mono inline-flex items-center border-2 border-gray-300 rounded-md px-2 py-0.5 whitespace-nowrap'
+              "
+            >
+              {{ formatDate(t.endDate) }}
+            </UiLabel>
+          </UiFlex>
+        }
+      }
+
+      <UiLabel
+        type="bodyXs"
+        weight="medium"
+        color="textAction"
+        className="underline cursor-pointer"
+      >
+        Ir a Proyectos →
+      </UiLabel>
+    </UiFlex>
+  </UiFlex>
+</UiSurface>

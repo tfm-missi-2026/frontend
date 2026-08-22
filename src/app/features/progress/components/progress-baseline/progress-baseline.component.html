@@ -1,0 +1,115 @@
+<UiSurface
+  variant="neutral"
+  padding="md"
+  className="border-2 border-gray-300 dark:border-gray-700"
+>
+  <UiFlex
+    direction="row"
+    alignItems="center"
+    [gap]="24"
+    className="flex-wrap"
+  >
+    <UiFlex
+      direction="row"
+      alignItems="center"
+      [gap]="12"
+      className="flex-1 min-w-60"
+    >
+      <UiFlex
+        direction="row"
+        alignItems="center"
+        justifyContent="center"
+        [gap]="0"
+        className="h-12 w-12 shrink-0 rounded-lg border-2 border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900"
+      >
+        <UiLabel type="HeadingL" weight="bold" color="textStrong">
+          ❄
+        </UiLabel>
+      </UiFlex>
+      <UiFlex direction="column" [gap]="2">
+        <UiHeader [level]="3" [text]="baselineLabel()" />
+        <UiLabel type="bodyXs" color="textWeak">
+          Congelada el
+          <strong class="font-semibold text-gray-800 dark:text-white/90">
+            {{ baselineDate() }}
+          </strong>
+          · vigente
+        </UiLabel>
+      </UiFlex>
+    </UiFlex>
+
+    <UiFlex direction="row" alignItems="center" [gap]="0" className="flex-wrap">
+      <UiFlex
+        direction="column"
+        [gap]="2"
+        className="px-22 text-center border-l-2 border-dashed border-gray-300 dark:border-gray-700 first:border-l-0 first:pl-0"
+      >
+        <UiLabel
+          type="bodyS"
+          weight="medium"
+          color="textWeak"
+          className="uppercase whitespace-nowrap"
+        >
+          Horas estimadas
+        </UiLabel>
+        <UiLabel
+          type="HeadingTV"
+          weight="bold"
+          color="textStrong"
+          className="text-5xl leading-none font-mono whitespace-nowrap"
+        >
+          {{ estimatedHours() }} h
+        </UiLabel>
+      </UiFlex>
+      <UiFlex
+        direction="column"
+        [gap]="2"
+        className="px-22 text-center border-l-2 border-dashed border-gray-300 dark:border-gray-700"
+      >
+        <UiLabel
+          type="bodyS"
+          weight="medium"
+          color="textWeak"
+          className="uppercase whitespace-nowrap"
+        >
+          Horas registradas
+        </UiLabel>
+        <UiLabel
+          type="HeadingTV"
+          weight="bold"
+          color="textStrong"
+          className="text-5xl leading-none font-mono whitespace-nowrap"
+        >
+          {{ loggedHours() }} h
+        </UiLabel>
+      </UiFlex>
+      <UiFlex
+        direction="column"
+        [gap]="2"
+        className="px-22 text-center border-l-2 border-dashed border-gray-300 dark:border-gray-700"
+      >
+        <UiLabel
+          type="bodyS"
+          weight="medium"
+          color="textWeak"
+          className="uppercase whitespace-nowrap"
+        >
+          % Avance
+        </UiLabel>
+        <UiFlex direction="row" alignItems="baseline" [gap]="2" className="justify-center">
+          <UiLabel
+            type="HeadingTV"
+            weight="bold"
+            color="textStrong"
+            className="text-5xl leading-none font-mono whitespace-nowrap"
+          >
+            {{ progressPct() }}
+          </UiLabel>
+          <UiLabel type="HeadingS" weight="bold" color="textStrong">
+            %
+          </UiLabel>
+        </UiFlex>
+      </UiFlex>
+    </UiFlex>
+  </UiFlex>
+</UiSurface>

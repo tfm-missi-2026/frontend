@@ -1,0 +1,42 @@
+<UiSurface variant="neutral" padding="md" className="border border-gray-200 dark:border-gray-700">
+  <UiFlex direction="column" [gap]="12">
+    <UiFlex direction="row" alignItems="center" [gap]="8" className="flex-wrap">
+      <UiBadge variant="light" color="dark" size="sm">
+        {{ subproject().type }}
+      </UiBadge>
+
+      <UiLabel
+        className="font-mono font-bold tracking-wide px-3 py-1 rounded-md border border-gray-300 bg-gray-50 text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 text-xs"
+      >
+        #{{ subproject().ticket ?? "—" }}
+      </UiLabel>
+
+      <UiBadge variant="light" [color]="priorityColor()" size="sm">
+        {{ priorityLabel() }}
+      </UiBadge>
+
+      <UiBadge variant="light" [color]="situationColor()" size="sm">
+        {{ situationLabel() }}
+      </UiBadge>
+
+      <UiLabel
+        type="bodyXs"
+        color="textWeak"
+        className="ml-auto"
+      >
+        Situación derivada de las tareas
+      </UiLabel>
+    </UiFlex>
+
+    <UiHeader [level]="3" [text]="subproject().description" className="text-xl" />
+
+    <UiLabel type="bodyS" color="textWeak">
+      Solicitante:
+      <strong class="font-semibold text-gray-800 dark:text-white/90">{{ subproject().requester }}</strong>
+      · Fecha de solicitud:
+      <strong class="font-semibold text-gray-800 dark:text-white/90">{{ formatRequestDate() }}</strong>
+      · Proyecto:
+      <strong class="font-semibold text-gray-800 dark:text-white/90">{{ projectName() || "—" }}</strong>
+    </UiLabel>
+  </UiFlex>
+</UiSurface>

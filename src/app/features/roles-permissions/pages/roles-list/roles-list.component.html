@@ -1,0 +1,171 @@
+<UiFlex direction="column" [gap]="5">
+  <CommonBreadcrumb [items]="breadcrumbItems" />
+
+  <UiFlex
+    direction="row"
+    alignItems="center"
+    justifyContent="between"
+    [gap]="3"
+    className="flex-wrap"
+  >
+    <UiHeader [level]="1" text="Roles y permisos" />
+    <UiButton
+      variant="primary"
+      [LeftIcon]="plusIcon"
+      label="Nuevo rol"
+      (click)="onCreate()"
+    />
+  </UiFlex>
+
+  @if (successAlert(); as msg) {
+    <UiAlert
+      variant="success"
+      [message]="msg"
+      className="cursor-pointer"
+      (click)="onDismissAlert()"
+    />
+  }
+
+  @if (error(); as errMsg) {
+    <UiAlert variant="error" [message]="errMsg" />
+  }
+
+  <UiFlex
+    alignItems="start"
+    className="grid gap-5 lg:grid-cols-[280px_1fr]"
+  >
+    <div>
+      @if (loading()) {
+        <UiCard variant="default" padding="lg">
+          <UiLabel
+            type="bodyS"
+            color="textWeak"
+            text="Cargando roles..."
+          />
+        </UiCard>
+      } @else {
+        <RoleListPanel
+          [roles]="roles()"
+          [selectedId]="selectedId()"
+          [totalModules]="totalModules()"
+          (select)="onSelectRole($event)"
+        />
+      }
+    </div>
+
+    <div>
+      @if (selectedRole(); as role) {
+        <UiCard variant="default" padding="lg" className="h-full">
+          <UiFlex
+            direction="row"
+            alignItems="start"
+            justifyContent="between"
+            [gap]="3"
+            className="flex-wrap"
+          >
+            <div class="min-w-0 flex-1">
+              <UiHeader
+                [level]="2"
+                [text]="role.name"
+                className="text-2xl"
+              />
+              <UiLabel
+                type="bodyS"
+                color="textWeak"
+                [text]="role.description || 'Sin descripción.'"
+                className="mt-1 block max-w-prose"
+              />
+            </div>
+            <UiFlex direction="row" [gap]="2" alignItems="center">
+              <UiBadge
+                [variant]="role.sistema ? 'light' : 'light'"
+                [color]="role.sistema ? 'primary' : 'info'"
+                size="md"
+              >
+                {{ role.code }}
+              </UiBadge>
+              @if (!role.sistema) {
+                <UiButton
+                  variant="secondary"
+                  [LeftIcon]="pencilIcon"
+                  label="Editar"
+                  (click)="onEditRole()"
+                />
+                <UiButton
+                  variant="secondary"
+                  [LeftIcon]="trashIcon"
+                  label="Eliminar"
+                  (click)="onRequestDelete()"
+                />
+              }
+            </UiFlex>
+          </UiFlex>
+
+          <UiFlex
+            direction="column"
+            [gap]="3"
+            className="mt-5 border-t border-gray-200 pt-4 dark:border-gray-800"
+          >
+            <UiFlex direction="row" alignItems="center" justifyContent="between">
+              <UiLabel
+                type="bodyXs"
+                color="textWeak"
+                weight="medium"
+                className="uppercase tracking-wider"
+                text="Permisos de módulos"
+              />
+              <UiLabel
+                type="bodyXs"
+                color="textWeak"
+                [text]="permissionCountLabel()"
+              />
+            </UiFlex>
+            <PermissionsMatrix
+              [modules]="modulosRaiz()"
+              [selected]="selectedPermissions()"
+              [readonly]="true"
+              [landingCodigo]="selectedRole()?.paginaInicioCodigo ?? null"
+            />
+            @if (role.sistema) {
+              <UiLabel
+                type="bodyXs"
+                color="textWeak"
+                text="Los roles del sistema son de solo lectura."
+              />
+            }
+          </UiFlex>
+        </UiCard>
+      } @else {
+        <UiCard variant="default" padding="lg">
+          <UiLabel
+            type="bodyS"
+            color="textWeak"
+            text="Selecciona un rol de la lista para ver sus permisos."
+          />
+        </UiCard>
+      }
+    </div>
+  </UiFlex>
+</UiFlex>
+
+<RoleFormModal
+  [isOpen]="createOpen()"
+  (close)="createOpen.set(false)"
+  (save)="onSaveRole($event)"
+/>
+
+<RoleEditModal
+  [role]="selectedRole()"
+  [modules]="modulosRaiz()"
+  [permisosIniciales]="selectedPermissions()"
+  [isOpen]="editTargetId() !== null"
+  (close)="editTargetId.set(null)"
+  (save)="onSaveEdit($event)"
+/>
+
+<RoleConfirmDeleteModal
+  [role]="selectedRole()"
+  [isOpen]="deleteTargetId() !== null"
+  (close)="deleteTargetId.set(null)"
+  (confirm)="onConfirmDelete($event)"
+/>

@@ -8,6 +8,7 @@ import {
   TooltipSide,
   TooltipAlign,
 } from "@shared/ui/tooltip/tooltip.types";
+import { CommonThemeToggleComponent } from "@shared/common/theme-toggle/theme-toggle.component";
 
 const variants: TooltipVariantType[] = [
   "light",
@@ -26,7 +27,7 @@ const meta: Meta<UiTooltipComponent> = {
   component: UiTooltipComponent,
   decorators: [
     moduleMetadata({
-      imports: [CommonModule, UiTooltipComponent],
+      imports: [CommonModule, UiTooltipComponent, CommonThemeToggleComponent],
     }),
   ],
   tags: ["autodocs"],
@@ -280,6 +281,58 @@ export const DarkMode: Story = {
             ${trigger("warning")}
           </UiTooltip>
           <UiTooltip variant="error" content="Variant error">
+            ${trigger("error")}
+          </UiTooltip>
+        </div>
+      </div>
+    `,
+  }),
+};
+
+// Contenido rico con TemplateRef
+export const WithTemplateRef: Story = {
+  render: () => ({
+    template: `
+      <div class="flex h-40 items-center justify-center">
+        <ng-template #richTpl>
+          <div class="flex flex-col gap-1">
+            <strong class="text-xs">Bold title</strong>
+            <span class="text-xs">Subtítulo en línea separada.</span>
+          </div>
+        </ng-template>
+
+        <UiTooltip [content]="richTpl" variant="light" side="bottom">
+          ${trigger("Hover (template)")}
+        </UiTooltip>
+      </div>
+    `,
+  }),
+};
+
+// Cambio de tema en vivo (light ↔ dark)
+export const WithThemeSwitch: Story = {
+  render: () => ({
+    template: `
+      <div class="flex flex-col items-center gap-6 p-6">
+        <CommonThemeToggle variant="subtle" size="md"></CommonThemeToggle>
+
+        <div class="flex flex-wrap items-center justify-center gap-4">
+          <UiTooltip variant="light" content="Light variant — adapta al tema">
+            ${trigger("light")}
+          </UiTooltip>
+          <UiTooltip variant="dark" content="Dark variant — adapta al tema">
+            ${trigger("dark")}
+          </UiTooltip>
+          <UiTooltip variant="info" content="Info variant — adapta al tema">
+            ${trigger("info")}
+          </UiTooltip>
+          <UiTooltip variant="success" content="Success variant — adapta al tema">
+            ${trigger("success")}
+          </UiTooltip>
+          <UiTooltip variant="warning" content="Warning variant — adapta al tema">
+            ${trigger("warning")}
+          </UiTooltip>
+          <UiTooltip variant="error" content="Error variant — adapta al tema">
             ${trigger("error")}
           </UiTooltip>
         </div>

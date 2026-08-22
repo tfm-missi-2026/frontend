@@ -1,0 +1,186 @@
+@if (blocks().length === 0) {
+  <UiSurface
+    variant="neutral"
+    padding="lg"
+    className="border-dashed"
+    data-testid="timesheet-timeline-empty"
+  >
+    <UiFlex
+      direction="column"
+      alignItems="center"
+      justifyContent="center"
+      [gap]="12"
+    >
+      <UiFlex
+        direction="row"
+        alignItems="center"
+        justifyContent="center"
+        [gap]="0"
+        className="h-16 w-16 rounded-full bg-gray-100 dark:bg-gray-800"
+      >
+        <IconCalendar24 [size]="32" />
+      </UiFlex>
+      <UiHeader [level]="4" [text]="emptyTitle()" />
+      <UiLabel type="bodyS" color="textWeak">
+        {{ emptyDescription() }}
+      </UiLabel>
+      <UiButton
+        variant="primary"
+        label="Registrar bloque"
+        labelText="Registrar bloque"
+        [LeftIcon]="IconPlusSimpleComponent"
+        (click)="register.emit()"
+      />
+    </UiFlex>
+  </UiSurface>
+} @else {
+  <UiSurface
+    variant="neutral"
+    padding="lg"
+    data-testid="timesheet-timeline"
+  >
+    <UiFlex
+      direction="row"
+      alignItems="center"
+      justifyContent="between"
+      [gap]="12"
+      className="mb-4 flex-wrap"
+    >
+      <UiLabel
+        type="bodyXs"
+        weight="medium"
+        color="textWeak"
+        className="uppercase"
+      >
+        {{ heading() }}
+      </UiLabel>
+      <UiLabel type="bodyXs" color="textWeak">
+        {{ countLabel() }}
+      </UiLabel>
+    </UiFlex>
+
+    <UiFlex direction="column" [gap]="0">
+      @for (block of blocks(); track block.entry.id; let last = $last) {
+        <UiFlex
+          direction="row"
+          alignItems="stretch"
+          [gap]="16"
+          className="py-4"
+        >
+          <UiFlex
+            direction="column"
+            [gap]="2"
+            className="w-32 shrink-0"
+          >
+            <UiLabel type="HeadingM" weight="bold" color="textStrong">
+              {{ block.entry.startTime }} – {{ block.entry.endTime }}
+            </UiLabel>
+            <UiLabel type="bodyXs" weight="medium" color="textWeak">
+              {{ block.durationLabel }}
+            </UiLabel>
+          </UiFlex>
+
+          <div class="relative w-px shrink-0">
+            <div
+              class="absolute inset-y-2 left-0 w-px bg-gray-200 dark:bg-gray-700"
+              aria-hidden="true"
+            ></div>
+            <span
+              class="absolute top-2 left-1/2 h-2.5 w-2.5 -translate-x-1/2 rounded-full border-2 border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-900"
+              aria-hidden="true"
+            ></span>
+          </div>
+
+          <UiFlex direction="column" [gap]="6" className="min-w-0 flex-1">
+            <UiBadge
+              [variant]="'light'"
+              [color]="block.badgeColor"
+              size="md"
+            >
+              {{ block.kindLabel }}: {{ block.linkLabel }}
+              @if (block.linkCode) {
+                <span class="ml-1 font-mono text-xs opacity-70">
+                  · {{ block.linkCode }}
+                </span>
+              }
+            </UiBadge>
+            <UiLabel
+              type="bodyS"
+              color="textStrong"
+              [className]="'max-w-prose'"
+            >
+              {{ block.entry.description }}
+            </UiLabel>
+          </UiFlex>
+
+          <UiFlex
+            direction="row"
+            alignItems="center"
+            [gap]="6"
+            className="shrink-0 self-start pt-1"
+          >
+            <UiButton
+              variant="tertiary"
+              [transparent]="true"
+              [compact]="true"
+              label="Editar"
+              labelText="Editar bloque"
+              (click)="edit.emit(block.entry)"
+            />
+            <span
+              class="text-gray-400 dark:text-gray-600"
+              aria-hidden="true"
+            >·</span>
+            <UiButton
+              variant="tertiary"
+              styleType="danger"
+              [transparent]="true"
+              [compact]="true"
+              label="Eliminar"
+              labelText="Eliminar bloque"
+              (click)="remove.emit(block.entry)"
+            />
+          </UiFlex>
+        </UiFlex>
+        @if (!last) {
+          <UiSeparator
+            orientation="horizontal"
+            variant="dashed"
+            color="subtle"
+            spacing="none"
+          />
+        }
+      }
+    </UiFlex>
+
+    <UiSeparator
+      orientation="horizontal"
+      variant="solid"
+      thickness="medium"
+      color="gray"
+      spacing="sm"
+    />
+
+    <UiFlex
+      direction="row"
+      alignItems="center"
+      justifyContent="between"
+      [gap]="12"
+      className="pt-1 flex-wrap"
+    >
+      <UiLabel type="bodyXs" color="textWeak">
+        {{ sumExplanation() }}
+      </UiLabel>
+      <UiFlex
+        direction="row"
+        alignItems="center"
+        [gap]="8"
+      >
+        <UiLabel type="bodyXs" color="textWeak">Total:</UiLabel>
+        <UiBadge variant="solid" color="dark" size="md">
+          {{ totalHoursLabel() }}
+        </UiBadge>
+      </UiFlex>
+    </UiFlex>
+  </UiSurface>
+}

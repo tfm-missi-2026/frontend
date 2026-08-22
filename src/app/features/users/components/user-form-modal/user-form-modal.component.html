@@ -1,0 +1,193 @@
+<UiModal
+  [isOpen]="isOpen()"
+  [showCloseButton]="true"
+  className="max-w-160 p-6 lg:p-10"
+  (close)="onCancel()"
+>
+  <UiFlex direction="column" [gap]="6">
+    <header>
+      <UiLabel
+        type="HeadingM"
+        color="textStrong"
+        weight="semibold"
+        className="mb-1 block"
+      >
+        {{ heading() }}
+      </UiLabel>
+      <UiLabel type="bodyS" color="textWeak" className="block">
+        {{ subheading() }}
+      </UiLabel>
+    </header>
+
+    @if (validationMessage()) {
+      <UiAlert
+        variant="error"
+        title="Revisa los datos del usuario"
+        [message]="validationMessage() ?? ''"
+      />
+    }
+
+    <UiFlex direction="column" [gap]="4">
+      <UiFlex direction="column" [gap]="2">
+        <UiLabel
+          type="bodyXs"
+          color="textStrong"
+          weight="medium"
+          className="block uppercase"
+        >
+          Nombres
+        </UiLabel>
+        <UiInput
+          placeholder="p. ej. Ana María"
+          [value]="form().firstName"
+          (valueChange)="patch({ firstName: $event })"
+        />
+      </UiFlex>
+
+      <UiGrid [columns]="2" gap="20px">
+        <UiFlex direction="column" [gap]="2">
+          <UiLabel
+            type="bodyXs"
+            color="textStrong"
+            weight="medium"
+            className="block uppercase"
+          >
+            Apellido paterno
+          </UiLabel>
+          <UiInput
+            placeholder="p. ej. Quispe"
+            [value]="form().lastNamePaternal"
+            (valueChange)="patch({ lastNamePaternal: $event })"
+          />
+        </UiFlex>
+        <UiFlex direction="column" [gap]="2">
+          <UiLabel
+            type="bodyXs"
+            color="textStrong"
+            weight="medium"
+            className="block uppercase"
+          >
+            Apellido materno
+          </UiLabel>
+          <UiInput
+            placeholder="p. ej. Rojas"
+            [value]="form().lastNameMaternal"
+            (valueChange)="patch({ lastNameMaternal: $event })"
+          />
+        </UiFlex>
+      </UiGrid>
+
+      <UiFlex direction="column" [gap]="2">
+        <UiLabel
+          type="bodyXs"
+          color="textStrong"
+          weight="medium"
+          className="block uppercase"
+        >
+          Correo electrónico
+        </UiLabel>
+        <UiInput
+          type="email"
+          placeholder="nombre.apellido@institucion.gob.pe"
+          [value]="form().email"
+          (valueChange)="patch({ email: $event })"
+        />
+      </UiFlex>
+
+      <UiGrid [columns]="2" gap="20px">
+        <UiFlex direction="column" [gap]="2">
+          <UiLabel
+            type="bodyXs"
+            color="textStrong"
+            weight="medium"
+            className="block uppercase"
+          >
+            Rol
+          </UiLabel>
+          <UiSelect
+            [options]="roleOptions"
+            [searchable]="false"
+            [ngModel]="form().role"
+            (ngModelChange)="onRoleChange($event)"
+          />
+        </UiFlex>
+        <UiFlex direction="column" [gap]="2">
+          <UiLabel
+            type="bodyXs"
+            color="textStrong"
+            weight="medium"
+            className="block uppercase"
+          >
+            Estado
+          </UiLabel>
+          <UiFlex
+            direction="row"
+            alignItems="center"
+            [gap]="24"
+            className="h-11"
+          >
+            <UiRadio
+              name="user-status"
+              value="active"
+              [checked]="form().status === 'active'"
+              label="Activo"
+              (valueChange)="patch({ status: 'active' })"
+            />
+            <UiRadio
+              name="user-status"
+              value="inactive"
+              [checked]="form().status === 'inactive'"
+              label="Inactivo"
+              (valueChange)="patch({ status: 'inactive' })"
+            />
+          </UiFlex>
+        </UiFlex>
+      </UiGrid>
+
+      @if (mode() === "create") {
+        <UiSurface variant="neutral" className="p-4">
+          <UiFlex direction="column" [gap]="3">
+            <UiFlex
+              direction="row"
+              alignItems="center"
+              [justifyContent]="'between'"
+            >
+              <UiLabel
+                type="bodyXs"
+                color="textStrong"
+                weight="medium"
+                className="uppercase"
+              >
+                Contraseña inicial
+              </UiLabel>
+              <UiBadge variant="light" color="info" size="sm">
+                Solo en alta
+              </UiBadge>
+            </UiFlex>
+            <UiInput
+              type="password"
+              placeholder="Mínimo 8 caracteres"
+              [showPasswordToggle]="true"
+              [value]="form().initialPassword ?? ''"
+              (valueChange)="patch({ initialPassword: $event })"
+            />
+            <UiLabel type="bodyXs" color="textWeak" className="block">
+              Al editar un usuario existente este campo no aparece;
+              la contraseña se cambia desde “Restablecer”.
+            </UiLabel>
+          </UiFlex>
+        </UiSurface>
+      }
+    </UiFlex>
+
+    <UiFlex
+      direction="row"
+      [justifyContent]="'end'"
+      [gap]="8"
+      className="border-t border-gray-200 pt-4 dark:border-gray-800"
+    >
+      <UiButton variant="secondary" label="Cancelar" (click)="onCancel()" />
+      <UiButton variant="primary" label="Guardar" (click)="onSave()" />
+    </UiFlex>
+  </UiFlex>
+</UiModal>

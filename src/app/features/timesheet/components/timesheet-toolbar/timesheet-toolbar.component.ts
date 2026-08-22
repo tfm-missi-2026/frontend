@@ -1,0 +1,157 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  output,
+} from "@angular/core";
+
+import {
+  IconChevronLeftComponent,
+  IconChevronRightComponent,
+} from "@shared/icons";
+import {
+  CommonTabGroupComponent,
+  type CommonTabOption,
+} from "@shared/common/tab-group";
+import { UiDatePickerComponent } from "@shared/ui/date-picker";
+import { UiFlexComponent } from "@shared/ui/flex";
+import { UiIconButtonComponent } from "@shared/ui/icon-button";
+import { UiLabelComponent } from "@shared/ui/label";
+import { parseIsoDate, toIsoDate } from "@utils/date";
+
+export type TimesheetViewMode = "day" | "range";
+
+const DAY_NAMES_ES = [
+  "domingo",
+  "lunes",
+  "martes",
+  "miércoles",
+  "jueves",
+  "viernes",
+  "sábado",
+];
+
+const MONTH_NAMES_ES = [
+  "enero",
+  "febrero",
+  "marzo",
+  "abril",
+  "mayo",
+  "junio",
+  "julio",
+  "agosto",
+  "septiembre",
+  "octubre",
+  "noviembre",
+  "diciembre",
+];
+
+function formatLong(iso: string): string {
+  const d = parseIsoDate(iso);
+  if (!d) return iso;
+  return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+}
+
+const VIEW_TABS: CommonTabOption<TimesheetViewMode>[] = [
+  { value: "day", label: "Por día" },
+  { value: "range", label: "Por rango" },
+];
+
+@Component({
+  selector: "TimesheetToolbar",
+  standalone: true,
+  imports: [
+    CommonTabGroupComponent,
+    UiDatePickerComponent,
+    UiFlexComponent,
+    UiIconButtonComponent,
+    UiLabelComponent,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: "./timesheet-toolbar.component.html",
+})
+export class TimesheetToolbarComponent {
+  readonly mode = input<TimesheetViewMode>("day");
+  readonly date = input<string>("");
+  readonly range = input<string[]>([]);
+
+  readonly modeChange = output<TimesheetViewMode>();
+  readonly dateChange = output<string>();
+  readonly rangeChange = output<string[]>();
+
+  protected readonly viewTabs = VIEW_TABS;
+  protected readonly IconChevronLeftComponent = IconChevronLeftComponent;
+  protected readonly IconChevronRightComponent = IconChevronRightComponent;
+
+  protected readonly todayIso = toIsoDate(new Date());
+
+  protected readonly todayLabel = computed<string>(() => {
+    const today = parseIsoDate(this.todayIso);
+    if (!today) return this.todayIso;
+    return `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
+  });
+
+  protected readonly displayLabel = computed<string>(() =>
+    formatLong(this.date()),
+  );
+
+  protected readonly dowLabel = computed<string>(() => {
+    const d = parseIsoDate(this.date());
+    if (!d) return "";
+    return DAY_NAMES_ES[d.getDay()];
+  });
+
+  protected readonly rangeLabel = computed<string>(() => {
+    const r = this.range();
+    if (!r || r.length === 0) return "Selecciona un rango";
+    if (r.length === 1) return formatLong(r[0]);
+    return `${formatLong(r[0])} – ${formatLong(r[r.length - 1])}`;
+  });
+
+  protected onPrev(): void {
+    if (this.mode() === "day") {
+      const d = parseIsoDate(this.date());
+      if (!d) return;
+      d.setDate(d.getDate() - 1);
+      this.dateChange.emit(toIsoDate(d));
+    } else {
+      const r = this.range();
+      if (!r.length) return;
+      const start = parseIsoDate(r[0]);
+      if (!start) return;
+      start.setDate(start.getDate() - 7);
+      const end = parseIsoDate(r[r.length - 1] ?? r[0]);
+      if (end) end.setDate(end.getDate() - 7);
+      this.rangeChange.emit([toIsoDate(start), toIsoDate(end ?? start)]);
+    }
+  }
+
+  protected onNext(): void {
+    if (this.mode() === "day") {
+      const d = parseIsoDate(this.date());
+      if (!d) return;
+      d.setDate(d.getDate() + 1);
+      this.dateChange.emit(toIsoDate(d));
+    } else {
+      const r = this.range();
+      if (!r.length) return;
+      const start = parseIsoDate(r[0]);
+      if (!start) return;
+      start.setDate(start.getDate() + 7);
+      const end = parseIsoDate(r[r.length - 1] ?? r[0]);
+      if (end) end.setDate(end.getDate() + 7);
+      this.rangeChange.emit([toIsoDate(start), toIsoDate(end ?? start)]);
+    }
+  }
+
+  protected asStringArray(value: string | string[]): string[] {
+    if (Array.isArray(value)) return value;
+    return value ? [value] : [];
+  }
+}
+
+export const TIMESHEET_DAY_NAMES = DAY_NAMES_ES;
+export const TIMESHEET_MONTH_NAMES = MONTH_NAMES_ES;
+export const toTimesheetIsoDate = toIsoDate;
+export const parseTimesheetIsoDate = parseIsoDate;

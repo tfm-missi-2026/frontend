@@ -1,0 +1,117 @@
+<UiSurface
+  variant="neutral"
+  padding="md"
+  className="border-2 border-gray-300 dark:border-gray-700"
+>
+  <UiFlex direction="column" [gap]="16">
+    <UiHeader [level]="4" text="Alertas" />
+
+    <UiFlex direction="column" [gap]="8">
+      <UiLabel
+        type="bodyXs"
+        weight="medium"
+        color="textWeak"
+        className="uppercase"
+      >
+        Recursos en sobrecarga
+      </UiLabel>
+
+      @if (overloads().length === 0) {
+        <UiLabel type="bodyS" color="textWeak" className="italic">
+          Sin recursos en sobrecarga en este período.
+        </UiLabel>
+      } @else {
+        @for (w of overloads(); track w.resourceId; let last = $last) {
+          <UiFlex
+            direction="row"
+            alignItems="center"
+            [gap]="8"
+            [className]="
+              last ? 'w-full' : 'w-full pb-2 border-b border-dashed border-gray-200 dark:border-gray-800'
+            "
+          >
+            <UiSurface
+              variant="neutral"
+              padding="none"
+              className="h-9 w-9 shrink-0 rounded-full bg-gray-100 dark:bg-gray-800"
+              ariaLabel="Avatar del recurso"
+            ></UiSurface>
+            <UiLabel
+              type="bodyS"
+              weight="bold"
+              color="textStrong"
+              className="flex-1 min-w-0 truncate"
+              [text]="w.resourceName"
+            />
+            <UiLabel
+              type="HeadingS"
+              weight="bold"
+              color="textStrong"
+              className="font-mono inline-flex items-center border-2 border-gray-400 rounded-md px-2 py-0.5 whitespace-nowrap dark:border-gray-600"
+            >
+              {{ w.utilizationPct }}%
+            </UiLabel>
+          </UiFlex>
+        }
+      }
+
+      <UiLabel
+        type="bodyXs"
+        weight="medium"
+        color="textAction"
+        className="underline cursor-pointer"
+      >
+        Ir a Carga del equipo →
+      </UiLabel>
+    </UiFlex>
+
+    <UiFlex direction="column" [gap]="8">
+      <UiLabel
+        type="bodyXs"
+        weight="medium"
+        color="textWeak"
+        className="uppercase border-t border-dashed border-gray-200 pt-3 dark:border-gray-800"
+      >
+        Variaciones por resolver
+      </UiLabel>
+
+      @if (variations().length === 0) {
+        <UiLabel type="bodyS" color="textWeak" className="italic">
+          Sin variaciones pendientes en el área.
+        </UiLabel>
+      } @else {
+        @for (v of variations(); track v.id; let last = $last) {
+          <UiFlex
+            direction="row"
+            alignItems="center"
+            [gap]="8"
+            [className]="
+              last ? 'w-full' : 'w-full pb-2 border-b border-dashed border-gray-200 dark:border-gray-800'
+            "
+          >
+            <UiBadge variant="solid" color="dark" size="sm">
+              {{ v.type }}
+            </UiBadge>
+            <UiLabel
+              type="bodyS"
+              weight="semibold"
+              color="textStrong"
+              className="flex-1 min-w-0"
+            >
+              {{ v.taskName }}{{ v.ref ? ' · ' + v.ref : '' }}
+            </UiLabel>
+          </UiFlex>
+        }
+      }
+
+      <UiLabel
+        type="bodyXs"
+        weight="medium"
+        color="textAction"
+        className="underline cursor-pointer"
+      >
+        Ir a Variaciones →
+      </UiLabel>
+    </UiFlex>
+  </UiFlex>
+</UiSurface>

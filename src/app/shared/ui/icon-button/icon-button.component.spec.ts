@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { UiIconButtonComponent } from './icon-button.component';
@@ -6,14 +6,15 @@ import { UiIconButtonComponent } from './icon-button.component';
 @Component({
   selector: 'IconStub',
   standalone: true,
-  template: `<svg data-testid="stub-svg" [attr.width]="size"></svg>`,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `<svg data-testid="stub-svg" [attr.width]="size()"></svg>`,
 })
 class IconStubComponent {
-  @Input() size: number | string = 16;
-  @Input() width?: number | string;
-  @Input() height?: number | string;
-  @Input() color?: string;
-  @Input() className?: string;
+  readonly size = input<number | string>(16);
+  readonly width = input<number | string | undefined>(undefined);
+  readonly height = input<number | string | undefined>(undefined);
+  readonly color = input<string | undefined>(undefined);
+  readonly className = input<string | undefined>(undefined);
 }
 
 /**

@@ -1,6 +1,39 @@
-<SigninForm
-  [loading]="loading()"
-  [errorMessage]="errorMessage()"
-  (submitForm)="onSubmit($event)"
-  (signUpRequested)="onSignUp()"
-/>
+<UiFlex
+  direction="column"
+  justifyContent="center"
+  alignItems="center"
+  className="flex-1 w-full"
+>
+  <SigninForm
+    [loading]="loading()"
+    (submitForm)="onSubmit($event)"
+    (forgotPasswordRequested)="forgotModalOpen.set(true)"
+  ></SigninForm>
+</UiFlex>
+
+@if (errorMessage(); as msg) {
+  <UiToast variant="error" [message]="msg" (dismissed)="errorMessage.set(null)" />
+}
+
+<UiModal
+  [isOpen]="forgotModalOpen()"
+  [showCloseButton]="true"
+  className="max-w-67.5 p-5"
+  (close)="forgotModalOpen.set(false)"
+>
+  <UiHeader [level]="3" text="Restablecer contraseña" />
+  <UiLabel type="bodyS" color="textStrong" className="mt-2 block">
+    Contacte al
+    <UiLabel type="bodyS" weight="bold" color="textStrong">
+      Administrador del sistema
+    </UiLabel>
+    para restablecer su contraseña.
+  </UiLabel>
+  <UiFlex justifyContent="end" className="mt-4">
+    <UiButton
+      variant="primary"
+      label="Entendido"
+      (click)="forgotModalOpen.set(false)"
+    ></UiButton>
+  </UiFlex>
+</UiModal>

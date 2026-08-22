@@ -9,6 +9,7 @@ import {
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 
+import { UiAlertComponent } from "@shared/ui/alert";
 import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiButtonComponent } from "@shared/ui/button";
 import { UiFlexComponent } from "@shared/ui/flex";
@@ -18,8 +19,12 @@ import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
 import { UiRadioComponent } from "@shared/ui/radio";
 import { UiSelectComponent } from "@shared/ui/select";
+import { UiSurfaceComponent } from "@shared/ui/surface";
 
-import { emptyUserForm, type UserFormSavePayload } from "../../models/user-form";
+import {
+  emptyUserForm,
+  type UserFormSavePayload,
+} from "../../models/user-form";
 import type { User, UserRole, UserStatus } from "../../models/user";
 import { USER_ROLE_OPTIONS } from "../../models/user";
 
@@ -30,6 +35,7 @@ export type UserFormMode = "create" | "edit";
   standalone: true,
   imports: [
     FormsModule,
+    UiAlertComponent,
     UiBadgeComponent,
     UiButtonComponent,
     UiFlexComponent,
@@ -39,148 +45,10 @@ export type UserFormMode = "create" | "edit";
     UiModalComponent,
     UiRadioComponent,
     UiSelectComponent,
+    UiSurfaceComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <UiModal
-      [isOpen]="isOpen()"
-      [showCloseButton]="false"
-      className="max-w-140 p-6 lg:p-8"
-      (close)="onCancel()"
-    >
-      <UiLabel
-        type="HeadingM"
-        color="textStrong"
-        weight="semibold"
-        className="mb-1"
-      >
-        {{ heading() }}
-      </UiLabel>
-      <UiLabel
-        type="bodyS"
-        color="textWeak"
-        className="mb-5"
-      >
-        {{ subheading() }}
-      </UiLabel>
-
-      <div class="mb-4">
-        <UiLabel type="bodyXs" color="textStrong" weight="medium" className="mb-2 block uppercase">
-          Nombres
-        </UiLabel>
-        <UiInput
-          placeholder="p. ej. Ana María"
-          [value]="form().firstName"
-          (valueChange)="patch({ firstName: $event })"
-        />
-      </div>
-
-      <UiGrid [columns]="2" gap="14px" className="mb-4">
-        <div>
-          <UiLabel type="bodyXs" color="textStrong" weight="medium" className="mb-2 block uppercase">
-            Apellido paterno
-          </UiLabel>
-          <UiInput
-            placeholder="p. ej. Quispe"
-            [value]="form().lastNamePaternal"
-            (valueChange)="patch({ lastNamePaternal: $event })"
-          />
-        </div>
-        <div>
-          <UiLabel type="bodyXs" color="textStrong" weight="medium" className="mb-2 block uppercase">
-            Apellido materno
-          </UiLabel>
-          <UiInput
-            placeholder="p. ej. Rojas"
-            [value]="form().lastNameMaternal"
-            (valueChange)="patch({ lastNameMaternal: $event })"
-          />
-        </div>
-      </UiGrid>
-
-      <div class="mb-4">
-        <UiLabel type="bodyXs" color="textStrong" weight="medium" className="mb-2 block uppercase">
-          Correo electrónico
-        </UiLabel>
-        <UiInput
-          type="email"
-          placeholder="nombre.apellido@institucion.gob.pe"
-          [value]="form().email"
-          (valueChange)="patch({ email: $event })"
-        />
-      </div>
-
-      <UiGrid [columns]="2" gap="14px" className="mb-4">
-        <div>
-          <UiLabel type="bodyXs" color="textStrong" weight="medium" className="mb-2 block uppercase">
-            Rol
-          </UiLabel>
-          <UiSelect
-            [options]="roleOptions"
-            [searchable]="false"
-            [ngModel]="form().role"
-            (ngModelChange)="onRoleChange($event)"
-          />
-        </div>
-        <div>
-          <UiLabel type="bodyXs" color="textStrong" weight="medium" className="mb-2 block uppercase">
-            Estado
-          </UiLabel>
-          <UiFlex direction="row" alignItems="center" gap="16px" className="pt-1.5">
-            <UiRadio
-              name="user-status"
-              value="active"
-              [checked]="form().status === 'active'"
-              label="Activo"
-              (valueChange)="patch({ status: 'active' })"
-            />
-            <UiRadio
-              name="user-status"
-              value="inactive"
-              [checked]="form().status === 'inactive'"
-              label="Inactivo"
-              (valueChange)="patch({ status: 'inactive' })"
-            />
-          </UiFlex>
-        </div>
-      </UiGrid>
-
-      @if (mode() === "create") {
-        <div
-          class="mb-4 rounded-xl border border-dashed border-gray-300 p-3 dark:border-gray-700"
-        >
-          <UiFlex direction="row" alignItems="center" justifyContent="space-between" className="mb-2">
-            <UiLabel type="bodyXs" color="textStrong" weight="medium" className="uppercase">
-              Contraseña inicial
-            </UiLabel>
-            <UiBadge variant="light" color="info" size="sm">
-              Solo en alta
-            </UiBadge>
-          </UiFlex>
-          <UiInput
-            type="password"
-            placeholder="••••••••"
-            [showPasswordToggle]="true"
-            [value]="form().initialPassword ?? ''"
-            (valueChange)="patch({ initialPassword: $event })"
-          />
-          <UiLabel type="bodyXs" color="textWeak" className="mt-2 block">
-            Al editar un usuario existente este campo no aparece; la contraseña se cambia desde “Restablecer”.
-          </UiLabel>
-        </div>
-      }
-
-      <UiFlex
-        direction="row"
-        justifyContent="flex-end"
-        gap="8px"
-        className="mt-4 border-t border-dashed border-gray-200 pt-4 dark:border-gray-800"
-      >
-        <UiButton variant="secondary" labelText="Cancelar" (click)="onCancel()" />
-        <UiButton variant="primary" labelText="Guardar" (click)="onSave()" />
-      </UiFlex>
-    </UiModal>
-  `,
+  templateUrl: "./user-form-modal.component.html",
 })
 export class UserFormModalComponent {
   readonly isOpen = input<boolean>(false);
@@ -193,6 +61,7 @@ export class UserFormModalComponent {
   protected readonly roleOptions = USER_ROLE_OPTIONS;
 
   protected readonly form = signal(emptyUserForm());
+  protected readonly validationMessage = signal<string | null>(null);
 
   protected readonly heading = computed<string>(() =>
     this.mode() === "create" ? "Nuevo usuario" : "Editar usuario",
@@ -239,6 +108,12 @@ export class UserFormModalComponent {
   protected onSave(): void {
     const f = this.form();
     const m = this.mode();
+    const validationMessage = this.validate(f, m);
+    if (validationMessage) {
+      this.validationMessage.set(validationMessage);
+      return;
+    }
+
     const u = this.user();
     if (m === "create") {
       this.save.emit({
@@ -267,5 +142,27 @@ export class UserFormModalComponent {
         },
       });
     }
+  }
+
+  private validate(
+    form: ReturnType<typeof emptyUserForm>,
+    mode: UserFormMode,
+  ): string | null {
+    const requiredValues = [
+      form.firstName,
+      form.lastNamePaternal,
+      form.lastNameMaternal,
+      form.email,
+    ];
+    if (requiredValues.some((value) => !value.trim())) {
+      return "Completa nombres, apellidos y correo electrónico antes de guardar.";
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      return "Ingresa un correo electrónico válido.";
+    }
+    if (mode === "create" && (form.initialPassword?.length ?? 0) < 8) {
+      return "La contraseña inicial debe tener al menos 8 caracteres.";
+    }
+    return null;
   }
 }

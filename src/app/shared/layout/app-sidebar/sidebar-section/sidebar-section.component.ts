@@ -40,7 +40,7 @@ import {
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <UiFlex direction="column" gap="4px">
+    <UiFlex direction="column" [gap]="4">
       <UiLabel
         as="span"
         type="bodyXs"

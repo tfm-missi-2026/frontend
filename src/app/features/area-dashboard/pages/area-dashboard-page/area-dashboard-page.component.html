@@ -1,0 +1,125 @@
+<UiFlex direction="column" [gap]="20">
+  <CommonBreadcrumb
+    [items]="[{ label: 'Operación' }, { label: 'Dashboard Jefe' }]"
+  />
+
+  <UiFlex
+    direction="row"
+    alignItems="end"
+    justifyContent="between"
+    [gap]="12"
+    className="flex-wrap"
+  >
+    <UiFlex direction="column" [gap]="6" className="flex-1 min-w-60">
+      <UiHeader [level]="1" [text]="dashboard().greeting" />
+      <UiLabel type="bodyS" color="textWeak">
+        Visión del área · periodo
+        <strong class="font-semibold text-gray-800 dark:text-white/90">
+          {{ currentPeriod().label }}
+        </strong>
+        · {{ dashboard().totalUsersActive }} recursos ·
+        {{ dashboard().projectsTotal }} proyectos activos.
+      </UiLabel>
+    </UiFlex>
+    <CommonPeriodSelector
+      [periods]="periods"
+      [periodId]="periodId()"
+      (periodChange)="onPeriodChange($event)"
+    />
+  </UiFlex>
+
+  <UiGrid [columns]="4" gap="gap-4">
+    <CommonKpiCard
+      [alert]="true"
+      label="Recursos en sobrecarga"
+      [value]="dashboard().overloadResourcesCount"
+      [valueSuffix]="' de ' + dashboard().totalUsersActive"
+      sub="% utilización &gt; 100"
+      linkLabel="Ver carga del equipo →"
+      (linkClick)="onKpiClick('/app/operacion/carga-equipo')"
+    />
+    <CommonKpiCard
+      label="% Utilización media del equipo"
+      [value]="dashboard().teamAverageUtilizationPct"
+      valueSuffix="%"
+      sub="línea = 100% capacidad"
+      [progressPct]="dashboard().teamAverageUtilizationPct"
+    />
+    <UiSurface
+      variant="neutral"
+      padding="md"
+      className="border-2 border-gray-300 dark:border-gray-700 min-h-37"
+    >
+      <UiFlex direction="column" [gap]="6" className="h-full">
+        <UiLabel
+          type="bodyS"
+          weight="medium"
+          color="textWeak"
+          className="uppercase leading-tight"
+        >
+          Proyectos del área
+        </UiLabel>
+        <UiFlex direction="row" alignItems="baseline" [gap]="2">
+          <UiLabel
+            type="HeadingTV"
+            weight="bold"
+            color="textStrong"
+            className="text-5xl leading-none font-mono whitespace-nowrap"
+          >
+            {{ dashboard().projectsTotal }}
+          </UiLabel>
+          <UiLabel type="HeadingS" weight="bold" color="textStrong">
+            activos
+          </UiLabel>
+        </UiFlex>
+        <UiFlex
+          direction="row"
+          alignItems="center"
+          [gap]="6"
+          className="flex-wrap"
+        >
+          <UiBadge variant="light" color="success" size="sm">
+            {{ dashboard().enPlazoCount }} en plazo
+          </UiBadge>
+          <UiBadge variant="light" color="warning" size="sm">
+            {{ dashboard().enRiesgoCount }} en riesgo
+          </UiBadge>
+          <UiBadge variant="solid" color="dark" size="sm">
+            {{ dashboard().retrasadoCount }} retrasado
+          </UiBadge>
+        </UiFlex>
+        <UiLabel type="bodyXs" color="textWeak" className="mt-auto">
+          indicador — dato de Proyectos.
+        </UiLabel>
+      </UiFlex>
+    </UiSurface>
+    <CommonKpiCard
+      label="Variaciones pendientes"
+      [value]="dashboard().variationsTotal"
+      sub="por resolver en el área"
+      linkLabel="Ver variaciones →"
+      (linkClick)="onKpiClick('/app/operacion/variaciones')"
+    />
+  </UiGrid>
+
+  <UiGrid [columns]="2" gap="gap-5">
+    <AreaLoadChart [workloads]="dashboard().teamWorkloads" />
+    <AreaAlerts
+      [overloads]="overloadsList()"
+      [variations]="dashboard().pendingVariations"
+    />
+  </UiGrid>
+
+  <UiSurface
+    variant="neutral"
+    padding="md"
+    className="border-dashed max-w-160"
+  >
+    <UiLabel type="bodyS" color="textWeak">
+      El dashboard
+      <strong class="font-semibold text-gray-800 dark:text-white/90">solo agrega y enlaza</strong>
+      : muestra indicadores tomados de Carga del equipo, Avance, Proyectos y
+      Variaciones. La captura y edición ocurre en cada módulo.
+    </UiLabel>
+  </UiSurface>
+</UiFlex>

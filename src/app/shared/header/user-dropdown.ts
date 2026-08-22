@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   input,
+  output,
   signal,
 } from "@angular/core";
 import { NgComponentOutlet } from "@angular/common";
@@ -16,10 +17,7 @@ import {
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiLabelComponent } from "@shared/ui/label";
 
-import {
-  HeaderUserInfo,
-  HeaderUserMenuItem,
-} from "./header.types";
+import { HeaderUserInfo, HeaderUserMenuItem } from "./header.types";
 
 const TRIGGER_BUTTON_CLASS =
   "flex items-center text-gray-700 dropdown-toggle dark:text-gray-400";
@@ -101,7 +99,7 @@ const ACTION_CLASS =
         (close)="closeDropdown()"
         [className]="PANEL_CLASS"
       >
-        <UiFlex direction="column" gap="0.125rem" [className]="HEADER_CLASS">
+        <UiFlex direction="column" [gap]="0.5" [className]="HEADER_CLASS">
           <UiLabel
             type="bodyS"
             color="textStrong"
@@ -110,11 +108,7 @@ const ACTION_CLASS =
           >
             {{ user().name }}
           </UiLabel>
-          <UiLabel
-            type="bodyXs"
-            color="textWeak"
-            className="block mt-0.5"
-          >
+          <UiLabel type="bodyXs" color="textWeak" className="block mt-0.5">
             {{ user().email }}
           </UiLabel>
         </UiFlex>
@@ -127,9 +121,7 @@ const ACTION_CLASS =
                 [to]="item.to"
                 [className]="MENU_ITEM_CLASS"
               >
-                <ng-container
-                  *ngComponentOutlet="item.icon"
-                ></ng-container>
+                <ng-container *ngComponentOutlet="item.icon"></ng-container>
                 {{ item.label }}
               </UiDropdownItem>
             </li>
@@ -138,13 +130,11 @@ const ACTION_CLASS =
 
         @if (actionItem(); as action) {
           <UiDropdownItem
-            (itemClick)="closeDropdown()"
+            (itemClick)="handleActionClick(action)"
             [to]="action.to"
             [className]="ACTION_CLASS"
           >
-            <ng-container
-              *ngComponentOutlet="action.icon"
-            ></ng-container>
+            <ng-container *ngComponentOutlet="action.icon"></ng-container>
             {{ action.label }}
           </UiDropdownItem>
         }
@@ -168,6 +158,9 @@ export class HeaderUserDropdownComponent {
    * renderiza ninguna acción.
    */
   readonly actionItem = input<HeaderUserMenuItem | undefined>(undefined);
+
+  /** Se emite cuando el usuario hace clic en la accion al pie del panel. */
+  readonly actionClick = output<HeaderUserMenuItem>();
 
   /** Estado interno de visibilidad del dropdown. */
   protected readonly isOpen = signal(false);
@@ -197,5 +190,10 @@ export class HeaderUserDropdownComponent {
 
   protected closeDropdown(): void {
     this.isOpen.set(false);
+  }
+
+  protected handleActionClick(action: HeaderUserMenuItem): void {
+    this.closeDropdown();
+    this.actionClick.emit(action);
   }
 }

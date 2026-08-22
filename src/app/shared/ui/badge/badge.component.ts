@@ -97,6 +97,9 @@ export class UiBadgeComponent {
   /** Props para los íconos (size default 12). */
   readonly iconProps = input<IconProps>({});
 
+  /** Clases extra aplicadas al contenedor del badge. */
+  readonly className = input<string>("");
+
   readonly sizeClass = computed<string>(() => SIZE_CLASSES[this.size()]);
 
   readonly colorClass = computed<string>(
@@ -104,7 +107,8 @@ export class UiBadgeComponent {
   );
 
   readonly containerClasses = computed<string>(
-    () => `${BASE_STYLES} ${this.sizeClass()} ${this.colorClass()}`,
+    () =>
+      `${BASE_STYLES} ${this.sizeClass()} ${this.colorClass()} ${this.className()}`.trim(),
   );
 
   readonly iconInputs = computed<Record<string, unknown>>(() => {

@@ -1,4 +1,4 @@
-import { Component, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ViewChild } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { UiGridComponent } from "./grid.component";
@@ -7,6 +7,7 @@ import { GridBreakpoint, GridColumns } from "./grid.types";
 @Component({
   standalone: true,
   imports: [UiGridComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <UiGrid
       [columns]="columns"
@@ -109,8 +110,6 @@ describe("UiGrid", () => {
   it("forwards ariaLabel to the container", () => {
     host.ariaLabel = "Galería de productos";
     fixture.detectChanges();
-    expect(container().getAttribute("aria-label")).toBe(
-      "Galería de productos",
-    );
+    expect(container().getAttribute("aria-label")).toBe("Galería de productos");
   });
 });

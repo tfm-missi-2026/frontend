@@ -1,0 +1,63 @@
+<UiSurface
+  variant="neutral"
+  padding="md"
+  className="border-2 border-gray-300 dark:border-gray-700"
+>
+  <UiFlex direction="column" [gap]="12">
+    <UiFlex direction="column" [gap]="4">
+      <UiHeader [level]="4" text="Mis tareas" />
+      <UiLabel type="bodyS" color="textWeak">
+        Tareas asignadas en el período · horas registradas ÷ planificadas.
+      </UiLabel>
+    </UiFlex>
+
+    @if (taskCount() === 0) {
+      <UiLabel type="bodyS" color="textWeak" className="italic">
+        Sin tareas asignadas en este período.
+      </UiLabel>
+    } @else {
+      @for (t of tasks(); track t.assignmentId; let last = $last) {
+        <UiFlex
+          direction="row"
+          alignItems="center"
+          [gap]="12"
+          [className]="
+            last
+              ? 'w-full'
+              : 'w-full pb-2 border-b border-dashed border-gray-200 dark:border-gray-800'
+          "
+        >
+          <UiLabel
+            type="bodyS"
+            weight="bold"
+            color="textStrong"
+            className="flex-1 min-w-0 truncate"
+            [text]="t.taskName"
+          />
+          <UiLabel
+            type="bodyXs"
+            weight="medium"
+            color="textWeak"
+            className="font-mono whitespace-nowrap"
+            [text]="t.ref"
+          />
+          <UiBadge
+            variant="light"
+            [color]="situationColor(t.situation)"
+            size="sm"
+          >
+            {{ t.situation }}
+          </UiBadge>
+          <UiLabel
+            type="bodyS"
+            weight="bold"
+            color="textStrong"
+            className="min-w-16 text-right font-mono whitespace-nowrap"
+          >
+            {{ t.loggedHours }}-{{ t.estimatedHours }}
+          </UiLabel>
+        </UiFlex>
+      }
+    }
+  </UiFlex>
+</UiSurface>

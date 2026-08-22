@@ -1,0 +1,178 @@
+<UiModal
+  [isOpen]="isOpen()"
+  [showCloseButton]="true"
+  className="max-w-150 p-6 pr-12 lg:p-8 lg:pr-14"
+  (close)="onCancel()"
+>
+  <UiHeader [level]="3" [text]="heading()" />
+  <UiLabel type="bodyS" color="textWeak" className="mt-1 mb-5 block">
+    {{ subheading() }}
+  </UiLabel>
+
+  <UiGrid [columns]="3" breakpoint="sm" gap="gap-4" className="mb-4">
+    <div>
+      <UiFormLabel
+        labelText="Fecha"
+        labelFor="entry-date"
+        [required]="true"
+      />
+      <UiDatePicker
+        id="entry-date"
+        [value]="form().date"
+        placeholder="dd/mm/aaaa"
+        (valueChange)="patch({ date: asString($event) })"
+      />
+      @if (errors().date; as msg) {
+        <UiFieldError [message]="msg" className="mt-1" />
+      }
+    </div>
+    <div>
+      <UiFormLabel
+        labelText="Hora inicio"
+        labelFor="entry-start"
+        [required]="true"
+      />
+      <UiTimePicker
+        id="entry-start"
+        [time24hr]="true"
+        [dateFormat]="'H:i'"
+        placeholder="hh:mm"
+        [value]="form().startTime"
+        (valueChange)="patch({ startTime: $event })"
+      />
+      @if (errors().startTime; as msg) {
+        <UiFieldError [message]="msg" className="mt-1" />
+      }
+    </div>
+    <div>
+      <UiFormLabel
+        labelText="Hora fin"
+        labelFor="entry-end"
+        [required]="true"
+      />
+      <UiTimePicker
+        id="entry-end"
+        [time24hr]="true"
+        [dateFormat]="'H:i'"
+        placeholder="hh:mm"
+        [value]="form().endTime"
+        (valueChange)="patch({ endTime: $event })"
+      />
+      @if (errors().endTime; as msg) {
+        <UiFieldError [message]="msg" className="mt-1" />
+      }
+    </div>
+  </UiGrid>
+
+  <UiLabel
+    type="bodyXs"
+    color="textStrong"
+    weight="medium"
+    className="mb-2 block uppercase"
+  >
+    ¿Qué registras?
+  </UiLabel>
+  <UiGrid [columns]="2" breakpoint="sm" gap="gap-3" className="mb-3">
+    <UiRadio
+      name="entry-kind"
+      value="task"
+      label="Trabajo en tarea"
+      [checked]="form().kind === 'task'"
+      [className]="kindCardClasses('task')"
+      (valueChange)="selectKind('task')"
+    />
+    <UiRadio
+      name="entry-kind"
+      value="activity"
+      label="Actividad"
+      [checked]="form().kind === 'activity'"
+      [className]="kindCardClasses('activity')"
+      (valueChange)="selectKind('activity')"
+    />
+  </UiGrid>
+
+  <UiAlert
+    variant="info"
+    message="Un bloque es de tarea O de actividad, no ambos."
+    className="mb-4"
+  />
+
+  @if (form().kind === "task") {
+    <div class="mb-4">
+      <UiFormLabel
+        labelText="Mis tareas asignadas"
+        labelFor="entry-task"
+        [required]="true"
+      />
+      <UiSelect
+        inputId="entry-task"
+        [options]="taskOptions"
+        [searchable]="false"
+        [ngModel]="form().task"
+        (ngModelChange)="onTaskChange($event)"
+      />
+      @if (errors().task; as msg) {
+        <UiFieldError [message]="msg" className="mt-1" />
+      }
+      <UiLabel type="bodyXs" color="textWeak" className="mt-1 block">
+        Solo tareas con asignación vigente para ti.
+      </UiLabel>
+    </div>
+  } @else {
+    <div class="mb-4">
+      <UiFormLabel
+        labelText="Actividad"
+        labelFor="entry-activity"
+        [required]="true"
+      />
+      <UiSelect
+        inputId="entry-activity"
+        [options]="activityOptions"
+        [searchable]="false"
+        [ngModel]="form().activity"
+        (ngModelChange)="onActivityChange($event)"
+      />
+      @if (errors().activity; as msg) {
+        <UiFieldError [message]="msg" className="mt-1" />
+      }
+      <UiLabel type="bodyXs" color="textWeak" className="mt-1 block">
+        Catálogo: Reunión · Capacitación · Soporte · Otro.
+      </UiLabel>
+    </div>
+  }
+
+  <div class="mb-4">
+    <UiFormLabel labelText="Descripción" labelFor="entry-description" />
+    <UiTextArea
+      id="entry-description"
+      [rows]="3"
+      placeholder="¿Qué hiciste en este bloque?"
+      [value]="form().description"
+      (valueChange)="patch({ description: $event })"
+    />
+  </div>
+
+  @if (formError(); as msg) {
+    <UiAlert variant="error" [message]="msg" className="mb-4" />
+  }
+
+  <UiSeparator className="mt-2" />
+
+  <UiFlex
+    direction="row"
+    [justifyContent]="'end'"
+    [gap]="8"
+    className="mt-4"
+  >
+    <UiButton
+      variant="secondary"
+      label="Cancelar"
+      (click)="onCancel()"
+    />
+    <UiButton
+      variant="primary"
+      [label]="mode() === 'create' ? 'Guardar' : 'Guardar cambios'"
+      (click)="onSave()"
+    />
+  </UiFlex>
+</UiModal>

@@ -1,0 +1,154 @@
+<UiModal
+  [isOpen]="isOpen()"
+  [showCloseButton]="true"
+  className="max-w-130 p-6 lg:p-8"
+  (close)="onCancel()"
+>
+  <UiFlex direction="column" [gap]="16">
+    <UiFlex direction="column" [gap]="4">
+      <UiLabel type="HeadingM" weight="semibold" color="textStrong">
+        {{ heading() }}
+      </UiLabel>
+      <UiLabel type="bodyS" color="textWeak">
+        Vincula un recurso técnico con una tarea.
+      </UiLabel>
+    </UiFlex>
+
+    @if (validationMessage(); as msg) {
+      <UiAlert variant="error" [message]="msg" />
+    }
+
+    <UiFlex direction="column" [gap]="6">
+      <UiFormLabel
+        labelText="Tarea"
+        labelFor="assignment-task"
+        [required]="true"
+      />
+      <UiSelect
+        inputId="assignment-task"
+        [options]="taskOptions()"
+        placeholder="Selecciona una tarea…"
+        [searchable]="false"
+        [ngModel]="form().taskId"
+        (ngModelChange)="onTaskChange($event)"
+      />
+      @if (taskError(); as msg) {
+        <UiFieldError [message]="msg" />
+      }
+      <UiLabel type="bodyXs" color="textWeak">
+        Tareas de los subproyectos del proyecto seleccionado.
+      </UiLabel>
+    </UiFlex>
+
+    <UiFlex direction="column" [gap]="6">
+      <UiFormLabel
+        labelText="Recurso técnico"
+        labelFor="assignment-resource"
+        [required]="true"
+      />
+      <UiSelect
+        inputId="assignment-resource"
+        [options]="resourceOptions()"
+        placeholder="Selecciona un recurso…"
+        [searchable]="false"
+        [ngModel]="form().resourceId"
+        (ngModelChange)="onResourceChange($event)"
+      />
+      @if (resourceError(); as msg) {
+        <UiFieldError [message]="msg" />
+      }
+      <UiLabel type="bodyXs" color="textWeak">
+        Solo usuarios con rol Recurso Técnico.
+      </UiLabel>
+    </UiFlex>
+
+    <UiGrid [columns]="2" gap="gap-4">
+      <UiFlex direction="column" [gap]="6">
+        <UiFormLabel
+          labelText="Horas planificadas"
+          labelFor="assignment-hours"
+          [required]="true"
+        />
+        <UiInput
+          id="assignment-hours"
+          type="number"
+          placeholder="p. ej. 20"
+          [value]="form().plannedHours"
+          (valueChange)="onHoursChange($event)"
+          className="max-w-30"
+        />
+        @if (hoursError(); as msg) {
+          <UiFieldError [message]="msg" />
+        }
+      </UiFlex>
+      <UiFlex direction="column" [gap]="6" className="justify-end">
+        <UiLabel type="bodyXs" color="textWeak">
+          {{ jornadaLabel() }}
+        </UiLabel>
+      </UiFlex>
+    </UiGrid>
+
+    <UiGrid [columns]="2" gap="gap-4">
+      <UiFlex direction="column" [gap]="6">
+        <UiFormLabel
+          labelText="Fecha inicio"
+          labelFor="assignment-start"
+          [required]="true"
+        />
+        <UiDatePicker
+          inputId="assignment-start"
+          mode="single"
+          dateFormat="d/m/Y"
+          placeholder="dd/mm/aaaa"
+          [value]="form().startDate"
+          (valueChange)="onStartDateChange($event)"
+          className="max-w-55"
+        />
+        @if (startError(); as msg) {
+          <UiFieldError [message]="msg" />
+        }
+      </UiFlex>
+      <UiFlex direction="column" [gap]="6">
+        <UiFormLabel
+          labelText="Fecha fin"
+          labelFor="assignment-end"
+          [required]="true"
+        />
+        <UiDatePicker
+          inputId="assignment-end"
+          mode="single"
+          dateFormat="d/m/Y"
+          placeholder="dd/mm/aaaa"
+          [value]="form().endDate"
+          (valueChange)="onEndDateChange($event)"
+          className="max-w-55"
+        />
+        @if (endError(); as msg) {
+          <UiFieldError [message]="msg" />
+        }
+      </UiFlex>
+    </UiGrid>
+
+    @if (dateRangeError(); as msg) {
+      <UiFieldError [message]="msg" />
+    }
+
+    <UiFlex
+      direction="row"
+      justifyContent="end"
+      [gap]="8"
+      className="mt-4 border-t border-dashed border-gray-200 pt-4 dark:border-gray-800"
+    >
+      <UiButton
+        variant="secondary"
+        label="Cancelar"
+        (click)="onCancel()"
+      />
+      <UiButton
+        variant="primary"
+        label="Guardar"
+        (click)="onSave()"
+      />
+    </UiFlex>
+  </UiFlex>
+</UiModal>

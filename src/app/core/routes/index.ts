@@ -1,0 +1,1 @@
+export { extractPathsFromRoutes } from "./routes-path.util";

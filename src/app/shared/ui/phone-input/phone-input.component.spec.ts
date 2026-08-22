@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { UiPhoneInputComponent } from "./phone-input.component";
-import type { CountryCode } from "./types";
+import type { CountryCode } from "./phone-input.types";
 
 function applyInputs<T>(
   fixture: ComponentFixture<T>,

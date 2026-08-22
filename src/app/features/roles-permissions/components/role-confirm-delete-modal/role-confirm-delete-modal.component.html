@@ -1,0 +1,63 @@
+<UiModal
+  [isOpen]="isOpen()"
+  [showCloseButton]="false"
+  className="max-w-160 p-6 lg:p-8"
+  (close)="onCancel()"
+>
+  @if (role(); as r) {
+    <UiFlex direction="column" [gap]="3">
+      <UiFlex direction="column" [gap]="1">
+        <UiHeader [level]="2" text="Eliminar rol" />
+        <UiLabel
+          type="bodyS"
+          color="textWeak"
+          [text]="
+            'Vas a eliminar el rol ' +
+            r.name +
+            '. Esta acción no se puede deshacer.'
+          "
+        />
+      </UiFlex>
+
+      <UiFlex direction="column" [gap]="1">
+        <UiFormLabel
+          labelText="Motivo de eliminación"
+          [required]="true"
+          [labelFor]="'role-delete-motivo'"
+        />
+        <UiTextArea
+          id="role-delete-motivo"
+          [rows]="3"
+          placeholder="Describe brevemente el motivo"
+          [value]="motivo()"
+          (valueChange)="patchMotivo($event)"
+          (blurEvt)="onMotivoBlur()"
+        />
+        @if (!visibleMotivoError()) {
+          <UiLabel
+            type="bodyXs"
+            color="textWeak"
+            text="Quedará registrado en la auditoría del sistema."
+          />
+        }
+        <UiFieldError [message]="visibleMotivoError()" />
+      </UiFlex>
+
+      <UiFlex
+        direction="row"
+        justifyContent="end"
+        [gap]="2"
+        className="mt-2 border-t border-gray-200 pt-3 dark:border-gray-800"
+      >
+        <UiButton variant="secondary" label="Cancelar" (click)="onCancel()" />
+        <UiButton
+          variant="primary"
+          styleType="danger"
+          label="Eliminar rol"
+          [disabled]="!isValid()"
+          (click)="onConfirm()"
+        />
+      </UiFlex>
+    </UiFlex>
+  }
+</UiModal>

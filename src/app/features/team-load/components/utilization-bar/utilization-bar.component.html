@@ -1,0 +1,28 @@
+<UiFlex direction="row" alignItems="center" [gap]="8" className="w-full min-w-40">
+  <UiFlex
+    direction="row"
+    alignItems="center"
+    [gap]="0"
+    className="relative h-5 w-full min-w-30 overflow-hidden rounded border-2 border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900"
+  >
+    <UiFlex
+      direction="row"
+      alignItems="center"
+      [className]="fillClasses()"
+      [style.width.%]="fillWidthPct()"
+    />
+    <UiFlex
+      direction="column"
+      className="absolute -top-1 -bottom-1 w-0 border-l-2 border-dashed border-gray-500"
+      [style.left.%]="markPos"
+    />
+  </UiFlex>
+  <UiLabel
+    type="bodyS"
+    weight="semibold"
+    color="textStrong"
+    className="min-w-16 whitespace-nowrap font-mono"
+  >
+    {{ labelText() }}
+  </UiLabel>
+</UiFlex>

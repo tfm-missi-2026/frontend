@@ -1,0 +1,30 @@
+<UiSurface variant="neutral" padding="md" className="border border-gray-200 dark:border-gray-700">
+  <UiFlex direction="row" alignItems="center" [gap]="20" className="flex-wrap">
+    <span
+      class="inline-block rounded-md border border-gray-300 bg-gray-50 px-3 py-1 font-mono text-sm font-bold tracking-wide text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+    >
+      {{ project().code }}
+    </span>
+
+    <UiFlex direction="column" [gap]="2" className="min-w-0 flex-1">
+      <UiHeader [level]="3" [text]="project().name" className="text-xl" />
+      <UiLabel type="bodyS" color="textWeak" className="block">
+        Gestor responsable:
+        <strong class="text-gray-800 dark:text-white/90">{{
+          managerName() || "Sin gestor"
+        }}</strong>
+        · Estado del proyecto:
+        <strong class="text-gray-800 dark:text-white/90">{{
+          statusLabel()
+        }}</strong>
+      </UiLabel>
+    </UiFlex>
+
+    <UiFlex direction="column" alignItems="end" [gap]="2">
+      <span class="font-mono text-3xl font-bold leading-none text-gray-800 dark:text-white/90">
+        {{ subCount() }}
+      </span>
+      <UiLabel type="bodyS" color="textWeak">subproyectos</UiLabel>
+    </UiFlex>
+  </UiFlex>
+</UiSurface>

@@ -7,4 +7,4 @@
  * Standalone + OnPush + signal APIs.
  */
 export { UiPhoneInputComponent } from "./phone-input.component";
-export type { CountryCode, PhoneSelectPosition } from "./types";
+export type { CountryCode, PhoneSelectPosition } from "./phone-input.types";

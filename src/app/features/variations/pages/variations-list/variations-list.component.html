@@ -1,0 +1,145 @@
+<UiFlex direction="column" [gap]="20">
+  <CommonBreadcrumb [items]="breadcrumbItems" />
+
+  <UiFlex
+    direction="row"
+    alignItems="end"
+    justifyContent="between"
+    [gap]="12"
+    className="flex-wrap"
+  >
+    <UiFlex direction="column" [gap]="4">
+      <UiHeader [level]="1" text="Variaciones" />
+      <UiLabel type="bodyS" color="textWeak" className="max-w-190">
+        Una variación es un cambio formal sobre el plan (alcance, plazo o
+        recursos) con
+        <strong class="font-semibold text-gray-800 dark:text-white/90">justificación obligatoria</strong>.
+        La reporta el Gestor o el Recurso Técnico; la resuelve el Gestor o el
+        Jefe de Área.
+      </UiLabel>
+    </UiFlex>
+    <UiButton
+      variant="primary"
+      label="Reportar variación"
+      labelText="Reportar variación"
+      [LeftIcon]="IconPlusSimpleComponent"
+      (click)="openReport()"
+    />
+  </UiFlex>
+
+  <VariationsToolbar
+    [searchTerm]="searchTerm()"
+    [typeOptions]="VARIATION_TYPE_FILTER_OPTIONS"
+    [typeValue]="filterType()"
+    [statusOptions]="VARIATION_STATUS_FILTER_OPTIONS"
+    [statusValue]="filterStatus()"
+    (searchChange)="onSearchChange($event)"
+    (typeChange)="onTypeFilterChange($event)"
+    (statusChange)="onStatusFilterChange($event)"
+  />
+
+  @if (rows().length === 0) {
+    <UiSurface
+      variant="neutral"
+      padding="lg"
+      className="border-dashed text-center"
+    >
+      <UiFlex direction="column" alignItems="center" [gap]="12">
+        <UiFlex
+          direction="row"
+          alignItems="center"
+          justifyContent="center"
+          [gap]="0"
+          className="h-14 w-14 rounded-lg bg-gray-100 dark:bg-gray-800"
+        >
+          <UiLabel type="HeadingM" color="textWeak">∅</UiLabel>
+        </UiFlex>
+        <UiHeader [level]="4" text="No hay variaciones con esos filtros." />
+        <UiLabel type="bodyS" color="textWeak">
+          Ajusta los filtros o reporta una nueva variación.
+        </UiLabel>
+        <UiButton
+          variant="primary"
+          label="Reportar variación"
+          labelText="Reportar variación"
+          [LeftIcon]="IconPlusSimpleComponent"
+          (click)="openReport()"
+        />
+      </UiFlex>
+    </UiSurface>
+  } @else {
+    <VariationsTable
+      [rows]="rows()"
+      (view)="onView($event)"
+      (resolve)="onResolve($event)"
+    />
+  }
+
+  @if (rows().length > 0) {
+    <UiSurface variant="neutral" padding="md">
+      <UiFlex
+        direction="row"
+        alignItems="center"
+        justifyContent="between"
+        [gap]="12"
+        className="flex-wrap"
+      >
+        <UiFlex direction="row" alignItems="center" [gap]="8" className="flex-wrap">
+          <UiLabel type="bodyXs" weight="medium" color="textWeak" className="uppercase">
+            Conteo
+          </UiLabel>
+          <UiBadge
+            variant="light"
+            color="warning"
+            size="md"
+            className="border border-dashed border-warning-300 dark:border-warning-700"
+          >
+            {{ pendingCount() }} pendientes
+          </UiBadge>
+          <UiBadge variant="solid" color="success" size="md">
+            {{ approvedCount() }} aprobadas
+          </UiBadge>
+          <UiBadge variant="solid" color="error" size="md">
+            {{ rejectedCount() }} rechazadas
+          </UiBadge>
+        </UiFlex>
+        <UiLabel type="bodyXs" color="textWeak">
+          "Resolver" solo activo en variaciones Pendientes.
+        </UiLabel>
+      </UiFlex>
+    </UiSurface>
+  }
+
+  <UiSurface
+    variant="neutral"
+    padding="md"
+    className="border-dashed max-w-160"
+  >
+    <UiLabel type="bodyS" color="textWeak">
+      <strong class="font-semibold">RF-11</strong>
+      · Las variaciones conservan su
+      <strong class="font-semibold text-gray-800 dark:text-white/90">histórico y trazabilidad</strong>
+      respecto a la línea base; resolverlas registra
+      <strong class="font-semibold text-gray-800 dark:text-white/90">quién y cuándo</strong>.
+    </UiLabel>
+  </UiSurface>
+</UiFlex>
+
+<ReportVariationModal
+  [isOpen]="reportOpen()"
+  [targetOptions]="targetOptions()"
+  [reportedBy]="currentReporter()"
+  (save)="onReportSubmit($event)"
+  (close)="closeReport()"
+/>
+
+@if (selectedVariation(); as v) {
+  <ResolveVariationModal
+    [isOpen]="resolveOpen()"
+    [mode]="resolveMode()"
+    [variation]="v"
+    [resolvedBy]="currentResolver()"
+    (resolve)="onResolveSubmit($event)"
+    (close)="closeResolve()"
+  />
+}

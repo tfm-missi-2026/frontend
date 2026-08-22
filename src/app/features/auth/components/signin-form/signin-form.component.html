@@ -1,85 +1,33 @@
-<UiFlex direction="column" justifyContent="center" className="flex-1 w-full max-w-md mx-auto">
-  <UiFlex direction="column" gap="24px">
-    <UiFlex direction="column" gap="8px">
-      <UiHeader [level]="1" text="Iniciar sesión"></UiHeader>
-      <UiLabel
-        type="bodyS"
-        color="textWeak"
-        text="Ingresa tu correo electrónico y contraseña para iniciar sesión."
-      ></UiLabel>
-    </UiFlex>
+<UiFlex direction="column" [gap]="6">
+  <UiFlex direction="column" alignItems="center" [gap]="6">
+    <UiLabel type="HeadingL" weight="bold" color="textStrong">
+      SPSRT
+    </UiLabel>
+    <UiLabel type="bodyXs" color="textWeak" align="center">
+      Planificación y Seguimiento de Recursos Técnicos
+    </UiLabel>
+  </UiFlex>
 
-    <form (submit)="onSubmit($event)">
-      <UiFlex direction="column" gap="20px">
-        @if (errorMessage()) {
-          <UiAlert
-            variant="error"
-            title="No se pudo iniciar sesión"
-            [message]="errorMessage() ?? ''"
-          ></UiAlert>
-        }
+  <UiForm (submit)="onSubmit($event)" className="flex flex-col gap-4">
+    <UiInput id="signin-email" name="email" type="email" labelText="Correo electrónico"
+      placeholder="nombre.apellido@institucion.gob.pe" [required]="true" [value]="email()"
+      (valueChange)="onEmailChange($event)"></UiInput>
 
-        <UiInput
-          id="signin-email"
-          name="email"
-          type="email"
-          labelText="Correo electrónico"
-          placeholder="ejemplo@correo.com"
-          [required]="true"
-          [value]="email()"
-          (valueChange)="onEmailChange($event)"
-        ></UiInput>
+    <UiInput id="signin-password" name="password" type="password" labelText="Contraseña" placeholder="••••••••"
+      [required]="true" [showPasswordToggle]="true" [value]="password()" (valueChange)="onPasswordChange($event)">
+    </UiInput>
 
-        <UiInput
-          id="signin-password"
-          name="password"
-          type="password"
-          labelText="Contraseña"
-          placeholder="Ingresa tu contraseña"
-          [required]="true"
-          [showPasswordToggle]="true"
-          [value]="password()"
-          (valueChange)="onPasswordChange($event)"
-        ></UiInput>
+    <UiButton variant="primary" [fullWidth]="true" [isSubmit]="true" [isLoading]="loading()" [disabled]="loading()"
+      label="Entrar" (click)="onSubmit()"></UiButton>
 
-        <UiFlex justifyContent="flex-end">
-          <UiLink
-            to="/reset-password"
-            size="sm"
-            variant="primary"
-            underline="hover"
-            (click)="onForgotPassword()"
-          >
-            ¿Olvidaste tu contraseña?
-          </UiLink>
-        </UiFlex>
-
-        <UiButton
-          [fullWidth]="true"
-          [isSubmit]="true"
-          [isLoading]="loading()"
-          [disabled]="loading()"
-        >
-          Iniciar sesión
-        </UiButton>
-      </UiFlex>
-    </form>
-
-    <UiFlex justifyContent="center" gap="6px" className="mt-2">
-      <UiLabel
-        type="bodyS"
-        color="textWeak"
-        text="¿No tienes una cuenta?"
-      ></UiLabel>
-      <UiLink
-        to="/signup"
-        size="sm"
-        variant="primary"
-        underline="hover"
-        (click)="onSignUp()"
-      >
-        Crear cuenta
+    <UiFlex justifyContent="center">
+      <UiLink variant="primary" size="sm" underline="hover" (click)="forgotPasswordRequested.emit()">
+        ¿Olvidó su contraseña?
       </UiLink>
     </UiFlex>
+  </UiForm>
+  <UiFlex justifyContent="center">
+    <UiLabel type="bodyXxs" color="textWeakest" className="font-mono" [text]="'v0.1 · SPSRT'">
+    </UiLabel>
   </UiFlex>
 </UiFlex>

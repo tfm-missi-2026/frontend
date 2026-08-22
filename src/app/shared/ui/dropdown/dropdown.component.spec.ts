@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { Component, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
 import { By } from "@angular/platform-browser";
 
 import { UiDropdownComponent } from "./dropdown.component";
@@ -9,6 +9,7 @@ import { UiDropdownItemComponent } from "./dropdown-item";
   selector: "UiDropdownTestHost",
   standalone: true,
   imports: [UiDropdownComponent, UiDropdownItemComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="relative">
       <button type="button" class="dropdown-toggle" (click)="toggle()">

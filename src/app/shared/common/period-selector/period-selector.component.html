@@ -1,0 +1,11 @@
+<UiFlex direction="row" alignItems="center" [gap]="8">
+  <UiSelect
+    [options]="periodOptions()"
+    placeholder="Selecciona un período…"
+    [searchable]="false"
+    [isClearable]="false"
+    [ngModel]="periodId()"
+    (ngModelChange)="periodChange.emit(asString($event))"
+    className="min-w-50"
+  />
+</UiFlex>

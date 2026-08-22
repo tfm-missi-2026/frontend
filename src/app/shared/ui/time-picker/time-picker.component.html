@@ -3,11 +3,7 @@
   Mismo layout que UiDatePicker: outer > form-label + container con icono clock.
 -->
 
-<div
-  [class]="outerClasses()"
-  [style]="outerStyles()"
-  data-testid="timepicker-wrapper"
->
+<div [class]="outerClasses()" data-testid="timepicker-wrapper">
   @if (labelText(); as lt) {
     <UiFormLabel
       [labelText]="lt"
@@ -19,11 +15,7 @@
     ></UiFormLabel>
   }
 
-  <div
-    [class]="containerClasses()"
-    [style]="containerStyles()"
-    data-testid="timepicker-container"
-  >
+  <div [class]="containerClasses()" data-testid="timepicker-container">
     <input
       #inputEl
       [id]="id() || null"

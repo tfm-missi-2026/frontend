@@ -2,7 +2,7 @@
   <div
     class="flex flex-col justify-center w-full h-screen lg:flex-row dark:bg-gray-900 sm:p-0"
   >
-    <div class="relative flex-1 w-full">
+    <div class="relative flex-1 w-full flex items-center justify-center">
       <router-outlet></router-outlet>
       <div class="absolute z-50 hidden bottom-6 right-6 sm:block">
         <CommonThemeToggle variant="brand" size="lg" />
@@ -30,9 +30,13 @@
               [bordered]="false"
             />
           </UiLink>
-          <p class="text-center text-gray-400 dark:text-white/60">
-            Sistema de Planificación y Seguimiento de Recursos Técnicos
-          </p>
+          <UiLabel
+            type="bodyS"
+            color="textWeak"
+            align="center"
+            className="block"
+            text="Sistema de Planificación y Seguimiento de Recursos Técnicos"
+          ></UiLabel>
         </div>
       </div>
     </div>

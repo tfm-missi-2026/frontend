@@ -1,4 +1,4 @@
-import { Component, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ViewChild } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { UiBadgeComponent } from "./badge.component";
@@ -10,6 +10,7 @@ import { BadgeColor, BadgeSize, BadgeVariant } from "./badge.types";
 @Component({
   standalone: true,
   imports: [UiBadgeComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <UiBadge
       [variant]="variant"

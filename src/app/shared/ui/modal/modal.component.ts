@@ -13,6 +13,18 @@ import { isPlatformBrowser } from "@angular/common";
 
 import { IconXComponent } from "@shared/icons";
 
+export type UiModalRounded = "none" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
+
+const ROUNDED_CLASS_MAP: Record<UiModalRounded, string> = {
+  none: "",
+  sm: "rounded-sm",
+  md: "rounded-md",
+  lg: "rounded-lg",
+  xl: "rounded-xl",
+  "2xl": "rounded-2xl",
+  "3xl": "rounded-3xl",
+};
+
 /**
  * `UiModal`
  * --------
@@ -39,7 +51,7 @@ import { IconXComponent } from "@shared/icons";
       >
         @if (!isFullscreen()) {
           <div
-            class="fixed inset-0 h-full w-full bg-gray-400/50 backdrop-blur-[32px]"
+            class="fixed inset-0 h-full w-full bg-black/15 backdrop-blur-[1px]"
             (click)="onBackdropClick($event)"
           ></div>
         }
@@ -50,11 +62,7 @@ import { IconXComponent } from "@shared/icons";
               (click)="close.emit()"
               class="absolute right-3 top-3 z-999 flex h-9.5 w-9.5 items-center justify-center rounded-full bg-gray-100 text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white sm:right-6 sm:top-6 sm:h-11 sm:w-11"
             >
-              <IconX
-                [size]="24"
-                color="currentColor"
-                [style]="{ 'stroke-width': '2' }"
-              />
+              <IconX [size]="24" color="currentColor" className="stroke-2" />
             </button>
           }
           <div>
@@ -74,13 +82,19 @@ export class UiModalComponent {
   readonly showCloseButton = input<boolean>(true);
   /** Modal a pantalla completa (sin backdrop, ocupa el viewport). */
   readonly isFullscreen = input<boolean>(false);
+  /**
+   * Radio de las esquinas del modal. Default: `'xl'` (12px). Usar
+   * `'lg'` (8px) o `'2xl'` (16px) si se necesita otro tamaño.
+   */
+  readonly rounded = input<UiModalRounded>("xl");
 
   readonly close = output<void>();
 
   readonly contentClasses = computed<string>(() => {
+    const radiusClass = ROUNDED_CLASS_MAP[this.rounded()];
     const base = this.isFullscreen()
       ? "w-full h-full"
-      : "relative w-full rounded-3xl bg-white dark:bg-gray-900";
+      : `relative w-full ${radiusClass} bg-white shadow-theme-xl ring-1 ring-black/5 dark:bg-gray-900 dark:ring-white/10`;
     const extra = this.className();
     return extra ? `${base} ${extra}` : base;
   });
@@ -88,9 +102,12 @@ export class UiModalComponent {
   private readonly platformId = inject(PLATFORM_ID);
 
   constructor() {
-    effect(() => {
+    effect((onCleanup) => {
       if (!isPlatformBrowser(this.platformId)) return;
       document.body.style.overflow = this.isOpen() ? "hidden" : "";
+      onCleanup(() => {
+        document.body.style.overflow = "";
+      });
     });
   }
 

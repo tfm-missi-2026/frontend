@@ -3,8 +3,8 @@
   justifyContent="center"
   className="flex-1 w-full max-w-md mx-auto"
 >
-  <UiFlex direction="column" gap="24px">
-    <UiFlex direction="column" gap="8px">
+  <UiFlex direction="column" [gap]="24">
+    <UiFlex direction="column" [gap]="8">
       <UiHeader [level]="1" text="Crear cuenta"></UiHeader>
       <UiLabel
         type="bodyS"
@@ -14,7 +14,7 @@
     </UiFlex>
 
     <form (ngSubmit)="onSubmit()">
-      <UiFlex direction="column" gap="20px">
+      <UiFlex direction="column" [gap]="20">
         <UiGrid [columns]="2" breakpoint="sm" gap="gap-5">
           <UiInput
             id="signup-fname"
@@ -68,7 +68,7 @@
       </UiFlex>
     </form>
 
-    <UiFlex justifyContent="center" gap="6px" className="mt-2">
+    <UiFlex justifyContent="center" [gap]="6" className="mt-2">
       <UiLabel
         type="bodyS"
         color="textWeak"

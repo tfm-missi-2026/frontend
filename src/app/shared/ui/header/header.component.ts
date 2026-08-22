@@ -11,6 +11,11 @@ import designConstants, {
   TypographyType,
 } from "@styles/constants";
 import { COLOR_CLASSES } from "@styles/types/colors";
+import {
+  FONT_SIZE_CLASS,
+  FONT_WEIGHT_CLASS,
+  LINE_HEIGHT_CLASS,
+} from "@shared/ui/label/label.utils";
 import { UiHeaderLevel } from "./header.types";
 
 const LEVEL_TO_TYPOGRAPHY: Record<UiHeaderLevel, TypographyType> = {
@@ -39,9 +44,9 @@ const LEVEL_TO_TAG: Record<UiHeaderLevel, string> = {
  * opcionales: si se omiten, se usan los valores por defecto del tipo
  * de tipografía resuelto.
  *
- * El color se aplica vía clase Tailwind (con variantes `dark:`) desde
- * `COLOR_CLASSES`, no via `style.color`, para que el dark mode funcione
- * correctamente.
+ * El color y la tipografía se aplican vía clases Tailwind (con variantes
+ * `dark:`) desde `COLOR_CLASSES`, `FONT_SIZE_CLASS`, `LINE_HEIGHT_CLASS`
+ * y `FONT_WEIGHT_CLASS`, no via `[style.*]`, para soportar light/dark.
  *
  * Casos de uso:
  *  - `<UiHeader level="1">` → h1, 24px, bold.
@@ -59,13 +64,7 @@ const LEVEL_TO_TAG: Record<UiHeaderLevel, string> = {
   template: `
     @switch (resolvedTag()) {
       @case ("h1") {
-        <h1
-          [id]="id() || null"
-          [class]="containerClasses()"
-          [style.font-weight]="resolvedWeight()"
-          [style.font-size]="resolvedFontSize()"
-          [style.line-height]="resolvedLineHeight()"
-        >
+        <h1 [id]="id() || null" [class]="containerClasses()">
           @if (text()) {
             {{ text() }}
           } @else {
@@ -74,13 +73,7 @@ const LEVEL_TO_TAG: Record<UiHeaderLevel, string> = {
         </h1>
       }
       @case ("h2") {
-        <h2
-          [id]="id() || null"
-          [class]="containerClasses()"
-          [style.font-weight]="resolvedWeight()"
-          [style.font-size]="resolvedFontSize()"
-          [style.line-height]="resolvedLineHeight()"
-        >
+        <h2 [id]="id() || null" [class]="containerClasses()">
           @if (text()) {
             {{ text() }}
           } @else {
@@ -89,13 +82,7 @@ const LEVEL_TO_TAG: Record<UiHeaderLevel, string> = {
         </h2>
       }
       @case ("h3") {
-        <h3
-          [id]="id() || null"
-          [class]="containerClasses()"
-          [style.font-weight]="resolvedWeight()"
-          [style.font-size]="resolvedFontSize()"
-          [style.line-height]="resolvedLineHeight()"
-        >
+        <h3 [id]="id() || null" [class]="containerClasses()">
           @if (text()) {
             {{ text() }}
           } @else {
@@ -104,13 +91,7 @@ const LEVEL_TO_TAG: Record<UiHeaderLevel, string> = {
         </h3>
       }
       @case ("h4") {
-        <h4
-          [id]="id() || null"
-          [class]="containerClasses()"
-          [style.font-weight]="resolvedWeight()"
-          [style.font-size]="resolvedFontSize()"
-          [style.line-height]="resolvedLineHeight()"
-        >
+        <h4 [id]="id() || null" [class]="containerClasses()">
           @if (text()) {
             {{ text() }}
           } @else {
@@ -119,13 +100,7 @@ const LEVEL_TO_TAG: Record<UiHeaderLevel, string> = {
         </h4>
       }
       @case ("h5") {
-        <h5
-          [id]="id() || null"
-          [class]="containerClasses()"
-          [style.font-weight]="resolvedWeight()"
-          [style.font-size]="resolvedFontSize()"
-          [style.line-height]="resolvedLineHeight()"
-        >
+        <h5 [id]="id() || null" [class]="containerClasses()">
           @if (text()) {
             {{ text() }}
           } @else {
@@ -165,25 +140,32 @@ export class UiHeaderComponent {
     return COLOR_CLASSES[c ?? "textStrong"];
   });
 
-  readonly resolvedWeight = computed<string>(() => {
+  readonly resolvedWeightClass = computed<string>(() => {
     const w =
       this.weight() ??
       designConstants.typography.fontWeightByTypographyType[
         this.resolvedTypography()
       ];
-    return designConstants.typography.fontWeight[w].toString();
+    return FONT_WEIGHT_CLASS[w];
   });
 
-  readonly resolvedFontSize = computed<string>(
-    () => designConstants.typography.fontSize[this.resolvedTypography()],
+  readonly resolvedFontSizeClass = computed<string>(
+    () => FONT_SIZE_CLASS[this.resolvedTypography()],
   );
 
-  readonly resolvedLineHeight = computed<string>(
-    () => designConstants.typography.lineHeight[this.resolvedTypography()],
+  readonly resolvedLineHeightClass = computed<string>(
+    () => LINE_HEIGHT_CLASS[this.resolvedTypography()],
   );
 
   readonly containerClasses = computed<string>(() => {
-    const parts = ["font-outfit", this.resolvedColorClass(), this.className()];
+    const parts = [
+      "font-outfit",
+      this.resolvedColorClass(),
+      this.resolvedWeightClass(),
+      this.resolvedFontSizeClass(),
+      this.resolvedLineHeightClass(),
+      this.className(),
+    ];
     return parts.filter(Boolean).join(" ");
   });
 }

@@ -6,6 +6,7 @@
 @import "swiper/css/pagination";
 @import "flatpickr/dist/flatpickr.css";
 @import "apexcharts/dist/apexcharts.css";
+@import "ngx-toastr/toastr";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -320,6 +321,35 @@
   input[type="time"]::-webkit-calendar-picker-indicator {
     display: none;
     -webkit-appearance: none;
+  }
+}
+
+@keyframes ltw-progress-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ltw-indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
   }
 }
 

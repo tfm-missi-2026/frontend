@@ -23,7 +23,7 @@ import {
   IconXComponent,
 } from "@shared/icons";
 
-import { ButtonLinkProps } from "@shared/ui/button/types";
+import { ButtonLinkProps } from "@shared/ui/button/button.types";
 
 import { UserProfileSocialLinks, UserProfileUser } from "./user-profile.types";
 
@@ -80,13 +80,13 @@ const SOCIAL_LINK_CLASS = "rounded-full! shadow-xs! shadow-theme-xs";
       <UiFlex
         direction="column"
         alignItems="stretch"
-        gap="1.25rem"
+        [gap]="5"
         className="xl:flex-row! xl:items-center! xl:justify-between!"
       >
         <UiFlex
           direction="column"
           alignItems="center"
-          gap="1.5rem"
+          [gap]="6"
           className="xl:flex-row!"
         >
           <UiAvatar
@@ -99,7 +99,7 @@ const SOCIAL_LINK_CLASS = "rounded-full! shadow-xs! shadow-theme-xs";
           <UiFlex
             direction="column"
             alignItems="center"
-            gap="0.25rem"
+            [gap]="1"
             className="order-3 xl:order-2 xl:items-start!"
           >
             <UiHeader
@@ -110,29 +110,25 @@ const SOCIAL_LINK_CLASS = "rounded-full! shadow-xs! shadow-theme-xs";
             <UiFlex
               direction="column"
               alignItems="center"
-              gap="0.25rem"
+              [gap]="1"
               className="xl:flex-row! xl:gap-3!"
             >
-              <UiLabel
-                as="p"
-                type="bodyS"
-                color="textWeak"
-                [wrapText]="true"
-              >{{ user().role }}</UiLabel>
-              <div class="hidden h-3.5 w-px bg-gray-300 dark:bg-gray-700 xl:block"></div>
-              <UiLabel
-                as="p"
-                type="bodyS"
-                color="textWeak"
-                [wrapText]="true"
-              >{{ user().location }}</UiLabel>
+                user().role
+              }}</UiLabel>
+              <UiFlex
+                direction="column"
+                [gap]="0"
+                className="hidden h-3.5 w-px bg-gray-300 dark:bg-gray-700 xl:flex"
+              />
+                user().location
+              }}</UiLabel>
             </UiFlex>
           </UiFlex>
 
           <UiFlex
             direction="row"
             alignItems="center"
-            gap="0.5rem"
+            [gap]="2"
             className="order-2 grow xl:order-3 xl:justify-end"
           >
             <UiIconButton
@@ -199,7 +195,9 @@ const SOCIAL_LINK_CLASS = "rounded-full! shadow-xs! shadow-theme-xs";
       (close)="closeModal()"
       className="max-w-175 m-4"
     >
-      <div class="no-scrollbar relative w-full max-w-175 overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
+      <div
+        class="no-scrollbar relative w-full max-w-175 overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11"
+      >
         <div class="px-2 pr-14">
           <UiHeader
             [level]="4"
@@ -211,11 +209,13 @@ const SOCIAL_LINK_CLASS = "rounded-full! shadow-xs! shadow-theme-xs";
             type="bodyS"
             color="textWeak"
             text="Update your details to keep your profile up-to-date."
-            [wrapText]="true"
             className="mb-6 lg:mb-7"
           />
         </div>
-        <form class="flex flex-col" (submit)="$event.preventDefault(); handleSave()">
+        <form
+          class="flex flex-col"
+          (submit)="$event.preventDefault(); handleSave()"
+        >
           <div class="custom-scrollbar h-112.5 overflow-y-auto px-2 pb-3">
             <div>
               <UiHeader
@@ -223,11 +223,28 @@ const SOCIAL_LINK_CLASS = "rounded-full! shadow-xs! shadow-theme-xs";
                 text="Social Links"
                 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6"
               />
-              <UiGrid [columns]="2" breakpoint="lg" gap="gap-x-6 gap-y-5" ariaLabel="Social links form fields">
-                <UiInput labelText="Facebook" type="text" [value]="social().facebook" />
+              <UiGrid
+                [columns]="2"
+                breakpoint="lg"
+                gap="gap-x-6 gap-y-5"
+                ariaLabel="Social links form fields"
+              >
+                <UiInput
+                  labelText="Facebook"
+                  type="text"
+                  [value]="social().facebook"
+                />
                 <UiInput labelText="X.com" type="text" [value]="social().x" />
-                <UiInput labelText="Linkedin" type="text" [value]="social().linkedin" />
-                <UiInput labelText="Instagram" type="text" [value]="social().instagram" />
+                <UiInput
+                  labelText="Linkedin"
+                  type="text"
+                  [value]="social().linkedin"
+                />
+                <UiInput
+                  labelText="Instagram"
+                  type="text"
+                  [value]="social().instagram"
+                />
               </UiGrid>
             </div>
             <div class="mt-7">
@@ -236,22 +253,56 @@ const SOCIAL_LINK_CLASS = "rounded-full! shadow-xs! shadow-theme-xs";
                 text="Personal Information"
                 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6"
               />
-              <UiGrid [columns]="2" breakpoint="lg" gap="gap-x-6 gap-y-5" ariaLabel="Personal information form fields">
-                <UiInput className="col-span-2 lg:col-span-1" labelText="First Name" type="text" [value]="user().firstName" />
-                <UiInput className="col-span-2 lg:col-span-1" labelText="Last Name" type="text" [value]="user().lastName" />
-                <UiInput className="col-span-2 lg:col-span-1" labelText="Email Address" type="text" [value]="user().email" />
-                <UiInput className="col-span-2 lg:col-span-1" labelText="Phone" type="text" [value]="user().phone" />
-                <UiInput className="col-span-2" labelText="Bio" type="text" [value]="user().bio" />
+              <UiGrid
+                [columns]="2"
+                breakpoint="lg"
+                gap="gap-x-6 gap-y-5"
+                ariaLabel="Personal information form fields"
+              >
+                <UiInput
+                  className="col-span-2 lg:col-span-1"
+                  labelText="First Name"
+                  type="text"
+                  [value]="user().firstName"
+                />
+                <UiInput
+                  className="col-span-2 lg:col-span-1"
+                  labelText="Last Name"
+                  type="text"
+                  [value]="user().lastName"
+                />
+                <UiInput
+                  className="col-span-2 lg:col-span-1"
+                  labelText="Email Address"
+                  type="text"
+                  [value]="user().email"
+                />
+                <UiInput
+                  className="col-span-2 lg:col-span-1"
+                  labelText="Phone"
+                  type="text"
+                  [value]="user().phone"
+                />
+                <UiInput
+                  className="col-span-2"
+                  labelText="Bio"
+                  type="text"
+                  [value]="user().bio"
+                />
               </UiGrid>
             </div>
           </div>
           <UiFlex
             direction="row"
             alignItems="center"
-            gap="0.75rem"
+            [gap]="3"
             className="px-2 mt-6 lg:justify-end"
           >
-            <UiButton variant="secondary" [compact]="true" (click)="closeModal()">
+            <UiButton
+              variant="secondary"
+              [compact]="true"
+              (click)="closeModal()"
+            >
               Close
             </UiButton>
             <UiButton [compact]="true" (click)="handleSave()">

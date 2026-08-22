@@ -1,0 +1,47 @@
+@if (visible()) {
+  <div
+    [class]="containerClasses()"
+    role="alert"
+    aria-live="polite"
+    data-testid="toast"
+  >
+    <UiSurface [variant]="surfaceVariant()" padding="sm" className="relative">
+      <UiFlex alignItems="center" [gap]="3">
+        <UiIcon [variant]="iconVariant()" [size]="20" dataTestId="toast-icon">
+          <ng-container
+            *ngComponentOutlet="iconComponent(); inputs: { size: 20 }"
+          ></ng-container>
+        </UiIcon>
+
+        <UiFlex direction="column" [gap]="1" className="flex-1 min-w-0 pr-6">
+          @if (title()) {
+            <UiLabel
+              type="bodyXs"
+              weight="semibold"
+              color="textStrong"
+              [text]="title()"
+            ></UiLabel>
+          }
+
+          <UiLabel
+            type="bodyS"
+            color="textWeak"
+            [text]="message()"
+          ></UiLabel>
+        </UiFlex>
+      </UiFlex>
+
+      @if (showCloseButton()) {
+        <button
+          type="button"
+          [class]="closeButtonClasses()"
+          aria-label="Cerrar notificación"
+          (click)="onCloseClick($event)"
+          data-testid="toast-close"
+        >
+          <ng-container *ngComponentOutlet="closeIcon; inputs: { size: 14 }"></ng-container>
+        </button>
+      }
+    </UiSurface>
+  </div>
+}

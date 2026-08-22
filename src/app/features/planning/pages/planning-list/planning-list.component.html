@@ -1,0 +1,184 @@
+<UiFlex direction="column" [gap]="20">
+  <CommonBreadcrumb [items]="breadcrumbItems" />
+
+  <UiFlex
+    direction="row"
+    alignItems="end"
+    justifyContent="between"
+    [gap]="12"
+    className="flex-wrap"
+  >
+    <UiFlex direction="column" [gap]="4">
+      <UiHeader [level]="1" text="Planificación" />
+      <UiLabel
+        type="bodyS"
+        color="textWeak"
+        className="max-w-190"
+      >
+        Planificar es asignar recursos técnicos a
+        <strong class="font-semibold text-gray-800 dark:text-white/90">tareas</strong>
+        con horas estimadas por periodo. El conjunto de asignaciones establece la
+        <strong class="font-semibold text-gray-800 dark:text-white/90">línea base</strong>
+        del plan.
+      </UiLabel>
+    </UiFlex>
+    <UiButton
+      variant="primary"
+      label="Nueva asignación"
+      labelText="Nueva asignación"
+      [LeftIcon]="IconPlusSimpleComponent"
+      (click)="openCreate()"
+    />
+  </UiFlex>
+
+  @if (freezeAlert(); as msg) {
+    <UiAlert variant="success" [message]="msg" />
+  }
+
+  <PlanningToolbar
+    [projectOptions]="projectOptions()"
+    [projectId]="selectedProjectId()"
+    [canFreeze]="canFreeze()"
+    (projectChange)="onProjectChange($event)"
+    (freeze)="onFreeze()"
+  />
+
+  @if (!selectedProjectId()) {
+    <UiSurface
+      variant="neutral"
+      padding="lg"
+      className="border-dashed text-center"
+    >
+      <UiFlex
+        direction="column"
+        alignItems="center"
+        [gap]="12"
+      >
+        <UiFlex
+          direction="row"
+          alignItems="center"
+          justifyContent="center"
+          [gap]="0"
+          className="h-14 w-14 rounded-lg bg-gray-100 dark:bg-gray-800"
+        >
+          <UiLabel type="HeadingM" color="textWeak">∅</UiLabel>
+        </UiFlex>
+        <UiHeader [level]="4" text="Selecciona un proyecto." />
+        <UiLabel type="bodyS" color="textWeak">
+          Elige un proyecto arriba para ver y crear asignaciones.
+        </UiLabel>
+      </UiFlex>
+    </UiSurface>
+  } @else if (rows().length === 0) {
+    <UiSurface
+      variant="neutral"
+      padding="lg"
+      className="border-dashed text-center"
+    >
+      <UiFlex
+        direction="column"
+        alignItems="center"
+        [gap]="12"
+      >
+        <UiFlex
+          direction="row"
+          alignItems="center"
+          justifyContent="center"
+          [gap]="0"
+          className="h-14 w-14 rounded-lg bg-gray-100 dark:bg-gray-800"
+        >
+          <UiLabel type="HeadingM" color="textWeak">∅</UiLabel>
+        </UiFlex>
+        <UiHeader [level]="4" text="Este proyecto aún no tiene asignaciones." />
+        <UiLabel type="bodyS" color="textWeak">
+          Crea la primera para iniciar la línea base.
+        </UiLabel>
+        <UiButton
+          variant="primary"
+          label="Nueva asignación"
+          labelText="Nueva asignación"
+          [LeftIcon]="IconPlusSimpleComponent"
+          (click)="openCreate()"
+        />
+      </UiFlex>
+    </UiSurface>
+  } @else {
+    <PlanningTable
+      [rows]="rows()"
+      (edit)="onEdit($event)"
+      (remove)="onRemove($event)"
+    />
+  }
+
+  @if (rows().length > 0) {
+    <UiSurface variant="neutral" padding="md">
+      <UiFlex
+        direction="row"
+        alignItems="center"
+        justifyContent="between"
+        [gap]="12"
+        className="flex-wrap"
+      >
+        <UiLabel type="bodyXs" color="textWeak">
+          {{ rows().length }} asignaciones · {{ distinctResourceCount() }} recursos técnicos
+        </UiLabel>
+        <UiFlex direction="row" alignItems="center" [gap]="6">
+          <UiLabel type="bodyXs" color="textWeak">
+            Total horas planificadas del proyecto:
+          </UiLabel>
+          <UiLabel
+            className="font-mono font-bold text-sm px-3 py-1 rounded-md border border-gray-300 bg-gray-50 text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+          >
+            {{ totalHours() }} h
+          </UiLabel>
+          <UiLabel type="bodyXs" color="textWeak">
+            ≈ {{ workdays() }} jornadas
+          </UiLabel>
+        </UiFlex>
+      </UiFlex>
+    </UiSurface>
+  }
+
+  <UiSurface
+    variant="neutral"
+    padding="md"
+    className="border-dashed max-w-140"
+  >
+    <UiLabel type="bodyS" color="textWeak">
+      Capacidad del recurso = jornada base
+      <strong class="font-semibold text-gray-800 dark:text-white/90">8 h/día</strong>
+      × días hábiles (L–V) del periodo. Si una asignación supera la capacidad,
+      SPSRT avisa de
+      <strong class="font-semibold text-gray-800 dark:text-white/90">sobrecarga</strong>
+      antes de confirmar (RF-06).
+    </UiLabel>
+  </UiSurface>
+</UiFlex>
+
+<AssignmentFormModal
+  [isOpen]="formOpen()"
+  [mode]="formMode()"
+  [projectId]="selectedProjectId() ?? ''"
+  [assignment]="selectedAssignment()"
+  [taskOptions]="taskOptions()"
+  [resourceOptions]="resourceOptions()"
+  [resourceNames]="resourceNames()"
+  (save)="onSave($event)"
+  (close)="formOpen.set(false)"
+  (overloadRequest)="onOverloadRequest($event)"
+/>
+
+@if (pendingOverload(); as req) {
+  <OverloadDialog
+    [isOpen]="overloadOpen()"
+    [resourceName]="req.resourceName"
+    [committedHours]="req.committedHours"
+    [newHours]="req.newHours"
+    [capacityHours]="req.capacityHours"
+    [periodStart]="req.periodStart"
+    [periodEnd]="req.periodEnd"
+    [businessDays]="req.businessDays"
+    (confirm)="onOverloadConfirm()"
+    (cancel)="onOverloadCancel()"
+  />
+}

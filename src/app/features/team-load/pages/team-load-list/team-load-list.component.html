@@ -1,0 +1,113 @@
+<UiFlex direction="column" [gap]="20">
+  <CommonBreadcrumb [items]="breadcrumbItems" />
+
+  <UiFlex direction="column" [gap]="4">
+    <UiHeader [level]="1" text="Carga del equipo" />
+    <UiLabel type="bodyS" color="textWeak" className="max-w-190">
+      Compara
+      <strong class="font-semibold text-gray-800 dark:text-white/90">horas planificadas</strong>
+      (lo asignado) con
+      <strong class="font-semibold text-gray-800 dark:text-white/90">horas registradas</strong>
+      (lo trabajado, de la bitácora) en un rango de fechas. % Utilización = registradas ÷
+      planificadas; hay
+      <strong class="font-semibold text-gray-800 dark:text-white/90">sobrecarga</strong>
+      cuando registradas &gt; planificadas.
+    </UiLabel>
+  </UiFlex>
+
+  <TeamLoadToolbar
+    [fromIso]="fromIso()"
+    [toIso]="toIso()"
+    [projectOptions]="projectOptions()"
+    [projectId]="projectId()"
+    (fromChange)="onFromChange($event)"
+    (toChange)="onToChange($event)"
+    (projectChange)="onProjectChange($event)"
+    (consult)="onConsult()"
+  />
+
+  <TeamLoadSummary
+    [totalResources]="totalResources()"
+    [overloadCount]="overloadCount()"
+    [averageUtilizationPct]="averageUtilizationPct()"
+  />
+
+  @if (workloads().length === 0) {
+    <UiSurface
+      variant="neutral"
+      padding="lg"
+      className="border-dashed text-center"
+    >
+      <UiFlex direction="column" alignItems="center" [gap]="12">
+        <UiFlex
+          direction="row"
+          alignItems="center"
+          justifyContent="center"
+          [gap]="0"
+          className="h-14 w-14 rounded-lg bg-gray-100 dark:bg-gray-800"
+        >
+          <UiLabel type="HeadingM" color="textWeak">∅</UiLabel>
+        </UiFlex>
+        <UiHeader [level]="4" text="No hay datos para el rango." />
+        <UiLabel type="bodyS" color="textWeak">
+          Selecciona un periodo y pulsa Consultar.
+        </UiLabel>
+      </UiFlex>
+    </UiSurface>
+  } @else {
+    <TeamLoadTable [rows]="workloads()" />
+  }
+
+  @if (workloads().length > 0) {
+    <UiSurface variant="neutral" padding="md">
+      <UiFlex
+        direction="row"
+        alignItems="center"
+        justifyContent="between"
+        [gap]="12"
+        className="flex-wrap"
+      >
+        <UiFlex direction="row" alignItems="center" [gap]="12" className="flex-wrap">
+          <UiLabel type="bodyXs" color="textWeak">
+            Línea punteada = 100% (capacidad planificada).
+          </UiLabel>
+          <UiFlex direction="row" alignItems="center" [gap]="6">
+            <UiFlex
+              direction="row"
+              alignItems="center"
+              [gap]="0"
+              className="relative h-3.5 w-12 overflow-hidden rounded border border-gray-400 bg-white dark:border-gray-600 dark:bg-gray-900"
+            >
+              <UiFlex
+                direction="row"
+                [gap]="0"
+                className="absolute top-0 bottom-0 left-0 w-full bg-[repeating-linear-gradient(45deg,var(--color-brand-500,_#4F46E5)_0_3px,var(--color-brand-300,_#A5B4FC)_3px_6px)]"
+              />
+            </UiFlex>
+            <UiLabel type="bodyXs" color="textWeak">trama = sobrecarga</UiLabel>
+          </UiFlex>
+        </UiFlex>
+        <UiLabel type="bodyXs" color="textWeak">
+          Rango consultado:
+          <strong class="font-semibold text-gray-800 dark:text-white/90">
+            {{ rangeLabel() }}
+          </strong>
+        </UiLabel>
+      </UiFlex>
+    </UiSurface>
+  }
+
+  <UiSurface
+    variant="neutral"
+    padding="md"
+    className="border-dashed max-w-180"
+  >
+    <UiLabel type="bodyS" color="textWeak">
+      Si un recurso no tiene plan (planificadas = 0), su % de utilización es
+      <strong class="font-semibold text-gray-800 dark:text-white/90">0</strong>
+      y
+      <strong class="font-semibold text-gray-800 dark:text-white/90">no</strong>
+      se marca sobrecarga, aunque tenga horas registradas.
+    </UiLabel>
+  </UiSurface>
+</UiFlex>

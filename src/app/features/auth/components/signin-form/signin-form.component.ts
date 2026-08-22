@@ -6,11 +6,10 @@ import {
   signal,
 } from "@angular/core";
 
-import { UiAlertComponent } from "@shared/ui/alert";
 import { UiButtonComponent } from "@shared/ui/button";
-import { UiInputComponent } from "@shared/ui/input";
 import { UiFlexComponent } from "@shared/ui/flex";
-import { UiHeaderComponent } from "@shared/ui/header";
+import { UiFormComponent } from "@shared/ui/form";
+import { UiInputComponent } from "@shared/ui/input";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiLinkComponent } from "@shared/ui/link";
 
@@ -19,26 +18,14 @@ export interface SignInFormData {
   password: string;
 }
 
-/**
- * Formulario de inicio de sesión del feature `auth`.
- *
- * Compone únicamente primitivas del design system: `UiHeader`, `UiLabel`,
- * `UiInput`, `UiButton` y `UiLink`. El toggle de visibilidad del password
- * es responsabilidad del propio `UiInput` (`showPasswordToggle`), no del
- * formulario.
- *
- * No emite submit por sí mismo: expone `submitForm` y `signUpRequested`
- * para que la página decida el routing y la integración con backend.
- */
 @Component({
   selector: "SigninForm",
   standalone: true,
-  host: { class: "w-full max-w-md mx-auto h-full flex flex-col" },
+  host: { class: "w-full max-w-80 mx-auto flex flex-col" },
   imports: [
-    UiAlertComponent,
     UiButtonComponent,
+    UiFormComponent,
     UiInputComponent,
-    UiHeaderComponent,
     UiLabelComponent,
     UiLinkComponent,
     UiFlexComponent,
@@ -50,14 +37,11 @@ export class SigninFormComponent {
   readonly email = signal<string>("");
   readonly password = signal<string>("");
 
-  /** Bloquea el submit y muestra estado de carga mientras se autentica. */
   readonly loading = input<boolean>(false);
-  /** Mensaje de error a mostrar (credenciales inválidas / fallo de red). */
   readonly errorMessage = input<string | null>(null);
 
   readonly submitForm = output<SignInFormData>();
   readonly forgotPasswordRequested = output<void>();
-  readonly signUpRequested = output<void>();
 
   onEmailChange(value: string): void {
     this.email.set(value);
@@ -73,13 +57,5 @@ export class SigninFormComponent {
       email: this.email(),
       password: this.password(),
     });
-  }
-
-  onForgotPassword(): void {
-    this.forgotPasswordRequested.emit();
-  }
-
-  onSignUp(): void {
-    this.signUpRequested.emit();
   }
 }

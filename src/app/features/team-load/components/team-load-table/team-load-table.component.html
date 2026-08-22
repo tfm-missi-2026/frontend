@@ -1,0 +1,127 @@
+<UiSurface
+  variant="neutral"
+  padding="none"
+  className="border border-gray-200 dark:border-gray-800"
+  ariaLabel="Tabla de carga del equipo"
+>
+  <UiFlex
+    direction="row"
+    alignItems="center"
+    [gap]="0"
+    className="border-b border-gray-200 px-4 py-3 text-xs uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400"
+  >
+    @for (label of headerLabels; track label; let i = $index) {
+      <UiFlex
+        [direction]="'row'"
+        alignItems="center"
+        [className]="columnClasses[i]"
+      >
+        <UiLabel type="bodyXs" weight="medium">{{ label }}</UiLabel>
+      </UiFlex>
+    }
+  </UiFlex>
+
+  @for (row of rows(); track row.resourceId; let last = $last) {
+    <UiFlex
+      direction="row"
+      alignItems="center"
+      [gap]="0"
+      [className]="
+        last
+          ? 'px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-white/3'
+          : 'border-b border-gray-100 dark:border-gray-800 px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-white/3'
+      "
+    >
+      <UiFlex direction="row" alignItems="center" [gap]="8">
+        <UiSurface
+          variant="neutral"
+          padding="none"
+          className="h-9 w-9 shrink-0 rounded-full bg-gray-100 dark:bg-gray-800"
+          ariaLabel="Avatar del recurso"
+        ></UiSurface>
+        <UiFlex direction="column" [gap]="0" className="min-w-0">
+          <UiLabel
+            type="bodyS"
+            weight="semibold"
+            color="textStrong"
+            [text]="row.resourceName"
+          />
+          <UiLabel
+            type="bodyXs"
+            color="textWeak"
+            [text]="row.resourceRole"
+          />
+        </UiFlex>
+      </UiFlex>
+
+      <UiFlex
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <UiLabel
+          type="bodyS"
+          weight="semibold"
+          [color]="row.hasPlan ? 'textStrong' : 'textWeakest'"
+          className="font-mono whitespace-nowrap"
+        >
+          {{ asHours(row.plannedHours, row.hasPlan) }}
+        </UiLabel>
+      </UiFlex>
+
+      <UiFlex
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <UiLabel
+          type="bodyS"
+          weight="semibold"
+          color="textStrong"
+          className="font-mono whitespace-nowrap"
+        >
+          {{ row.loggedHours }} h
+        </UiLabel>
+      </UiFlex>
+
+      <UiFlex
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <UiLabel
+          type="bodyS"
+          weight="bold"
+          color="textStrong"
+          className="font-mono inline-flex items-center justify-center border-2 border-gray-400 rounded-md px-2 py-0.5 text-sm dark:border-gray-600"
+        >
+          {{ row.activeTaskCount }}
+        </UiLabel>
+      </UiFlex>
+
+      <UiFlex direction="row" alignItems="center" className="px-3">
+        <UtilizationBar
+          [utilizationPct]="row.utilizationPct"
+          [hasPlan]="row.hasPlan"
+          [isOverload]="row.isOverload"
+        />
+      </UiFlex>
+
+      <UiFlex
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+      >
+        @if (row.isOverload) {
+          <UiBadge variant="solid" color="error" size="md">
+            Sobrecarga
+          </UiBadge>
+        } @else {
+          <UiBadge variant="light" color="success" size="md">
+            Normal
+          </UiBadge>
+        }
+      </UiFlex>
+    </UiFlex>
+  }
+</UiSurface>

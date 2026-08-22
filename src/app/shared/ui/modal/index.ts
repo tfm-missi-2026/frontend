@@ -6,3 +6,4 @@
  * `isFullscreen`.
  */
 export { UiModalComponent } from './modal.component';
+export type { UiModalRounded } from './modal.component';

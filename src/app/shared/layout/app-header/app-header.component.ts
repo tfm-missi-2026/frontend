@@ -9,8 +9,9 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NgClass } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
+import { AuthService } from '@core/auth/auth.service';
 import { SidebarService } from '../../services/sidebar.service';
 import { CommonThemeToggleComponent } from '@shared/common/theme-toggle';
 import {
@@ -34,12 +35,6 @@ import { UiFlexComponent } from '@shared/ui/flex';
 import { UiIconButtonComponent } from '@shared/ui/icon-button';
 import { UiImageComponent } from '@shared/ui/image';
 
-const CURRENT_USER: HeaderUserInfo = {
-  name: 'Musharof Chowdhury',
-  email: 'randomuser@pimjo.com',
-  avatar: '/images/user/owner.png',
-};
-
 const USER_MENU_ITEMS: HeaderUserMenuItem[] = [
   { to: '/profile', icon: IconUserCircleComponent, label: 'Editar perfil' },
   { to: '/profile', icon: IconSettingsComponent, label: 'Configuración de la cuenta' },
@@ -47,78 +42,9 @@ const USER_MENU_ITEMS: HeaderUserMenuItem[] = [
 ];
 
 const SIGN_OUT_ITEM: HeaderUserMenuItem = {
-  to: '/signin',
   icon: IconLogoutComponent,
   label: 'Cerrar sesión',
 };
-
-const NOTIFICATIONS: HeaderNotificationItem[] = [
-  {
-    actor: { name: 'Terry Franci', avatar: '/images/user/user-02.jpg' },
-    action: 'solicita permiso para modificar',
-    target: 'Proyecto - Nganter App',
-    category: 'Proyecto',
-    time: 'hace 5 min',
-    status: 'online',
-  },
-  {
-    actor: { name: 'Alena Franci', avatar: '/images/user/user-03.jpg' },
-    action: 'solicita permiso para modificar',
-    target: 'Proyecto - Nganter App',
-    category: 'Proyecto',
-    time: 'hace 8 min',
-    status: 'online',
-  },
-  {
-    actor: { name: 'Jocelyn Kenter', avatar: '/images/user/user-04.jpg' },
-    action: 'solicita permiso para modificar',
-    target: 'Proyecto - Nganter App',
-    category: 'Proyecto',
-    time: 'hace 15 min',
-    status: 'online',
-  },
-  {
-    actor: { name: 'Brandon Philips', avatar: '/images/user/user-05.jpg' },
-    action: 'solicita permiso para modificar',
-    target: 'Proyecto - Nganter App',
-    category: 'Proyecto',
-    time: 'hace 1 hora',
-    status: 'offline',
-    to: '/',
-  },
-  {
-    actor: { name: 'Terry Franci', avatar: '/images/user/user-02.jpg' },
-    action: 'solicita permiso para modificar',
-    target: 'Proyecto - Nganter App',
-    category: 'Proyecto',
-    time: 'hace 5 min',
-    status: 'online',
-  },
-  {
-    actor: { name: 'Alena Franci', avatar: '/images/user/user-03.jpg' },
-    action: 'solicita permiso para modificar',
-    target: 'Proyecto - Nganter App',
-    category: 'Proyecto',
-    time: 'hace 8 min',
-    status: 'online',
-  },
-  {
-    actor: { name: 'Jocelyn Kenter', avatar: '/images/user/user-04.jpg' },
-    action: 'solicita permiso para modificar',
-    target: 'Proyecto - Nganter App',
-    category: 'Proyecto',
-    time: 'hace 15 min',
-    status: 'online',
-  },
-  {
-    actor: { name: 'Brandon Philips', avatar: '/images/user/user-05.jpg' },
-    action: 'solicita permiso para modificar',
-    target: 'Proyecto - Nganter App',
-    category: 'Proyecto',
-    time: 'hace 1 hora',
-    status: 'offline',
-  },
-];
 
 /**
  * `AppHeaderComponent`
@@ -150,6 +76,8 @@ const NOTIFICATIONS: HeaderNotificationItem[] = [
 })
 export class AppHeaderComponent {
   private readonly sidebarService = inject(SidebarService);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
   protected readonly isMobileOpen = toSignal(this.sidebarService.isMobileOpen$, {
     initialValue: false,
@@ -157,10 +85,18 @@ export class AppHeaderComponent {
 
   protected readonly isApplicationMenuOpen = signal(false);
 
-  protected readonly currentUser = CURRENT_USER;
+  protected readonly currentUser = computed<HeaderUserInfo>(() => {
+    const usuario = this.auth.usuario();
+    return {
+      name: usuario?.nombreCompleto ?? 'Usuario',
+      email: usuario?.email ?? '',
+      avatar: '/images/user/owner.png',
+    };
+  });
+
+  protected readonly notifications: HeaderNotificationItem[] = [];
   protected readonly userMenuItems = USER_MENU_ITEMS;
   protected readonly signOutItem = SIGN_OUT_ITEM;
-  protected readonly notifications = NOTIFICATIONS;
 
   protected readonly hamburgerIcon = IconHamburgerComponent;
   protected readonly closeIcon = IconXLargeComponent;
@@ -175,11 +111,25 @@ export class AppHeaderComponent {
   );
 
   protected handleToggle(): void {
-    if (window.innerWidth >= 1280) {
+    // `matchMedia` es más confiable que `window.innerWidth` para
+    // detectar el breakpoint xl (1280px). Evita falsos negativos
+    // cuando hay zoom no-100%, DevTools abierto a un lado, iframes,
+    // o scrollbars que reducen el viewport efectivo.
+    const isDesktop = window.matchMedia('(min-width: 1280px)').matches;
+    if (isDesktop) {
       this.sidebarService.toggleExpanded();
+      // Garantiza que el cambio sea visible de inmediato aunque haya
+      // hover residual sobre el aside (e.g. el cursor quedó encima
+      // mientras el usuario iba al botón del header).
+      this.sidebarService.setHovered(false);
     } else {
       this.sidebarService.toggleMobileOpen();
     }
+  }
+
+  protected handleSignOut(): void {
+    this.auth.logout();
+    void this.router.navigateByUrl('/signin');
   }
 
   protected toggleApplicationMenu(): void {

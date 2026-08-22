@@ -1,0 +1,90 @@
+<UiGrid [columns]="3" gap="gap-4">
+  <UiSurface
+    variant="neutral"
+    padding="md"
+    className="border-2 border-gray-300 dark:border-gray-700"
+  >
+    <UiFlex direction="column" [gap]="6">
+      <UiLabel
+        type="bodyS"
+        weight="medium"
+        color="textWeak"
+        className="uppercase"
+      >
+        Recursos
+      </UiLabel>
+      <UiLabel
+        type="HeadingTV"
+        weight="bold"
+        color="textStrong"
+        className="text-5xl leading-none"
+      >
+        {{ totalResources() }}
+      </UiLabel>
+      <UiLabel type="bodyXs" color="textWeak">
+        en el rango consultado
+      </UiLabel>
+    </UiFlex>
+  </UiSurface>
+
+  <UiSurface
+    variant="warning"
+    padding="md"
+    className="border-2 border-warning-300 bg-[repeating-linear-gradient(45deg,var(--paper)_0_8px,var(--paper-alt)_8px_9px)] dark:border-warning-700"
+  >
+    <UiFlex direction="column" [gap]="6">
+      <UiLabel
+        type="bodyS"
+        weight="medium"
+        color="textWeak"
+        className="uppercase"
+      >
+        En sobrecarga
+      </UiLabel>
+      <UiLabel
+        type="HeadingTV"
+        weight="bold"
+        color="textStrong"
+        className="text-5xl leading-none"
+      >
+        {{ overloadCount() }}
+      </UiLabel>
+      <UiLabel type="bodyXs" color="textWeak">
+        % utilización &gt; 100
+      </UiLabel>
+    </UiFlex>
+  </UiSurface>
+
+  <UiSurface
+    variant="neutral"
+    padding="md"
+    className="border-2 border-gray-300 dark:border-gray-700"
+  >
+    <UiFlex direction="column" [gap]="6">
+      <UiLabel
+        type="bodyS"
+        weight="medium"
+        color="textWeak"
+        className="uppercase"
+      >
+        % Utilización media
+      </UiLabel>
+      <UiFlex direction="row" alignItems="baseline" [gap]="2">
+        <UiLabel
+          type="HeadingTV"
+          weight="bold"
+          color="textStrong"
+          className="text-5xl leading-none font-mono"
+        >
+          {{ averageUtilizationPct() }}
+        </UiLabel>
+        <UiLabel type="HeadingS" weight="bold" color="textStrong">
+          %
+        </UiLabel>
+      </UiFlex>
+      <UiLabel type="bodyXs" color="textWeak">
+        promedio de recursos con plan
+      </UiLabel>
+    </UiFlex>
+  </UiSurface>
+</UiGrid>
