@@ -8,6 +8,8 @@ export interface Rol {
   codigo: string;
   nombre: string;
   descripcion?: string | null;
+  paginaInicioId?: string | null;
+  paginaInicioCodigo?: string | null;
   estado?: number | null;
 }
 

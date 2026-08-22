@@ -9,7 +9,6 @@ import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiLabelComponent } from "@shared/ui/label";
 
 import type { Role } from "../../models/role";
-import { ROLE_KIND_LABELS, SYSTEM_MODULES } from "../../models/role";
 
 @Component({
   selector: "RoleListPanel",
@@ -21,6 +20,7 @@ import { ROLE_KIND_LABELS, SYSTEM_MODULES } from "../../models/role";
 export class RoleListPanelComponent {
   readonly roles = input<Role[]>([]);
   readonly selectedId = input<string | null>(null);
+  readonly totalModules = input<number>(0);
 
   readonly select = output<string>();
 
@@ -35,7 +35,8 @@ export class RoleListPanelComponent {
   }
 
   protected metaLine(r: Role): string {
-    const total = SYSTEM_MODULES.length;
-    return `${r.users} usuarios · ${r.permissions.length}/${total} módulos · ${ROLE_KIND_LABELS[r.kind]}`;
+    const total = this.totalModules();
+    const kindLabel = r.sistema ? "Sistema" : "Personalizado";
+    return `${r.users} usuarios · ${r.permissions.length}/${total} módulos · ${kindLabel}`;
   }
 }

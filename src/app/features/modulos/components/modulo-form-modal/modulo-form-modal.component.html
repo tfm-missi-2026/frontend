@@ -1,0 +1,143 @@
+<UiModal
+  [isOpen]="isOpen()"
+  [showCloseButton]="false"
+  className="max-w-150 p-6 lg:p-8"
+  (close)="onCancel()"
+>
+  <UiHeader [level]="3" [text]="isEdit() ? 'Editar modulo' : 'Nuevo modulo'" className="mb-1" />
+  <UiLabel
+    type="bodyS"
+    color="textWeak"
+    className="mb-5 block"
+    text="Define un modulo del sidebar. Su seccion determina el grupo donde aparece."
+  />
+
+  @if (!isEdit()) {
+    <div class="mb-4">
+      <UiFormLabel
+        labelText="Codigo"
+        [required]="true"
+        [labelFor]="'modulo-codigo'"
+      />
+      <UiInput
+        id="modulo-codigo"
+        placeholder="p. ej. INDICADORES"
+        [value]="form().codigo"
+        (valueChange)="patch({ codigo: $event })"
+        [errorMessage]="errors().codigo"
+      />
+      <UiFieldError [message]="errors().codigo" />
+    </div>
+  }
+
+  <div class="mb-4">
+    <UiFormLabel
+      labelText="Nombre"
+      [required]="true"
+      [labelFor]="'modulo-nombre'"
+    />
+    <UiInput
+      id="modulo-nombre"
+      placeholder="p. ej. Indicadores"
+      [value]="form().nombre"
+      (valueChange)="patch({ nombre: $event })"
+      [errorMessage]="errors().nombre"
+    />
+    <UiFieldError [message]="errors().nombre" />
+  </div>
+
+  <div class="mb-4">
+    <UiFormLabel
+      labelText="Icono (slug)"
+      [labelFor]="'modulo-icono'"
+    />
+    <UiInput
+      id="modulo-icono"
+      placeholder="chart"
+      [value]="form().icono"
+      (valueChange)="patch({ icono: $event })"
+    />
+  </div>
+
+  <div class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+    <div>
+      <UiFormLabel
+        labelText="Seccion"
+        [required]="true"
+        [labelFor]="'modulo-seccion'"
+      />
+      <UiSelect
+        inputId="modulo-seccion"
+        [options]="secciones"
+        [searchable]="false"
+        [ngModel]="form().seccion"
+        (ngModelChange)="onSeccionChange($event)"
+      />
+      <UiFieldError [message]="errors().seccion" />
+    </div>
+
+    <div>
+      <UiFormLabel
+        labelText="Orden"
+        [required]="true"
+        [labelFor]="'modulo-orden'"
+      />
+      <UiInput
+        id="modulo-orden"
+        type="number"
+        [value]="ordenString()"
+        (valueChange)="onOrdenChange($event)"
+        [errorMessage]="errors().orden"
+      />
+      <UiFieldError [message]="errors().orden" />
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <UiFormLabel
+      labelText="Tipo"
+      [required]="true"
+      [labelFor]="'modulo-tipo'"
+    />
+    <UiSelect
+      inputId="modulo-tipo"
+      [options]="tipos"
+      [searchable]="false"
+      [ngModel]="form().tipo"
+      (ngModelChange)="onTipoChange($event)"
+    />
+  </div>
+
+  <div class="mb-4">
+    <UiFormLabel
+      labelText="Descripcion"
+      [labelFor]="'modulo-desc'"
+    />
+    <UiTextArea
+      id="modulo-desc"
+      [rows]="3"
+      placeholder="Describe el proposito del modulo"
+      [value]="form().descripcion"
+      (valueChange)="patch({ descripcion: $event })"
+    />
+  </div>
+
+  <UiFlex
+    direction="row"
+    justifyContent="end"
+    [gap]="2"
+    className="mt-4 border-t border-dashed border-gray-200 pt-4 dark:border-gray-800"
+  >
+    <UiButton
+      variant="secondary"
+      labelText="Cancelar"
+      (click)="onCancel()"
+    />
+    <UiButton
+      variant="primary"
+      [labelText]="isEdit() ? 'Guardar cambios' : 'Crear modulo'"
+      [disabled]="!isValid()"
+      (click)="onSave()"
+    />
+  </UiFlex>
+</UiModal>

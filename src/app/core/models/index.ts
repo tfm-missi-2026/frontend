@@ -1,0 +1,1 @@
+export { type PageData } from "./page-data";

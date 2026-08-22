@@ -3,6 +3,9 @@ import type { Routes } from "@angular/router";
 import { NotImplementedPageComponent } from "./features/users/pages/not-implemented/not-implemented.component";
 import { UsersListComponent } from "./features/users/pages/users-list/users-list.component";
 import { authGuard } from "@core/auth/auth.guard";
+import { landingGuard } from "@core/modulos/landing.guard";
+import { LandingRedirectComponent } from "@core/modulos/landing-redirect/landing-redirect.component";
+import { moduloPermisoGuard } from "@core/modulos/modulo-permiso.guard";
 
 export const routes: Routes = [
   {
@@ -26,10 +29,13 @@ export const routes: Routes = [
       {
         path: "",
         pathMatch: "full",
-        redirectTo: "administracion/usuarios",
+        canActivate: [landingGuard],
+        component: LandingRedirectComponent,
       },
       {
         path: "operacion/dashboard",
+        canMatch: [moduloPermisoGuard],
+        data: { moduloCodigo: "INICIO" },
         loadChildren: () =>
           import(
             "@features/manager-dashboard/manager-dashboard.module"
@@ -38,6 +44,8 @@ export const routes: Routes = [
       },
       {
         path: "operacion/dashboard-jefe",
+        canMatch: [moduloPermisoGuard],
+        data: { moduloCodigo: "DASHBOARD_JEFE" },
         loadChildren: () =>
           import("@features/area-dashboard/area-dashboard.module").then(
             (m) => m.AreaDashboardModule,
@@ -46,6 +54,8 @@ export const routes: Routes = [
       },
       {
         path: "operacion/dashboard-recurso",
+        canMatch: [moduloPermisoGuard],
+        data: { moduloCodigo: "DASHBOARD_RECURSO" },
         loadChildren: () =>
           import(
             "@features/resource-dashboard/resource-dashboard.module"
@@ -54,11 +64,15 @@ export const routes: Routes = [
       },
       {
         path: "administracion/usuarios",
+        canMatch: [moduloPermisoGuard],
+        data: { moduloCodigo: "USUARIOS" },
         component: UsersListComponent,
         title: "SPSRT — Gestión de usuarios",
       },
       {
         path: "administracion/roles",
+        canMatch: [moduloPermisoGuard],
+        data: { moduloCodigo: "ROLES" },
         loadChildren: () =>
           import("@features/roles-permissions/roles-permissions.module").then(
             (m) => m.RolesPermissionsModule,
@@ -67,6 +81,8 @@ export const routes: Routes = [
       },
       {
         path: "administracion/catalogo",
+        canMatch: [moduloPermisoGuard],
+        data: { moduloCodigo: "CATALOGO" },
         loadChildren: () =>
           import("@features/catalog/catalog.module").then(
             (m) => m.CatalogModule,
@@ -74,6 +90,8 @@ export const routes: Routes = [
       },
       {
         path: "seguimiento/mi-bitacora",
+        canMatch: [moduloPermisoGuard],
+        data: { moduloCodigo: "BITACORA" },
         loadChildren: () =>
           import("@features/timesheet/timesheet.module").then(
             (m) => m.TimesheetModule,
@@ -82,6 +100,8 @@ export const routes: Routes = [
       },
       {
         path: "operacion/proyectos",
+        canMatch: [moduloPermisoGuard],
+        data: { moduloCodigo: "PROYECTOS" },
         loadChildren: () =>
           import("@features/projects/projects.module").then(
             (m) => m.ProjectsModule,
@@ -90,6 +110,8 @@ export const routes: Routes = [
       },
       {
         path: "operacion/planificacion",
+        canMatch: [moduloPermisoGuard],
+        data: { moduloCodigo: "ASIGNACIONES" },
         loadChildren: () =>
           import("@features/planning/planning.module").then(
             (m) => m.PlanningModule,
@@ -98,6 +120,8 @@ export const routes: Routes = [
       },
       {
         path: "operacion/variaciones",
+        canMatch: [moduloPermisoGuard],
+        data: { moduloCodigo: "VARIACIONES" },
         loadChildren: () =>
           import("@features/variations/variations.module").then(
             (m) => m.VariationsModule,
@@ -106,6 +130,8 @@ export const routes: Routes = [
       },
       {
         path: "operacion/carga-equipo",
+        canMatch: [moduloPermisoGuard],
+        data: { moduloCodigo: "CARGA_EQUIPO" },
         loadChildren: () =>
           import("@features/team-load/team-load.module").then(
             (m) => m.TeamLoadModule,
@@ -114,6 +140,8 @@ export const routes: Routes = [
       },
       {
         path: "operacion/avance",
+        canMatch: [moduloPermisoGuard],
+        data: { moduloCodigo: "AVANCE" },
         loadChildren: () =>
           import("@features/progress/progress.module").then(
             (m) => m.ProgressModule,
@@ -122,11 +150,18 @@ export const routes: Routes = [
       },
       {
         path: "administracion/modulos",
-        component: NotImplementedPageComponent,
-        title: "SPSRT — Módulos",
+        canMatch: [moduloPermisoGuard],
+        data: { moduloCodigo: "MODULOS" },
+        loadChildren: () =>
+          import("@features/modulos/modulos-admin.module").then(
+            (m) => m.ModulosAdminModule,
+          ),
+        title: "SPSRT — Módulos del sistema",
       },
       {
         path: "cuenta/configuracion",
+        canMatch: [moduloPermisoGuard],
+        data: { moduloCodigo: "CONFIGURACION" },
         component: NotImplementedPageComponent,
         title: "SPSRT — Configuración",
       },

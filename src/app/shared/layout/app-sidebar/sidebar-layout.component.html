@@ -13,16 +13,23 @@
   <SidebarLayoutLogo [isExpandedOrHovered]="isVisible()" />
 
   <UiFlex direction="column" overflow="auto" className="flex-1 no-scrollbar">
-    <nav>
-      <UiFlex direction="column" [gap]="16">
-        <SidebarLayoutSection
-          [title]="navSection().title"
-          [items]="navSection().items"
-          [sectionKey]="navSection().sectionKey"
-          [isExpandedOrHovered]="isVisible()"
-          [sectionIcon]="sectionIcon"
+    <nav class="flex flex-col gap-6">
+      @for (section of navSections(); track section.sectionKey) {
+        @if (isVisible()) {
+          <UiFlex direction="column" [gap]="2">
+            <h3
+              class="px-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+            >
+              {{ section.title }}
+            </h3>
+            <hr class="border-t border-gray-200 dark:border-gray-800" />
+          </UiFlex>
+        }
+        <SidebarLayoutNavSection
+          [items]="section.items"
+          [sectionKey]="section.sectionKey"
         />
-      </UiFlex>
+      }
     </nav>
   </UiFlex>
 </aside>

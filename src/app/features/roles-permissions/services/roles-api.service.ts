@@ -1,42 +1,59 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 
 import { environment } from "@env/environment";
+import { RolQueryParams } from "@core/query-params";
+import { type PageData } from "@core/models";
 
 import type { ModuloResponse } from "@core/modulos/modulo.models";
 import type { RolApi } from "../models/role-api";
 
-// Capa fina contra /api/roles y /api/modulos del gateway.
-// Usuarios lo consume para resolver rolId. RolesService lo envuelve
-// para agregar signals y mapear el shape UI.
 @Injectable({ providedIn: "root" })
 export class RolesApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiGatewayUrl}${environment.apiPrefix}/roles`;
   private readonly modulosBaseUrl = `${environment.apiGatewayUrl}${environment.apiPrefix}/modulos`;
 
-  listar(): Observable<RolApi[]> {
-    return this.http.get<RolApi[]>(this.baseUrl);
+  list(query: RolQueryParams): Observable<PageData<RolApi>> {
+    return this.http.get<PageData<RolApi>>(this.baseUrl, {
+      params: query.toHttpParams(),
+    });
   }
 
-  buscarPorId(id: string): Observable<RolApi> {
+  listAll(): Observable<RolApi[]> {
+    return this.http.get<RolApi[]>(`${this.baseUrl}/todos`);
+  }
+
+  findById(id: string): Observable<RolApi> {
     return this.http.get<RolApi>(`${this.baseUrl}/${id}`);
   }
 
-  crear(body: {
+  create(body: {
     codigo: string;
     nombre: string;
     descripcion?: string;
+    paginaInicioId: string;
   }): Observable<RolApi> {
     return this.http.post<RolApi>(this.baseUrl, body);
   }
 
-  listarModulos(rolId: string): Observable<ModuloResponse[]> {
+  update(
+    id: string,
+    body: { nombre: string; descripcion?: string; paginaInicioId: string },
+  ): Observable<RolApi> {
+    return this.http.put<RolApi>(`${this.baseUrl}/${id}`, body);
+  }
+
+  delete(id: string, body: { motivoEliminacion: string }): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`, { body });
+  }
+
+  listModules(rolId: string): Observable<ModuloResponse[]> {
     return this.http.get<ModuloResponse[]>(`${this.baseUrl}/${rolId}/modulos`);
   }
 
-  asignarModulos(
+  replaceModules(
     rolId: string,
     moduloIds: string[],
   ): Observable<ModuloResponse[]> {
@@ -44,9 +61,5 @@ export class RolesApiService {
       `${this.baseUrl}/${rolId}/modulos`,
       { moduloIds },
     );
-  }
-
-  listarModulosTodos(): Observable<ModuloResponse[]> {
-    return this.http.get<ModuloResponse[]>(this.modulosBaseUrl);
   }
 }

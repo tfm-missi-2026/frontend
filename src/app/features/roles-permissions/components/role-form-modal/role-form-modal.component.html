@@ -4,12 +4,13 @@
   className="max-w-120 p-6 lg:p-8"
   (close)="onCancel()"
 >
-  <h2 class="mb-1 text-xl font-semibold text-gray-800 dark:text-white/90">
-    Nuevo rol
-  </h2>
-  <p class="mb-5 text-sm text-gray-500 dark:text-gray-400">
-    Define un rol. Sus permisos de módulo se configuran después de crearlo.
-  </p>
+  <UiHeader [level]="2" text="Nuevo rol" className="mb-1" />
+  <UiLabel
+    type="bodyS"
+    color="textWeak"
+    className="mb-5 block"
+    text="Define un rol. Sus permisos de módulo se configuran después de crearlo."
+  />
 
   <div class="mb-4">
     <UiFormLabel
@@ -25,9 +26,12 @@
       [errorMessage]="errors().code"
     />
     @if (!errors().code) {
-      <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-        Identificador corto del rol (2–4 letras).
-      </p>
+      <UiLabel
+        type="bodyXs"
+        color="textWeak"
+        className="mt-1 block"
+        text="Identificador corto del rol (2–4 letras)."
+      />
     }
     <UiFieldError [message]="errors().code" />
   </div>
@@ -46,6 +50,31 @@
       [errorMessage]="errors().name"
     />
     <UiFieldError [message]="errors().name" />
+  </div>
+
+  <div class="mb-4">
+    <UiFormLabel
+      labelText="Página de inicio (tras el login)"
+      [required]="true"
+      [labelFor]="'role-pagina-inicio'"
+    />
+    <UiSelect
+      inputId="role-pagina-inicio"
+      [options]="moduloOpciones()"
+      [searchable]="true"
+      placeholder="Selecciona el módulo que ve el rol tras el login"
+      [ngModel]="form().paginaInicioId"
+      (ngModelChange)="onPaginaInicioChange($event)"
+    />
+    @if (!errors().paginaInicioId) {
+      <UiLabel
+        type="bodyXs"
+        color="textWeak"
+        className="mt-1 block"
+        text="El rol siempre debe tener una página de inicio configurada."
+      />
+    }
+    <UiFieldError [message]="errors().paginaInicioId" />
   </div>
 
   <div class="mb-4">

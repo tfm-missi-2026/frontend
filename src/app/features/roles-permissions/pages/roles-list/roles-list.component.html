@@ -26,19 +26,40 @@
     />
   }
 
+  @if (error(); as errMsg) {
+    <UiAlert variant="error" [message]="errMsg" />
+  }
+
   <div class="grid grid-cols-1 gap-5 lg:grid-cols-[280px_1fr]">
     <div>
-      <RoleListPanel
-        [roles]="roles()"
-        [selectedId]="selectedId()"
-        (select)="onSelectRole($event)"
-      />
+      @if (loading()) {
+        <UiCard variant="default" padding="lg">
+          <UiLabel
+            type="bodyS"
+            color="textWeak"
+            text="Cargando roles..."
+          />
+        </UiCard>
+      } @else {
+        <RoleListPanel
+          [roles]="roles()"
+          [selectedId]="selectedId()"
+          [totalModules]="totalModules()"
+          (select)="onSelectRole($event)"
+        />
+      }
     </div>
 
     <div>
       @if (selectedRole(); as role) {
         <UiCard variant="default" padding="lg" className="h-full">
-          <div class="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+          <UiFlex
+            direction="row"
+            alignItems="start"
+            justifyContent="between"
+            [gap]="3"
+            className="flex-wrap"
+          >
             <div class="min-w-0 flex-1">
               <UiHeader
                 [level]="2"
@@ -52,37 +73,62 @@
                 className="mt-2 block max-w-prose"
               />
             </div>
-            <UiBadge
-              [variant]="role.kind === 'system' ? 'light' : 'light'"
-              [color]="role.kind === 'system' ? 'primary' : 'info'"
-              size="md"
-            >
-              {{ role.code }}
-            </UiBadge>
-          </div>
+            <UiFlex direction="row" [gap]="2" alignItems="center">
+              <UiBadge
+                [variant]="role.sistema ? 'light' : 'light'"
+                [color]="role.sistema ? 'primary' : 'info'"
+                size="md"
+              >
+                {{ role.code }}
+              </UiBadge>
+              @if (!role.sistema) {
+                <UiButton
+                  variant="secondary"
+                  size="sm"
+                  [LeftIcon]="pencilIcon"
+                  labelText="Editar"
+                  (click)="onEditRole()"
+                />
+                <UiButton
+                  variant="secondary"
+                  size="sm"
+                  [LeftIcon]="trashIcon"
+                  labelText="Eliminar"
+                  (click)="onRequestDelete()"
+                />
+              }
+            </UiFlex>
+          </UiFlex>
 
           <div
             class="mt-6 flex flex-col gap-2 border-t border-dashed border-gray-200 pt-4 dark:border-gray-800 sm:flex-row sm:items-center sm:justify-between"
           >
-            <p
-              class="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-            >
-              Módulos visibles / permisos
-            </p>
+            <UiLabel
+              type="bodyXs"
+              color="textWeak"
+              weight="medium"
+              className="uppercase tracking-wider"
+              text="Modulos visibles / permisos"
+            />
             <UiLabel
               type="bodyXs"
               color="textWeak"
               [text]="permissionCountLabel()"
             />
           </div>
-          <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            Marca los módulos del sidebar a los que este rol puede acceder.
-          </p>
+          <UiLabel
+            type="bodyS"
+            color="textWeak"
+            className="mt-2 block"
+            text="Marca los modulos del sidebar a los que este rol puede acceder."
+          />
 
           <div class="mt-4">
             <PermissionsMatrix
+              [modules]="modulosRaiz()"
               [selected]="effectivePermissions()"
               [readonly]="!canEditSelected()"
+              [landingCodigo]="selectedRole()?.paginaInicioCodigo ?? null"
               (selectedChange)="onPermissionsChange($event)"
             />
           </div>
@@ -109,12 +155,12 @@
               />
             </UiFlex>
           } @else {
-            <p
-              class="mt-6 border-t border-dashed border-gray-200 pt-4 text-xs text-gray-500 dark:border-gray-800 dark:text-gray-400"
-            >
-              Los roles del sistema son de solo lectura. Crea un rol
-              personalizado para editar sus permisos.
-            </p>
+            <UiLabel
+              type="bodyXs"
+              color="textWeak"
+              className="mt-6 block border-t border-dashed border-gray-200 pt-4 dark:border-gray-800"
+              text="Los roles del sistema son de solo lectura."
+            />
           }
         </UiCard>
       } @else {
@@ -134,4 +180,18 @@
   [isOpen]="createOpen()"
   (close)="createOpen.set(false)"
   (save)="onSaveRole($event)"
+/>
+
+<RoleEditModal
+  [role]="selectedRole()"
+  [isOpen]="editTargetId() !== null"
+  (close)="editTargetId.set(null)"
+  (save)="onSaveEdit($event)"
+/>
+
+<RoleConfirmDeleteModal
+  [role]="selectedRole()"
+  [isOpen]="deleteTargetId() !== null"
+  (close)="deleteTargetId.set(null)"
+  (confirm)="onConfirmDelete($event)"
 />

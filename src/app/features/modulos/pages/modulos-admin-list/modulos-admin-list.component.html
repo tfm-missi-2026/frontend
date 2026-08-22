@@ -1,0 +1,124 @@
+<UiFlex direction="column" [gap]="5">
+  <CommonBreadcrumb [items]="breadcrumbItems" />
+
+  <UiFlex
+    direction="row"
+    alignItems="center"
+    justifyContent="between"
+    [gap]="3"
+    className="flex-wrap"
+  >
+    <UiHeader [level]="1" text="Modulos del sistema" />
+    <UiButton
+      variant="primary"
+      [LeftIcon]="plusIcon"
+      labelText="Nuevo modulo"
+      (click)="onCreate()"
+    />
+  </UiFlex>
+
+  @if (successAlert(); as msg) {
+    <UiAlert
+      variant="success"
+      [message]="msg"
+      className="cursor-pointer"
+      (click)="onDismissAlert()"
+    />
+  }
+
+  @if (error(); as errMsg) {
+    <UiAlert variant="error" [message]="errMsg" />
+  }
+
+  <UiFlex direction="row" [gap]="3" className="flex-wrap">
+    <UiSelect
+      inputId="filtro-seccion"
+      [options]="seccionesFiltro"
+      [searchable]="false"
+      [ngModel]="seccionFiltroActual()"
+      (ngModelChange)="onSeccionFiltroChange($event)"
+    />
+    <UiSelect
+      inputId="filtro-estado"
+      [options]="estadoFiltro"
+      [searchable]="false"
+      [ngModel]="estadoFiltroActual()"
+      (ngModelChange)="onEstadoFiltroChange($event)"
+    />
+  </UiFlex>
+
+  <UiTable
+    [columns]="tableColumns()"
+    [data]="modulos()"
+    [searchable]="true"
+    [paginated]="true"
+    [pageSize]="20"
+    searchPlaceholder="Buscar modulos por codigo o nombre..."
+    emptyText="No hay modulos que coincidan con los filtros."
+    (searchChange)="onSearchChange($event)"
+    (pageChange)="onPageChange($event)"
+  >
+  </UiTable>
+</UiFlex>
+
+<!-- Templates de celda para UiTable (referenciados por tableColumns) -->
+<ng-template #estadoCell let-m>
+  @if (m.sistema) {
+    <UiBadge variant="light" color="primary" size="sm">Sistema</UiBadge>
+  } @else if (m.estado === 0) {
+    <UiBadge variant="light" color="error" size="sm">Deshabilitado</UiBadge>
+  } @else {
+    <UiBadge variant="light" color="success" size="sm">Habilitado</UiBadge>
+  }
+</ng-template>
+
+<ng-template #accionesCell let-m>
+  @if (!m.sistema) {
+    <UiFlex [gap]="2" justifyContent="end">
+      @if (m.estado === 0) {
+        <UiButton
+          variant="primary"
+          size="sm"
+          labelText="Habilitar"
+          (click)="onRequestEnable(m)"
+        />
+      } @else {
+        <UiButton
+          variant="secondary"
+          size="sm"
+          [LeftIcon]="editIcon"
+          labelText="Editar"
+          (click)="onEdit(m)"
+        />
+        <UiButton
+          variant="secondary"
+          size="sm"
+          labelText="Deshabilitar"
+          (click)="onRequestDisable(m)"
+        />
+      }
+    </UiFlex>
+  } @else {
+    <UiLabel type="bodyXs" color="textWeak" text="(no editable)" />
+  }
+</ng-template>
+
+<ModuloFormModal
+  [isOpen]="createOpen()"
+  (close)="createOpen.set(false)"
+  (save)="onSave($event)"
+ />
+
+<ModuloFormModal
+  [isOpen]="editTarget() !== null"
+  [existing]="editTarget()"
+  (close)="editTarget.set(null)"
+  (save)="onSave($event)"
+/>
+
+<ModuloDisableModal
+  [modulo]="disableTarget()"
+  [isOpen]="disableTarget() !== null"
+  (close)="disableTarget.set(null)"
+  (confirm)="onConfirmDisable($event)"
+/>

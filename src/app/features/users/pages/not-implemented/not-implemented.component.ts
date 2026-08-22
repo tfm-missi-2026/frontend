@@ -32,6 +32,6 @@ export class NotImplementedPageComponent {
   protected readonly homeIcon = IconArrowLeftComponent;
 
   protected goHome(): void {
-    void this.router.navigateByUrl("/app/administracion/usuarios");
+    void this.router.navigateByUrl("/app");
   }
 }

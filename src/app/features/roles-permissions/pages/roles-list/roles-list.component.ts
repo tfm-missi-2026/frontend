@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
   inject,
   OnInit,
   signal,
@@ -11,7 +10,10 @@ import {
 import { CommonBreadcrumbComponent } from "@shared/common/page-breadcrumb";
 import {
   IconCheckLargeComponent,
+  IconChevronRightComponent,
+  IconEditPencilComponent,
   IconPlusSimpleComponent,
+  IconTrashComponent,
 } from "@shared/icons";
 import { UiAlertComponent } from "@shared/ui/alert";
 import { UiBadgeComponent } from "@shared/ui/badge";
@@ -22,10 +24,11 @@ import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
 
 import { PermissionsMatrixComponent } from "../../components/permissions-matrix/permissions-matrix.component";
+import { RoleConfirmDeleteModalComponent } from "../../components/role-confirm-delete-modal/role-confirm-delete-modal.component";
+import { RoleEditModalComponent } from "../../components/role-edit-modal/role-edit-modal.component";
 import { RoleFormModalComponent } from "../../components/role-form-modal/role-form-modal.component";
 import { RoleListPanelComponent } from "../../components/role-list-panel/role-list-panel.component";
 import type { Role, RoleFormData } from "../../models/role";
-import { SYSTEM_MODULES } from "../../models/role";
 import { RolesService } from "../../services/roles.service";
 
 @Component({
@@ -34,6 +37,8 @@ import { RolesService } from "../../services/roles.service";
   imports: [
     CommonBreadcrumbComponent,
     PermissionsMatrixComponent,
+    RoleConfirmDeleteModalComponent,
+    RoleEditModalComponent,
     RoleFormModalComponent,
     RoleListPanelComponent,
     UiAlertComponent,
@@ -51,11 +56,23 @@ export class RolesListComponent implements OnInit {
   private readonly rolesService = inject(RolesService);
 
   ngOnInit(): void {
-    void this.rolesService.cargar();
+    void this.bootstrap();
+  }
+
+  private async bootstrap(): Promise<void> {
+    await this.rolesService.load();
+    const roles = this.roles();
+    if (this.selectedId() === null && roles.length > 0) {
+      this.selectedId.set(roles[0].id);
+      void this.rolesService.loadPermissionsForRole(roles[0].id);
+    }
   }
 
   protected readonly plusIcon = IconPlusSimpleComponent;
   protected readonly checkIcon = IconCheckLargeComponent;
+  protected readonly pencilIcon = IconEditPencilComponent;
+  protected readonly trashIcon = IconTrashComponent;
+  protected readonly chevronIcon = IconChevronRightComponent;
 
   protected readonly breadcrumbItems = [
     { label: "Administración" },
@@ -63,9 +80,14 @@ export class RolesListComponent implements OnInit {
   ];
 
   protected readonly roles = this.rolesService.roles;
+  protected readonly modulosRaiz = this.rolesService.modulosRaiz;
+  protected readonly loading = this.rolesService.loading;
+  protected readonly error = this.rolesService.error;
 
   protected readonly selectedId = signal<string | null>(null);
   protected readonly draftPermissions = signal<string[] | null>(null);
+  protected readonly deleteTargetId = signal<string | null>(null);
+  protected readonly editTargetId = signal<string | null>(null);
 
   protected readonly selectedRole = computed<Role | null>(() => {
     const id = this.selectedId();
@@ -73,7 +95,6 @@ export class RolesListComponent implements OnInit {
     return this.roles().find((r) => r.id === id) ?? null;
   });
 
-  /** Permisos efectivos (en edición) o los actuales del rol (cache local). */
   protected readonly effectivePermissions = computed<string[]>(() => {
     const draft = this.draftPermissions();
     if (draft) return draft;
@@ -82,11 +103,13 @@ export class RolesListComponent implements OnInit {
     return this.rolesService.getPermissionsForRole(id);
   });
 
-  protected readonly moduleCount = computed<number>(() => SYSTEM_MODULES.length);
+  protected readonly totalModules = computed<number>(
+    () => this.modulosRaiz().length,
+  );
 
   protected readonly canEditSelected = computed<boolean>(() => {
     const r = this.selectedRole();
-    return !!r && r.kind === "custom";
+    return !!r && !r.sistema;
   });
 
   protected readonly hasChanges = computed<boolean>(
@@ -95,14 +118,6 @@ export class RolesListComponent implements OnInit {
 
   protected readonly createOpen = signal<boolean>(false);
   protected readonly successAlert = signal<string | null>(null);
-
-  constructor() {
-    effect(() => {
-      if (this.selectedId() === null && this.roles().length > 0) {
-        this.selectedId.set(this.roles()[0].id);
-      }
-    });
-  }
 
   protected onSelectRole(id: string): void {
     this.selectedId.set(id);
@@ -136,10 +151,10 @@ export class RolesListComponent implements OnInit {
 
   protected async onSaveRole(payload: { data: RoleFormData }): Promise<void> {
     const created = await this.rolesService.create({
-      code: payload.data.code.trim().toUpperCase(),
-      name: payload.data.name.trim(),
-      description: payload.data.description.trim(),
-      permissions: [],
+      code: payload.data.code,
+      name: payload.data.name,
+      description: payload.data.description,
+      paginaInicioId: payload.data.paginaInicioId,
     });
     if (created) {
       this.createOpen.set(false);
@@ -152,14 +167,62 @@ export class RolesListComponent implements OnInit {
     }
   }
 
+  protected onEditRole(): void {
+    const r = this.selectedRole();
+    if (!r || r.sistema) return;
+    this.editTargetId.set(r.id);
+  }
+
+  protected async onSaveEdit(payload: {
+    id: string;
+    nombre: string;
+    descripcion: string;
+    paginaInicioId: string;
+  }): Promise<void> {
+    const updated = await this.rolesService.update(payload.id, {
+      nombre: payload.nombre,
+      descripcion: payload.descripcion,
+      paginaInicioId: payload.paginaInicioId,
+    });
+    if (updated) {
+      this.editTargetId.set(null);
+      this.successAlert.set(`Rol "${updated.name}" actualizado.`);
+    }
+  }
+
+  protected onRequestDelete(): void {
+    const r = this.selectedRole();
+    if (!r || r.sistema) return;
+    this.deleteTargetId.set(r.id);
+  }
+
+  protected async onConfirmDelete(payload: {
+    id: string;
+    motivoEliminacion: string;
+  }): Promise<void> {
+    const ok = await this.rolesService.delete(
+      payload.id,
+      payload.motivoEliminacion,
+    );
+    if (ok) {
+      this.deleteTargetId.set(null);
+      const remaining = this.roles();
+      if (this.selectedId() === payload.id) {
+        this.selectedId.set(remaining[0]?.id ?? null);
+        if (remaining[0]) {
+          void this.rolesService.loadPermissionsForRole(remaining[0].id);
+        }
+      }
+      this.successAlert.set("Rol eliminado.");
+    }
+  }
+
   protected onDismissAlert(): void {
     this.successAlert.set(null);
   }
 
   protected permissionCountLabel(): string {
-    const r = this.selectedRole();
-    if (!r) return `0 de ${this.moduleCount()} módulos`;
     const count = this.effectivePermissions().length;
-    return `${count} de ${this.moduleCount()} módulos`;
+    return `${count} de ${this.totalModules()} módulos`;
   }
 }

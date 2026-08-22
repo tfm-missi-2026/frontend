@@ -74,6 +74,7 @@ export class UiTableComponent implements OnInit {
   readonly pageSize = input<number>(10);
   readonly trackByKey = input<string>("id");
   readonly searchIcon = input<Type<unknown> | undefined>(undefined);
+  readonly total = input<number | null>(null);
   readonly prevIcon = input<Type<unknown>>(ChevronLeftIcon);
   readonly nextIcon = input<Type<unknown>>(ChevronRightIcon);
   readonly initialSearchTerm = input<string>("");
@@ -105,7 +106,8 @@ export class UiTableComponent implements OnInit {
   /** Filas tras aplicar la búsqueda. */
   protected readonly filteredData = computed<unknown[]>(() => {
     const term = this.searchTerm();
-    if (!term.trim() || !this.searchable()) return this.data();
+    const serverSide = this.total() !== null;
+    if (!term.trim() || !this.searchable() || serverSide) return this.data();
 
     const cols = this.columns().filter((c) => c.searchable !== false && c.key);
     if (!cols.length) return this.data();
@@ -131,7 +133,11 @@ export class UiTableComponent implements OnInit {
   /** Total de páginas. */
   protected readonly totalPages = computed<number>(() => {
     if (!this.paginated()) return 1;
-    return Math.max(1, Math.ceil(this.filteredData().length / this.pageSize()));
+    const total = this.total();
+    if (total === null) {
+      return Math.max(1, Math.ceil(this.filteredData().length / this.pageSize()));
+    }
+    return Math.max(1, Math.ceil(total / this.pageSize()));
   });
 
   /** Indica si la fila dada está seleccionada. */
@@ -157,7 +163,7 @@ export class UiTableComponent implements OnInit {
   /** Rango "Showing X–Y of Z". */
   protected readonly rangeLabel = computed<string>(() => {
     if (!this.paginated()) return "";
-    const total = this.filteredData().length;
+    const total = this.total() ?? this.filteredData().length;
     if (!total) return "Showing 0 of 0";
     const size = Math.max(1, this.pageSize());
     const start = (this.currentPage() - 1) * size + 1;
