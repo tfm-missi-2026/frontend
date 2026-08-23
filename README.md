@@ -2,9 +2,9 @@
 
 ## Bootstrap inicial (una sola vez)
 
-El frontend se construye a partir del template **TailAdmin Angular**, ajustado
-a las versiones que cierra el `Reporte_Stack_Frontend.pdf` (Angular 21.3.18,
-pnpm 10.33.0, Tailwind 4.2.2, Angular CDK 20, date-fns 4.1.0).
+El frontend se construye a partir del template **TailAdmin Angular**, ajustado al stack
+del proyecto: Angular 21.2, Angular CDK 21.2, Tailwind 4.3, date-fns 4.3, TypeScript 5.9
+y Storybook 10.4.
 
 Esta carpeta contiene únicamente la documentación de arranque y los archivos
 **override** que se aplican después del clonado. El clonado en sí lo realiza
@@ -12,40 +12,43 @@ el usuario manualmente para mantener el control del flujo de Git.
 
 ### Paso 1 — Verificar herramientas
 
-**Versiones requeridas (fijadas por `Reporte_Stack_Frontend.pdf`):**
+**Versiones requeridas:**
 
-| Herramienta | Versión         | Notas                                                                                    |
-| ----------- | --------------- | ---------------------------------------------------------------------------------------- |
-| Node.js     | **20.19.x LTS** | Soporte LTS hasta abril 2026. No usar Node 22 ni 24 — fuera del stack declarado del TFM. |
-| pnpm        | **10.33.0**     | Cubre CVE-2025-69262 / 69263 / 69264.                                                    |
-
-```powershell
-node -v      # debe imprimir v20.19.x
-pnpm -v      # debe imprimir 10.33.0
-```
-
-Si pnpm no está instalado o está desactualizado:
+| Herramienta | Versión     | Fuente en el repo                          |
+| ----------- | ----------- | ------------------------------------------ |
+| Node.js     | **24.18.0** | `.nvmrc`                                   |
+| pnpm        | **11.3.0**  | campo `packageManager` del `package.json`  |
 
 ```powershell
-npm install -g pnpm@10.33.0
+node -v      # debe imprimir v24.18.0
+pnpm -v      # debe imprimir 11.3.0
 ```
 
-**Si tenés otra versión de Node activa** (por ejemplo Node 22 o 24 para otros proyectos), usá un gestor de versiones (`nvm-windows`, `fnm` o `volta`) y posicioná Node 20.19.x antes de continuar. Con `nvm-windows` en PowerShell:
+pnpm se obtiene con **corepack**, incluido con Node. Se habilita una sola vez:
 
 ```powershell
-nvm install 20.19.0
-nvm use 20.19.0
+corepack enable
 ```
 
-Para evitar tener que tipear `nvm use 20.19.0` cada vez, podés definir una función en tu `$PROFILE` de PowerShell:
+Con corepack activo, `pnpm` usa automáticamente la versión declarada en `packageManager`,
+sin instalación global ni sincronización manual.
+
+**Gestor de versiones de Node.** El repo fija la versión en `.nvmrc`, que leen tanto
+`nvm-windows` como `fnm`. Con **fnm**, conviene activar el cambio automático al entrar a la
+carpeta agregando esta línea al `$PROFILE` de PowerShell:
 
 ```powershell
-function nvm-tfm { nvm use 20.19.0 }
+fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression
 ```
 
-Después con `nvm-tfm` cambiás la versión activa de la consola en un único comando.
+En Git Bash, la equivalente en `~/.bashrc`:
 
-> Nota: `pnpm` queda asociado a la versión de Node activa en nvm-windows. Si cambiás a otra versión de Node en otra consola y `pnpm -v` no responde, reinstalalo con `npm install -g pnpm@10.33.0` en esa consola.
+```bash
+eval "$(fnm env --use-on-cd --shell bash)"
+```
+
+Con eso configurado, `fnm install` sin argumentos instala la versión que indica el `.nvmrc`,
+y `node -v` devuelve `v24.18.0` al posicionarse en la carpeta del proyecto.
 
 ### Paso 2 — Clonar el template TailAdmin
 
@@ -75,15 +78,15 @@ cp overrides/src/styles.css src/styles.css
 ### Paso 4 — Forzar las versiones del stack
 
 ```bash
-pnpm add @angular/animations@21.0.0 @angular/common@21.0.0 \
-         @angular/compiler@21.0.0 @angular/core@21.0.0 \
-         @angular/forms@21.0.0 @angular/platform-browser@21.0.0 \
-         @angular/platform-browser-dynamic@21.0.0 @angular/router@21.0.0 \
-         @angular/cdk@21 rxjs@^7.8.0 \
-         tailwindcss@4.2.2 @tailwindcss/postcss@4.2.2 postcss@^8.5.9 \
-         date-fns@4.1.0
+pnpm add @angular/animations@^21.2 @angular/common@^21.2 \
+         @angular/compiler@^21.2 @angular/core@^21.2 \
+         @angular/forms@^21.2 @angular/platform-browser@^21.2 \
+         @angular/platform-browser-dynamic@^21.2 @angular/router@^21.2 \
+         @angular/cdk@^21.2 rxjs@~7.8.2 \
+         tailwindcss@^4.3.0 @tailwindcss/postcss@^4.3.0 postcss@^8.5.9 \
+         date-fns@^4.3.0
 
-pnpm add -D @angular/cli@21.0.0 @angular/compiler-cli@21.0.0 typescript@~5.8.0
+pnpm add -D @angular/cli@^21.2 @angular/compiler-cli@^21.2 typescript@~5.9.3
 ```
 
 ### Paso 5 — Instalación limpia y arranque
@@ -125,12 +128,12 @@ Frontend/
             └── planificacion-seguimiento/
 ```
 
-## Notas de seguridad (del Reporte_Stack_Frontend.pdf)
+## Notas de seguridad
 
-- **CVE-2025-66035** (XSRF en `@angular/common` < 20.3.14) → al fijar 21.0.0
-  queda cubierto. Evitar URLs con `//` en el código.
+- **CVE-2025-66035** (XSRF en `@angular/common` < 20.3.14) → Angular 21.2 queda
+  por encima del parche. Evitar URLs con `//` en el código.
 - **CVE-2025-59052** (fuga SSR en `@angular/ssr` < 20.3.0) → no aplica porque
-  estamos en CSR, pero la versión 21.0.0 ya está por encima del parche.
-- **CVE-2025-69262 / 69263 / 69264** (pnpm < 10.27.0) → pnpm 10.33.0 las cubre.
+  el frontend es CSR, y Angular 21.2 está por encima del parche.
+- **CVE-2025-69262 / 69263 / 69264** (pnpm < 10.27.0) → pnpm 11.3.0 las cubre.
 - `pnpm-workspace.yaml` declara `onlyBuiltDependencies: [esbuild, sharp]`
   como hardening de supply chain.
