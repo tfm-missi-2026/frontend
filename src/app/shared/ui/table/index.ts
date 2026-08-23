@@ -1,35 +1,40 @@
 /**
  * Public API del `UiTable` del design system.
  *
- * Réplica Angular del `Table` del proyecto React. Cubre los features
- * de los `basic-table-{one..five}` (búsqueda, selección, paginación,
- * acciones por fila) consolidándolos en un solo componente data-driven.
+ * Unico punto de entrada: importar `UiTableComponent` y los tipos
+ * publicos (`TableColumn`, `TableAction`, etc.).
+ *
+ * Los sub-componentes (`UiTableToolbar`, `UiTableSortableHeader`,
+ * `UiTablePaginationFooter`) son detalles internos y NO se exportan.
+ * El consumidor nunca los usa directamente.
+ *
+ * Tabla declarativa data-driven server-side-first.
+ *
+ * Contrato:
+ *  1. El padre mantiene un `WritableSignal<MyQueryParams>` en su servicio.
+ *  2. Pasa `[query]="admin.query()"` (read value) y
+ *     `(queryChange)="admin.query.set($event)"` para sincronizar.
+ *  3. Pasa `[fetchData]="(q) => service.fetchData(q)"` para auto-cargar.
+ *
+ * El UiTable se auto-gestiona:
+ *  - Sort/page/search/pageSize: mutan el query y lo emiten (queryChange).
+ *  - El effect() interno dispara `fetchData(query)` en cada cambio.
  *
  * @example
  * ```ts
- * import { UiTableComponent, TableColumn, TableAction } from '@ui/table';
- *
- * @Component({
- *   imports: [UiTableComponent],
- *   template: `
- *     <UiTable
- *       [columns]="columns"
- *       [data]="users"
- *       [selectable]="true"
- *       [searchable]="true"
- *       [paginated]="true"
- *       [actions]="rowActions"
- *       title="Users"
- *     />
- *   `,
- * })
- * export class UsersPage {}
+ * // componente
+ * <UiTable
+ *   [query]="admin.query()"
+ *   [fetchData]="(q) => admin.fetchData(q)"
+ *   [columns]="columns"
+ *   (queryChange)="admin.query.set($event)"
+ * />
  * ```
  */
 
 export { UiTableComponent } from './table.component';
 
-// Iconos stub internos (chevrons de paginación). Exportados por si el
+// Iconos stub internos (chevrons de paginacion) re-exportados por si el
 // consumer quiere reutilizarlos en otras partes de la UI.
 export { ChevronLeftIcon, ChevronRightIcon } from './table.component';
 
@@ -38,6 +43,8 @@ export type {
   TableColumn,
   TableAction,
   TableAlign,
-  TablePageEvent,
+  TableSortDirection,
+  TableSortEvent,
+  TableFetchResult,
   TableSelection,
 } from './table.types';

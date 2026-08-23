@@ -2,62 +2,113 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  OnInit,
+  effect,
+  input,
   signal,
   TemplateRef,
   Type,
-  input,
   output,
 } from "@angular/core";
 import { NgTemplateOutlet } from "@angular/common";
 
-import { UiFlexComponent } from "@shared/ui/flex/flex.component";
-import { UiLabelComponent } from "@shared/ui/label/label.component";
-import { matchesSearch } from "@utils/strings";
+import { BaseQueryParams } from "@core/query-params";
+
+import { UiButtonComponent } from "@shared/ui/button";
 import { UiCheckboxComponent } from "@shared/ui/input/checkbox/checkbox.component";
-import { UiInputComponent } from "@shared/ui/input/input/input.component";
-import { UiIconButtonComponent } from "@shared/ui/icon-button/icon-button.component";
+import { UiFlexComponent } from "@shared/ui/flex/flex.component";
+import { UiLabelComponent } from "@shared/ui/label";
 import { IconChevronLeftComponent } from "@shared/icons/chevron-left-icon";
 import { IconChevronRightComponent } from "@shared/icons/chevron-right-icon";
+import { extractProblemMessage } from "@utils/problem-detail";
+
+import { UiTableSortableHeaderComponent } from "./table-sortable-header.component";
+import { UiTableToolbarComponent } from "./table-toolbar.component";
+import { UiTablePaginationFooterComponent } from "./table-pagination-footer.component";
+
 import {
   TableAction,
   TableCellContext,
   TableColumn,
-  TablePageEvent,
+  TableFetchResult,
   TableSelection,
 } from "./table.types";
+import { cloneQuery, tableWidthClass } from "./table.utils";
 
 /**
- * `UiTable`
- * Tabla genérica data-driven del design system.
+ * `UiTable` — orquestador.
  *
- * Cubre los features presentes en los `basic-table-{one..five}`:
- *  - Headers tipados por `columns`.
- *  - Búsqueda client-side case-insensitive sobre columnas `searchable`.
- *  - Selección por fila + select-all (`<UiCheckbox>`).
- *  - Paginación client-side con `pageSize` configurable.
- *  - Acciones por fila (`<UiIconButton>` con tooltip).
- *  - Toolbar opcional con title + slot para acciones globales.
+ * El consumer pasa:
+ *  - `[query]`: el valor actual del `BaseQueryParams` (signal derivado
+ *    en el padre, tipicamente via `[query]="admin.query()"`).
+ *  - `(queryChange)`: emite el query mutado cuando el usuario interactua
+ *    (sort, search, pageSize, prev/next). El padre lo aplica sobre su
+ *    signal: `admin.query.set($event)`.
+ *  - `[fetchData]`: funcion invocada por el `effect()` interno cada vez
+ *    que `query` cambia.
+ *
+ * **Modos de carga** (mutuamente excluyentes):
+ *  - **auto**: `[fetchData]` presente → llama la funcion cada vez que
+ *    cambia `query` y renderiza el resultado.
+ *  - **controlado**: `[data]` presente → el padre empuja los datos
+ *    (con `[total]`/`[pageCount]`/`[loading]`/`[error]` opcionales).
+ *
+ * **Acciones**: si pasas `[actions]`, el UiTable renderiza una columna
+ * final con `UiButton` por accion (horizontal, `noWrap`). Si prefieres
+ * control total (como en `modulos-admin-list`), declara tu propia
+ * columna `key: "acciones"` con `cell: TemplateRef<TableCellContext<T>>`
+ * y NO pases `[actions]`.
  */
 @Component({
   selector: "UiTable",
   standalone: true,
   imports: [
+    NgTemplateOutlet,
+    UiButtonComponent,
+    UiCheckboxComponent,
     UiFlexComponent,
     UiLabelComponent,
-    UiCheckboxComponent,
-    UiInputComponent,
-    UiIconButtonComponent,
-    NgTemplateOutlet,
+    UiTablePaginationFooterComponent,
+    UiTableSortableHeaderComponent,
+    UiTableToolbarComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./table.component.html",
   styleUrls: ["./table.component.css"],
 })
-export class UiTableComponent implements OnInit {
-  readonly data = input<unknown[]>([]);
-  readonly columns = input<TableColumn[]>([]);
-  readonly actions = input<TableAction[]>([]);
+export class UiTableComponent<
+  TQuery extends BaseQueryParams = BaseQueryParams,
+  TRow = unknown,
+> {
+  /**
+   * Valor actual del query (read-only). Tipicamente `[query]="admin.query()"`.
+   * Es el `WritableSignal` del padre lo que mantiene el estado; el padre
+   * lo aplica al UiTable via `[query]` y consume los cambios via
+   * `(queryChange)`.
+   */
+  readonly query = input.required<TQuery>();
+
+  /**
+   * Emite un NUEVO `TQuery` (clonado y mutado) cuando el usuario
+   * interactua. El padre debe hacer `admin.query.set($event)` para
+   * propagarlo a su signal y que el `effect()` interno re-dispare el fetch.
+   */
+  readonly queryChange = output<TQuery>();
+
+  // ----- Modo AUTO ---------------------------------------------------------
+  readonly fetchData = input<(q: TQuery) => Promise<TableFetchResult<TRow>>>();
+
+  // ----- Modo CONTROLADO ---------------------------------------------------
+  readonly data = input<TRow[] | undefined>(undefined);
+  readonly total = input<number | null | undefined>(undefined);
+  readonly pageCount = input<number | null | undefined>(undefined);
+  readonly loading = input<boolean | undefined>(undefined);
+  readonly error = input<string | null | undefined>(undefined);
+
+  // ----- Visual / estructura ----------------------------------------------
+  readonly columns = input<TableColumn<TRow>[]>([]);
+  readonly actions = input<TableAction<TRow>[]>([]);
+
+  readonly actionVariant = input<"primary" | "secondary" | "tertiary">("secondary");
 
   readonly title = input<string | undefined>(undefined);
   readonly description = input<string | undefined>(undefined);
@@ -65,6 +116,7 @@ export class UiTableComponent implements OnInit {
   readonly searchPlaceholder = input<string>("Buscar…");
   readonly emptyText = input<string>("Sin resultados.");
   readonly rangeLabelTemplate = input<string>("Mostrando {from}–{to} de {total}");
+  readonly pageLabelTemplate = input<string>("Página {page} de {total}");
   readonly className = input<string>("");
 
   readonly searchable = input<boolean>(false);
@@ -72,86 +124,73 @@ export class UiTableComponent implements OnInit {
   readonly paginated = input<boolean>(false);
   readonly hasActions = input<boolean>(true);
 
-  readonly pageSize = input<number>(10);
+  readonly pageSizeOptions = input<number[]>([]);
   readonly trackByKey = input<string>("id");
   readonly searchIcon = input<Type<unknown> | undefined>(undefined);
-  readonly total = input<number | null>(null);
   readonly prevIcon = input<Type<unknown>>(ChevronLeftIcon);
   readonly nextIcon = input<Type<unknown>>(ChevronRightIcon);
-  readonly initialSearchTerm = input<string>("");
 
-  readonly rowSelect = output<TableSelection>();
-  readonly searchChange = output<string>();
-  readonly pageChange = output<TablePageEvent>();
+  readonly rowSelect = output<TableSelection<TRow>>();
 
-  protected readonly searchTerm = signal("");
-  protected readonly currentPage = signal(1);
-  protected readonly selectedRows = signal<unknown[]>([]);
+  // ----- Estado interno del modo AUTO --------------------------------------
+  private readonly _autoData = signal<TRow[]>([]);
+  private readonly _autoTotal = signal<number | null>(null);
+  private readonly _autoPageCount = signal<number | null>(null);
+  private readonly _autoLoading = signal<boolean>(false);
+  private readonly _autoError = signal<string | null>(null);
+  private _fetchSeq = 0;
 
-  // Mapa tipado para mapear `TableColumn.width` a clases Tailwind estáticas
-  // (necesario para que el JIT de Tailwind detecte las clases en build).
-  private static readonly WIDTH_CLASS_MAP: Record<string, string> = {
-    "60px": "min-w-[60px]",
-    "80px": "min-w-[80px]",
-    "100px": "min-w-[100px]",
-    "120px": "min-w-[120px]",
-    "140px": "min-w-[140px]",
-    "160px": "min-w-[160px]",
-    "180px": "min-w-[180px]",
-    "200px": "min-w-[200px]",
-    "240px": "min-w-[240px]",
-    "280px": "min-w-[280px]",
-    "320px": "min-w-[320px]",
-  };
+  /** UI-only state (no parte del query). */
+  protected readonly selectedRows = signal<TRow[]>([]);
 
-  /** Filas tras aplicar la búsqueda. */
-  protected readonly filteredData = computed<unknown[]>(() => {
-    const term = this.searchTerm();
-    const serverSide = this.total() !== null;
-    if (!term.trim() || !this.searchable() || serverSide) return this.data();
+  // ----- Derivados ---------------------------------------------------------
+  protected readonly isAutoMode = computed<boolean>(
+    () => this.fetchData() !== undefined,
+  );
 
-    const cols = this.columns().filter((c) => c.searchable !== false && c.key);
-    if (!cols.length) return this.data();
-
-    return this.data().filter((row) => {
-      for (const c of cols) {
-        const value = (row as Record<string, unknown>)[c.key];
-        if (value === null || value === undefined) continue;
-        if (matchesSearch(term, String(value))) return true;
-      }
-      return false;
-    });
+  protected readonly effectiveData = computed<TRow[]>(() => {
+    if (this.isAutoMode()) return this._autoData();
+    return this.data() ?? [];
+  });
+  protected readonly effectiveTotal = computed<number | null>(() => {
+    if (this.isAutoMode()) return this._autoTotal();
+    return this.total() ?? null;
+  });
+  protected readonly effectivePageCount = computed<number | null>(() => {
+    if (this.isAutoMode()) return this._autoPageCount();
+    return this.pageCount() ?? null;
+  });
+  protected readonly effectiveLoading = computed<boolean>(() => {
+    if (this.isAutoMode()) return this._autoLoading();
+    return this.loading() ?? false;
+  });
+  protected readonly effectiveError = computed<string | null>(() => {
+    if (this.isAutoMode()) return this._autoError();
+    return this.error() ?? null;
   });
 
-  /** Filas visibles en la página actual. */
-  protected readonly pagedData = computed<unknown[]>(() => {
-    if (!this.paginated()) return this.filteredData();
-    const size = Math.max(1, this.pageSize());
-    const start = (this.currentPage() - 1) * size;
-    return this.filteredData().slice(start, start + size);
-  });
+  protected readonly currentSearch = computed<string>(() => this.query().search);
+  protected readonly currentPage = computed<number>(() => this.query().page);
+  protected readonly currentPageSize = computed<number>(() => this.query().pageSize);
+  protected readonly currentSortBy = computed<string | null>(() => this.query().sortBy);
+  protected readonly currentSortDir = computed<"asc" | "desc" | null>(
+    () => this.query().sortDir,
+  );
 
-  /** Total de páginas. */
   protected readonly totalPages = computed<number>(() => {
     if (!this.paginated()) return 1;
-    const total = this.total();
-    if (total === null) {
-      return Math.max(1, Math.ceil(this.filteredData().length / this.pageSize()));
-    }
-    return Math.max(1, Math.ceil(total / this.pageSize()));
+    const pc = this.effectivePageCount();
+    if (pc !== null) return Math.max(1, pc);
+    const total = this.effectiveTotal();
+    if (total !== null) return Math.max(1, Math.ceil(total / this.currentPageSize()));
+    return Math.max(1, Math.ceil(this.effectiveData().length / this.currentPageSize()));
   });
 
-  /** Indica si la fila dada está seleccionada. */
-  protected isRowSelected = (row: unknown): boolean => {
-    return this.selectedRows().includes(row);
-  };
-
-  /** Estado del checkbox de "select all" en la página actual. */
   protected readonly selectAllState = computed<{
     checked: boolean;
     indeterminate: boolean;
   }>(() => {
-    const page = this.pagedData();
+    const page = this.effectiveData();
     if (!page.length) return { checked: false, indeterminate: false };
     const sel = this.selectedRows();
     const onPage = page.filter((r) => sel.includes(r));
@@ -161,15 +200,16 @@ export class UiTableComponent implements OnInit {
     };
   });
 
-  /** Rango "Mostrando X–Y de Z" con plantilla localizable. */
   protected readonly rangeLabel = computed<string>(() => {
     if (!this.paginated()) return "";
-    const total = this.total() ?? this.filteredData().length;
-    if (!total) return this.rangeLabelTemplate()
-      .replace("{from}", "0")
-      .replace("{to}", "0")
-      .replace("{total}", "0");
-    const size = Math.max(1, this.pageSize());
+    const total = this.effectiveTotal() ?? this.effectiveData().length;
+    if (!total) {
+      return this.rangeLabelTemplate()
+        .replace("{from}", "0")
+        .replace("{to}", "0")
+        .replace("{total}", "0");
+    }
+    const size = Math.max(1, this.currentPageSize());
     const start = (this.currentPage() - 1) * size + 1;
     const end = Math.min(start + size - 1, total);
     return this.rangeLabelTemplate()
@@ -178,21 +218,89 @@ export class UiTableComponent implements OnInit {
       .replace("{total}", String(total));
   });
 
-  /** Etiqueta de página actual, p.ej. "Página 1 de 3". */
-  readonly pageLabelTemplate = input<string>("Página {page} de {total}");
-
-  protected readonly pageLabel = computed<string>(() =>
-    this.pageLabelTemplate()
-      .replace("{page}", String(this.currentPage()))
-      .replace("{total}", String(this.totalPages())),
-  );
-
-  ngOnInit(): void {
-    this.searchTerm.set(this.initialSearchTerm());
+  constructor() {
+    effect(() => {
+      const fetch = this.fetchData();
+      if (!fetch) return;
+      const q = this.query();
+      void this.runFetch(q, fetch);
+    });
   }
 
-  /** `trackBy` para `@for`. */
-  protected trackByRow = (_: number, row: unknown): unknown => {
+  private async runFetch(
+    q: TQuery,
+    fetch: (q: TQuery) => Promise<TableFetchResult<TRow>>,
+  ): Promise<void> {
+    const seq = ++this._fetchSeq;
+    this._autoLoading.set(true);
+    this._autoError.set(null);
+    try {
+      const result = await fetch(q);
+      if (seq !== this._fetchSeq) return;
+      if (Array.isArray(result)) {
+        this._autoData.set(result as TRow[]);
+        this._autoTotal.set(result.length);
+        this._autoPageCount.set(null);
+      } else {
+        this._autoData.set(result.items);
+        this._autoTotal.set(result.total);
+        this._autoPageCount.set(
+          typeof result.totalPages === "number" ? result.totalPages : null,
+        );
+      }
+    } catch (err) {
+      if (seq !== this._fetchSeq) return;
+      this._autoError.set(extractProblemMessage(err));
+    } finally {
+      if (seq === this._fetchSeq) {
+        this._autoLoading.set(false);
+      }
+    }
+  }
+
+  // ----- Handlers: clonar + mutar + emitir `queryChange` ----------------
+
+  private emitNext(mutator: (q: TQuery) => void): void {
+    const next = cloneQuery(this.query());
+    mutator(next);
+    this.queryChange.emit(next);
+  }
+
+  protected onSearchInput(value: string | number | undefined): void {
+    const term = (value ?? "").toString();
+    this.emitNext((q) => q.setSearch(term));
+  }
+
+  protected onSortChange(payload: {
+    key: string;
+    direction: "asc" | "desc" | null;
+  }): void {
+    this.emitNext((q) => {
+      if (payload.direction) {
+        q.setSort(payload.key, payload.direction);
+      } else {
+        q.sortBy = null;
+        q.sortDir = "asc";
+        q.page = 1;
+      }
+    });
+  }
+
+  protected onPrevPage(): void {
+    this.emitNext((q) => q.prevPage());
+  }
+
+  protected onNextPage(): void {
+    this.emitNext((q) => q.nextPage());
+  }
+
+  protected onPageSizeSelect(pageSize: number): void {
+    this.emitNext((q) => q.setPageSize(pageSize));
+  }
+
+  // ----- Helpers compartidos con template (filas/celdas/seleccion) -------
+
+  protected trackByRow = (_: number, row: TRow): unknown => {
     const key = this.trackByKey();
     if (key && typeof row === "object" && row !== null) {
       return (row as Record<string, unknown>)[key];
@@ -200,7 +308,6 @@ export class UiTableComponent implements OnInit {
     return row;
   };
 
-  /** Valor de la celda default (sin template custom). */
   protected getCellValue(row: unknown, key: string): string {
     if (row === null || row === undefined) return "";
     const value = (row as Record<string, unknown>)[key];
@@ -208,65 +315,56 @@ export class UiTableComponent implements OnInit {
     return String(value);
   }
 
-  /** Clases del header de una columna. */
-  protected thClass(col: TableColumn): string {
+  protected thClass(col: TableColumn<TRow>): string {
     return [
-      "px-4 py-3 font-semibold text-gray-700 uppercase tracking-wider text-xs text-start",
+      "px-4 py-3 font-semibold text-gray-700 text-sm text-start",
       "bg-gray-50 border-b border-gray-200 dark:bg-white/[0.02] dark:border-white/[0.05] dark:text-gray-300",
       col.align === "center" ? "text-center" : "",
       col.align === "end" ? "text-end" : "",
       col.sortable ? "cursor-pointer select-none hover:text-brand-600 dark:hover:text-brand-400" : "",
-      this.widthClass(col.width),
+      tableWidthClass(col.width),
       col.headerClassName ?? "",
     ]
       .filter(Boolean)
       .join(" ");
   }
 
-  /** Clases de la celda. */
-  protected tdClass(col: TableColumn): string {
+  protected tdClass(col: TableColumn<TRow>): string {
     return [
       "px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400",
       col.align === "center" ? "text-center" : "",
       col.align === "end" ? "text-end" : "",
-      this.widthClass(col.width),
+      tableWidthClass(col.width),
       col.cellClassName ?? "",
     ]
       .filter(Boolean)
       .join(" ");
   }
 
-  /** Mapea `TableColumn.width` a una clase Tailwind estática del mapa. */
-  private widthClass(width: string | undefined): string {
-    if (!width) return "";
-    return UiTableComponent.WIDTH_CLASS_MAP[width] ?? "";
-  }
-
-  /** Context para `*ngTemplateOutlet` de una celda. */
   protected cellContext(
-    col: TableColumn,
-    row: unknown,
+    col: TableColumn<TRow>,
+    row: TRow,
     index: number,
-  ): TableCellContext<unknown> {
+  ): TableCellContext<TRow> {
     return { $implicit: row, row, index };
   }
 
-  /** Indica si hay acciones configuradas y `hasActions` está activo. */
+  protected isRowSelected(row: TRow): boolean {
+    return this.selectedRows().includes(row);
+  }
+
   protected get showActionsColumn(): boolean {
     return this.hasActions() && this.actions().length > 0;
   }
 
-  /** Indica si se debe renderizar la columna de select. */
   protected get showSelectColumn(): boolean {
     return this.selectable();
   }
 
-  /** Indica si se debe renderizar el toolbar. */
   protected get showToolbar(): boolean {
     return !!this.title() || this.searchable();
   }
 
-  /** Clases del contenedor raíz. */
   protected get containerClasses(): string {
     const base =
       this.variant() === "card"
@@ -275,15 +373,7 @@ export class UiTableComponent implements OnInit {
     return [base, this.className()].filter(Boolean).join(" ");
   }
 
-  protected onSearchInput(value: string | number | undefined): void {
-    const term = (value ?? "").toString();
-    this.searchTerm.set(term);
-    this.currentPage.set(1);
-    this.searchChange.emit(term);
-    this.pageChange.emit({ page: 1, pageSize: this.pageSize() });
-  }
-
-  protected onRowToggle(row: unknown, checked: boolean): void {
+  protected onRowToggle(row: TRow, checked: boolean): void {
     const current = this.selectedRows();
     const next = checked ? [...current, row] : current.filter((r) => r !== row);
     this.selectedRows.set(next);
@@ -291,7 +381,7 @@ export class UiTableComponent implements OnInit {
   }
 
   protected onSelectAllToggle(checked: boolean): void {
-    const page = this.pagedData();
+    const page = this.effectiveData();
     const current = this.selectedRows();
     const pageSet = new Set(page);
     const next = checked
@@ -302,29 +392,15 @@ export class UiTableComponent implements OnInit {
   }
 
   protected onActionClick(
-    action: TableAction,
-    row: unknown,
+    action: TableAction<TRow>,
+    row: TRow,
     index: number,
   ): void {
     if (action.disabled?.(row)) return;
     action.onClick(row, index);
   }
 
-  protected onPrevPage(): void {
-    const next = Math.max(1, this.currentPage() - 1);
-    if (next === this.currentPage()) return;
-    this.currentPage.set(next);
-    this.pageChange.emit({ page: next, pageSize: this.pageSize() });
-  }
-
-  protected onNextPage(): void {
-    const next = Math.min(this.totalPages(), this.currentPage() + 1);
-    if (next === this.currentPage()) return;
-    this.currentPage.set(next);
-    this.pageChange.emit({ page: next, pageSize: this.pageSize() });
-  }
-
-  private emitSelection(rows: unknown[]): void {
+  private emitSelection(rows: TRow[]): void {
     const key = this.trackByKey();
     const keys = rows.map((r) =>
       typeof r === "object" && r !== null && key
@@ -335,7 +411,7 @@ export class UiTableComponent implements OnInit {
   }
 }
 
-// Iconos de paginación por defecto re-exportados desde `@ui/icon` como `Type<unknown>` para encajar en `prevIcon`/`nextIcon` sin cast en el consumer.
+// Iconos de paginacion por defecto (consumer puede sobrescribir via [prevIcon]/[nextIcon]).
 export const ChevronLeftIcon =
   IconChevronLeftComponent as unknown as Type<unknown>;
 export const ChevronRightIcon =
