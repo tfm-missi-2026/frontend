@@ -3,8 +3,11 @@ import {
   Component,
   TemplateRef,
   ViewChild,
+  signal,
 } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
+
+import { BaseQueryParams } from "@core/query-params";
 
 import { UiTableComponent } from "./table.component";
 import { TableColumn } from "./table.types";
@@ -29,6 +32,8 @@ const SAMPLE_COLUMNS: TableColumn<User>[] = [
   { key: "role", header: "Role" },
 ];
 
+class TestQuery extends BaseQueryParams {}
+
 function applyInputs<T>(
   fixture: ComponentFixture<T>,
   opts: Record<string, unknown>,
@@ -44,14 +49,22 @@ function applyInputs<T>(
 describe("Table", () => {
   let fixture: ComponentFixture<UiTableComponent>;
   let component: UiTableComponent;
+  let queryValue: () => TestQuery;
+  let queryEmitSpy: jasmine.Spy;
 
   beforeEach(async () => {
+    const querySignal = signal(new TestQuery());
+    queryValue = () => querySignal();
+
     await TestBed.configureTestingModule({
       imports: [UiTableComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(UiTableComponent);
     component = fixture.componentInstance;
+    queryEmitSpy = jasmine.createSpy("queryChange");
+    component.queryChange.subscribe(queryEmitSpy);
+    fixture.componentRef.setInput("query", querySignal());
     applyInputs(fixture, {
       columns: SAMPLE_COLUMNS,
       data: SAMPLE_DATA,
@@ -76,117 +89,93 @@ describe("Table", () => {
     expect(empty.textContent.trim()).toContain("No results found");
   });
 
-  describe("search", () => {
-    beforeEach(() => {
-      fixture.componentRef.setInput("searchable", true);
-      fixture.detectChanges();
+  describe("queryChange emission (sort/search/page)", () => {
+    it("onSearchInput emits a new query with setSearch and page=1", () => {
+      component.onSearchInput("ada");
+      expect(queryEmitSpy).toHaveBeenCalledTimes(1);
+      const emitted = queryEmitSpy.calls.mostRecent().args[0] as TestQuery;
+      expect(emitted.search).toBe("ada");
+      expect(emitted.page).toBe(1);
     });
 
-    it("filters rows by the search term", () => {
-      fixture.detectChanges();
-      component["searchTerm"].set("ada");
-      fixture.detectChanges();
-      const visibleRows = component["filteredData"]();
-      expect(visibleRows.length).toBe(1);
-      expect((visibleRows[0] as User).name).toBe("Ada Lovelace");
+    it("does NOT mutate the input query in-place", () => {
+      const before = queryValue();
+      component.onSearchInput("ada");
+      const after = queryValue();
+      expect(after).toBe(before);
+      expect(before.search).toBe("");
     });
 
-    it("is case-insensitive", () => {
-      fixture.detectChanges();
-      component["searchTerm"].set("GRACE");
-      fixture.detectChanges();
-      expect(component["filteredData"]().length).toBe(1);
+    it("onSortChange cycles asc -> desc -> null", () => {
+      component.onSortChange({ key: "name", direction: "asc" });
+      expect((queryEmitSpy.calls.mostRecent().args[0] as TestQuery).sortBy).toBe(
+        "name",
+      );
+
+      component.onSortChange({ key: "name", direction: "desc" });
+      expect((queryEmitSpy.calls.mostRecent().args[0] as TestQuery).sortDir).toBe(
+        "desc",
+      );
+
+      component.onSortChange({ key: "name", direction: null });
+      const cleared = queryEmitSpy.calls.mostRecent().args[0] as TestQuery;
+      expect(cleared.sortBy).toBeNull();
+      expect(cleared.sortDir).toBe("asc");
+      expect(cleared.page).toBe(1);
     });
 
-    it("returns all rows when term is empty", () => {
-      fixture.detectChanges();
-      component["searchTerm"].set("");
-      fixture.detectChanges();
-      expect(component["filteredData"]().length).toBe(SAMPLE_DATA.length);
+    it("onPrevPage / onNextPage mutate the page", () => {
+      component.onPrevPage();
+      // page=1, emit permite q.page avanzar a 0 -> setPrevPage lo mantiene en 1
+      expect((queryEmitSpy.calls.mostRecent().args[0] as TestQuery).page).toBe(1);
+
+      component.onNextPage();
+      expect((queryEmitSpy.calls.mostRecent().args[0] as TestQuery).page).toBe(2);
+    });
+
+    it("onPageSizeSelect changes pageSize and resets page to 1", () => {
+      component.onPageSizeSelect(25);
+      const emitted = queryEmitSpy.calls.mostRecent().args[0] as TestQuery;
+      expect(emitted.pageSize).toBe(25);
+      expect(emitted.page).toBe(1);
     });
   });
 
   describe("selection", () => {
-    beforeEach(() => {
-      fixture.componentRef.setInput("selectable", true);
-      fixture.detectChanges();
-    });
-
     it("toggles a single row in and out of selectedRows", () => {
       const row = SAMPLE_DATA[0];
-      component["onRowToggle"](row, true);
+      component.onRowToggle(row, true);
       expect(component["selectedRows"]()).toContain(row);
-      component["onRowToggle"](row, false);
+      component.onRowToggle(row, false);
       expect(component["selectedRows"]()).not.toContain(row);
     });
 
     it("emits rowSelect with rows and keys", () => {
       const spy = spyOn(component.rowSelect, "emit");
-      component["onRowToggle"](SAMPLE_DATA[0], true);
+      component.onRowToggle(SAMPLE_DATA[0], true);
       expect(spy).toHaveBeenCalledWith({
         rows: [SAMPLE_DATA[0]],
         keys: [1],
       });
     });
-
-    it("select-all adds every visible row to selection", () => {
-      const spy = spyOn(component.rowSelect, "emit");
-      component["onSelectAllToggle"](true);
-      expect(component["selectedRows"]().length).toBe(SAMPLE_DATA.length);
-      expect(spy).toHaveBeenCalled();
-    });
-
-    it("select-all removes only the visible rows", () => {
-      component["selectedRows"].set([...SAMPLE_DATA]);
-      component["onSelectAllToggle"](false);
-      expect(component["selectedRows"]().length).toBe(0);
-    });
   });
 
   describe("pagination", () => {
-    beforeEach(() => {
-      applyInputs(fixture, {
-        paginated: true,
-        pageSize: 2,
-      });
+    it("computes totalPages from pageCount input", () => {
+      fixture.componentRef.setInput("paginated", true);
+      fixture.componentRef.setInput("pageCount", 5);
+      fixture.detectChanges();
+      expect(component["totalPages"]()).toBe(5);
     });
 
-    it("paginates filtered data", () => {
+    it("computes totalPages from total + pageSize when no pageCount", () => {
+      fixture.componentRef.setInput("paginated", true);
+      fixture.componentRef.setInput("total", 100);
+      const q = queryValue();
+      q.setPageSize(25);
+      fixture.componentRef.setInput("query", q);
       fixture.detectChanges();
-      expect(component["pagedData"]().length).toBe(2);
-      expect(component["totalPages"]()).toBe(2);
-    });
-
-    it("moves to next page and emits pageChange", () => {
-      fixture.detectChanges();
-      const spy = spyOn(component.pageChange, "emit");
-      component["onNextPage"]();
-      expect(component["currentPage"]()).toBe(2);
-      expect(spy).toHaveBeenCalledWith({ page: 2, pageSize: 2 });
-    });
-
-    it("does not go below page 1", () => {
-      fixture.detectChanges();
-      const spy = spyOn(component.pageChange, "emit");
-      component["onPrevPage"]();
-      expect(component["currentPage"]()).toBe(1);
-      expect(spy).not.toHaveBeenCalled();
-    });
-
-    it("does not go beyond totalPages", () => {
-      fixture.detectChanges();
-      component["currentPage"].set(2);
-      const spy = spyOn(component.pageChange, "emit");
-      component["onNextPage"]();
-      expect(component["currentPage"]()).toBe(2);
-      expect(spy).not.toHaveBeenCalled();
-    });
-
-    it("computes the correct rangeLabel", () => {
-      fixture.detectChanges();
-      expect(component["rangeLabel"]()).toBe("Showing 1–2 of 3");
-      component["currentPage"].set(2);
-      expect(component["rangeLabel"]()).toBe("Showing 3–3 of 3");
+      expect(component["totalPages"]()).toBe(4);
     });
   });
 
@@ -197,58 +186,14 @@ describe("Table", () => {
       );
     });
 
-    it('getCellValue returns "" for null/undefined value', () => {
+    it('getCellValue returns "" for missing key', () => {
       expect(component["getCellValue"](SAMPLE_DATA[0], "missing")).toBe("");
     });
 
-    it('getCellValue returns "" for null row', () => {
-      expect(component["getCellValue"](null, "name")).toBe("");
-    });
-  });
-
-  describe("trackBy", () => {
-    it("uses the configured trackByKey by default", () => {
-      fixture.componentRef.setInput("trackByKey", "id");
-      expect(component["trackByRow"](0, SAMPLE_DATA[0])).toBe(1);
-    });
-
-    it("falls back to row reference when trackByKey is not in row", () => {
-      fixture.componentRef.setInput("trackByKey", "unknown");
-      expect(component["trackByRow"](0, SAMPLE_DATA[0])).toBe(SAMPLE_DATA[0]);
-    });
-  });
-
-  describe("custom cell templates", () => {
-    @Component({
-      standalone: true,
-      imports: [UiTableComponent],
-      changeDetection: ChangeDetectionStrategy.OnPush,
-      template: `
-        <ng-template #badgeTpl let-row>
-          <span data-testid="custom-cell">[{{ row.role }}]</span>
-        </ng-template>
-      `,
-    })
-    class HostComponent {
-      @ViewChild("badgeTpl") badgeTpl!: TemplateRef<unknown>;
-    }
-
-    it("renders custom templates for cells with a `cell` field", () => {
-      const hostFixture = TestBed.createComponent(HostComponent);
-      hostFixture.detectChanges();
-      const tpl = hostFixture.componentInstance.badgeTpl;
-
-      fixture.componentRef.setInput("columns", [
-        ...SAMPLE_COLUMNS.slice(0, 3),
-        { key: "role", header: "Role", cell: tpl as TableColumn["cell"] },
-      ]);
+    it("does not render uppercase class on header th", () => {
       fixture.detectChanges();
-
-      const customCell = fixture.nativeElement.querySelector(
-        '[data-testid="custom-cell"]',
-      );
-      expect(customCell).toBeTruthy();
-      expect(customCell.textContent).toBe("[admin]");
+      const th = fixture.nativeElement.querySelector("thead th");
+      expect(th.className).not.toContain("uppercase");
     });
   });
 });

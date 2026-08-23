@@ -1,0 +1,29 @@
+<UiFlex
+  [justifyContent]="'between'"
+  [alignItems]="'center'"
+  [direction]="'row'"
+  [noWrap]="true"
+  [className]="'px-5 pt-4 pb-3 sm:px-6 gap-3'"
+>
+  @if (title()) {
+    <UiFlex [direction]="'column'" [gap]="2">
+      <UiLabel [type]="'HeadingS'" [text]="title()"></UiLabel>
+      @if (description()) {
+        <UiLabel [type]="'bodyXs'" [color]="'textWeak'" [text]="description()"></UiLabel>
+      }
+    </UiFlex>
+  }
+  <UiFlex [gap]="12" [alignItems]="'center'">
+    @if (searchable()) {
+      <UiInput
+        [placeholder]="searchPlaceholder()"
+        [leftIcon]="searchIcon()"
+        [debounceTime]="200"
+        [width]="'280px'"
+        [value]="searchValue()"
+        (valueChange)="searchChange.emit($event.toString())"
+      ></UiInput>
+    }
+    <ng-content select="[table-actions]"></ng-content>
+  </UiFlex>
+</UiFlex>

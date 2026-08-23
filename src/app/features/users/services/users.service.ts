@@ -3,20 +3,33 @@ import { firstValueFrom } from "rxjs";
 
 import { LookupsService } from "@core/lookups/lookups.service";
 
-import type { User } from "../models/user";
+import type { User, UserRole, UserStatus } from "../models/user";
 import { USER_STATUS_OPTIONS } from "../models/user";
-import type { UserFormData } from "../models/user-form";
 import { UsersApiService } from "./users-api.service";
 import { buildRolLookup, resolveRolId, usuarioApiToUser } from "./users.mapper";
 import { extractProblemMessage } from "@utils/problem-detail";
 
 export interface CreateUserInput {
-  data: UserFormData;
+  data: {
+    firstName: string;
+    lastNamePaternal: string;
+    lastNameMaternal: string;
+    email: string;
+    role: UserRole;
+    status: UserStatus;
+  };
   initialPassword: string;
 }
 
 export interface UpdateUserInput {
-  data: Omit<UserFormData, "initialPassword">;
+  data: {
+    firstName: string;
+    lastNamePaternal: string;
+    lastNameMaternal: string;
+    email: string;
+    role: UserRole;
+    status: UserStatus;
+  };
 }
 
 @Injectable({ providedIn: "root" })
@@ -40,7 +53,6 @@ export class UsersService {
     this._loading.set(true);
     this._error.set(null);
     try {
-      // Roles compartidos con RolesService y ModulosService via LookupsService.
       await this.lookups.loadRoles();
       const usuarios = await firstValueFrom(this.api.listar());
       this._users.set(usuarios.map(usuarioApiToUser));
@@ -129,5 +141,4 @@ export class UsersService {
       return false;
     }
   }
-
 }

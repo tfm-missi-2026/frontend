@@ -1,0 +1,55 @@
+<UiFlex
+  [justifyContent]="'between'"
+  [alignItems]="'center'"
+  [className]="'px-5 py-3 sm:px-6 border-t border-gray-100 dark:border-white/5'"
+>
+  <UiFlex [gap]="12" [alignItems]="'center'">
+    <UiLabel [type]="'bodyXs'" [color]="'textWeak'" [text]="rangeLabel()"></UiLabel>
+    @if (showPageSizeSelector()) {
+      <UiFlex [gap]="6" [alignItems]="'center'">
+        <UiLabel
+          [type]="'bodyXs'"
+          [color]="'textWeak'"
+          [text]="'Filas por página:'"
+        ></UiLabel>
+        <UiSelect
+          inputId="table-page-size"
+          [options]="pageSizeOptions$()"
+          [searchable]="false"
+          [isClearable]="false"
+          placeholder="—"
+          [width]="'88px'"
+          [ngModel]="currentPageSize()"
+          (ngModelChange)="onPageSizeSelect($event)"
+        ></UiSelect>
+      </UiFlex>
+    }
+  </UiFlex>
+  <UiFlex [gap]="4" [alignItems]="'center'">
+    @if (prevIcon()) {
+      <UiIconButton
+        [Icon]="prevIcon()"
+        [variant]="'tertiary'"
+        [compact]="true"
+        [disabled]="currentPage() === 1"
+        [labelText]="'Página anterior'"
+        (click)="onPrevPage()"
+      ></UiIconButton>
+    }
+    <UiLabel
+      [type]="'bodyXs'"
+      [text]="currentPage() + ' / ' + totalPages()"
+      [className]="'px-2'"
+    ></UiLabel>
+    @if (nextIcon()) {
+      <UiIconButton
+        [Icon]="nextIcon()"
+        [variant]="'tertiary'"
+        [compact]="true"
+        [disabled]="currentPage() === totalPages()"
+        [labelText]="'Página siguiente'"
+        (click)="onNextPage()"
+      ></UiIconButton>
+    }
+  </UiFlex>
+</UiFlex>

@@ -6,15 +6,22 @@ import {
   output,
 } from "@angular/core";
 
-import { UiCheckboxComponent } from "@shared/ui/input";
 import { UiBadgeComponent } from "@shared/ui/badge";
+import { UiGridComponent } from "@shared/ui/grid";
+import { UiCheckboxComponent } from "@shared/ui/input";
+import { UiLabelComponent } from "@shared/ui/label";
 
 import type { ModuloResponse } from "@core/modulos/modulo.models";
 
 @Component({
   selector: "PermissionsMatrix",
   standalone: true,
-  imports: [UiCheckboxComponent, UiBadgeComponent],
+  imports: [
+    UiBadgeComponent,
+    UiCheckboxComponent,
+    UiGridComponent,
+    UiLabelComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./permissions-matrix.component.html",
 })

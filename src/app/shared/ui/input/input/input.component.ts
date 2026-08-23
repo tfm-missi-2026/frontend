@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   ElementRef,
   forwardRef,
   inject,
@@ -93,6 +94,17 @@ export class UiInputComponent
 
   private _formDisabled = signal(false);
   protected readonly _passwordVisible = signal(false);
+
+  constructor() {
+    effect(() => {
+      const v = this.value();
+      const next = (v ?? "").toString();
+      if (next !== this.internalValue()) {
+        this.internalValue.set(next);
+        this.charCount.set(next.length);
+      }
+    });
+  }
 
   readonly isEffectivelyDisabled = computed<boolean>(
     () => this.disabled() || this._formDisabled(),
