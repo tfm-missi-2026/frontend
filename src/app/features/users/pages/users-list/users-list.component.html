@@ -53,15 +53,23 @@
     />
   </UiFlex>
 
+  <!--
+    UiTable declarativo server-side-first:
+    - [query]="admin.query()": el UiTable lee el valor actual del query.
+    - (queryChange)="onQueryChange($event)": el UiTable emite un query mutado
+      cuando el usuario hace sort/page/search; el padre lo aplica al signal.
+    - [fetchData]: funcion invocada por el UiTable cada vez que cambia el query.
+  -->
   <UiTable
+    [query]="admin.query()"
+    [fetchData]="fetchUsers"
     [columns]="tableColumns()"
-    [data]="filteredUsers()"
     [searchable]="true"
-    [searchPlaceholder]="'Buscar por nombre o correo…'"
     [paginated]="true"
-    [pageSize]="8"
-    [emptyText]="'No hay usuarios que coincidan con los filtros.'"
-    (searchChange)="searchTerm.set($event)"
+    [pageSizeOptions]="pageSizeOptions"
+    searchPlaceholder="Buscar por nombre o correo…"
+    emptyText="No hay usuarios que coincidan con los filtros."
+    (queryChange)="onQueryChange($event)"
   ></UiTable>
 </UiFlex>
 
@@ -90,8 +98,30 @@
   }
 </ng-template>
 
-<ng-template #emptyCell>
-  <UiLabel type="bodyS" color="textWeak" text="—" />
+<ng-template #accionesCell let-u>
+  <UiFlex [gap]="2" [alignItems]="'center'" [justifyContent]="'end'" [noWrap]="true">
+    <UiButton
+      variant="secondary"
+      size="sm"
+      [LeftIcon]="editIcon"
+      labelText="Editar"
+      (click)="openEdit(u)"
+    />
+    <UiButton
+      variant="secondary"
+      size="sm"
+      [LeftIcon]="envelopeIcon"
+      labelText="Restablecer"
+      (click)="openResetPassword(u)"
+    />
+    <UiButton
+      variant="primary"
+      size="sm"
+      [LeftIcon]="trashIcon"
+      labelText="Dar de baja"
+      (click)="onDeactivate(u)"
+    />
+  </UiFlex>
 </ng-template>
 
 <UserFormModal

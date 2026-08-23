@@ -29,8 +29,6 @@ const MOTIVO_MAX = 500;
   selector: "RoleConfirmDeleteModal",
   standalone: true,
   imports: [
-    IconTrashComponent,
-    IconXComponent,
     UiFieldErrorComponent,
     UiFlexComponent,
     UiFormLabelComponent,

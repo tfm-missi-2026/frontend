@@ -1,8 +1,10 @@
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 
 import { environment } from "@env/environment";
+import { UsuarioQueryParams } from "@core/query-params";
+import { type PageData } from "@core/models";
 
 import type {
   EliminacionRequest,
@@ -13,15 +15,28 @@ import type {
 } from "../models/user-api";
 
 // Capa fina contra el gateway. No contiene logica de UI ni signals.
-// Si necesitas un endpoint nuevo del backend, agregalo aca con
-// la firma 1:1 de UsuarioMapper.java / UsuarioController.java.
+// Las firmas son 1:1 con UsuarioController.java / UsuarioMapper.java.
+//
+// `listar()` consume `/todos` (listado completo sin paginar, usado por
+// consumers legacy: dashboard, planning, projects, team-load, variations,
+// resource-dashboard, etc.).
+//
+// `list(query)` consume `/` con paginacion server-side, usado por
+// `UsersAdminService` para la pagina de administracion de usuarios
+// (UiTable en modo server-side con sort + pageSize).
 @Injectable({ providedIn: "root" })
 export class UsersApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiGatewayUrl}${environment.apiPrefix}/usuarios`;
 
   listar(): Observable<UsuarioApi[]> {
-    return this.http.get<UsuarioApi[]>(this.baseUrl);
+    return this.http.get<UsuarioApi[]>(`${this.baseUrl}/todos`);
+  }
+
+  list(query: UsuarioQueryParams): Observable<PageData<UsuarioApi>> {
+    return this.http.get<PageData<UsuarioApi>>(this.baseUrl, {
+      params: query.toHttpParams(),
+    });
   }
 
   buscarPorId(id: string): Observable<UsuarioApi> {
@@ -46,18 +61,5 @@ export class UsersApiService {
 
   resetPassword(id: string, body: ResetPasswordRequest): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/${id}/reset-password`, body);
-  }
-
-  // Helper opcional para paginacion cuando el backend la exponga.
-  // Hoy ms-administracion devuelve List<UsuarioResponse> plano; queda
-  // como punto de extension para cuando se sume page/size al controller.
-  listarPaginado(
-    page: number,
-    size: number,
-  ): Observable<UsuarioApi[]> {
-    const params = new HttpParams()
-      .set("page", String(page))
-      .set("size", String(size));
-    return this.http.get<UsuarioApi[]>(this.baseUrl, { params });
   }
 }

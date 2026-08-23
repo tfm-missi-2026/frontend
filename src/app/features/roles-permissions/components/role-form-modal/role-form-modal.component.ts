@@ -39,8 +39,6 @@ const DESCRIPTION_MAX = 500;
   standalone: true,
   imports: [
     FormsModule,
-    IconCheckComponent,
-    IconXComponent,
     UiFieldErrorComponent,
     UiFlexComponent,
     UiFormLabelComponent,

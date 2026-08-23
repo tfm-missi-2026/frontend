@@ -8,11 +8,11 @@
     [gap]="3"
     className="flex-wrap"
   >
-    <UiHeader [level]="1" text="Modulos del sistema" />
+    <UiHeader [level]="1" text="Módulos del sistema" />
     <UiButton
       variant="primary"
       [LeftIcon]="plusIcon"
-      labelText="Nuevo modulo"
+      labelText="Nuevo módulo"
       (click)="onCreate()"
     />
   </UiFlex>
@@ -47,21 +47,25 @@
     />
   </UiFlex>
 
+  <!--
+    UiTable declarativo server-side-first.
+    [(query)] = signal compartido con el servicio.
+    [fetchData] = funcion invocada por el UiTable al cambiar el query.
+  -->
   <UiTable
+    [query]="service.query()"
+    [fetchData]="fetchModulos"
     [columns]="tableColumns()"
-    [data]="modulos()"
     [searchable]="true"
     [paginated]="true"
-    [pageSize]="20"
-    searchPlaceholder="Buscar modulos por codigo o nombre..."
-    emptyText="No hay modulos que coincidan con los filtros."
-    (searchChange)="onSearchChange($event)"
-    (pageChange)="onPageChange($event)"
-  >
-  </UiTable>
+    [pageSizeOptions]="pageSizeOptions"
+    searchPlaceholder="Buscar módulos por código o nombre..."
+    emptyText="No hay módulos que coincidan con los filtros."
+    (queryChange)="onQueryChange($event)"
+  ></UiTable>
 </UiFlex>
 
-<!-- Templates de celda para UiTable (referenciados por tableColumns) -->
+<!-- Templates de celda para UiTable -->
 <ng-template #estadoCell let-m>
   @if (m.sistema) {
     <UiBadge variant="light" color="primary" size="sm">Sistema</UiBadge>
@@ -105,7 +109,7 @@
 
 <ModuloFormModal
   [isOpen]="createOpen()"
-  (close)="createOpen.set(false)"
+  (close)="onCloseCreate()"
   (save)="onSave($event)"
  />
 
