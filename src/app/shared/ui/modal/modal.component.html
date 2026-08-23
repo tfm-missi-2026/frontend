@@ -1,0 +1,82 @@
+@if (isOpen()) {
+  <UiModalShell (backdropClose)="onBackdropClick()">
+    @if (!isFullscreen()) {
+      <UiModalBackdrop (backdropClose)="onBackdropClick()" />
+    }
+    <UiFlex
+      [direction]="'column'"
+      [className]="contentClasses()"
+      (click)="onContentClick($event)"
+    >
+      @if (showCloseButton()) {
+        <UiButton
+          [variant]="'tertiary'"
+          [compact]="true"
+          [className]="closeButtonClasses()"
+          (click)="close.emit()"
+          [LeftIcon]="IconX"
+        />
+      }
+
+      @if (title() || subtitle()) {
+        <UiFlex
+          [direction]="'column'"
+          [gap]="1"
+          [className]="headerClasses()"
+        >
+          @if (title()) {
+            <UiHeader
+              [level]="2"
+              [text]="title()"
+              className="text-xl font-semibold text-gray-900 dark:text-white"
+            />
+          }
+          @if (subtitle()) {
+            <UiLabel type="bodyS" color="textWeak" [text]="subtitle()" />
+          }
+        </UiFlex>
+      }
+
+      <UiFlex [direction]="'column'" [className]="bodyClasses()">
+        <ng-content></ng-content>
+      </UiFlex>
+
+      @if (hasFooter()) {
+        <UiFlex
+          [direction]="'row'"
+          alignItems="center"
+          [justifyContent]="footerAlign()"
+          [gap]="3"
+          [className]="footerClasses()"
+        >
+          @if (leftAction(); as left) {
+            <UiButton
+              [variant]="left.variant ?? 'secondary'"
+              [styleType]="left.styleType ?? 'default'"
+              [label]="left.label"
+              [compact]="!left.label && !!left.icon"
+              [LeftIcon]="left.icon"
+              [tooltip]="left.tooltip"
+              [disabled]="left.disabled ?? false"
+              [isLoading]="left.loading ?? false"
+              (click)="onLeftAction()"
+            />
+          }
+          @if (rightAction(); as right) {
+            <UiButton
+              [variant]="right.variant ?? 'primary'"
+              [styleType]="right.styleType ?? 'default'"
+              [label]="right.label"
+              [compact]="!right.label && !!right.icon"
+              [LeftIcon]="right.icon"
+              [tooltip]="right.tooltip"
+              [disabled]="right.disabled ?? false"
+              [isLoading]="right.loading ?? false"
+              (click)="onRightAction()"
+            />
+          }
+        </UiFlex>
+      }
+    </UiFlex>
+  </UiModalShell>
+}

@@ -6,14 +6,21 @@ import {
 } from "@angular/core";
 
 import { UiBadgeComponent } from "@shared/ui/badge";
+import { UiFlexComponent } from "@shared/ui/flex";
 import { UiLabelComponent } from "@shared/ui/label";
+import { IconChevronRightComponent } from "@shared/icons";
 
 import type { Role } from "../../models/role";
 
 @Component({
   selector: "RoleListPanel",
   standalone: true,
-  imports: [UiBadgeComponent, UiLabelComponent],
+  imports: [
+    IconChevronRightComponent,
+    UiBadgeComponent,
+    UiFlexComponent,
+    UiLabelComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./role-list-panel.component.html",
 })

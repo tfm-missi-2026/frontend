@@ -19,6 +19,28 @@ import {
   NG_VALUE_ACCESSOR,
 } from "@angular/forms";
 
+type MenuPositionStyle = {
+  top: string;
+  left: string;
+  width: string;
+  maxHeight: string;
+};
+
+/**
+ * Recorre ancestros hasta encontrar un `UiModalShell` (marcado con
+ * `data-ui-modal-shell`). Limita la búsqueda al documento para evitar
+ * loops y es seguro contra selectores que escapan el árbol (p. ej.
+ * shadow DOM / iframes no se atraviesan).
+ */
+function detectInsideModalShell(start: HTMLElement | null): boolean {
+  let node: HTMLElement | null = start;
+  while (node && node !== document.documentElement) {
+    if (node.hasAttribute("data-ui-modal-shell")) return true;
+    node = node.parentElement;
+  }
+  return false;
+}
+
 import { matchesSearch } from "@utils/strings";
 
 import {
@@ -90,7 +112,7 @@ export class UiSelectComponent implements ControlValueAccessor {
   readonly isOptionDisabled = input<
     ((option: SelectOption) => boolean) | undefined
   >(undefined);
-  readonly menuPosition = input<"absolute" | "fixed">("absolute");
+  readonly menuPosition = input<"absolute" | "fixed" | "auto">("auto");
   readonly menuIsOpen = input<boolean | undefined>(undefined);
   readonly className = input<string>("");
   readonly tabSelectsValue = input<boolean>(true);
@@ -120,6 +142,7 @@ export class UiSelectComponent implements ControlValueAccessor {
   readonly searchInputRef =
     viewChild<ElementRef<HTMLInputElement>>("searchInputRef");
   readonly rootRef = viewChild<ElementRef<HTMLElement>>("rootRef");
+  readonly menuRef = viewChild<ElementRef<HTMLElement>>("menuRef");
 
   readonly value = signal<unknown>(null);
   readonly searchInput = signal<string>("");
@@ -132,8 +155,30 @@ export class UiSelectComponent implements ControlValueAccessor {
   private readonly _isDisabledOverride = signal<boolean | null>(null);
   private readonly _lastDebouncedTerm = signal<string | null>(null);
 
+  /**
+   * Detect once at construction whether the host lives inside a
+   * `UiModalShell` (marks its root with `data-ui-modal-shell`). If so,
+   * `effectiveMenuPosition` resolves `"auto"` to `"fixed"` so the menu
+   * escapes the modal body's `overflow-y-auto` clipping.
+   */
+  private readonly _hostElement = inject(ElementRef<HTMLElement>);
+  private readonly _insideModalShell = detectInsideModalShell(
+    this._hostElement.nativeElement,
+  );
+  protected readonly effectiveMenuPosition = computed<
+    "absolute" | "fixed"
+  >(() => {
+    const requested = this.menuPosition();
+    if (requested === "auto") {
+      return this._insideModalShell ? "fixed" : "absolute";
+    }
+    return requested;
+  });
+
   private onChangeFn: (value: unknown) => void = () => {};
   private onTouchedFn: () => void = () => {};
+
+  protected readonly menuStyle = signal<MenuPositionStyle | null>(null);
 
   constructor() {
     effect((onCleanup) => {
@@ -161,6 +206,12 @@ export class UiSelectComponent implements ControlValueAccessor {
         this.defaultOptions() === true
       ) {
         void this.runLoadOptions("");
+      }
+    });
+
+    effect(() => {
+      if (this.isOpen() && this.effectiveMenuPosition() === "fixed") {
+        this.repositionMenu();
       }
     });
   }
@@ -272,7 +323,46 @@ export class UiSelectComponent implements ControlValueAccessor {
     if (this.effectiveIsDisabled() || this.readOnly()) return;
     this.setOpen(!this.isOpen());
     if (this.isOpen()) {
+      // Focus via afterNextRender; positioning via effect() on isOpen.
       queueMicrotask(() => this.searchInputRef()?.nativeElement.focus());
+    }
+  }
+
+  protected repositionMenu(): void {
+    if (this.effectiveMenuPosition() !== "fixed") {
+      this.menuStyle.set(null);
+      return;
+    }
+    const root = this.rootRef()?.nativeElement;
+    const menu = this.menuRef()?.nativeElement;
+    if (!root || !menu) return;
+    const rect = root.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const spaceBelow = viewportHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const desiredMax = 240;
+    const openAbove =
+      spaceBelow < Math.min(desiredMax, 160) && spaceAbove > spaceBelow;
+    const maxHeight = Math.min(
+      desiredMax,
+      Math.max(spaceBelow, spaceAbove) - 8,
+    );
+    const top = openAbove
+      ? `${Math.max(8, rect.top - maxHeight - 4)}px`
+      : `${rect.bottom + 4}px`;
+    this.menuStyle.set({
+      top,
+      left: `${rect.left}px`,
+      width: `${rect.width}px`,
+      maxHeight: `${Math.max(120, maxHeight)}px`,
+    });
+  }
+
+  @HostListener("window:resize")
+  @HostListener("window:scroll")
+  protected onViewportChange(): void {
+    if (this.isOpen() && this.effectiveMenuPosition() === "fixed") {
+      this.repositionMenu();
     }
   }
 
@@ -287,7 +377,9 @@ export class UiSelectComponent implements ControlValueAccessor {
 
   onSearchInput(value: string): void {
     this.searchInput.set(value);
-    if (!this.isOpen()) this.setOpen(true);
+    if (!this.isOpen()) {
+      this.setOpen(true);
+    }
   }
 
   setOpen(v: boolean): void {

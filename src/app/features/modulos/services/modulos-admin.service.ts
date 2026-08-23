@@ -1,5 +1,4 @@
-import { Injectable, computed, inject, signal } from "@angular/core";
-import { firstValueFrom } from "rxjs";
+import { Injectable, inject, signal } from "@angular/core";
 
 import { LookupsService } from "@core/lookups/lookups.service";
 import { ModuloQueryParams } from "@core/query-params";
@@ -15,63 +14,63 @@ import type {
 } from "./modulos-admin-api.service";
 import { ModulosAdminApiService } from "./modulos-admin-api.service";
 
+/**
+ * Servicio de administracion de modulos con paginacion server-side.
+ *
+ * Sigue el mismo patron que {@link UsersAdminService}:
+ *  - `query` (signal publico): fuente unica de verdad para UI.
+ *  - `fetchData(q)`: funcion consumida por el UiTable.
+ *  - `filterBySeccion` / `filterByEstado`: helpers para filtros de
+ *    dominio.
+ *  - Mutaciones (create/update/changeState): bumpRefresh al final.
+ */
 @Injectable({ providedIn: "root" })
 export class ModulosAdminService {
   private readonly api = inject(ModulosAdminApiService);
   private readonly lookups = inject(LookupsService);
 
-  private readonly _loading = signal<boolean>(false);
-  private readonly _error = signal<string | null>(null);
-  private readonly _page = signal<PageData<ModuloResponse> | null>(null);
-  private readonly _query = signal<ModuloQueryParams>(
+  readonly query = signal<ModuloQueryParams>(
     new ModuloQueryParams({ pageSize: 20 }),
   );
+  private readonly _error = signal<string | null>(null);
 
-  readonly page = this._page.asReadonly();
-  readonly loading = this._loading.asReadonly();
   readonly error = this._error.asReadonly();
-  readonly query = this._query.asReadonly();
-  readonly count = computed(() => this._page()?.total ?? 0);
 
-  async load(query?: {
-    page?: number;
-    pageSize?: number;
-    search?: string;
-    sortBy?: string | null;
-    sortDir?: "asc" | "desc";
-    seccion?: string | null;
-    estado?: 0 | 1 | null;
-  }): Promise<void> {
-    if (this._loading()) return;
-    this._loading.set(true);
-    this._error.set(null);
-    if (query) {
-      const current = this._query();
-      this._query.set(
-        new ModuloQueryParams({
-          page: query.page ?? current.page,
-          pageSize: query.pageSize ?? current.pageSize,
-          search: query.search ?? current.search,
-          sortBy: query.sortBy ?? current.sortBy,
-          sortDir: query.sortDir ?? current.sortDir,
-          seccion: query.seccion ?? current.seccion,
-          estado: query.estado ?? current.estado,
-        }),
-      );
+  /**
+   * Funcion consumida por el UiTable como `[fetchData]`.
+   */
+  async fetchData(q: ModuloQueryParams): Promise<PageData<ModuloResponse>> {
+    if (this._error()) this._error.set(null);
+    const p = await safeFirstValueFrom(
+      this.api.list(q),
+      (msg) => this._error.set(msg),
+    );
+    if (!p) {
+      return {
+        items: [],
+        total: 0,
+        page: q.page,
+        pageSize: q.pageSize,
+        totalPages: 0,
+      };
     }
-    try {
-      const p = await safeFirstValueFrom(
-        this.api.list(this._query()),
-        (msg) => this._error.set(msg),
-      );
-      this._page.set(p);
-    } finally {
-      this._loading.set(false);
-    }
+    return p;
   }
 
-  updateQuery(query: ModuloQueryParams): void {
-    this._query.set(query);
+  filterBySeccion(seccion: string | null): void {
+    this.query.update((q) => {
+      q.seccion = seccion && seccion !== "" ? seccion : null;
+      q.page = 1;
+      return q;
+    });
+  }
+
+  filterByEstado(estado: 0 | 1 | null): void {
+    this.query.update((q) => {
+      q.estado = estado;
+      q.page = 1;
+      return q;
+    });
   }
 
   async create(data: ModuloCrearRequest): Promise<ModuloResponse | null> {
@@ -79,11 +78,10 @@ export class ModulosAdminService {
       this.api.create(data),
       (msg) => this._error.set(msg),
     );
-    if (creado) {
-      this.lookups.setModulo(creado);
-      return creado;
-    }
-    return null;
+    if (!creado) return null;
+    this.lookups.setModulo(creado);
+    this.query.update((q) => q.bumpRefresh());
+    return creado;
   }
 
   async update(
@@ -94,11 +92,10 @@ export class ModulosAdminService {
       this.api.update(id, data),
       (msg) => this._error.set(msg),
     );
-    if (actualizado) {
-      this.lookups.setModulo(actualizado);
-      return actualizado;
-    }
-    return null;
+    if (!actualizado) return null;
+    this.lookups.setModulo(actualizado);
+    this.query.update((q) => q.bumpRefresh());
+    return actualizado;
   }
 
   async changeState(
@@ -109,15 +106,14 @@ export class ModulosAdminService {
       this.api.changeState(id, body),
       (msg) => this._error.set(msg),
     );
-    if (actualizado) {
-      this.lookups.setModulo(actualizado);
-      return actualizado;
-    }
-    return null;
+    if (!actualizado) return null;
+    this.lookups.setModulo(actualizado);
+    this.query.update((q) => q.bumpRefresh());
+    return actualizado;
   }
 
   reset(): void {
-    this._page.set(null);
+    this.query.update((q) => q.reset());
     this._error.set(null);
   }
 }
