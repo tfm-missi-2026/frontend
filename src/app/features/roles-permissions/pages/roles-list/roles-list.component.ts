@@ -112,6 +112,7 @@ export class RolesListComponent implements OnInit {
   });
 
   protected readonly createOpen = signal<boolean>(false);
+  protected readonly createSaving = signal<boolean>(false);
   protected readonly successAlert = signal<string | null>(null);
 
   protected onSelectRole(id: string): void {
@@ -123,20 +124,34 @@ export class RolesListComponent implements OnInit {
     this.createOpen.set(true);
   }
 
-  protected async onSaveRole(payload: { data: RoleFormData }): Promise<void> {
-    const created = await this.rolesService.create({
-      code: payload.data.code,
-      name: payload.data.name,
-      description: payload.data.description,
-      paginaInicioId: payload.data.paginaInicioId,
-    });
-    if (created) {
-      this.createOpen.set(false);
-      this.selectedId.set(created.id);
-      this.successAlert.set(
-        `Rol "${created.name}" creado. Asigna sus permisos desde Editar.`,
+  protected async onSaveRole(payload: {
+    data: RoleFormData;
+    permisos: string[];
+  }): Promise<void> {
+    if (this.createSaving()) return;
+    this.createSaving.set(true);
+    try {
+      const created = await this.rolesService.create(
+        {
+          code: payload.data.code,
+          name: payload.data.name,
+          description: payload.data.description,
+          paginaInicioId: payload.data.paginaInicioId,
+        },
+        payload.permisos,
       );
-      void this.rolesService.loadPermissionsForRole(created.id);
+      if (created) {
+        this.createOpen.set(false);
+        this.selectedId.set(created.id);
+        this.successAlert.set(
+          payload.permisos.length > 0
+            ? `Rol "${created.name}" creado con ${payload.permisos.length} permiso(s) de módulo.`
+            : `Rol "${created.name}" creado.`,
+        );
+        void this.rolesService.loadPermissionsForRole(created.id);
+      }
+    } finally {
+      this.createSaving.set(false);
     }
   }
 

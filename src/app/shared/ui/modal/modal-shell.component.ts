@@ -15,6 +15,7 @@ import { MODAL_SHELL_HOST_CLASSES } from "./modal-shell.constants";
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     "[class]": "hostClasses()",
+    "[attr.data-ui-modal-shell]": "''",
   },
   template: `<ng-content></ng-content>`,
 })

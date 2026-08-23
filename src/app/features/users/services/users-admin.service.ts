@@ -6,8 +6,7 @@ import { type PageData } from "@core/models";
 import { safeFirstValueFrom } from "@utils/safe-async";
 
 import type { UsuarioApi } from "../models/user-api";
-import type { User } from "../models/user";
-import type { UserFormData } from "../models/user-form";
+import type { User, UserRole, UserStatus } from "../models/user";
 import {
   buildRolLookup,
   resolveRolId,
@@ -18,12 +17,30 @@ import {
 import { UsersApiService } from "./users-api.service";
 
 export interface CreateUserInput {
-  data: UserFormData;
+  data: UserCreateData;
   initialPassword: string;
 }
 
 export interface UpdateUserInput {
-  data: Omit<UserFormData, "initialPassword">;
+  data: UserUpdateData;
+}
+
+export interface UserCreateData {
+  firstName: string;
+  lastNamePaternal: string;
+  lastNameMaternal: string;
+  email: string;
+  role: UserRole;
+  status: UserStatus;
+}
+
+export interface UserUpdateData {
+  firstName: string;
+  lastNamePaternal: string;
+  lastNameMaternal: string;
+  email: string;
+  role: UserRole;
+  status: UserStatus;
 }
 
 export interface FilterByRolInput {

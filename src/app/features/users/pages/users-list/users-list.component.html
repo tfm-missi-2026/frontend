@@ -53,13 +53,6 @@
     />
   </UiFlex>
 
-  <!--
-    UiTable declarativo server-side-first:
-    - [query]="admin.query()": el UiTable lee el valor actual del query.
-    - (queryChange)="onQueryChange($event)": el UiTable emite un query mutado
-      cuando el usuario hace sort/page/search; el padre lo aplica al signal.
-    - [fetchData]: funcion invocada por el UiTable cada vez que cambia el query.
-  -->
   <UiTable
     [query]="admin.query()"
     [fetchData]="fetchUsers"
@@ -75,9 +68,12 @@
 
 <!-- Templates de celda para UiTable (referenciados por tableColumns) -->
 <ng-template #nombreCell let-u>
-  <span class="font-semibold text-gray-800 dark:text-white/90">
-    {{ fullName(u) }}
-  </span>
+  <UiLabel
+    type="bodyS"
+    weight="semibold"
+    color="textStrong"
+    [text]="fullName(u)"
+  />
 </ng-template>
 
 <ng-template #rolCell let-u>
@@ -88,13 +84,9 @@
 
 <ng-template #estadoCell let-u>
   @if (u.status === "active") {
-    <UiBadge variant="light" color="success" size="sm">
-      <span class="mr-1 text-success-500">●</span> Activo
-    </UiBadge>
+    <UiBadge variant="light" color="success" size="sm">Activo</UiBadge>
   } @else {
-    <UiBadge variant="light" color="error" size="sm">
-      <span class="mr-1 text-error-500">○</span> Inactivo
-    </UiBadge>
+    <UiBadge variant="light" color="error" size="sm">Inactivo</UiBadge>
   }
 </ng-template>
 
@@ -124,17 +116,31 @@
   </UiFlex>
 </ng-template>
 
+<!--
+  Modal de crear/editar usuario. Un solo modal con `mode` interno;
+  la pagina decide el modo segun `modalState()`. `saving` controlado
+  por la pagina para evitar doble submit y mostrar spinner.
+-->
 <UserFormModal
-  [isOpen]="formOpen()"
-  [mode]="formMode()"
-  [user]="selectedUser()"
+  [isOpen]="modalState() !== null"
+  [mode]="formModalMode()"
+  [user]="editingUser()"
+  [saving]="formSaving()"
+  (close)="closeFormModal()"
   (save)="onSaveUser($event)"
-  (close)="formOpen.set(false)"
 />
 
+<!--
+  Modal de restablecimiento de contrasena. El componente solo emite
+  el payload; la pagina llama a `admin.resetPassword()` y muestra
+  feedback de exito/error. Mantener el servicio fuera del modal
+  evita acoplar el componente al backend y permite testear el modal
+  sin levantar DI.
+-->
 <ResetPasswordModal
-  [isOpen]="resetOpen()"
-  [user]="resetUser()"
+  [isOpen]="resetTarget() !== null"
+  [user]="resetTarget()"
+  [saving]="resetSaving()"
+  (close)="closeResetModal()"
   (confirm)="onConfirmReset($event)"
-  (close)="resetOpen.set(false)"
 />

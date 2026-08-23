@@ -161,6 +161,8 @@
 
 <RoleFormModal
   [isOpen]="createOpen()"
+  [modules]="modulosRaiz()"
+  [saving]="createSaving()"
   (close)="createOpen.set(false)"
   (save)="onSaveRole($event)"
 />

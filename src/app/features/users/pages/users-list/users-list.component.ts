@@ -22,6 +22,7 @@ import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiButtonComponent } from "@shared/ui/button";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
+import { UiLabelComponent } from "@shared/ui/label";
 import { UiSelectComponent } from "@shared/ui/select";
 import type { SelectOption } from "@shared/ui/select";
 import {
@@ -31,6 +32,7 @@ import {
 } from "@shared/ui/table";
 
 import { ResetPasswordModalComponent } from "../../components/reset-password-modal/reset-password-modal.component";
+import type { ResetPasswordPayload } from "../../components/reset-password-modal/reset-password-modal.component";
 import { UserFormModalComponent } from "../../components/user-form-modal/user-form-modal.component";
 import type { UserFormSavePayload } from "../../models/user-form";
 import type { User, UserRole, UserStatus } from "../../models/user";
@@ -38,19 +40,25 @@ import { USER_ROLE_OPTIONS, USER_STATUS_OPTIONS, userFullName } from "../../mode
 import type { UsuarioQueryParams } from "@core/query-params";
 import { UsersAdminService } from "../../services/users-admin.service";
 
+type FormModalState =
+  | { mode: "create" }
+  | { mode: "edit"; user: User };
+
 /**
  * Pagina de administracion de usuarios.
  *
- * El UiTable se auto-gestiona: pasa `[(query)]` (signal compartido con
- * el servicio) + `[fetchData]` (funcion declarada en este componente
- * que delega al servicio). NO hay handlers de sort/page/pageSize/search
- * en este componente.
+ * Estado de modales consolidado en un unico signal `modalState`
+ * para evitar el "shotgun state" (varios signals relacionados que
+ * pueden quedar desincronizados entre si).
  *
- * Los handlers del componente son solo para:
- *  - Filtros de dominio: rol, estado (via service.filterByRol/Estado).
- *  - Acciones de fila (UI del UiTable): onSaveUser, onDeactivate, etc.,
- *    que delegan al servicio. Las mutaciones disparan `bumpRefresh`
- *    internamente, lo que hace que el UiTable re-fetchee solo.
+ * - `modalState`: null cuando no hay modal abierto.
+ * - `formSaving` / `resetSaving`: feedback de mutaciones en curso
+ *   (boton con spinner + disabled) controlados aqui, no en el modal.
+ *
+ * Cada mutacion del servicio (`crear`, `actualizar`, `desactivar`,
+ * `resetPassword`) llama internamente `bumpRefresh()` para que el
+ * UiTable re-fetchee solo sin necesidad de un trigger explicito desde
+ * la pagina.
  */
 @Component({
   selector: "UsersListPage",
@@ -64,6 +72,7 @@ import { UsersAdminService } from "../../services/users-admin.service";
     UiButtonComponent,
     UiFlexComponent,
     UiHeaderComponent,
+    UiLabelComponent,
     UiSelectComponent,
     UiTableComponent,
     UserFormModalComponent,
@@ -88,16 +97,12 @@ export class UsersListComponent implements OnInit {
   protected readonly statusOptions: SelectOption[] = USER_STATUS_OPTIONS;
   protected readonly pageSizeOptions: number[] = [5, 10, 20, 50];
 
-  /** Error fatal (mostrado fuera del UiTable). */
   protected readonly errorMessage = this.admin.error;
   protected readonly successAlert = signal<string | null>(null);
 
-  /**
-   * Funcion de carga para el UiTable. Closure que delega al servicio.
-   * El UiTable la invoca con el query signal cada vez que cambia.
-   */
-  protected readonly fetchUsers = (q: Parameters<UsersAdminService["fetchData"]>[0]) =>
-    this.admin.fetchData(q);
+  protected readonly fetchUsers = (
+    q: Parameters<UsersAdminService["fetchData"]>[0],
+  ) => this.admin.fetchData(q);
 
   protected readonly tableColumns = computed<TableColumn<User>[]>(() => [
     {
@@ -141,12 +146,10 @@ export class UsersListComponent implements OnInit {
     },
   ]);
 
-  protected readonly formOpen = signal<boolean>(false);
-  protected readonly formMode = signal<"create" | "edit">("create");
-  protected readonly selectedUser = signal<User | null>(null);
-
-  protected readonly resetOpen = signal<boolean>(false);
-  protected readonly resetUser = signal<User | null>(null);
+  protected readonly modalState = signal<FormModalState | null>(null);
+  protected readonly resetTarget = signal<User | null>(null);
+  protected readonly formSaving = signal<boolean>(false);
+  protected readonly resetSaving = signal<boolean>(false);
 
   protected readonly filterRol = signal<UserRole | null>(null);
   protected readonly filterStatus = signal<UserStatus | null>(null);
@@ -167,11 +170,6 @@ export class UsersListComponent implements OnInit {
 
   // ----- Sincronización query signal <-> UiTable -----
 
-  /**
-   * Unico handler del UiTable: recibe el query mutado por sort/page/search
-   * y lo aplica al signal compartido del servicio. Esto dispara la
-   * reactividad -> el `effect()` interno del UiTable re-ejecuta `fetchData`.
-   */
   protected onQueryChange(q: UsuarioQueryParams): void {
     this.admin.query.set(q);
   }
@@ -190,59 +188,105 @@ export class UsersListComponent implements OnInit {
     this.admin.filterByEstado({ estado });
   }
 
-  // ----- Acciones (mutaciones via servicio) -----
+  // ----- Apertura / cierre de modales -----
 
   protected openCreate(): void {
-    this.formMode.set("create");
-    this.selectedUser.set(null);
-    this.formOpen.set(true);
+    this.modalState.set({ mode: "create" });
   }
 
   protected openEdit(u: User): void {
-    this.formMode.set("edit");
-    this.selectedUser.set(u);
-    this.formOpen.set(true);
+    this.modalState.set({ mode: "edit", user: u });
+  }
+
+  protected closeFormModal(): void {
+    this.modalState.set(null);
   }
 
   protected openResetPassword(u: User): void {
-    this.resetUser.set(u);
-    this.resetOpen.set(true);
+    this.resetTarget.set(u);
   }
 
-  protected onSaveUser(payload: UserFormSavePayload): void {
-    if (payload.mode === "create") {
-      void this.admin.crear({
-        data: {
-          firstName: payload.data.firstName,
-          lastNamePaternal: payload.data.lastNamePaternal,
-          lastNameMaternal: payload.data.lastNameMaternal,
-          email: payload.data.email,
-          role: payload.data.role,
-          status: payload.data.status,
-        },
-        initialPassword: payload.data.initialPassword,
-      });
-    } else {
-      void this.admin.actualizar(payload.id, {
-        data: {
-          firstName: payload.data.firstName,
-          lastNamePaternal: payload.data.lastNamePaternal,
-          lastNameMaternal: payload.data.lastNameMaternal,
-          email: payload.data.email,
-          role: payload.data.role,
-          status: payload.data.status,
-        },
-      });
+  protected closeResetModal(): void {
+    this.resetTarget.set(null);
+  }
+
+  // ----- Mutaciones delegadas al servicio -----
+
+  protected async onSaveUser(payload: UserFormSavePayload): Promise<void> {
+    if (this.formSaving()) return;
+    this.formSaving.set(true);
+    try {
+      if (payload.mode === "create") {
+        const created = await this.admin.crear({
+          data: {
+            firstName: payload.data.firstName,
+            lastNamePaternal: payload.data.lastNamePaternal,
+            lastNameMaternal: payload.data.lastNameMaternal,
+            email: payload.data.email,
+            role: payload.data.role,
+            status: payload.data.status,
+          },
+          initialPassword: payload.data.initialPassword,
+        });
+        if (created) {
+          this.successAlert.set(
+            `Usuario "${userFullName(created)}" creado.`,
+          );
+          this.closeFormModal();
+        }
+      } else {
+        const updated = await this.admin.actualizar(payload.id, {
+          data: {
+            firstName: payload.data.firstName,
+            lastNamePaternal: payload.data.lastNamePaternal,
+            lastNameMaternal: payload.data.lastNameMaternal,
+            email: payload.data.email,
+            role: payload.data.role,
+            status: payload.data.status,
+          },
+        });
+        if (updated) {
+          this.successAlert.set(
+            `Usuario "${userFullName(updated)}" actualizado.`,
+          );
+          this.closeFormModal();
+        }
+      }
+    } finally {
+      this.formSaving.set(false);
     }
-    this.formOpen.set(false);
   }
 
-  protected onDeactivate(u: User): void {
-    void this.admin.desactivar(u.id);
+  protected async onDeactivate(u: User): Promise<void> {
+    await this.admin.desactivar(u.id);
+    const err = this.admin.error();
+    if (!err) {
+      this.successAlert.set(
+        `Usuario "${userFullName(u)}" dado de baja.`,
+      );
+    }
   }
 
-  protected onConfirmReset(_password: string): void {
-    this.resetOpen.set(false);
+  protected async onConfirmReset(payload: ResetPasswordPayload): Promise<void> {
+    if (this.resetSaving()) return;
+    this.resetSaving.set(true);
+    try {
+      const ok = await this.admin.resetPassword(
+        payload.userId,
+        payload.contraseniaPlano,
+      );
+      if (ok) {
+        const target = this.resetTarget();
+        this.successAlert.set(
+          target
+            ? `Contraseña de "${userFullName(target)}" restablecida.`
+            : "Contraseña restablecida.",
+        );
+        this.closeResetModal();
+      }
+    } finally {
+      this.resetSaving.set(false);
+    }
   }
 
   protected onDismissAlert(): void {
@@ -257,4 +301,17 @@ export class UsersListComponent implements OnInit {
     const option = USER_ROLE_OPTIONS.find((o) => o.value === role);
     return option?.label ?? role;
   }
+
+  // ----- Selectores derivados para el template -----
+
+  protected readonly formModalMode = computed<"create" | "edit">(() =>
+    this.modalState()?.mode ?? "create",
+  );
+
+  protected readonly editingUser = computed<User | null>(
+    () =>
+      this.modalState()?.mode === "edit"
+        ? (this.modalState() as { mode: "edit"; user: User }).user
+        : null,
+  );
 }
