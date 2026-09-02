@@ -15,6 +15,7 @@ import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
 import { matchesSearch } from "@utils/strings";
+import { ToastService } from "@core/http/toast.service";
 
 import {
   ProjectFormModalComponent,
@@ -45,6 +46,7 @@ import { ProjectsService } from "../../services/projects.service";
 export class ProjectsListComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly projectsService = inject(ProjectsService);
+  private readonly toastService = inject(ToastService);
 
   ngOnInit(): void {
     void this.projectsService.cargar();
@@ -84,10 +86,21 @@ export class ProjectsListComponent implements OnInit {
   }
 
   protected onView(p: Project): void {
-    void this.router.navigate(["/app/operacion/proyectos", p.id]);
+    void this.router.navigate([
+      "/app/operacion/proyectos",
+      p.id,
+      "subproyectos",
+    ]);
   }
 
   protected onEdit(p: Project): void {
+    if (p.status !== "active") {
+      this.toastService.warning(
+        "No se pueden editar proyectos inactivos.",
+        "Proyecto inactivo",
+      );
+      return;
+    }
     this.formMode.set("edit");
     this.selectedProject.set(p);
     this.formOpen.set(true);
@@ -100,13 +113,25 @@ export class ProjectsListComponent implements OnInit {
   protected async onSaveProject(payload: ProjectFormSavePayload): Promise<void> {
     if (payload.mode === "create") {
       const created = await this.projectsService.create(payload.data);
-      if (created) this.formOpen.set(false);
+      if (created) {
+        this.formOpen.set(false);
+        this.toastService.success(
+          `El proyecto "${created.name}" se creó correctamente.`,
+          "Proyecto creado",
+        );
+      }
     } else {
       const updated = await this.projectsService.update(
         payload.id,
         payload.data,
       );
-      if (updated) this.formOpen.set(false);
+      if (updated) {
+        this.formOpen.set(false);
+        this.toastService.success(
+          `El proyecto "${updated.name}" se actualizó correctamente.`,
+          "Proyecto actualizado",
+        );
+      }
     }
   }
 

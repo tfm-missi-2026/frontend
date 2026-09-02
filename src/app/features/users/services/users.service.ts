@@ -42,7 +42,7 @@ export class UsersService {
     try {
       // Roles compartidos con RolesService y ModulosService via LookupsService.
       await this.lookups.loadRoles();
-      const usuarios = await firstValueFrom(this.api.listar());
+      const usuarios = await firstValueFrom(this.api.listarTodos());
       this._users.set(usuarios.map(usuarioApiToUser));
     } catch (err) {
       this._error.set(extractProblemMessage(err));

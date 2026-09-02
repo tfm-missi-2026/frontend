@@ -31,9 +31,11 @@ import {
   SubprojectFormModalComponent,
 } from "../../components/subproject-form-modal/subproject-form-modal.component";
 import {
+  SUBPROJECT_ACTIVE_OPTIONS,
   SUBPROJECT_SITUATION_OPTIONS,
   SUBPROJECT_TYPE_OPTIONS,
   type Subproject,
+  type SubprojectActiveFilter,
   type SubprojectSituation,
   type SubprojectType,
 } from "../../models/subproject";
@@ -41,6 +43,7 @@ import type { SubprojectFormSavePayload } from "../../models/subproject-form";
 import { ProjectsService } from "../../services/projects.service";
 import { SubprojectsService } from "../../services/subprojects.service";
 import { UsersService } from "@features/users/services/users.service";
+import { ToastService } from "@core/http/toast.service";
 
 @Component({
   selector: "ProjectsSubprojectsListPage",
@@ -66,10 +69,12 @@ export class ProjectsSubprojectsListComponent implements OnInit {
   private readonly projectsService = inject(ProjectsService);
   private readonly subprojectsService = inject(SubprojectsService);
   private readonly usersService = inject(UsersService);
+  private readonly toastService = inject(ToastService);
 
   ngOnInit(): void {
     void this.projectsService.cargar();
     void this.subprojectsService.cargar();
+    void this.usersService.cargar();
   }
 
   constructor() {
@@ -87,6 +92,7 @@ export class ProjectsSubprojectsListComponent implements OnInit {
 
   protected readonly typeOptions = SUBPROJECT_TYPE_OPTIONS;
   protected readonly situationOptions = SUBPROJECT_SITUATION_OPTIONS;
+  protected readonly activeOptions = SUBPROJECT_ACTIVE_OPTIONS;
 
   protected readonly projectId = toSignal(
     this.route.paramMap.pipe(map((p) => p.get("projectId"))),
@@ -114,13 +120,22 @@ export class ProjectsSubprojectsListComponent implements OnInit {
   protected readonly searchTerm = signal<string>("");
   protected readonly filterType = signal<SubprojectType | null>(null);
   protected readonly filterSituation = signal<SubprojectSituation | null>(null);
+  protected readonly filterActive = signal<SubprojectActiveFilter | null>(null);
+
+  // Conteo de negocio: subproyectos activos del proyecto, independiente
+  // del filtro de estado que se este viendo en la tabla.
+  protected readonly activeSubCount = computed<number>(
+    () => this.subprojects().filter((s) => s.active).length,
+  );
 
   protected readonly visibleSubprojects = computed<Subproject[]>(() => {
-    const list = this.subprojects().filter((s) => s.active);
     const term = this.searchTerm().trim().toLowerCase();
     const t = this.filterType();
     const st = this.filterSituation();
-    return list.filter((s) => {
+    const activeFilter = this.filterActive();
+    return this.subprojects().filter((s) => {
+      if (activeFilter === "active" && !s.active) return false;
+      if (activeFilter === "inactive" && s.active) return false;
       if (t && s.type !== t) return false;
       if (st && s.situation !== st) return false;
       if (!term) return true;
@@ -143,13 +158,35 @@ export class ProjectsSubprojectsListComponent implements OnInit {
   protected readonly formMode = signal<"create" | "edit">("create");
   protected readonly selectedSub = signal<Subproject | null>(null);
 
+  protected readonly existingTicketsForForm = computed<string[]>(() => {
+    const editingId = this.selectedSub()?.id;
+    return this.subprojects()
+      .filter((s) => s.active && s.ticket && s.id !== editingId)
+      .map((s) => s.ticket as string);
+  });
+
   protected openCreate(): void {
+    const p = this.project();
+    if (p && p.status !== "active") {
+      this.toastService.warning(
+        "No se pueden crear subproyectos sobre un proyecto inactivo.",
+        "Proyecto inactivo",
+      );
+      return;
+    }
     this.formMode.set("create");
     this.selectedSub.set(null);
     this.formOpen.set(true);
   }
 
   protected onEdit(s: Subproject): void {
+    if (!s.active) {
+      this.toastService.warning(
+        "No se pueden editar subproyectos inactivos.",
+        "Subproyecto inactivo",
+      );
+      return;
+    }
     this.formMode.set("edit");
     this.selectedSub.set(s);
     this.formOpen.set(true);
@@ -202,10 +239,15 @@ export class ProjectsSubprojectsListComponent implements OnInit {
     this.filterSituation.set(value);
   }
 
+  protected onActiveChange(value: SubprojectActiveFilter | null): void {
+    this.filterActive.set(value);
+  }
+
   protected onClearFilters(): void {
     this.searchTerm.set("");
     this.filterType.set(null);
     this.filterSituation.set(null);
+    this.filterActive.set(null);
   }
 
   protected goBack(): void {

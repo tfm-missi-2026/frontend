@@ -35,4 +35,15 @@
       (ngModelChange)="situationChange.emit(asSituation($event))"
     ></UiSelect>
   </UiFlex>
+
+  <UiFlex direction="row" alignItems="center" className="min-w-37.5">
+    <UiSelect
+      [options]="activeOptions()"
+      placeholder="Estado: Todos"
+      [searchable]="false"
+      [isClearable]="true"
+      [ngModel]="activeValue()"
+      (ngModelChange)="activeChange.emit(asActive($event))"
+    ></UiSelect>
+  </UiFlex>
 </UiFlex>

@@ -1,7 +1,6 @@
 import type {
   ProyectoApi,
   ProyectoCrearApi,
-  SubproyectoActualizarApi,
   SubproyectoApi,
   SubproyectoCrearApi,
   TareaActualizarApi,
@@ -40,6 +39,15 @@ export function buildCatalogLookup(
   items: ReadonlyArray<{ id: string; name: string }>,
 ): CatalogLookup {
   return { byId: new Map(items.map((i) => [i.id, i.name])) };
+}
+
+// Mismo shape que CatalogLookup (id -> nombre a mostrar), pero construido
+// desde msa_usuario para resolver gestores/solicitantes en la UI.
+export type UserLookup = CatalogLookup;
+export function buildUserLookup(
+  users: ReadonlyArray<{ id: string; fullName: string }>,
+): UserLookup {
+  return { byId: new Map(users.map((u) => [u.id, u.fullName])) };
 }
 
 export const SUBPROJECT_TYPE_FALLBACK: SubprojectType = "Incidencia";
@@ -88,6 +96,7 @@ export function projectFormDataToCrearApi(
 export function subproyectoApiToSubproject(
   api: SubproyectoApi,
   catalog: CatalogLookup,
+  users: UserLookup,
 ): import("../models/subproject").Subproject {
   return {
     id: api.id,
@@ -104,8 +113,10 @@ export function subproyectoApiToSubproject(
       api.prioridadId,
       SUBPROJECT_PRIORITY_FALLBACK,
     ) as SubprojectPriority) ?? SUBPROJECT_PRIORITY_FALLBACK,
-    requester: "", // cross-BD a msa_usuario, no resuelto aca
+    requesterId: api.solicitanteId,
+    requester: users.byId.get(api.solicitanteId) ?? "",
     requestDate: api.fechaSolicitud,
+    situationId: api.situacionId,
     situation: (lookupOr(
       catalog,
       api.situacionId,
@@ -128,26 +139,12 @@ export function subprojectFormDataToCrearApi(
     codigoTicket: data.ticket,
     prioridadId: data.priority,
     descripcion: data.description,
-    solicitanteId: data.requester, // mismo comentario
+    solicitanteId: data.requesterId,
     fechaSolicitud: data.requestDate,
     situacionId: SUBPROJECT_SITUATION_FALLBACK, // "Pendiente" por defecto al crear
   };
 }
 
-export function subprojectFormDataToActualizarApi(
-  catalog: CatalogLookup,
-  data: SubprojectFormData,
-  currentSituationId: string,
-): SubproyectoActualizarApi {
-  return {
-    tipoSubproyectoId: data.type,
-    codigoTicket: data.ticket,
-    prioridadId: data.priority,
-    descripcion: data.description,
-    situacionId: currentSituationId, // el facade resuelve la situacion actual
-    justificacionRechazo: data.rejectionReason,
-  };
-}
 
 // --- Tareas ---
 

@@ -24,6 +24,10 @@ export class UsersApiService {
     return this.http.get<UsuarioApi[]>(this.baseUrl);
   }
 
+  listarTodos(): Observable<UsuarioApi[]> {
+    return this.http.get<UsuarioApi[]>(`${this.baseUrl}/todos`);
+  }
+
   buscarPorId(id: string): Observable<UsuarioApi> {
     return this.http.get<UsuarioApi>(`${this.baseUrl}/${id}`);
   }

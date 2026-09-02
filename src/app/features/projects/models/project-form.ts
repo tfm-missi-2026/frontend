@@ -1,13 +1,8 @@
-import type { Project, ProjectStatus } from "./project";
-
 export interface ProjectFormData {
   code: string;
   name: string;
   description: string;
   managerId: string;
-  subCount: number;
-  status: ProjectStatus;
-  startDate: string;
 }
 
 export type ProjectFormSavePayload =
@@ -20,8 +15,5 @@ export function emptyProjectForm(): ProjectFormData {
     name: "",
     description: "",
     managerId: "",
-    subCount: 0,
-    status: "active",
-    startDate: "",
   };
 }

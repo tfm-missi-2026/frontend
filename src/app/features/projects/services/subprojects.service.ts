@@ -7,6 +7,8 @@ import {
 import { firstValueFrom } from "rxjs";
 
 import { CatalogService } from "@features/catalog/services/catalog.service";
+import { UsersService } from "@features/users/services/users.service";
+import { userFullName } from "@features/users/models/user";
 
 import type {
   SubproyectoApi,
@@ -16,8 +18,7 @@ import type { Subproject } from "../models/subproject";
 import type { SubprojectFormData } from "../models/subproject-form";
 import {
   buildCatalogLookup,
-  SUBPROJECT_SITUATION_FALLBACK,
-  subprojectFormDataToActualizarApi,
+  buildUserLookup,
   subproyectoApiToSubproject,
 } from "./project.mapper";
 import { SubproyectosApiService } from "./subprojects-api.service";
@@ -32,6 +33,7 @@ const PENDIENTE_BACKEND = "Pendiente";
 export class SubprojectsService {
   private readonly api = inject(SubproyectosApiService);
   private readonly catalogService = inject(CatalogService);
+  private readonly usersService = inject(UsersService);
 
   private readonly _subs = signal<Subproject[]>([]);
   private readonly _loading = signal<boolean>(false);
@@ -56,10 +58,20 @@ export class SubprojectsService {
     buildCatalogLookup(this.catalogService.items()),
   );
 
+  private readonly userLookup = computed(() =>
+    buildUserLookup(
+      this.usersService.users().map((u) => ({ id: u.id, fullName: userFullName(u) })),
+    ),
+  );
+
   private async ensureCatalog(): Promise<void> {
     if (this.catalogService.count() === 0) {
       await this.catalogService.cargar();
     }
+  }
+
+  private async ensureUsers(): Promise<void> {
+    await this.usersService.cargar();
   }
 
   private findCatalogIdByOpcion(
@@ -97,12 +109,13 @@ export class SubprojectsService {
     this._loading.set(true);
     this._error.set(null);
     try {
-      await this.ensureCatalog();
+      await Promise.all([this.ensureCatalog(), this.ensureUsers()]);
       const data = await firstValueFrom(this.api.listar());
       const lookup = this.catalogLookup();
-      const mapped = data
-        .map((api) => subproyectoApiToSubproject(api, lookup))
-        .filter((x): x is Subproject => x !== null);
+      const users = this.userLookup();
+      const mapped = data.map((api) =>
+        subproyectoApiToSubproject(api, lookup, users),
+      );
       this._subs.set(mapped);
     } catch (err) {
       this._error.set(extractProblemMessage(err));
@@ -115,13 +128,14 @@ export class SubprojectsService {
     this._loading.set(true);
     this._error.set(null);
     try {
-      await this.ensureCatalog();
+      await Promise.all([this.ensureCatalog(), this.ensureUsers()]);
       const data = await firstValueFrom(
         this.api.listarPorProyecto(proyectoId),
       );
       const lookup = this.catalogLookup();
+      const users = this.userLookup();
       const mapped = data.map((api) =>
-        subproyectoApiToSubproject(api, lookup),
+        subproyectoApiToSubproject(api, lookup, users),
       );
       this._subs.update((arr) => {
         const others = arr.filter((s) => s.projectId !== proyectoId);
@@ -147,14 +161,14 @@ export class SubprojectsService {
     data: SubprojectFormData,
   ): Promise<Subproject | null> {
     try {
-      await this.ensureCatalog();
+      await Promise.all([this.ensureCatalog(), this.ensureUsers()]);
       const tipoId =
         this.findCatalogIdByOpcion("TIPO_SUBPROYECTO", data.type) ?? "";
       const prioridadId =
         this.findCatalogIdByOpcion("PRIORIDAD", data.priority) ?? "";
       const situacionId =
         this.findCatalogIdByOpcion("SITUACION", PENDIENTE_BACKEND) ?? "";
-      const solicitanteId = data.requester.trim();
+      const solicitanteId = data.requesterId.trim();
       const body: SubproyectoCrearApi = {
         proyectoId: projectId,
         tipoSubproyectoId: tipoId,
@@ -179,7 +193,7 @@ export class SubprojectsService {
       }
       const creado = await firstValueFrom(this.api.crear(body));
       const lookup = this.catalogLookup();
-      const sub = subproyectoApiToSubproject(creado, lookup);
+      const sub = subproyectoApiToSubproject(creado, lookup, this.userLookup());
       if (sub) {
         this._subs.update((arr) => [sub, ...arr]);
       }
@@ -196,11 +210,9 @@ export class SubprojectsService {
     data: SubprojectFormData,
   ): Promise<Subproject | null> {
     try {
-      await this.ensureCatalog();
+      await Promise.all([this.ensureCatalog(), this.ensureUsers()]);
       const current = this.getById(id);
-      const currentSituacion = current?.situation ?? SUBPROJECT_SITUATION_FALLBACK;
-      const situacionId =
-        this.findCatalogIdByOpcion("SITUACION", currentSituacion) ?? "";
+      const situacionId = data.situationId || current?.situationId || "";
       const tipoId =
         this.findCatalogIdByOpcion("TIPO_SUBPROYECTO", data.type) ?? "";
       const prioridadId =
@@ -210,16 +222,20 @@ export class SubprojectsService {
         return null;
       }
       const actualizado = await firstValueFrom(
-        this.api.actualizar(
-          id,
-          subprojectFormDataToActualizarApi(
-            this.catalogLookup(),
-            data,
-            situacionId,
-          ),
-        ),
+        this.api.actualizar(id, {
+          tipoSubproyectoId: tipoId,
+          codigoTicket: data.ticket,
+          prioridadId,
+          descripcion: data.description,
+          situacionId,
+          justificacionRechazo: data.rejectionReason,
+        }),
       );
-      const sub = subproyectoApiToSubproject(actualizado, this.catalogLookup());
+      const sub = subproyectoApiToSubproject(
+        actualizado,
+        this.catalogLookup(),
+        this.userLookup(),
+      );
       if (sub) {
         this._subs.update((arr) =>
           arr.map((s) => (s.id === id ? sub : s)),

@@ -162,13 +162,14 @@ export class ProjectsTasksListComponent implements OnInit {
     if (p) {
       items.push({
         label: p.code,
-        route: `/app/operacion/proyectos/${p.id}`,
+        route: `/app/operacion/proyectos/${p.id}/subproyectos`,
       });
     }
     if (s && p) {
+      // No existe una pagina de detalle de subproyecto aparte de esta
+      // lista de tareas: se muestra como texto, no como link.
       items.push({
         label: `Subproyecto ${s.ticket ?? s.id}`,
-        route: `/app/operacion/proyectos/${p.id}/subproyectos/${s.id}`,
       });
     }
     items.push({ label: "Tareas" });
@@ -229,13 +230,11 @@ export class ProjectsTasksListComponent implements OnInit {
 
   protected goBack(): void {
     const pid = this.projectId();
-    const sid = this.subId();
-    if (!pid || !sid) return;
+    if (!pid) return;
     void this.router.navigate([
       "/app/operacion/proyectos",
       pid,
       "subproyectos",
-      sid,
     ]);
   }
 }

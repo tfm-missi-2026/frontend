@@ -20,7 +20,7 @@
     <ProjectsSubprojectsHeader
       [project]="p"
       [managerName]="managerName()"
-      [subCount]="visibleSubprojects().length"
+      [subCount]="activeSubCount()"
     />
 
     <UiFlex
@@ -46,9 +46,12 @@
       [typeOptions]="typeOptions"
       [situationValue]="filterSituation()"
       [situationOptions]="situationOptions"
+      [activeValue]="filterActive()"
+      [activeOptions]="activeOptions"
       (searchChange)="onSearchChange($event)"
       (typeChange)="onTypeChange($event)"
       (situationChange)="onSituationChange($event)"
+      (activeChange)="onActiveChange($event)"
       (clearFilters)="onClearFilters()"
     />
 
@@ -133,6 +136,7 @@
   [projectCode]="project()?.code ?? ''"
   [projectId]="projectId() ?? ''"
   [subproject]="selectedSub()"
+  [existingTickets]="existingTicketsForForm()"
   (save)="onSave($event)"
   (close)="formOpen.set(false)"
 />

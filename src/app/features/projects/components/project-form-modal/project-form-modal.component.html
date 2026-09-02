@@ -37,13 +37,18 @@
     <UiInput
       placeholder="p. ej. SIGTRAMITES"
       [value]="form().code"
+      [readOnly]="isCodeReadonly()"
       (valueChange)="onCodeChange($event)"
     />
     @if (codeError(); as msg) {
       <UiFieldError [message]="msg" className="mt-1" />
     }
     <UiLabel type="bodyXs" color="textWeak" className="mt-2 block">
-      Identificador corto del sistema, en mayúsculas y único.
+      @if (isCodeReadonly()) {
+        Identificador corto del sistema. No se puede modificar una vez creado: se usa como referencia en toda la app.
+      } @else {
+        Identificador corto del sistema, en mayúsculas y único.
+      }
     </UiLabel>
   </div>
 
@@ -107,55 +112,13 @@
     </UiLabel>
   </div>
 
-  <UiGrid [columns]="2" gap="gap-4" className="mb-4">
-    <div>
-      <UiLabel
-        type="bodyXs"
-        color="textStrong"
-        weight="medium"
-        className="mb-2 block uppercase"
-      >
-        Subproyectos
-      </UiLabel>
-      <UiInput
-        type="number"
-        placeholder="0"
-        [value]="form().subCount"
-        (valueChange)="onSubCountChange($event)"
-      />
-    </div>
-    <div>
-      <UiLabel
-        type="bodyXs"
-        color="textStrong"
-        weight="medium"
-        className="mb-2 block uppercase"
-      >
-        Estado
-      </UiLabel>
-      <UiFlex
-        direction="row"
-        alignItems="center"
-        [gap]="16"
-        className="pt-1.5"
-      >
-        <UiRadio
-          name="project-status"
-          value="active"
-          [checked]="form().status === 'active'"
-          label="Activo"
-          (valueChange)="onStatusChange('active')"
-        />
-        <UiRadio
-          name="project-status"
-          value="inactive"
-          [checked]="form().status === 'inactive'"
-          label="Inactivo"
-          (valueChange)="onStatusChange('inactive')"
-        />
-      </UiFlex>
-    </div>
-  </UiGrid>
+  @if (mode() === "edit") {
+    <UiAlert
+      variant="info"
+      message="El estado (activo/inactivo) y el número de subproyectos no se editan aquí: se manejan desde la lista de proyectos y desde cada subproyecto."
+      className="mb-4"
+    />
+  }
 
   <UiFlex
     direction="row"

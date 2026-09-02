@@ -7,6 +7,7 @@ import {
   input,
   output,
   signal,
+  untracked,
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 
@@ -14,21 +15,20 @@ import { UiAlertComponent } from "@shared/ui/alert";
 import { UiButtonComponent } from "@shared/ui/button";
 import { UiFieldErrorComponent } from "@shared/ui/field-error";
 import { UiFlexComponent } from "@shared/ui/flex";
-import { UiGridComponent } from "@shared/ui/grid";
 import { UiInputComponent } from "@shared/ui/input";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
-import { UiRadioComponent } from "@shared/ui/radio";
 import { UiSelectComponent } from "@shared/ui/select";
 import { UiTextAreaComponent } from "@shared/ui/text-area";
 
 import { UsersService } from "@features/users/services/users.service";
+import { ToastService } from "@core/http/toast.service";
 
 import {
   emptyProjectForm,
   type ProjectFormSavePayload,
 } from "../../models/project-form";
-import type { Project, ProjectStatus } from "../../models/project";
+import type { Project } from "../../models/project";
 
 export type ProjectFormMode = "create" | "edit";
 
@@ -43,11 +43,9 @@ const CODE_REGEX = /^[A-Z0-9-]+$/;
     UiButtonComponent,
     UiFieldErrorComponent,
     UiFlexComponent,
-    UiGridComponent,
     UiInputComponent,
     UiLabelComponent,
     UiModalComponent,
-    UiRadioComponent,
     UiSelectComponent,
     UiTextAreaComponent,
   ],
@@ -56,6 +54,7 @@ const CODE_REGEX = /^[A-Z0-9-]+$/;
 })
 export class ProjectFormModalComponent {
   private readonly usersService = inject(UsersService);
+  private readonly toastService = inject(ToastService);
 
   readonly isOpen = input<boolean>(false);
   readonly mode = input<ProjectFormMode>("create");
@@ -87,10 +86,17 @@ export class ProjectFormModalComponent {
     "Datos del sistema. Las fechas y la prioridad se definen luego, en cada subproyecto.",
   );
 
+  // El codigo (nombreCorto) se usa como identificador visible en toda la
+  // app (breadcrumbs, rutas); una vez creado el proyecto queda fijo.
+  protected readonly isCodeReadonly = computed<boolean>(
+    () => this.mode() === "edit",
+  );
+
   constructor() {
     effect(() => {
       const open = this.isOpen();
       if (!open) return;
+      untracked(() => void this.usersService.cargar());
       const p = this.project();
       const m = this.mode();
       this.validationMessage.set(null);
@@ -103,9 +109,6 @@ export class ProjectFormModalComponent {
           name: p.name,
           description: p.description,
           managerId: p.managerId,
-          subCount: p.subCount,
-          status: p.status,
-          startDate: p.startDate,
         });
       } else {
         this.form.set(emptyProjectForm());
@@ -118,7 +121,8 @@ export class ProjectFormModalComponent {
   }
 
   protected onCodeChange(value: string): void {
-    this.patch({ code: value.toUpperCase() });
+    const sanitized = value.toUpperCase().replace(/[^A-Z0-9-]/g, "");
+    this.patch({ code: sanitized });
     this.codeError.set(null);
   }
 
@@ -131,21 +135,16 @@ export class ProjectFormModalComponent {
     this.patch({ description: value });
   }
 
-  protected onSubCountChange(value: string | number | undefined): void {
-    const num = Number(value ?? 0);
-    this.patch({ subCount: Number.isFinite(num) && num >= 0 ? num : 0 });
-  }
-
   protected onManagerChange(value: unknown): void {
     this.patch({ managerId: value == null ? "" : String(value) });
     this.managerError.set(null);
   }
 
-  protected onStatusChange(status: ProjectStatus): void {
-    this.patch({ status });
-  }
-
   protected onCancel(): void {
+    this.toastService.warning(
+      "No se guardaron los cambios del proyecto.",
+      "Operación cancelada",
+    );
     this.close.emit();
   }
 
@@ -167,9 +166,6 @@ export class ProjectFormModalComponent {
       name: f.name.trim(),
       description: f.description.trim(),
       managerId: f.managerId,
-      subCount: f.subCount,
-      status: f.status,
-      startDate: f.startDate,
     };
 
     const p = this.project();
