@@ -43,8 +43,11 @@
       [searchTerm]="searchTerm()"
       [situationValue]="filterSituation()"
       [situationOptions]="situationOptions"
+      [activeValue]="filterActive()"
+      [activeOptions]="activeOptions"
       (searchChange)="onSearchChange($event)"
       (situationChange)="onSituationChange($event)"
+      (activeChange)="onActiveChange($event)"
       (clearFilters)="onClearFilters()"
     />
 

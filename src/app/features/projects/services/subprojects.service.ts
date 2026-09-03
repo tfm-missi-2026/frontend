@@ -44,12 +44,12 @@ export class SubprojectsService {
   readonly error = this._error.asReadonly();
   readonly count = computed(() => this._subs().length);
 
+  // Cuenta todos los subproyectos del proyecto, sin importar su estado
+  // (activo/inactivo) — la baja logica no reduce la asociacion al padre.
   readonly countByProject = computed<Record<string, number>>(() => {
     const map: Record<string, number> = {};
     for (const s of this._subs()) {
-      if (s.active) {
-        map[s.projectId] = (map[s.projectId] ?? 0) + 1;
-      }
+      map[s.projectId] = (map[s.projectId] ?? 0) + 1;
     }
     return map;
   });

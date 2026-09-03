@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   effect,
+  inject,
   input,
   output,
   signal,
@@ -14,6 +15,8 @@ import { UiLabelComponent } from "@shared/ui/label";
 import { UiLinkComponent } from "@shared/ui/link";
 import { formatShortDate } from "@utils/date";
 import { range } from "@utils/collections";
+
+import { TasksService } from "../../services/tasks.service";
 
 import {
   SUBPROJECT_PRIORITY_LABELS,
@@ -65,6 +68,8 @@ const PRIORITY_DOT: Record<SubprojectPriority, string> = {
   templateUrl: "./projects-subprojects-table.component.html",
 })
 export class ProjectsSubprojectsTableComponent {
+  private readonly tasksService = inject(TasksService);
+
   readonly subprojects = input<Subproject[]>([]);
 
   readonly view = output<Subproject>();
@@ -74,12 +79,20 @@ export class ProjectsSubprojectsTableComponent {
 
   protected readonly currentPage = signal(1);
 
+  protected readonly rows = computed<Subproject[]>(() => {
+    const counts = this.tasksService.countBySubproject();
+    return this.subprojects().map((s) => ({
+      ...s,
+      taskCount: counts[s.id] ?? 0,
+    }));
+  });
+
   protected readonly totalPages = computed(() =>
-    Math.max(1, Math.ceil(this.subprojects().length / PAGE_SIZE)),
+    Math.max(1, Math.ceil(this.rows().length / PAGE_SIZE)),
   );
 
   protected readonly pagedRows = computed<Subproject[]>(() => {
-    const all = this.subprojects();
+    const all = this.rows();
     const start = (this.currentPage() - 1) * PAGE_SIZE;
     return all.slice(start, start + PAGE_SIZE);
   });
@@ -99,6 +112,7 @@ export class ProjectsSubprojectsTableComponent {
   });
 
   constructor() {
+    void this.tasksService.cargar();
     effect(() => {
       this.subprojects();
       this.currentPage.set(1);

@@ -14,10 +14,12 @@
       </UiLabel>
     </UiFlex>
 
-    <UiAlert
-      variant="info"
-      message="Una tarea nueva arranca en situación Pendiente. No hay campo de situación editable en el alta."
-    />
+    @if (mode() === "create") {
+      <UiAlert
+        variant="info"
+        message="Una tarea nueva arranca en situación Pendiente."
+      />
+    }
 
     @if (validationMessage(); as msg) {
       <UiAlert variant="error" [message]="msg" />
@@ -116,6 +118,34 @@
     <UiLabel type="bodyXs" color="textWeak">
       {{ jornadaLabel() }}
     </UiLabel>
+
+    @if (mode() === "edit") {
+      <UiFlex direction="column" [gap]="6">
+        <UiFormLabel
+          labelText="Situación"
+          labelFor="task-situation"
+          weight="medium"
+        />
+        @if (isSituationTerminal()) {
+          <UiAlert
+            variant="info"
+            message="Esta situación es definitiva; ya no admite más cambios."
+          />
+        } @else {
+          <UiSelect
+            id="task-situation"
+            [options]="situationOptions()"
+            placeholder="Selecciona una situación…"
+            [searchable]="false"
+            [ngModel]="form().situationId"
+            (ngModelChange)="onSituationChange($event)"
+          />
+        }
+        @if (situationError(); as msg) {
+          <UiFieldError [message]="msg" />
+        }
+      </UiFlex>
+    }
 
     <UiSurface variant="neutral" padding="md" className="border-dashed">
       <UiFlex direction="column" [gap]="12">

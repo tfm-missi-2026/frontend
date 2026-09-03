@@ -8,12 +8,10 @@ import { firstValueFrom } from "rxjs";
 
 import { CatalogService } from "@features/catalog/services/catalog.service";
 
-import type { TareaApi } from "../models/project-api";
 import type { Task } from "../models/task";
 import type { TaskFormData } from "../models/task-form";
 import {
   buildCatalogLookup,
-  TASK_SITUATION_FALLBACK,
   tareaApiToTask,
   taskFormDataToActualizarApi,
   taskFormDataToCrearApi,
@@ -36,6 +34,16 @@ export class TasksService {
   readonly loading = this._loading.asReadonly();
   readonly error = this._error.asReadonly();
   readonly count = computed(() => this._tasks().length);
+
+  // Cuenta todas las tareas del subproyecto, sin importar su estado
+  // (activo/inactivo) — la baja logica no reduce la asociacion al padre.
+  readonly countBySubproject = computed<Record<string, number>>(() => {
+    const map: Record<string, number> = {};
+    for (const t of this._tasks()) {
+      map[t.subprojectId] = (map[t.subprojectId] ?? 0) + 1;
+    }
+    return map;
+  });
 
   private readonly catalogLookup = computed(() =>
     buildCatalogLookup(this.catalogService.items()),
@@ -109,9 +117,7 @@ export class TasksService {
   }
 
   getBySubproject(subprojectId: string): Task[] {
-    return this._tasks().filter(
-      (t) => t.subprojectId === subprojectId && t.active,
-    );
+    return this._tasks().filter((t) => t.subprojectId === subprojectId);
   }
 
   getById(id: string): Task | undefined {
@@ -159,11 +165,18 @@ export class TasksService {
     try {
       await this.ensureCatalog();
       const current = this.getById(id);
-      const currentSituacion = current?.situation ?? TASK_SITUATION_FALLBACK;
-      const situacionId =
-        this.findCatalogIdByOpcion("SITUACION", currentSituacion) ?? "";
+      const situacionId = data.situationId || current?.situationId || "";
       if (!situacionId) {
         this._error.set("No se encontró la situación actual en el catálogo.");
+        return null;
+      }
+      if (
+        !data.name.trim() ||
+        !data.startDate ||
+        !data.endDate ||
+        !data.estimatedHours
+      ) {
+        this._error.set("Faltan datos requeridos (nombre, fechas u horas).");
         return null;
       }
       const actualizado = await firstValueFrom(
@@ -171,7 +184,7 @@ export class TasksService {
           id,
           taskFormDataToActualizarApi(
             situacionId,
-            current?.origin === "var" ? "PENDIENTE" : null,
+            current?.origenVariacionId ?? null,
             data,
           ),
         ),

@@ -37,14 +37,17 @@ import {
   TaskFormModalComponent,
 } from "../../components/task-form-modal/task-form-modal.component";
 import {
+  TASK_ACTIVE_OPTIONS,
   TASK_SITUATION_OPTIONS,
   type Task,
+  type TaskActiveFilter,
   type TaskSituation,
 } from "../../models/task";
 import type { TaskFormSavePayload } from "../../models/task-form";
 import { ProjectsService } from "../../services/projects.service";
 import { SubprojectsService } from "../../services/subprojects.service";
 import { TasksService } from "../../services/tasks.service";
+import { ToastService } from "@core/http/toast.service";
 
 @Component({
   selector: "ProjectsTasksListPage",
@@ -71,6 +74,7 @@ export class ProjectsTasksListComponent implements OnInit {
   private readonly projectsService = inject(ProjectsService);
   private readonly subprojectsService = inject(SubprojectsService);
   private readonly tasksService = inject(TasksService);
+  private readonly toastService = inject(ToastService);
 
   ngOnInit(): void {
     void this.projectsService.cargar();
@@ -92,6 +96,7 @@ export class ProjectsTasksListComponent implements OnInit {
   protected readonly IconPlusSimpleComponent = IconPlusSimpleComponent;
 
   protected readonly situationOptions = TASK_SITUATION_OPTIONS;
+  protected readonly activeOptions = TASK_ACTIVE_OPTIONS;
 
   protected readonly projectId = toSignal(
     this.route.paramMap.pipe(map((p) => p.get("projectId"))),
@@ -124,19 +129,27 @@ export class ProjectsTasksListComponent implements OnInit {
 
   protected readonly searchTerm = signal<string>("");
   protected readonly filterSituation = signal<TaskSituation | null>(null);
+  protected readonly filterActive = signal<TaskActiveFilter | null>(null);
 
   protected readonly visibleTasks = computed<Task[]>(() => {
     const list = this.tasks();
     const term = this.searchTerm();
     const sit = this.filterSituation();
+    const activeFilter = this.filterActive();
     return list.filter((t) => {
+      if (activeFilter === "active" && !t.active) return false;
+      if (activeFilter === "inactive" && t.active) return false;
       if (sit && t.situation !== sit) return false;
       return matchesSearch(term, t.name);
     });
   });
 
+  // Metrica de negocio: horas/jornadas de las tareas activas, independiente
+  // del filtro de estado que se este viendo en la tabla.
   protected readonly totalHours = computed<number>(() =>
-    this.visibleTasks().reduce((acc, t) => acc + t.estimatedHours, 0),
+    this.tasks()
+      .filter((t) => t.active)
+      .reduce((acc, t) => acc + t.estimatedHours, 0),
   );
 
   protected readonly workdays = computed<number>(() => {
@@ -181,12 +194,27 @@ export class ProjectsTasksListComponent implements OnInit {
   protected readonly selectedTask = signal<Task | null>(null);
 
   protected openCreate(): void {
+    const s = this.subproject();
+    if (s && !s.active) {
+      this.toastService.warning(
+        "No se pueden crear tareas sobre un subproyecto inactivo.",
+        "Subproyecto inactivo",
+      );
+      return;
+    }
     this.formMode.set("create");
     this.selectedTask.set(null);
     this.formOpen.set(true);
   }
 
   protected onEdit(t: Task): void {
+    if (!t.active) {
+      this.toastService.warning(
+        "No se pueden editar tareas inactivas.",
+        "Tarea inactiva",
+      );
+      return;
+    }
     this.formMode.set("edit");
     this.selectedTask.set(t);
     this.formOpen.set(true);
@@ -204,14 +232,26 @@ export class ProjectsTasksListComponent implements OnInit {
         payload.subprojectId,
         payload.data,
       );
-      if (created) this.formOpen.set(false);
+      if (created) {
+        this.formOpen.set(false);
+        this.toastService.success(
+          `La tarea "${created.name}" se creó correctamente.`,
+          "Tarea creada",
+        );
+      }
     } else {
       const updated = await this.tasksService.update(
         payload.subprojectId,
         payload.id,
         payload.data,
       );
-      if (updated) this.formOpen.set(false);
+      if (updated) {
+        this.formOpen.set(false);
+        this.toastService.success(
+          `La tarea "${updated.name}" se actualizó correctamente.`,
+          "Tarea actualizada",
+        );
+      }
     }
   }
 
@@ -223,9 +263,14 @@ export class ProjectsTasksListComponent implements OnInit {
     this.filterSituation.set(value);
   }
 
+  protected onActiveChange(value: TaskActiveFilter | null): void {
+    this.filterActive.set(value);
+  }
+
   protected onClearFilters(): void {
     this.searchTerm.set("");
     this.filterSituation.set(null);
+    this.filterActive.set(null);
   }
 
   protected goBack(): void {

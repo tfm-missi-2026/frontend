@@ -160,11 +160,13 @@ export function tareaApiToTask(
     startDate: api.fechaInicioPlanificada,
     endDate: api.fechaFinPlanificada,
     estimatedHours: api.horasEstimadas,
+    situationId: api.situacionId,
     situation: (lookupOr(
       catalog,
       api.situacionId,
       TASK_SITUATION_FALLBACK,
     ) as TaskSituation) ?? TASK_SITUATION_FALLBACK,
+    origenVariacionId: api.origenVariacionId,
     origin: api.origenVariacionId ? "var" : "base",
     originLabel: api.origenVariacionId ? "Variación" : "Línea base",
     dependsOnIds: [], // no persistido en backend

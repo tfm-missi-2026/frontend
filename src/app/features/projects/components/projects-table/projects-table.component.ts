@@ -16,6 +16,7 @@ import { UiLabelComponent } from "@shared/ui/label";
 import { UiLinkComponent } from "@shared/ui/link";
 
 import { UsersService } from "@features/users/services/users.service";
+import { SubprojectsService } from "../../services/subprojects.service";
 import { range } from "@utils/collections";
 
 import {
@@ -44,6 +45,7 @@ interface ProjectRow extends Project {
 })
 export class ProjectsTableComponent {
   private readonly usersService = inject(UsersService);
+  private readonly subprojectsService = inject(SubprojectsService);
 
   readonly projects = input<Project[]>([]);
 
@@ -56,8 +58,10 @@ export class ProjectsTableComponent {
 
   protected readonly rows = computed<ProjectRow[]>(() => {
     const users = this.usersService.users();
+    const counts = this.subprojectsService.countByProject();
     return this.projects().map((p) => ({
       ...p,
+      subCount: counts[p.id] ?? 0,
       managerName: users.find((u) => u.id === p.managerId)
         ? `${users.find((u) => u.id === p.managerId)!.firstName} ${users.find((u) => u.id === p.managerId)!.lastNamePaternal}`
         : "Sin gestor",
@@ -89,6 +93,7 @@ export class ProjectsTableComponent {
   });
 
   constructor() {
+    void this.subprojectsService.cargar();
     effect(() => {
       this.projects();
       this.currentPage.set(1);

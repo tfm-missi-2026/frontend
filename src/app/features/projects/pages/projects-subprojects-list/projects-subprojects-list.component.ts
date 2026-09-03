@@ -122,10 +122,11 @@ export class ProjectsSubprojectsListComponent implements OnInit {
   protected readonly filterSituation = signal<SubprojectSituation | null>(null);
   protected readonly filterActive = signal<SubprojectActiveFilter | null>(null);
 
-  // Conteo de negocio: subproyectos activos del proyecto, independiente
-  // del filtro de estado que se este viendo en la tabla.
-  protected readonly activeSubCount = computed<number>(
-    () => this.subprojects().filter((s) => s.active).length,
+  // Conteo de negocio: todos los subproyectos asociados al proyecto,
+  // indistintamente de su estado, e independiente del filtro que se
+  // este viendo en la tabla.
+  protected readonly totalSubCount = computed<number>(
+    () => this.subprojects().length,
   );
 
   protected readonly visibleSubprojects = computed<Subproject[]>(() => {

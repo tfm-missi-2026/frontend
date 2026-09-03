@@ -4,6 +4,8 @@ export interface TaskFormData {
   startDate: string | null;
   endDate: string | null;
   estimatedHours: number | null;
+  /** UUID del catalogo (grupo SITUACION) seleccionado. Vacio en modo creacion. */
+  situationId: string;
 }
 
 export type TaskFormSavePayload =
@@ -17,5 +19,6 @@ export function emptyTaskForm(): TaskFormData {
     startDate: null,
     endDate: null,
     estimatedHours: null,
+    situationId: "",
   };
 }
