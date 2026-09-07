@@ -22,6 +22,7 @@ import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiButtonComponent } from "@shared/ui/button";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
+import { UiIconButtonComponent } from "@shared/ui/icon-button";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiSelectComponent } from "@shared/ui/select";
 import type { SelectOption } from "@shared/ui/select";
@@ -72,6 +73,7 @@ type FormModalState =
     UiButtonComponent,
     UiFlexComponent,
     UiHeaderComponent,
+    UiIconButtonComponent,
     UiLabelComponent,
     UiSelectComponent,
     UiTableComponent,

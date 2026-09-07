@@ -9,8 +9,8 @@ import {
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 
+import { IconCheckComponent, IconXComponent } from "@shared/icons";
 import { UiAlertComponent } from "@shared/ui/alert";
-import { UiButtonComponent } from "@shared/ui/button";
 import { UiFieldErrorComponent } from "@shared/ui/field-error";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiFormLabelComponent } from "@shared/ui/form-label";
@@ -47,7 +47,6 @@ interface ItemFormErrors {
   imports: [
     FormsModule,
     UiAlertComponent,
-    UiButtonComponent,
     UiFieldErrorComponent,
     UiFlexComponent,
     UiFormLabelComponent,
@@ -71,6 +70,9 @@ export class ItemFormModalComponent {
   readonly save = output<ItemFormSavePayload>();
 
   protected readonly groupOptions = CATALOG_GROUP_OPTIONS;
+
+  protected readonly IconCheck = IconCheckComponent;
+  protected readonly IconX = IconXComponent;
 
   protected readonly form = signal<CatalogItemFormData>(emptyCatalogItemForm());
   protected readonly errors = signal<ItemFormErrors>({});
@@ -150,5 +152,13 @@ export class ItemFormModalComponent {
   protected onCancel(): void {
     this.errors.set({});
     this.close.emit();
+  }
+
+  protected onAction(side: "left" | "right"): void {
+    if (side === "left") {
+      this.onCancel();
+    } else {
+      this.onSave();
+    }
   }
 }
