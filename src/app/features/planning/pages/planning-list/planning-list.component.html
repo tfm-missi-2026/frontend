@@ -13,6 +13,39 @@
     <UiAlert variant="success" [message]="msg" />
   }
 
+  @if (sinLineaBase()) {
+    <UiAlert
+      variant="info"
+      message="Este proyecto todavía no tiene una línea base congelada. Congélala para poder seguir el avance."
+    />
+  }
+
+  <FreezeBaselineDialog
+    [isOpen]="freezeOpen()"
+    [projectLabel]="selectedProject()?.name ?? ''"
+    [assignmentCount]="assignments().length"
+    [resourceCount]="distinctResourceCount()"
+    [totalHours]="totalHours()"
+    [currentVersion]="currentBaseline()?.version ?? null"
+    [unchanged]="baselineUnchanged()"
+    [saving]="freezeSaving()"
+    (confirm)="onFreezeConfirm()"
+    (cancel)="onFreezeCancel()"
+  />
+
+  @if (deleteRow(); as row) {
+    <DeleteAssignmentDialog
+      [isOpen]="true"
+      [resourceName]="row.resourceName"
+      [taskName]="row.taskName"
+      [plannedHours]="row.plannedHours"
+      [periodLabel]="row.startDate + ' – ' + row.endDate"
+      [saving]="deleteSaving()"
+      (confirm)="onDeleteConfirm()"
+      (cancel)="onDeleteCancel()"
+    />
+  }
+
   <PlanningToolbar
     [projectOptions]="projectOptions()"
     [projectId]="selectedProjectId()"
@@ -97,6 +130,7 @@
   [taskOptions]="taskOptions()"
   [resourceOptions]="resourceOptions()"
   [resourceNames]="resourceNames()"
+  [saving]="formSaving()"
   (save)="onSave($event)"
   (close)="formOpen.set(false)"
   (overloadRequest)="onOverloadRequest($event)"

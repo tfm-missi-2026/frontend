@@ -72,6 +72,15 @@ export class PlanningTableComponent {
   private readonly periodoCell = viewChild.required<Cell>("periodoCell");
   private readonly accionesCell = viewChild.required<Cell>("accionesCell");
 
+  protected initials(name: string): string {
+    return name
+      .split(" ")
+      .filter((part) => part.length > 0)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? "")
+      .join("");
+  }
+
   protected readonly columns = computed<TableColumn<AssignmentRowViewModel>[]>(
     () => [
       {

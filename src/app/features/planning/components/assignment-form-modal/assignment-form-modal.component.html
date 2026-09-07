@@ -14,6 +14,8 @@
     label: mode() === 'create' ? 'Crear asignación' : 'Guardar cambios',
     variant: 'primary',
     icon: IconCheck,
+    disabled: saving() || formInvalid(),
+    loading: saving(),
   }"
   (close)="onCancel()"
   (action)="onAction($event)"
@@ -121,15 +123,16 @@
 
     <UiFlex direction="column" [gap]="1">
       <UiFormLabel
-        labelText="Horas planificadas"
+        labelText="Horas por día"
         labelFor="assignment-hours"
         [required]="true"
       />
       <UiInput
         id="assignment-hours"
         type="number"
-        placeholder="p. ej. 20"
-        [value]="form().plannedHours"
+        placeholder="p. ej. 3"
+        sufix="h/día"
+        [value]="hoursPerDay()"
         (valueChange)="onHoursChange($event)"
         [errorMessage]="hoursError() ?? undefined"
       />

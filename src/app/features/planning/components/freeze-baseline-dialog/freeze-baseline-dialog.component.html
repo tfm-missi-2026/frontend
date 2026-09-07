@@ -3,24 +3,32 @@
   [showCloseButton]="true"
   [showFooter]="true"
   className="max-w-115"
-  title="Recurso en sobrecarga"
-  subtitle="RF-06 · verificación de capacidad"
+  title="Congelar línea base"
+  subtitle="RF-05 · foto inmutable del plan"
   [leftAction]="{ label: 'Cancelar', variant: 'secondary', icon: IconX }"
   [rightAction]="{
-    label: 'Confirmar de todas formas',
+    label: 'Congelar',
     variant: 'primary',
     icon: IconCheck,
+    disabled: unchanged() || saving(),
+    loading: saving(),
   }"
   (close)="cancel.emit()"
   (action)="onAction($event)"
 >
   <UiFlex direction="column" [gap]="4">
-    <UiAlert
-      variant="warning"
-      [message]="'Excede la capacidad en ' + excessHours() + ' h.'"
-    />
+    @if (unchanged()) {
+      <UiAlert
+        variant="warning"
+        [message]="
+          'El plan no cambió desde la línea base v' +
+          currentVersion() +
+          '. Congelar de nuevo crearía una copia idéntica.'
+        "
+      />
+    }
 
-    <UiLabel type="bodyS" color="textStrong" [text]="explanationLabel()" />
+    <UiLabel type="bodyS" color="textStrong" [text]="explanation()" />
 
     <UiSurface variant="neutral" padding="md">
       <UiFlex direction="column" [gap]="2">
@@ -39,7 +47,7 @@
     </UiSurface>
 
     <UiLabel type="bodyXs" color="textWeak">
-      Confirmar registra la asignación aunque supere la capacidad del recurso.
+      Una línea base no se puede editar ni eliminar desde el sistema.
     </UiLabel>
   </UiFlex>
 </UiModal>

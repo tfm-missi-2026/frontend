@@ -65,6 +65,7 @@ export class AssignmentFormModalComponent {
   private readonly assignmentsService = inject(AssignmentsService);
 
   readonly isOpen = input<boolean>(false);
+  readonly saving = input<boolean>(false);
   readonly mode = input<AssignmentFormMode>("create");
   readonly projectId = input<string>("");
   readonly assignment = input<Assignment | null>(null);
@@ -92,10 +93,29 @@ export class AssignmentFormModalComponent {
     this.mode() === "create" ? "Nueva asignación" : "Editar asignación",
   );
 
+  protected readonly hoursPerDay = signal<number>(WORKDAY_HOURS);
+
+  protected readonly formInvalid = computed<boolean>(
+    () =>
+      this.taskError() !== null ||
+      this.resourceError() !== null ||
+      this.hoursError() !== null ||
+      this.startError() !== null ||
+      this.endError() !== null ||
+      this.dateRangeError() !== null,
+  );
+
+  protected readonly businessDays = computed<number>(() => {
+    const f = this.form();
+    if (!f.startDate || !f.endDate) return 0;
+    return countBusinessDays(f.startDate, f.endDate);
+  });
+
   protected readonly jornadaLabel = computed<string>(() => {
-    const h = this.form().plannedHours;
-    const jornadas = (h / WORKDAY_HOURS).toFixed(2);
-    return `8 h/día · ${h} h ≈ ${jornadas} jornadas`;
+    const dias = this.businessDays();
+    if (dias === 0) return "Elige el periodo para calcular el total.";
+    const total = this.form().plannedHours;
+    return `${this.hoursPerDay()} h/día × ${dias} días hábiles = ${total} h`;
   });
 
   constructor() {
@@ -113,8 +133,15 @@ export class AssignmentFormModalComponent {
           startDate: a.startDate,
           endDate: a.endDate,
         });
+        const dias = countBusinessDays(a.startDate, a.endDate);
+        this.hoursPerDay.set(
+          dias > 0
+            ? Math.min(WORKDAY_HOURS, a.plannedHours / dias)
+            : WORKDAY_HOURS,
+        );
       } else {
         this.form.set(emptyAssignmentForm());
+        this.hoursPerDay.set(WORKDAY_HOURS);
       }
     });
   }
@@ -141,23 +168,37 @@ export class AssignmentFormModalComponent {
 
   protected onHoursChange(value: string | number | undefined): void {
     if (value === undefined || value === null || value === "") {
-      this.patch({ plannedHours: 0 });
+      this.hoursPerDay.set(0);
+      this.recalcularTotal();
       this.hoursError.set(null);
       return;
     }
     const num = Number(value);
-    if (Number.isFinite(num) && num >= 0) {
-      this.patch({ plannedHours: num });
-      this.hoursError.set(null);
-    } else {
-      this.patch({ plannedHours: 0 });
+    if (!Number.isFinite(num) || num <= 0) {
+      this.hoursPerDay.set(0);
+      this.recalcularTotal();
       this.hoursError.set("Número inválido.");
+      return;
     }
+    if (num > WORKDAY_HOURS) {
+      this.hoursPerDay.set(num);
+      this.recalcularTotal();
+      this.hoursError.set(`La jornada base es de ${WORKDAY_HOURS} horas.`);
+      return;
+    }
+    this.hoursPerDay.set(num);
+    this.recalcularTotal();
+    this.hoursError.set(null);
+  }
+
+  private recalcularTotal(): void {
+    this.patch({ plannedHours: this.hoursPerDay() * this.businessDays() });
   }
 
   protected onStartDateChange(value: string | string[]): void {
     const iso = Array.isArray(value) ? value[0] ?? "" : value ?? "";
     this.patch({ startDate: iso });
+    this.recalcularTotal();
     this.startError.set(null);
     this.dateRangeError.set(null);
   }
@@ -165,6 +206,7 @@ export class AssignmentFormModalComponent {
   protected onEndDateChange(value: string | string[]): void {
     const iso = Array.isArray(value) ? value[0] ?? "" : value ?? "";
     this.patch({ endDate: iso });
+    this.recalcularTotal();
     this.endError.set(null);
     this.dateRangeError.set(null);
   }

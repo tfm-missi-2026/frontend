@@ -9,7 +9,6 @@ import {
 import { Router } from "@angular/router";
 
 import { CommonBreadcrumbComponent } from "@shared/common/page-breadcrumb";
-import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiButtonComponent } from "@shared/ui/button";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
@@ -38,7 +37,6 @@ import { ProgressService } from "../../services/progress.service";
     ProgressBaselineComponent,
     ProgressTableComponent,
     ProgressToolbarComponent,
-    UiBadgeComponent,
     UiButtonComponent,
     UiFlexComponent,
     UiHeaderComponent,

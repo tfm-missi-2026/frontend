@@ -13,7 +13,21 @@
       padding="none"
       className="h-9 w-9 rounded-full shrink-0 bg-gray-100 dark:bg-gray-800"
       ariaLabel="Avatar del recurso"
-    ></UiSurface>
+    >
+      <UiFlex
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+        className="h-full w-full"
+      >
+        <UiLabel
+          type="bodyXs"
+          weight="semibold"
+          color="textWeak"
+          [text]="initials(row.resourceName)"
+        />
+      </UiFlex>
+    </UiSurface>
     <UiFlex direction="column" [gap]="0" className="min-w-0">
       <UiLabel
         type="bodyS"
@@ -47,14 +61,16 @@
 </ng-template>
 
 <ng-template #horasCell let-row>
-  <UiLabel
-    type="bodyS"
-    weight="semibold"
-    color="textStrong"
-    className="font-mono whitespace-nowrap"
-  >
-    {{ row.plannedHours }} h
-  </UiLabel>
+  <UiFlex direction="row" justifyContent="center" alignItems="center">
+    <UiLabel
+      type="bodyS"
+      weight="semibold"
+      color="textStrong"
+      className="font-mono whitespace-nowrap"
+    >
+      {{ row.plannedHours }} h
+    </UiLabel>
+  </UiFlex>
 </ng-template>
 
 <ng-template #periodoCell let-row>
