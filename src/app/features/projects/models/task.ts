@@ -14,7 +14,11 @@ export interface Task {
   startDate: string | null;
   endDate: string | null;
   estimatedHours: number;
+  /** UUID del catalogo (grupo SITUACION) que representa la situacion actual. */
+  situationId: string;
   situation: TaskSituation;
+  /** UUID de la variacion que origino esta tarea, o null si viene de la linea base. */
+  origenVariacionId: string | null;
   origin: TaskOrigin;
   originLabel: string;
   dependsOnIds: string[];
@@ -38,4 +42,18 @@ export const TASK_SITUATION_OPTIONS: SelectOption[] = [
   ...(
     Object.entries(TASK_SITUATION_LABELS) as [TaskSituation, string][]
   ).map(([value, label]) => ({ value, label })),
+];
+
+export type TaskActiveFilter = "active" | "inactive";
+
+export const TASK_ACTIVE_LABELS: Record<TaskActiveFilter, string> = {
+  active: "Activo",
+  inactive: "Inactivo",
+};
+
+export const TASK_ACTIVE_OPTIONS: SelectOption[] = [
+  { value: "", label: "Estado: Todos" },
+  ...(Object.entries(TASK_ACTIVE_LABELS) as [TaskActiveFilter, string][]).map(
+    ([value, label]) => ({ value, label }),
+  ),
 ];

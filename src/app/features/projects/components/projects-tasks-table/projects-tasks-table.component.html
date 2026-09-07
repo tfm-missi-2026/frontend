@@ -88,6 +88,18 @@
       </UiFlex>
 
       <UiFlex [direction]="'row'" [className]="columnClasses[5]">
+        @if (t.active) {
+          <UiBadge variant="light" color="success" size="sm">
+            Activo
+          </UiBadge>
+        } @else {
+          <UiBadge variant="light" color="light" size="sm">
+            Inactivo
+          </UiBadge>
+        }
+      </UiFlex>
+
+      <UiFlex [direction]="'row'" [className]="columnClasses[6]">
         @if (t.origin === "base") {
           <UiLabel
             type="bodyXs"
@@ -102,7 +114,7 @@
         }
       </UiFlex>
 
-      <UiFlex [direction]="'row'" [className]="columnClasses[6]">
+      <UiFlex [direction]="'row'" [className]="columnClasses[7]">
         <UiLabel
           type="bodyXs"
           color="textWeak"
@@ -122,6 +134,7 @@
         <UiLink
           variant="primary"
           size="sm"
+          [disabled]="!t.active"
           (click)="edit.emit(t)"
           labelText="Editar tarea"
         >
@@ -131,6 +144,7 @@
         <UiLink
           variant="danger"
           size="sm"
+          [disabled]="!t.active"
           (click)="deactivate.emit(t)"
           labelText="Dar de baja tarea"
         >

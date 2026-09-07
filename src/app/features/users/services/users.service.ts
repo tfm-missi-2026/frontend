@@ -54,7 +54,7 @@ export class UsersService {
     this._error.set(null);
     try {
       await this.lookups.loadRoles();
-      const usuarios = await firstValueFrom(this.api.listar());
+      const usuarios = await firstValueFrom(this.api.listarTodos());
       this._users.set(usuarios.map(usuarioApiToUser));
     } catch (err) {
       this._error.set(extractProblemMessage(err));

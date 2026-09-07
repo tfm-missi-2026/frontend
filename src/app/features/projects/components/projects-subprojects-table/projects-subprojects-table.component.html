@@ -47,6 +47,7 @@
             <th class="w-29.5 px-4 py-3 font-medium">Solicitante</th>
             <th class="w-24 px-4 py-3 font-medium">Fecha sol.</th>
             <th class="w-29.5 px-4 py-3 font-medium">Situación</th>
+            <th class="w-20 px-4 py-3 font-medium">Estado</th>
             <th class="w-14 px-4 py-3 text-center font-medium">Tareas</th>
             <th class="px-4 py-3 text-right font-medium">Acciones</th>
           </tr>
@@ -93,6 +94,17 @@
                   {{ situationLabel(s.situation) }}
                 </UiBadge>
               </td>
+              <td class="px-4 py-3.5">
+                @if (s.active) {
+                  <UiBadge variant="light" color="success" size="sm">
+                    Activo
+                  </UiBadge>
+                } @else {
+                  <UiBadge variant="light" color="light" size="sm">
+                    Inactivo
+                  </UiBadge>
+                }
+              </td>
               <td class="px-4 py-3.5 text-center">
                 <UiBadge variant="light" color="dark" size="sm">
                   {{ s.taskCount }}
@@ -117,6 +129,7 @@
                   <UiLink
                     variant="primary"
                     size="sm"
+                    [disabled]="!s.active"
                     (click)="edit.emit(s)"
                   >
                     Editar
@@ -125,6 +138,7 @@
                   <UiLink
                     variant="danger"
                     size="sm"
+                    [disabled]="!s.active"
                     (click)="deactivate.emit(s)"
                   >
                     Dar de baja

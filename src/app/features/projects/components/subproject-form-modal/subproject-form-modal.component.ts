@@ -3,11 +3,18 @@ import {
   Component,
   computed,
   effect,
+  inject,
   input,
   output,
   signal,
+  untracked,
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
+
+import { UsersService } from "@features/users/services/users.service";
+import { userFullName } from "@features/users/models/user";
+import { ToastService } from "@core/http/toast.service";
+import { CatalogService } from "@features/catalog/services/catalog.service";
 
 import { UiAlertComponent } from "@shared/ui/alert";
 import { UiBadgeComponent } from "@shared/ui/badge";
@@ -30,13 +37,18 @@ import {
 } from "../../models/subproject-form";
 import {
   SUBPROJECT_PRIORITY_OPTIONS,
-  SUBPROJECT_REQUESTER_OPTIONS,
   SUBPROJECT_TYPE_OPTIONS,
   TICKET_REGEX,
   type Subproject,
 } from "../../models/subproject";
 
 export type SubprojectFormMode = "create" | "edit";
+
+const DESCRIPTION_MIN_LENGTH = 10;
+
+function todayIso(): string {
+  return new Date().toISOString().slice(0, 10);
+}
 
 @Component({
   selector: "SubprojectFormModal",
@@ -61,18 +73,44 @@ export type SubprojectFormMode = "create" | "edit";
   templateUrl: "./subproject-form-modal.component.html",
 })
 export class SubprojectFormModalComponent {
+  private readonly usersService = inject(UsersService);
+  private readonly toastService = inject(ToastService);
+  private readonly catalogService = inject(CatalogService);
+
+  // Transiciones validas de situacion. Los nombres coinciden tal cual con
+  // el texto almacenado en el catalogo backend (grupo SITUACION), sin
+  // acentos ("En atencion"), ya que se comparan por igualdad de string.
+  // Culminado y Rechazado son estados terminales: no se ofrecen mas
+  // transiciones desde ahi.
+  private static readonly SITUATION_TRANSITIONS: Readonly<
+    Record<string, readonly string[]>
+  > = {
+    Pendiente: ["En atencion", "Rechazado"],
+    "En atencion": ["Culminado", "Rechazado"],
+    Culminado: [],
+    Rechazado: [],
+  };
+
   readonly isOpen = input<boolean>(false);
   readonly mode = input<SubprojectFormMode>("create");
   readonly projectCode = input<string>("");
   readonly projectId = input<string>("");
   readonly subproject = input<Subproject | null>(null);
+  /** Tickets activos de otros subproyectos del mismo proyecto, para detectar duplicados. */
+  readonly existingTickets = input<readonly string[]>([]);
 
   readonly close = output<void>();
   readonly save = output<SubprojectFormSavePayload>();
 
   protected readonly typeOptions = SUBPROJECT_TYPE_OPTIONS;
   protected readonly priorityOptions = SUBPROJECT_PRIORITY_OPTIONS;
-  protected readonly requesterOptions = SUBPROJECT_REQUESTER_OPTIONS;
+
+  protected readonly requesterOptions = computed(() =>
+    this.usersService
+      .users()
+      .filter((u) => u.status === "active")
+      .map((u) => ({ value: u.id, label: userFullName(u) })),
+  );
 
   protected readonly form = signal<SubprojectFormData>(
     emptySubprojectForm(),
@@ -85,6 +123,37 @@ export class SubprojectFormModalComponent {
   protected readonly priorityError = signal<string | null>(null);
   protected readonly requesterError = signal<string | null>(null);
   protected readonly dateError = signal<string | null>(null);
+  protected readonly situationError = signal<string | null>(null);
+
+  private readonly situationCatalogItems = computed(() =>
+    this.catalogService.byGroup("SIT"),
+  );
+
+  private situationName(id: string): string | undefined {
+    return this.situationCatalogItems().find((i) => i.id === id)?.name;
+  }
+
+  /** Opciones ofrecidas: la situacion actual + las transiciones validas desde ahi. */
+  protected readonly situationOptions = computed(() => {
+    const current = this.subproject()?.situationId ?? "";
+    const currentName = this.situationName(current);
+    const allowedNames = new Set<string>(
+      currentName
+        ? SubprojectFormModalComponent.SITUATION_TRANSITIONS[currentName] ?? []
+        : [],
+    );
+    return this.situationCatalogItems()
+      .filter((i) => i.id === current || allowedNames.has(i.name))
+      .map((i) => ({ value: i.id, label: i.name }));
+  });
+
+  protected readonly isSituationTerminal = computed<boolean>(() => {
+    const currentName = this.situationName(this.subproject()?.situationId ?? "");
+    return (
+      !!currentName &&
+      (SubprojectFormModalComponent.SITUATION_TRANSITIONS[currentName]?.length ?? 0) === 0
+    );
+  });
 
   protected readonly heading = computed<string>(() => {
     if (this.mode() === "create") return "Nuevo subproyecto";
@@ -97,16 +166,19 @@ export class SubprojectFormModalComponent {
     () => `Unidad de trabajo sobre ${this.projectCode() || "el proyecto"}.`,
   );
 
-  protected readonly showRejectionBlock = computed<boolean>(
-    () =>
-      this.mode() === "edit" &&
-      this.subproject()?.situation === "Rechazado",
-  );
+  // Dinamico: se activa apenas el usuario elige "Rechazado" en el select,
+  // no solo cuando el subproyecto ya estaba rechazado de antes.
+  protected readonly showRejectionBlock = computed<boolean>(() => {
+    if (this.mode() !== "edit") return false;
+    const selectedName = this.situationName(this.form().situationId);
+    return selectedName === "Rechazado";
+  });
 
   constructor() {
     effect(() => {
       const open = this.isOpen();
       if (!open) return;
+      untracked(() => void this.usersService.cargar());
       this.resetErrors();
       const m = this.mode();
       const s = this.subproject();
@@ -116,8 +188,9 @@ export class SubprojectFormModalComponent {
           ticket: s.ticket,
           description: s.description,
           priority: s.priority,
-          requester: s.requester,
+          requesterId: s.requesterId,
           requestDate: s.requestDate,
+          situationId: s.situationId,
           rejectionReason: s.rejectionReason,
         });
       } else {
@@ -161,7 +234,7 @@ export class SubprojectFormModalComponent {
 
   protected onRequesterChange(value: unknown): void {
     this.patch({
-      requester: (value as string) ?? "Mesa de Ayuda",
+      requesterId: value == null ? "" : String(value),
     });
     this.requesterError.set(null);
   }
@@ -170,6 +243,11 @@ export class SubprojectFormModalComponent {
     const iso = Array.isArray(value) ? value[0] ?? "" : value ?? "";
     this.patch({ requestDate: iso });
     this.dateError.set(null);
+  }
+
+  protected onSituationChange(value: unknown): void {
+    this.patch({ situationId: value == null ? "" : String(value) });
+    this.situationError.set(null);
   }
 
   protected onRejectionReasonChange(value: string): void {
@@ -181,6 +259,10 @@ export class SubprojectFormModalComponent {
   }
 
   protected onCancel(): void {
+    this.toastService.warning(
+      "No se guardaron los cambios del subproyecto.",
+      "Operación cancelada",
+    );
     this.close.emit();
   }
 
@@ -193,6 +275,7 @@ export class SubprojectFormModalComponent {
     this.priorityError.set(errors.priority);
     this.requesterError.set(errors.requester);
     this.dateError.set(errors.date);
+    this.situationError.set(errors.situation);
 
     if (Object.values(errors).some((v) => v !== null)) {
       this.validationMessage.set(
@@ -210,8 +293,9 @@ export class SubprojectFormModalComponent {
           : null,
       description: f.description.trim(),
       priority: f.priority,
-      requester: f.requester,
+      requesterId: f.requesterId,
       requestDate: f.requestDate,
+      situationId: f.situationId,
       rejectionReason:
         f.rejectionReason && f.rejectionReason.trim() !== ""
           ? f.rejectionReason.trim()
@@ -236,6 +320,7 @@ export class SubprojectFormModalComponent {
     priority: string | null;
     requester: string | null;
     date: string | null;
+    situation: string | null;
   } {
     const errors = {
       type: null as string | null,
@@ -244,18 +329,44 @@ export class SubprojectFormModalComponent {
       priority: null as string | null,
       requester: null as string | null,
       date: null as string | null,
+      situation: null as string | null,
     };
 
     if (!form.type) errors.type = "Selecciona un tipo.";
     if (form.ticket && !TICKET_REGEX.test(form.ticket)) {
       errors.ticket = "Solo letras mayúsculas, números y guion.";
     }
+    if (form.ticket && !errors.ticket) {
+      const dup = this.existingTickets().some(
+        (t) => t.toUpperCase() === form.ticket?.toUpperCase(),
+      );
+      if (dup) {
+        errors.ticket = "Ya existe un subproyecto activo con este ticket.";
+      }
+    }
     if (!form.description.trim()) {
       errors.description = "La descripción es obligatoria.";
+    } else if (form.description.trim().length < DESCRIPTION_MIN_LENGTH) {
+      errors.description = `Describe con más detalle (mínimo ${DESCRIPTION_MIN_LENGTH} caracteres).`;
     }
     if (!form.priority) errors.priority = "Selecciona una prioridad.";
-    if (!form.requester) errors.requester = "Selecciona un solicitante.";
-    if (!form.requestDate) errors.date = "Selecciona una fecha.";
+    if (!form.requesterId) errors.requester = "Selecciona un solicitante.";
+    if (!form.requestDate) {
+      errors.date = "Selecciona una fecha.";
+    } else if (form.requestDate > todayIso()) {
+      errors.date = "La fecha de solicitud no puede ser futura.";
+    }
+    if (this.mode() === "edit") {
+      if (!form.situationId) {
+        errors.situation = "Selecciona una situación.";
+      } else if (
+        this.situationName(form.situationId) === "Rechazado" &&
+        !form.rejectionReason?.trim()
+      ) {
+        errors.situation =
+          "Indica la justificación del rechazo para continuar.";
+      }
+    }
 
     return errors;
   }

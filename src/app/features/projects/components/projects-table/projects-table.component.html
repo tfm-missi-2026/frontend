@@ -97,7 +97,7 @@
                   <UiLink
                     variant="primary"
                     size="sm"
-                    [routerLink]="['/app/operacion/proyectos', p.id]"
+                    [routerLink]="['/app/operacion/proyectos', p.id, 'subproyectos']"
                     (click)="view.emit(p)"
                   >
                     Ver subproyectos
@@ -106,6 +106,7 @@
                   <UiLink
                     variant="primary"
                     size="sm"
+                    [disabled]="p.status !== 'active'"
                     (click)="edit.emit(p)"
                   >
                     Editar
@@ -114,6 +115,7 @@
                   <UiLink
                     variant="danger"
                     size="sm"
+                    [disabled]="p.status !== 'active'"
                     (click)="deactivate.emit(p)"
                   >
                     Dar de baja

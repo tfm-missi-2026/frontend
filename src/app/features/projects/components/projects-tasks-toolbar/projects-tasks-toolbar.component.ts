@@ -11,7 +11,7 @@ import { UiFlexComponent } from "@shared/ui/flex";
 import { UiInputComponent } from "@shared/ui/input";
 import { UiSelectComponent } from "@shared/ui/select";
 import type { SelectOption } from "@shared/ui/select";
-import type { TaskSituation } from "../../models/task";
+import type { TaskActiveFilter, TaskSituation } from "../../models/task";
 
 @Component({
   selector: "ProjectsTasksToolbar",
@@ -29,9 +29,12 @@ export class ProjectsTasksToolbarComponent {
   readonly searchTerm = input<string>("");
   readonly situationValue = input<TaskSituation | null>(null);
   readonly situationOptions = input<SelectOption[]>([]);
+  readonly activeValue = input<TaskActiveFilter | null>(null);
+  readonly activeOptions = input<SelectOption[]>([]);
 
   readonly searchChange = output<string>();
   readonly situationChange = output<TaskSituation | null>();
+  readonly activeChange = output<TaskActiveFilter | null>();
   readonly clearFilters = output<void>();
 
   protected readonly IconSearchLightComponent = IconSearchLightComponent;
@@ -39,6 +42,11 @@ export class ProjectsTasksToolbarComponent {
   protected asSituation(value: unknown): TaskSituation | null {
     const text = this.asString(value);
     return text ? (text as TaskSituation) : null;
+  }
+
+  protected asActive(value: unknown): TaskActiveFilter | null {
+    const text = this.asString(value);
+    return text ? (text as TaskActiveFilter) : null;
   }
 
   private asString(value: unknown): string | null {

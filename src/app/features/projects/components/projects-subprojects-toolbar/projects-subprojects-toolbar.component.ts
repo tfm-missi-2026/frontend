@@ -12,6 +12,7 @@ import { UiInputComponent } from "@shared/ui/input";
 import { UiSelectComponent } from "@shared/ui/select";
 import type { SelectOption } from "@shared/ui/select";
 import type {
+  SubprojectActiveFilter,
   SubprojectSituation,
   SubprojectType,
 } from "../../models/subproject";
@@ -34,10 +35,13 @@ export class ProjectsSubprojectsToolbarComponent {
   readonly typeOptions = input<SelectOption[]>([]);
   readonly situationValue = input<SubprojectSituation | null>(null);
   readonly situationOptions = input<SelectOption[]>([]);
+  readonly activeValue = input<SubprojectActiveFilter | null>(null);
+  readonly activeOptions = input<SelectOption[]>([]);
 
   readonly searchChange = output<string>();
   readonly typeChange = output<SubprojectType | null>();
   readonly situationChange = output<SubprojectSituation | null>();
+  readonly activeChange = output<SubprojectActiveFilter | null>();
   readonly clearFilters = output<void>();
 
   protected readonly IconSearchLightComponent = IconSearchLightComponent;
@@ -50,6 +54,11 @@ export class ProjectsSubprojectsToolbarComponent {
   protected asSituation(value: unknown): SubprojectSituation | null {
     const text = this.asString(value);
     return text ? (text as SubprojectSituation) : null;
+  }
+
+  protected asActive(value: unknown): SubprojectActiveFilter | null {
+    const text = this.asString(value);
+    return text ? (text as SubprojectActiveFilter) : null;
   }
 
   private asString(value: unknown): string | null {
