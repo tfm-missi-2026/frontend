@@ -162,7 +162,10 @@ export const routes: Routes = [
         path: "cuenta/configuracion",
         canMatch: [moduloPermisoGuard],
         data: { moduloCodigo: "CONFIGURACION" },
-        component: NotImplementedPageComponent,
+        loadComponent: () =>
+          import(
+            "@features/account/pages/account-settings/account-settings.component"
+          ).then((m) => m.AccountSettingsPageComponent),
         title: "SPSRT — Configuración",
       },
     ],

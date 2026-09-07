@@ -2,10 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  ElementRef,
   inject,
   signal,
-  viewChild,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NgClass } from '@angular/common';
@@ -24,22 +22,14 @@ import {
 import {
   IconDotsVerticalComponent,
   IconHamburgerComponent,
-  IconInfoCircleBorderComponent,
   IconLogoutComponent,
-  IconSearchComponent,
-  IconSettingsComponent,
-  IconUserCircleComponent,
   IconXLargeComponent,
 } from '@shared/icons';
 import { UiFlexComponent } from '@shared/ui/flex';
 import { UiIconButtonComponent } from '@shared/ui/icon-button';
 import { UiImageComponent } from '@shared/ui/image';
 
-const USER_MENU_ITEMS: HeaderUserMenuItem[] = [
-  { to: '/profile', icon: IconUserCircleComponent, label: 'Editar perfil' },
-  { to: '/profile', icon: IconSettingsComponent, label: 'Configuración de la cuenta' },
-  { to: '/profile', icon: IconInfoCircleBorderComponent, label: 'Soporte' },
-];
+const USER_MENU_ITEMS: HeaderUserMenuItem[] = [];
 
 const SIGN_OUT_ITEM: HeaderUserMenuItem = {
   icon: IconLogoutComponent,
@@ -66,8 +56,7 @@ const SIGN_OUT_ITEM: HeaderUserMenuItem = {
     CommonThemeToggleComponent,
     HeaderNotificationDropdownComponent,
     HeaderUserDropdownComponent,
-    IconSearchComponent,
-    UiFlexComponent,
+      UiFlexComponent,
     UiIconButtonComponent,
     UiImageComponent,
   ],
@@ -91,6 +80,7 @@ export class AppHeaderComponent {
       name: usuario?.nombreCompleto ?? 'Usuario',
       email: usuario?.email ?? '',
       avatar: '/images/user/owner.png',
+      role: usuario?.rol?.nombre,
     };
   });
 
@@ -101,11 +91,6 @@ export class AppHeaderComponent {
   protected readonly hamburgerIcon = IconHamburgerComponent;
   protected readonly closeIcon = IconXLargeComponent;
   protected readonly dotsIcon = IconDotsVerticalComponent;
-  protected readonly searchIcon = IconSearchComponent;
-
-  protected readonly searchInput =
-    viewChild<ElementRef<HTMLInputElement>>('searchInput');
-
   protected readonly mobileToggleBgClass = computed<string>(() =>
     this.isMobileOpen() ? 'bg-gray-100 dark:bg-white/[0.03]' : '',
   );
@@ -132,18 +117,4 @@ export class AppHeaderComponent {
     this.isApplicationMenuOpen.update((v) => !v);
   }
 
-  private readonly handleKeyDown = (event: KeyboardEvent): void => {
-    if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
-      event.preventDefault();
-      this.searchInput()?.nativeElement.focus();
-    }
-  };
-
-  constructor() {
-    document.addEventListener('keydown', this.handleKeyDown);
-  }
-
-  ngOnDestroy(): void {
-    document.removeEventListener('keydown', this.handleKeyDown);
-  }
 }

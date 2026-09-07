@@ -1,0 +1,27 @@
+<UiFlex direction="column" [gap]="5">
+  <CommonBreadcrumb [items]="breadcrumbItems" />
+
+  <UiFlex direction="column" [gap]="1">
+    <UiHeader [level]="1" text="Configuración de la cuenta" />
+    <UiLabel type="bodyS" color="textWeak">
+      Datos de la sesión activa. Para modificarlos, solicítalo al administrador
+      del sistema.
+    </UiLabel>
+  </UiFlex>
+
+  <UiSurface variant="neutral" padding="lg">
+    <UiFlex direction="column" [gap]="4">
+      @for (field of fields(); track field.label) {
+        <UiFlex direction="column" [gap]="1">
+          <UiLabel type="bodyXs" color="textWeak" [text]="field.label" />
+          <UiLabel
+            type="bodyS"
+            weight="semibold"
+            color="textStrong"
+            [text]="field.value"
+          />
+        </UiFlex>
+      }
+    </UiFlex>
+  </UiSurface>
+</UiFlex>
