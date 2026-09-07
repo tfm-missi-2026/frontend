@@ -142,6 +142,7 @@ export class UiButtonComponent {
       "rounded-lg",
       "cursor-pointer select-none",
       "border border-solid",
+      "[&>*]:flex [&>*]:items-center",
       this.compact() ? "px-2 py-1" : "px-3 py-2",
       this.fullWidth() ? "w-full" : "",
     ];
@@ -172,23 +173,6 @@ export class UiButtonComponent {
     () => designConstants.typography.fontSize[this.fontSize()],
   );
 
-  /**
-   * Offset vertical (en px) para alinear el centro óptico del icono con el
-   * del label. Al usar `inline-flex items-center`, el icono ya queda
-   * centrado con el line-box del label (su centro cae en `lineHeight / 2`),
-   * no en `fontSize / 2`. El centro óptico del label está a
-   * `(lineHeight + fontSize * 0.1) / 2`, por lo que el delta a compensar
-   * es `fontSize * 0.05`. Se aplica como `translate-y-[Npx]` al SVG.
-   */
-  readonly resolvedIconTranslateY = computed<string>(() => {
-    const fontSize = parseInt(
-      designConstants.typography.fontSize[this.fontSize()],
-      10,
-    );
-    const offset = Math.max(0, Math.round(fontSize * 0.05));
-    return `${offset}px`;
-  });
-
   readonly leftIconInputs = computed<Record<string, unknown> | undefined>(() =>
     this.LeftIcon() ? this.buildIconInputs() : undefined,
   );
@@ -201,9 +185,6 @@ export class UiButtonComponent {
     const props: Record<string, unknown> = { ...this.iconProps() };
     if (props["size"] === undefined) {
       props["size"] = this.resolvedIconSize();
-    }
-    if (props["className"] === undefined) {
-      props["className"] = `translate-y-[${this.resolvedIconTranslateY()}]`;
     }
     return props;
   }
