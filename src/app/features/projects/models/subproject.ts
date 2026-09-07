@@ -20,8 +20,13 @@ export interface Subproject {
   type: SubprojectType;
   description: string;
   priority: SubprojectPriority;
+  /** UUID del usuario solicitante (msa_usuario.id). */
+  requesterId: string;
+  /** Nombre completo resuelto del solicitante, para mostrar en UI. */
   requester: string;
   requestDate: string;
+  /** UUID del catalogo (grupo SITUACION) que representa la situacion actual. */
+  situationId: string;
   situation: SubprojectSituation;
   rejectionReason: string | null;
   taskCount: number;
@@ -70,8 +75,18 @@ export const SUBPROJECT_SITUATION_OPTIONS: SelectOption[] = [
   ][]).map(([value, label]) => ({ value, label })),
 ];
 
-export const SUBPROJECT_REQUESTER_OPTIONS: SelectOption[] = [
-  { value: "Mesa de Ayuda", label: "Mesa de Ayuda" },
-  { value: "Of. de Trámites", label: "Of. de Trámites" },
-  { value: "Jefatura de Área", label: "Jefatura de Área" },
+export type SubprojectActiveFilter = "active" | "inactive";
+
+export const SUBPROJECT_ACTIVE_LABELS: Record<SubprojectActiveFilter, string> = {
+  active: "Activo",
+  inactive: "Inactivo",
+};
+
+export const SUBPROJECT_ACTIVE_OPTIONS: SelectOption[] = [
+  { value: "", label: "Estado: Todos" },
+  ...(Object.entries(SUBPROJECT_ACTIVE_LABELS) as [
+    SubprojectActiveFilter,
+    string,
+  ][]).map(([value, label]) => ({ value, label })),
 ];
+

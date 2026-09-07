@@ -16,11 +16,13 @@
     {{ subheading() }}
   </UiLabel>
 
-  <UiAlert
-    variant="info"
-    message="La situación se calcula a partir de las tareas; un subproyecto nuevo arranca en Pendiente. No hay campo de situación editable aquí."
-    className="mb-4"
-  />
+  @if (mode() === "create") {
+    <UiAlert
+      variant="info"
+      message="Un subproyecto nuevo siempre arranca en situación Pendiente."
+      className="mb-4"
+    />
+  }
 
   @if (validationMessage()) {
     <UiAlert
@@ -128,10 +130,10 @@
         Solicitante
       </UiLabel>
       <UiSelect
-        [options]="requesterOptions"
+        [options]="requesterOptions()"
         placeholder="Selecciona un solicitante…"
-        [searchable]="false"
-        [ngModel]="form().requester"
+        [searchable]="true"
+        [ngModel]="form().requesterId"
         (ngModelChange)="onRequesterChange($event)"
       />
       @if (requesterError(); as msg) {
@@ -161,6 +163,36 @@
       <UiFieldError [message]="msg" className="mt-1" />
     }
   </div>
+
+  @if (mode() === "edit") {
+    <div class="mb-4">
+      <UiLabel
+        type="bodyXs"
+        color="textStrong"
+        weight="medium"
+        className="mb-2 block uppercase"
+      >
+        Situación
+      </UiLabel>
+      @if (isSituationTerminal()) {
+        <UiAlert
+          variant="info"
+          message="Esta situación es definitiva; ya no admite más cambios."
+        />
+      } @else {
+        <UiSelect
+          [options]="situationOptions()"
+          placeholder="Selecciona una situación…"
+          [searchable]="false"
+          [ngModel]="form().situationId"
+          (ngModelChange)="onSituationChange($event)"
+        />
+      }
+      @if (situationError(); as msg) {
+        <UiFieldError [message]="msg" className="mt-1" />
+      }
+    </div>
+  }
 
   @if (showRejectionBlock()) {
     <UiSurface
