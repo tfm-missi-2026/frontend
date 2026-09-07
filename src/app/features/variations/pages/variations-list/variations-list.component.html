@@ -1,19 +1,19 @@
-<UiFlex direction="column" [gap]="20">
+<UiFlex direction="column" [gap]="5">
   <CommonBreadcrumb [items]="breadcrumbItems" />
 
   <UiFlex
     direction="row"
-    alignItems="end"
+    alignItems="center"
     justifyContent="between"
-    [gap]="12"
+    [gap]="3"
     className="flex-wrap"
   >
-    <UiFlex direction="column" [gap]="4">
+    <UiFlex direction="column" [gap]="1">
       <UiHeader [level]="1" text="Variaciones" />
       <UiLabel type="bodyS" color="textWeak" className="max-w-190">
         Una variación es un cambio formal sobre el plan (alcance, plazo o
         recursos) con
-        <strong class="font-semibold text-gray-800 dark:text-white/90">justificación obligatoria</strong>.
+        justificación obligatoria.
         La reporta el Gestor o el Recurso Técnico; la resuelve el Gestor o el
         Jefe de Área.
       </UiLabel>
@@ -116,11 +116,11 @@
     className="border-dashed max-w-160"
   >
     <UiLabel type="bodyS" color="textWeak">
-      <strong class="font-semibold">RF-11</strong>
+      RF-11
       · Las variaciones conservan su
-      <strong class="font-semibold text-gray-800 dark:text-white/90">histórico y trazabilidad</strong>
+      histórico y trazabilidad
       respecto a la línea base; resolverlas registra
-      <strong class="font-semibold text-gray-800 dark:text-white/90">quién y cuándo</strong>.
+      quién y cuándo.
     </UiLabel>
   </UiSurface>
 </UiFlex>

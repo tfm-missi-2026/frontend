@@ -32,7 +32,12 @@ const KNOWN_CODES = new Set<string>([
 
 // Paths que no muestran toast porque el caller los maneja (login, etc.)
 // o son pings de salud.
-const SILENT_PATHS = ["/api/auth/login", "/api/ping", "/api/ping/secure"];
+const SILENT_PATHS = [
+  "/api/auth/login",
+  "/api/ping",
+  "/api/ping/secure",
+  "/api/avance/por-proyecto",
+];
 
 export function parseProblem(error: HttpErrorResponse): ApiProblem | null {
   const body = error.error;
