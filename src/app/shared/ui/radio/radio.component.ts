@@ -30,9 +30,9 @@ import {
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <label [attr.for]="id()" [class]="wrapperClasses()">
+    <label [attr.for]="id() || null" [class]="wrapperClasses()" (click)="onChange()">
       <input
-        [id]="id()"
+        [id]="id() || null"
         [name]="name()"
         type="radio"
         [value]="value()"
@@ -74,7 +74,7 @@ export class UiRadioComponent {
   readonly valueChange = output<string>();
 
   onChange(): void {
-    if (this.disabled()) return;
+    if (this.disabled() || this.checked()) return;
     this.valueChange.emit(this.value());
   }
 

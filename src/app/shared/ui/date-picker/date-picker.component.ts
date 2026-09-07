@@ -4,6 +4,7 @@ import {
   ChangeDetectorRef,
   Component,
   computed,
+  effect,
   ElementRef,
   forwardRef,
   inject,
@@ -89,6 +90,18 @@ export class UiDatePickerComponent
 
   private flatpickrInstance: flatpickr.Instance | undefined;
   private cdr = inject(ChangeDetectorRef);
+
+  constructor() {
+    effect(() => {
+      const next = this.value();
+      const fp = this.flatpickrInstance;
+      if (!fp) return;
+      const incoming = Array.isArray(next) ? next.join(", ") : next ?? "";
+      if (incoming === this.internalValue) return;
+      this.internalValue = incoming;
+      fp.setDate(incoming, false);
+    });
+  }
 
   private onChangeFn: (value: string | string[]) => void = () => {};
   private onTouchedFn: () => void = () => {};
