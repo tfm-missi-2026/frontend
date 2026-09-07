@@ -11,12 +11,12 @@
         variant="tertiary"
         [compact]="true"
         [Icon]="isMobileOpen() ? closeIcon : hamburgerIcon"
-        [className]="'xl:border z-99999 ' + mobileToggleBgClass()"
+        [className]="'xl:hidden z-99999 ' + mobileToggleBgClass()"
         labelText="Alternar barra lateral"
         (click)="handleToggle()"
       />
 
-      <a routerLink="/" class="xl:hidden">
+      <div class="xl:hidden">
         <UiImage
           src="/images/logo/logo.svg"
           alt="Logo SPSRT"
@@ -35,7 +35,7 @@
           [bordered]="false"
           className="hidden dark:block"
         />
-      </a>
+      </div>
 
       <UiIconButton
         variant="tertiary"

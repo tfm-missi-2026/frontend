@@ -118,10 +118,6 @@ export class AppHeaderComponent {
     const isDesktop = window.matchMedia('(min-width: 1280px)').matches;
     if (isDesktop) {
       this.sidebarService.toggleExpanded();
-      // Garantiza que el cambio sea visible de inmediato aunque haya
-      // hover residual sobre el aside (e.g. el cursor quedó encima
-      // mientras el usuario iba al botón del header).
-      this.sidebarService.setHovered(false);
     } else {
       this.sidebarService.toggleMobileOpen();
     }

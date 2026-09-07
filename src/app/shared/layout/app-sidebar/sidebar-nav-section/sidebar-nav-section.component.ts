@@ -34,19 +34,16 @@ export class SidebarLayoutNavSectionComponent {
   protected readonly isExpanded = toSignal(this.sidebarService.isExpanded$, {
     initialValue: true,
   });
-  protected readonly isHovered = toSignal(this.sidebarService.isHovered$, {
-    initialValue: false,
-  });
   protected readonly isMobileOpen = toSignal(this.sidebarService.isMobileOpen$, {
     initialValue: false,
   });
 
   protected readonly isVisible = computed<boolean>(
-    () => this.isExpanded() || this.isHovered() || this.isMobileOpen(),
+    () => this.isExpanded() || this.isMobileOpen(),
   );
 
-  protected readonly isExpandedOrHovered = computed<boolean>(
-    () => this.isExpanded() || this.isHovered(),
+  protected readonly isExpandedOrHovered = computed<boolean>(() =>
+    this.isExpanded(),
   );
 
   protected resolveIcon(item: NavItem) {
