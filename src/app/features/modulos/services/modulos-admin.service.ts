@@ -3,6 +3,7 @@ import { Injectable, inject, signal } from "@angular/core";
 import { LookupsService } from "@core/lookups/lookups.service";
 import { ModuloQueryParams } from "@core/query-params";
 import { type PageData } from "@core/models";
+import { cloneQuery } from "@shared/ui/table";
 import { safeFirstValueFrom } from "@utils/safe-async";
 
 import type { ModuloResponse } from "@core/modulos/modulo.models";
@@ -59,17 +60,19 @@ export class ModulosAdminService {
 
   filterBySeccion(seccion: string | null): void {
     this.query.update((q) => {
-      q.seccion = seccion && seccion !== "" ? seccion : null;
-      q.page = 1;
-      return q;
+      const next = cloneQuery(q);
+      next.seccion = seccion && seccion !== "" ? seccion : null;
+      next.page = 1;
+      return next;
     });
   }
 
   filterByEstado(estado: 0 | 1 | null): void {
     this.query.update((q) => {
-      q.estado = estado;
-      q.page = 1;
-      return q;
+      const next = cloneQuery(q);
+      next.estado = estado;
+      next.page = 1;
+      return next;
     });
   }
 

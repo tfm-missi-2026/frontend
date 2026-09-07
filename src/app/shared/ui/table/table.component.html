@@ -110,6 +110,8 @@
                       size="sm"
                       [LeftIcon]="action.icon"
                       [labelText]="action.label"
+                      [tooltip]="action.label"
+                      [tooltipSide]="action.tooltipSide ?? 'top'"
                       [disabled]="!!action.disabled?.(row)"
                       (click)="onActionClick(action, row, rowIndex)"
                     ></UiButton>
