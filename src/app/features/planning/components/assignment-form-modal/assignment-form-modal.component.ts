@@ -10,8 +10,8 @@ import {
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 
+import { IconCheckComponent, IconXComponent } from "@shared/icons";
 import { UiAlertComponent } from "@shared/ui/alert";
-import { UiButtonComponent } from "@shared/ui/button";
 import { UiDatePickerComponent } from "@shared/ui/date-picker";
 import { UiFieldErrorComponent } from "@shared/ui/field-error";
 import { UiFlexComponent } from "@shared/ui/flex";
@@ -48,7 +48,6 @@ const WORKDAY_HOURS = 8;
   imports: [
     FormsModule,
     UiAlertComponent,
-    UiButtonComponent,
     UiDatePickerComponent,
     UiFieldErrorComponent,
     UiFlexComponent,
@@ -76,6 +75,9 @@ export class AssignmentFormModalComponent {
   readonly close = output<void>();
   readonly save = output<AssignmentFormSavePayload>();
   readonly overloadRequest = output<OverloadRequest>();
+
+  protected readonly IconCheck = IconCheckComponent;
+  protected readonly IconX = IconXComponent;
 
   protected readonly form = signal<AssignmentFormData>(emptyAssignmentForm());
   protected readonly validationMessage = signal<string | null>(null);
@@ -173,6 +175,14 @@ export class AssignmentFormModalComponent {
 
   protected onCancel(): void {
     this.close.emit();
+  }
+
+  protected onAction(side: "left" | "right"): void {
+    if (side === "left") {
+      this.onCancel();
+    } else {
+      this.onSave();
+    }
   }
 
   protected onSave(): void {

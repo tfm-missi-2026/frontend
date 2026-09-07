@@ -1,24 +1,29 @@
 <UiModal
   [isOpen]="isOpen()"
   [showCloseButton]="true"
-  className="max-w-130"
+  [showFooter]="true"
+  [size]="'lg'"
+  [title]="heading()"
+  subtitle="Vincula un recurso técnico con una tarea del proyecto seleccionado."
+  [leftAction]="{
+    label: 'Cancelar',
+    variant: 'secondary',
+    icon: IconX,
+  }"
+  [rightAction]="{
+    label: mode() === 'create' ? 'Crear asignación' : 'Guardar cambios',
+    variant: 'primary',
+    icon: IconCheck,
+  }"
   (close)="onCancel()"
+  (action)="onAction($event)"
 >
-  <UiFlex direction="column" [gap]="16">
-    <UiFlex direction="column" [gap]="4">
-      <UiLabel type="HeadingM" weight="semibold" color="textStrong">
-        {{ heading() }}
-      </UiLabel>
-      <UiLabel type="bodyS" color="textWeak">
-        Vincula un recurso técnico con una tarea.
-      </UiLabel>
-    </UiFlex>
-
+  <UiFlex direction="column" [gap]="4">
     @if (validationMessage(); as msg) {
       <UiAlert variant="error" [message]="msg" />
     }
 
-    <UiFlex direction="column" [gap]="6">
+    <UiFlex direction="column" [gap]="1">
       <UiFormLabel
         labelText="Tarea"
         labelFor="assignment-task"
@@ -31,16 +36,20 @@
         [searchable]="false"
         [ngModel]="form().taskId"
         (ngModelChange)="onTaskChange($event)"
+        [errorMessage]="taskError() ?? undefined"
       />
       @if (taskError(); as msg) {
         <UiFieldError [message]="msg" />
+      } @else {
+        <UiLabel
+          type="bodyXs"
+          color="textWeak"
+          text="Tareas de los subproyectos del proyecto seleccionado."
+        />
       }
-      <UiLabel type="bodyXs" color="textWeak">
-        Tareas de los subproyectos del proyecto seleccionado.
-      </UiLabel>
     </UiFlex>
 
-    <UiFlex direction="column" [gap]="6">
+    <UiFlex direction="column" [gap]="1">
       <UiFormLabel
         labelText="Recurso técnico"
         labelFor="assignment-resource"
@@ -53,43 +62,21 @@
         [searchable]="false"
         [ngModel]="form().resourceId"
         (ngModelChange)="onResourceChange($event)"
+        [errorMessage]="resourceError() ?? undefined"
       />
       @if (resourceError(); as msg) {
         <UiFieldError [message]="msg" />
+      } @else {
+        <UiLabel
+          type="bodyXs"
+          color="textWeak"
+          text="Solo usuarios con rol Recurso Técnico."
+        />
       }
-      <UiLabel type="bodyXs" color="textWeak">
-        Solo usuarios con rol Recurso Técnico.
-      </UiLabel>
     </UiFlex>
 
     <UiGrid [columns]="2" gap="gap-4">
-      <UiFlex direction="column" [gap]="6">
-        <UiFormLabel
-          labelText="Horas planificadas"
-          labelFor="assignment-hours"
-          [required]="true"
-        />
-        <UiInput
-          id="assignment-hours"
-          type="number"
-          placeholder="p. ej. 20"
-          [value]="form().plannedHours"
-          (valueChange)="onHoursChange($event)"
-          className="max-w-30"
-        />
-        @if (hoursError(); as msg) {
-          <UiFieldError [message]="msg" />
-        }
-      </UiFlex>
-      <UiFlex direction="column" [gap]="6" className="justify-end">
-        <UiLabel type="bodyXs" color="textWeak">
-          {{ jornadaLabel() }}
-        </UiLabel>
-      </UiFlex>
-    </UiGrid>
-
-    <UiGrid [columns]="2" gap="gap-4">
-      <UiFlex direction="column" [gap]="6">
+      <UiFlex direction="column" [gap]="1" className="min-w-0">
         <UiFormLabel
           labelText="Fecha inicio"
           labelFor="assignment-start"
@@ -98,17 +85,17 @@
         <UiDatePicker
           inputId="assignment-start"
           mode="single"
-          dateFormat="d/m/Y"
-          placeholder="dd/mm/aaaa"
+          dateFormat="Y-m-d"
+          placeholder="aaaa-mm-dd"
           [value]="form().startDate"
           (valueChange)="onStartDateChange($event)"
-          className="max-w-55"
         />
         @if (startError(); as msg) {
           <UiFieldError [message]="msg" />
         }
       </UiFlex>
-      <UiFlex direction="column" [gap]="6">
+
+      <UiFlex direction="column" [gap]="1" className="min-w-0">
         <UiFormLabel
           labelText="Fecha fin"
           labelFor="assignment-end"
@@ -117,11 +104,10 @@
         <UiDatePicker
           inputId="assignment-end"
           mode="single"
-          dateFormat="d/m/Y"
-          placeholder="dd/mm/aaaa"
+          dateFormat="Y-m-d"
+          placeholder="aaaa-mm-dd"
           [value]="form().endDate"
           (valueChange)="onEndDateChange($event)"
-          className="max-w-55"
         />
         @if (endError(); as msg) {
           <UiFieldError [message]="msg" />
@@ -133,22 +119,25 @@
       <UiFieldError [message]="msg" />
     }
 
-    <UiFlex
-      direction="row"
-      justifyContent="end"
-      [gap]="8"
-      className="mt-4 border-t border-dashed border-gray-200 pt-4 dark:border-gray-800"
-    >
-      <UiButton
-        variant="secondary"
-        label="Cancelar"
-        (click)="onCancel()"
+    <UiFlex direction="column" [gap]="1">
+      <UiFormLabel
+        labelText="Horas planificadas"
+        labelFor="assignment-hours"
+        [required]="true"
       />
-      <UiButton
-        variant="primary"
-        label="Guardar"
-        (click)="onSave()"
+      <UiInput
+        id="assignment-hours"
+        type="number"
+        placeholder="p. ej. 20"
+        [value]="form().plannedHours"
+        (valueChange)="onHoursChange($event)"
+        [errorMessage]="hoursError() ?? undefined"
       />
+      @if (hoursError(); as msg) {
+        <UiFieldError [message]="msg" />
+      } @else {
+        <UiLabel type="bodyXs" color="textWeak" [text]="jornadaLabel()" />
+      }
     </UiFlex>
   </UiFlex>
 </UiModal>

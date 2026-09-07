@@ -7,10 +7,8 @@ import {
   signal,
 } from "@angular/core";
 
-import { IconPlusSimpleComponent } from "@shared/icons";
 import { CommonBreadcrumbComponent } from "@shared/common/page-breadcrumb";
 import { UiAlertComponent } from "@shared/ui/alert";
-import { UiButtonComponent } from "@shared/ui/button";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
@@ -55,7 +53,6 @@ const WORKDAY_HOURS = 8;
     PlanningTableComponent,
     PlanningToolbarComponent,
     UiAlertComponent,
-    UiButtonComponent,
     UiFlexComponent,
     UiHeaderComponent,
     UiLabelComponent,
@@ -82,7 +79,6 @@ export class PlanningListComponent implements OnInit {
     if (pid) void this.lineaBaseService.cargarPorProyecto(pid);
   }
 
-  protected readonly IconPlusSimpleComponent = IconPlusSimpleComponent;
 
   protected readonly projects = this.projectsService.projects;
 
@@ -92,7 +88,7 @@ export class PlanningListComponent implements OnInit {
       .map((p) => ({ value: p.id, label: `${p.code} · ${p.name}` })),
   );
 
-  protected readonly selectedProjectId = signal<string | null>("p-sigtramites");
+  protected readonly selectedProjectId = signal<string | null>(null);
 
   protected readonly selectedProject = computed(() => {
     const id = this.selectedProjectId();
@@ -113,10 +109,9 @@ export class PlanningListComponent implements OnInit {
     const subs = this.subprojectsInProject();
     return this.tasksInProject().map((t) => {
       const sub = subs.find((s) => s.id === t.subprojectId);
-      const subLabel = sub?.ticket ?? t.subprojectId;
       return {
         value: t.id,
-        label: `${t.name} · #${subLabel}`,
+        label: sub ? `${sub.description} · ${t.name}` : t.name,
       };
     });
   });
@@ -156,9 +151,8 @@ export class PlanningListComponent implements OnInit {
       return {
         ...a,
         taskName: t?.name ?? "Tarea sin asignar",
-        taskSubprojectLabel: sub
-          ? `#${sub.ticket ?? sub.id} · ${sub.type}`
-          : "—",
+        subprojectName: sub ? `${sub.description} · ${sub.type}` : "—",
+        subprojectPriority: sub?.priority ?? null,
         resourceName: r
           ? `${r.firstName} ${r.lastNamePaternal} ${r.lastNameMaternal}`
           : "Sin recurso",
