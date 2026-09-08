@@ -34,6 +34,8 @@
 
 export { UiTableComponent } from './table.component';
 
+export { cloneQuery } from './table.utils';
+
 // Iconos stub internos (chevrons de paginacion) re-exportados por si el
 // consumer quiere reutilizarlos en otras partes de la UI.
 export { ChevronLeftIcon, ChevronRightIcon } from './table.component';

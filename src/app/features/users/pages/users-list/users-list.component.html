@@ -12,7 +12,7 @@
     <UiButton
       variant="primary"
       [LeftIcon]="plusIcon"
-      labelText="Nuevo usuario"
+      label="Nuevo usuario"
       (click)="openCreate()"
     />
   </UiFlex>
@@ -92,24 +92,27 @@
 
 <ng-template #accionesCell let-u>
   <UiFlex [gap]="2" [alignItems]="'center'" [justifyContent]="'end'" [noWrap]="true">
-    <UiButton
+    <UiIconButton
+      [Icon]="editIcon"
       variant="secondary"
-      size="sm"
-      [LeftIcon]="editIcon"
+      tooltip="Editar"
+      tooltipSide="top"
       labelText="Editar"
       (click)="openEdit(u)"
     />
-    <UiButton
+    <UiIconButton
+      [Icon]="envelopeIcon"
       variant="secondary"
-      size="sm"
-      [LeftIcon]="envelopeIcon"
+      tooltip="Restablecer"
+      tooltipSide="top"
       labelText="Restablecer"
       (click)="openResetPassword(u)"
     />
-    <UiButton
-      variant="primary"
-      size="sm"
-      [LeftIcon]="trashIcon"
+    <UiIconButton
+      [Icon]="trashIcon"
+      variant="secondary"
+      tooltip="Dar de baja"
+      tooltipSide="top"
       labelText="Dar de baja"
       (click)="onDeactivate(u)"
     />

@@ -12,7 +12,7 @@
     <UiButton
       variant="primary"
       [LeftIcon]="plusIcon"
-      labelText="Nuevo módulo"
+      label="Nuevo módulo"
       (click)="onCreate()"
     />
   </UiFlex>
@@ -83,7 +83,7 @@
         <UiButton
           variant="primary"
           size="sm"
-          labelText="Habilitar"
+          label="Habilitar"
           (click)="onRequestEnable(m)"
         />
       } @else {
@@ -91,13 +91,13 @@
           variant="secondary"
           size="sm"
           [LeftIcon]="editIcon"
-          labelText="Editar"
+          label="Editar"
           (click)="onEdit(m)"
         />
         <UiButton
           variant="secondary"
           size="sm"
-          labelText="Deshabilitar"
+          label="Deshabilitar"
           (click)="onRequestDisable(m)"
         />
       }

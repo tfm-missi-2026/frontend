@@ -142,6 +142,7 @@ export class UiButtonComponent {
       "rounded-lg",
       "cursor-pointer select-none",
       "border border-solid",
+      "[&>*]:flex [&>*]:items-center",
       this.compact() ? "px-2 py-1" : "px-3 py-2",
       this.fullWidth() ? "w-full" : "",
     ];

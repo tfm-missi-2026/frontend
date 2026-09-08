@@ -3,6 +3,7 @@ import { Injectable, inject, signal } from "@angular/core";
 import { LookupsService } from "@core/lookups/lookups.service";
 import { UsuarioQueryParams } from "@core/query-params";
 import { type PageData } from "@core/models";
+import { cloneQuery } from "@shared/ui/table";
 import { safeFirstValueFrom } from "@utils/safe-async";
 
 import type { UsuarioApi } from "../models/user-api";
@@ -111,17 +112,19 @@ export class UsersAdminService {
 
   filterByRol(input: FilterByRolInput): void {
     this.query.update((q) => {
-      q.rolCodigo = input.rol ? rolUiToBackend(input.rol) : null;
-      q.page = 1;
-      return q;
+      const next = cloneQuery(q);
+      next.rolCodigo = input.rol ? rolUiToBackend(input.rol) : null;
+      next.page = 1;
+      return next;
     });
   }
 
   filterByEstado(input: FilterByEstadoInput): void {
     this.query.update((q) => {
-      q.estado = input.estado ? statusToEstado(input.estado) : null;
-      q.page = 1;
-      return q;
+      const next = cloneQuery(q);
+      next.estado = input.estado ? statusToEstado(input.estado) : null;
+      next.page = 1;
+      return next;
     });
   }
 

@@ -5,6 +5,7 @@
     }
     <UiFlex
       [direction]="'column'"
+      [noWrap]="true"
       [className]="contentClasses()"
       (click)="onContentClick($event)"
     >
@@ -37,7 +38,7 @@
         </UiFlex>
       }
 
-      <UiFlex [direction]="'column'" [className]="bodyClasses()">
+      <UiFlex [direction]="'column'" [noWrap]="true" [className]="bodyClasses()">
         <ng-content></ng-content>
       </UiFlex>
 
