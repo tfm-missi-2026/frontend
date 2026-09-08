@@ -1,38 +1,47 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnInit,
+  TemplateRef,
+  ViewChild,
   computed,
   inject,
-  OnInit,
   signal,
 } from "@angular/core";
+import { FormsModule } from "@angular/forms";
 
+import { CatalogoQueryParams } from "@core/query-params";
 import {
-  IconDotsVerticalComponent,
+  IconEditPencilComponent,
   IconPlusSimpleComponent,
+  IconTrashComponent,
 } from "@shared/icons";
 import { CommonBreadcrumbComponent } from "@shared/common/page-breadcrumb";
+import { UiAlertComponent } from "@shared/ui/alert";
 import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiButtonComponent } from "@shared/ui/button";
 import { UiCardComponent } from "@shared/ui/card";
-import { UiDropdownComponent } from "@shared/ui/dropdown";
-import { UiDropdownItemComponent } from "@shared/ui/dropdown";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiIconButtonComponent } from "@shared/ui/icon-button";
 import { UiLabelComponent } from "@shared/ui/label";
-import { sortBy } from "@utils/collections";
-import { matchesSearch } from "@utils/strings";
+import { UiSelectComponent } from "@shared/ui/select";
+import type { SelectOption } from "@shared/ui/select";
+import {
+  UiTableComponent,
+  TableColumn,
+  type TableCellContext,
+} from "@shared/ui/table";
 
 import { ItemFormModalComponent } from "../../components/item-form-modal/item-form-modal.component";
 import type { ItemFormSavePayload } from "../../components/item-form-modal/item-form-modal.component";
-import { CatalogToolbarComponent } from "../../components/catalog-toolbar/catalog-toolbar.component";
 import {
   CATALOG_GROUPS,
   findGroup,
   type CatalogGroupCode,
   type CatalogItem,
 } from "../../models/catalog-item";
+import { CatalogoAdminService } from "../../services/catalog-admin.service";
 import { CatalogService } from "../../services/catalog.service";
 
 @Component({
@@ -40,66 +49,36 @@ import { CatalogService } from "../../services/catalog.service";
   standalone: true,
   imports: [
     CommonBreadcrumbComponent,
+    FormsModule,
     ItemFormModalComponent,
-    CatalogToolbarComponent,
+    UiAlertComponent,
     UiBadgeComponent,
     UiButtonComponent,
     UiCardComponent,
-    UiDropdownComponent,
-    UiDropdownItemComponent,
     UiFlexComponent,
     UiHeaderComponent,
     UiIconButtonComponent,
     UiLabelComponent,
+    UiSelectComponent,
+    UiTableComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./catalog-list.component.html",
-  styles: [
-    `
-      .group-item {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        width: 100%;
-        padding: 10px 12px;
-        cursor: pointer;
-        border-radius: 12px;
-        border: 1px solid transparent;
-        background: transparent;
-        transition:
-          background-color 120ms ease,
-          border-color 120ms ease;
-        text-align: left;
-      }
-      .group-item:hover {
-        background-color: rgb(249 250 251);
-      }
-      :host-context(.dark) .group-item:hover {
-        background-color: rgb(255 255 255 / 0.03);
-      }
-      .group-item-selected {
-        background-color: rgb(249 250 251);
-        border-color: rgb(229 231 235);
-        box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
-      }
-      :host-context(.dark) .group-item-selected {
-        background-color: rgb(255 255 255 / 0.04);
-        border-color: rgb(55 65 81);
-      }
-    `,
-  ],
 })
 export class CatalogListComponent implements OnInit {
+  private readonly admin = inject(CatalogoAdminService);
   private readonly catalogService = inject(CatalogService);
 
   ngOnInit(): void {
     void this.catalogService.cargar();
+    this.admin.filterByGrupo(this.selectedGroup());
   }
 
   protected readonly groups = CATALOG_GROUPS;
 
   protected readonly plusIcon = IconPlusSimpleComponent;
-  protected readonly dotsIcon = IconDotsVerticalComponent;
+  protected readonly editIcon = IconEditPencilComponent;
+  protected readonly trashIcon = IconTrashComponent;
 
   protected readonly breadcrumbItems = [
     { label: "Administración", route: "/app/administracion" },
@@ -107,46 +86,123 @@ export class CatalogListComponent implements OnInit {
   ];
 
   protected readonly selectedGroup = signal<CatalogGroupCode>("TACT");
-  protected readonly searchTerm = signal<string>("");
+  protected readonly estadoFiltro = signal<"todos" | "Activo" | "Inactivo">(
+    "todos",
+  );
 
-  protected readonly items = this.catalogService.items;
+  protected readonly estadoFiltroOpciones: SelectOption[] = [
+    { value: "todos", label: "Todos" },
+    { value: "Activo", label: "Activo" },
+    { value: "Inactivo", label: "Inactivo" },
+  ];
 
-  protected readonly currentGroup = computed(() => findGroup(this.selectedGroup()));
+  // ----- Servicio server-side (UiTable en modo auto) -----
+  protected readonly query = this.admin.query;
+  protected readonly error = this.admin.error;
 
-  protected readonly itemsInGroup = computed<CatalogItem[]>(() => {
-    const code = this.selectedGroup();
-    return sortBy(
-      this.items().filter((i) => i.groupCode === code),
-      (i) => i.order,
-    );
-  });
+  protected readonly fetchCatalogo = (
+    q: Parameters<CatalogoAdminService["fetchData"]>[0],
+  ) => this.admin.fetchData(q);
 
-  protected readonly filteredItems = computed<CatalogItem[]>(() => {
-    const term = this.searchTerm();
-    if (!term.trim()) return this.itemsInGroup();
-    return this.itemsInGroup().filter((i) =>
-      matchesSearch(term, i.code, i.name, i.description),
-    );
-  });
+  protected readonly currentGroup = computed(() =>
+    findGroup(this.selectedGroup()),
+  );
+
+  protected readonly pageSizeOptions: number[] = [10, 20, 50];
+
+  protected readonly groupCount = computed<number>(
+    () =>
+      this.catalogService
+        .items()
+        .filter((i) => i.groupCode === this.selectedGroup()).length,
+  );
 
   protected readonly activeCount = computed<number>(
-    () => this.itemsInGroup().filter((i) => i.status === "Activo").length,
+    () =>
+      this.catalogService
+        .items()
+        .filter(
+          (i) =>
+            i.groupCode === this.selectedGroup() && i.status === "Activo",
+        ).length,
   );
 
   protected readonly formOpen = signal<boolean>(false);
   protected readonly formMode = signal<"create" | "edit">("create");
   protected readonly selectedItem = signal<CatalogItem | null>(null);
 
-  protected readonly openActionsId = signal<string | null>(null);
+  @ViewChild("estadoCell", { static: true })
+  private estadoCell!: TemplateRef<TableCellContext<CatalogItem>>;
+  @ViewChild("accionesCell", { static: true })
+  private accionesCell!: TemplateRef<TableCellContext<CatalogItem>>;
+
+  protected readonly tableColumns = computed<TableColumn<CatalogItem>[]>(() => [
+    {
+      key: "code",
+      header: "Código",
+      width: "120px",
+      searchable: false,
+      sortable: true,
+      sortKey: "code",
+    },
+    {
+      key: "name",
+      header: "Nombre",
+      searchable: false,
+      sortable: true,
+      sortKey: "name",
+    },
+    { key: "description", header: "Descripción", searchable: false },
+    {
+      key: "order",
+      header: "Orden",
+      align: "center",
+      width: "90px",
+      searchable: false,
+      sortable: true,
+      sortKey: "order",
+    },
+    {
+      key: "estado",
+      header: "Estado",
+      align: "center",
+      width: "120px",
+      searchable: false,
+      sortable: true,
+      sortKey: "status",
+      cell: this.estadoCell,
+    },
+    {
+      key: "acciones",
+      header: "Acciones",
+      align: "end",
+      width: "160px",
+      searchable: false,
+      cell: this.accionesCell,
+    },
+  ]);
 
   protected countByGroup(code: CatalogGroupCode): number {
-    return this.items().filter((i) => i.groupCode === code).length;
+    return this.catalogService
+      .items()
+      .filter((i) => i.groupCode === code).length;
   }
 
   protected selectGroup(code: CatalogGroupCode): void {
     this.selectedGroup.set(code);
-    this.searchTerm.set("");
-    this.closeActions();
+    this.admin.filterByGrupo(code);
+  }
+
+  protected onQueryChange(q: CatalogoQueryParams): void {
+    this.admin.query.set(q);
+  }
+
+  protected onEstadoFiltroChange(value: unknown): void {
+    const v = value == null ? "todos" : String(value);
+    this.estadoFiltro.set(v as "todos" | "Activo" | "Inactivo");
+    this.admin.filterByEstado(
+      v === "Activo" ? 1 : v === "Inactivo" ? 0 : null,
+    );
   }
 
   protected openCreate(): void {
@@ -159,42 +215,26 @@ export class CatalogListComponent implements OnInit {
     this.formMode.set("edit");
     this.selectedItem.set(item);
     this.formOpen.set(true);
-    this.closeActions();
   }
 
   protected closeForm(): void {
     this.formOpen.set(false);
   }
 
-  protected toggleActions(id: string): void {
-    this.openActionsId.update((curr) => (curr === id ? null : id));
-  }
-
-  protected closeActions(): void {
-    this.openActionsId.set(null);
-  }
-
-  protected onEditFromMenu(item: CatalogItem): void {
-    this.openEdit(item);
-  }
-
   protected onDeactivate(item: CatalogItem): void {
-    void this.catalogService.deactivate(item.id);
-    this.closeActions();
+    void this.admin.deactivate(item.id);
   }
 
   protected async onSaveItem(payload: ItemFormSavePayload): Promise<void> {
     if (payload.mode === "create") {
-      const created = await this.catalogService.create(payload.data);
+      const created = await this.admin.create(payload.data);
       if (created) {
         this.selectedGroup.set(payload.data.groupCode);
+        this.admin.filterByGrupo(payload.data.groupCode);
         this.formOpen.set(false);
       }
     } else {
-      const updated = await this.catalogService.update(
-        payload.id,
-        payload.data,
-      );
+      const updated = await this.admin.update(payload.id, payload.data);
       if (updated) {
         this.formOpen.set(false);
       }

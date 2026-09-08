@@ -42,7 +42,7 @@ export const MODAL_CLOSE_BUTTON_CLASSES = [
 ];
 
 export const MODAL_HEADER_CLASSES = [
-  "flex-col gap-1 pr-12 pl-4 pt-4",
+  "shrink-0 flex-col gap-1 pr-12 pl-4 pt-4",
   "sm:pl-5 sm:pt-4",
   "lg:pl-6 lg:pt-4",
 ];
