@@ -1,24 +1,38 @@
 <UiModal
   [isOpen]="isOpen()"
-  [showCloseButton]="false"
-  className="max-w-[640px] p-6 lg:p-8"
+  [showCloseButton]="true"
+  [showFooter]="true"
+  [size]="'3xl'"
+  title="Editar rol"
+  [subtitle]="subtitleText()"
+  [leftAction]="{
+    label: 'Cancelar',
+    variant: 'secondary',
+    icon: IconX,
+    tooltip: 'Descartar cambios y cerrar',
+  }"
+  [rightAction]="{
+    label: 'Guardar Cambios',
+    variant: 'primary',
+    icon: IconCheck,
+    disabled: !isValid() || !hasChanges() || saving(),
+    loading: saving(),
+  }"
   (close)="onCancel()"
+  (action)="onAction($event)"
 >
-  @if (role(); as r) {
-    <UiFlex direction="column" [gap]="3">
-      <UiFlex direction="column" [gap]="1">
-        <UiHeader [level]="2" text="Editar rol" />
-        <UiLabel
-          type="bodyS"
-          color="textWeak"
-          [text]="'Código ' + r.code + ' (no modificable)'"
-        />
-      </UiFlex>
-
+  <UiFlex direction="row" [gap]="5" className="min-w-0">
+    <UiFlex
+      direction="column"
+      [gap]="3"
+      [flex]="'1'"
+      [shrinkable]="true"
+      className="min-w-0"
+    >
       <UiFlex direction="column" [gap]="1">
         <UiFormLabel
           labelText="Nombre"
-          [required]="true"
+          [required]="!camposReadonly()"
           [labelFor]="'role-edit-name'"
         />
         <UiInput
@@ -29,15 +43,13 @@
           (blurEvt)="onNombreBlur()"
           [errorMessage]="visibleNombreError()"
           [maxLength]="100"
+          [disabled]="camposReadonly()"
         />
         <UiFieldError [message]="visibleNombreError()" />
       </UiFlex>
 
       <UiFlex direction="column" [gap]="1">
-        <UiFormLabel
-          labelText="Descripción"
-          [labelFor]="'role-edit-desc'"
-        />
+        <UiFormLabel labelText="Descripción" [labelFor]="'role-edit-desc'" />
         <UiTextArea
           id="role-edit-desc"
           [rows]="2"
@@ -45,6 +57,7 @@
           [value]="descripcion()"
           (valueChange)="patchDescripcion($event)"
           (blurEvt)="onDescripcionBlur()"
+          [disabled]="camposReadonly()"
         />
         <UiFieldError [message]="visibleDescripcionError()" />
       </UiFlex>
@@ -52,7 +65,7 @@
       <UiFlex direction="column" [gap]="1">
         <UiFormLabel
           labelText="Página de inicio (tras el login)"
-          [required]="true"
+          [required]="!camposReadonly()"
           [labelFor]="'role-edit-pagina-inicio'"
         />
         <UiSelect
@@ -63,59 +76,60 @@
           [ngModel]="paginaInicioId()"
           (ngModelChange)="onPaginaInicioChange($event)"
           (blur)="onPaginaInicioBlur()"
+          [isDisabled]="camposReadonly()"
         />
         @if (!visiblePaginaInicioError()) {
           <UiLabel
             type="bodyXs"
             color="textWeak"
-            text="El rol siempre debe tener una página de inicio configurada."
+            [text]="
+              camposReadonly()
+                ? 'Definida por el sistema y no modificable.'
+                : 'El rol siempre debe tener una página de inicio configurada.'
+            "
           />
         }
         <UiFieldError [message]="visiblePaginaInicioError()" />
       </UiFlex>
+    </UiFlex>
 
-      <UiFlex direction="column" [gap]="1" className="mt-1">
-        <UiFlex direction="row" alignItems="center" justifyContent="between">
-          <UiLabel
-            type="bodyS"
-            weight="semibold"
-            color="textStrong"
-            text="Permisos de módulos"
-          />
-          <UiLabel
-            type="bodyXs"
-            color="textWeak"
-            [text]="permisos().length + ' de ' + modules().length + ' módulos'"
-          />
-        </UiFlex>
+    <UiFlex
+      direction="column"
+      [gap]="2"
+      [flex]="'1'"
+      [shrinkable]="true"
+      className="min-w-0"
+    >
+      <UiFlex
+        direction="row"
+        alignItems="center"
+        justifyContent="between"
+        className="min-w-0"
+      >
+        <UiLabel
+          type="bodyS"
+          weight="semibold"
+          color="textStrong"
+          text="Permisos de módulos"
+        />
         <UiLabel
           type="bodyXs"
           color="textWeak"
-          text="Marca los módulos del sidebar a los que este rol puede acceder. La página de inicio siempre queda otorgada."
-        />
-        <PermissionsMatrix
-          [modules]="modules()"
-          [selected]="permisos()"
-          [readonly]="false"
-          [landingCodigo]="landingCodigo()"
-          (selectedChange)="onPermisosChange($event)"
+          [text]="permisos().length + ' de ' + modules().length + ' módulos'"
         />
       </UiFlex>
-
-      <UiFlex
-        direction="row"
-        justifyContent="end"
-        [gap]="2"
-        className="mt-2 border-t border-gray-200 pt-3 dark:border-gray-800"
-      >
-        <UiButton variant="secondary" label="Cancelar" (click)="onCancel()" />
-        <UiButton
-          variant="primary"
-          label="Guardar cambios"
-          [disabled]="!isValid() || !hasChanges()"
-          (click)="onSave()"
-        />
-      </UiFlex>
+      <UiLabel
+        type="bodyXs"
+        color="textWeak"
+        text="Marca los módulos del sidebar a los que este rol puede acceder. La página de inicio siempre queda otorgada."
+      />
+      <PermissionsMatrix
+        [modules]="modules()"
+        [selected]="permisos()"
+        [readonly]="false"
+        [landingCodigo]="landingCodigo()"
+        (selectedChange)="onPermisosChange($event)"
+      />
     </UiFlex>
-  }
+  </UiFlex>
 </UiModal>

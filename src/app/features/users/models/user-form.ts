@@ -5,14 +5,36 @@ export interface UserFormData {
   lastNamePaternal: string;
   lastNameMaternal: string;
   email: string;
-  role: UserRole;
+  role: UserRole | null;
   status: UserStatus;
   initialPassword?: string;
 }
 
 export type UserFormSavePayload =
-  | { mode: "create"; data: Required<Omit<UserFormData, "initialPassword">> & { initialPassword: string } }
-  | { mode: "edit"; id: string; data: Omit<UserFormData, "initialPassword"> };
+  | {
+      mode: "create";
+      data: {
+        firstName: string;
+        lastNamePaternal: string;
+        lastNameMaternal: string;
+        email: string;
+        role: UserRole;
+        status: UserStatus;
+        initialPassword: string;
+      };
+    }
+  | {
+      mode: "edit";
+      id: string;
+      data: {
+        firstName: string;
+        lastNamePaternal: string;
+        lastNameMaternal: string;
+        email: string;
+        role: UserRole;
+        status: UserStatus;
+      };
+    };
 
 export function emptyUserForm(): UserFormData {
   return {
@@ -20,7 +42,7 @@ export function emptyUserForm(): UserFormData {
     lastNamePaternal: "",
     lastNameMaternal: "",
     email: "",
-    role: "recurso_tecnico",
+    role: null,
     status: "active",
     initialPassword: "",
   };

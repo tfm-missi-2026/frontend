@@ -3,6 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   computed,
+  effect,
   ElementRef,
   forwardRef,
   inject,
@@ -94,6 +95,18 @@ export class UiTextAreaComponent implements ControlValueAccessor, OnInit {
 
   ngOnInit(): void {
     this.syncFromValue();
+  }
+
+  constructor() {
+    effect(() => {
+      const v = this.value();
+      const next = v ?? "";
+      if (next !== this.internalValue) {
+        this.internalValue = next;
+        this.charCount = next.length;
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   focusTextarea(): void {

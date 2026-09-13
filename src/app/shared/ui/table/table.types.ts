@@ -1,5 +1,6 @@
 import { TemplateRef, Type } from "@angular/core";
 
+import type { PageData } from "@core/models";
 import { TooltipSide } from "@shared/ui/tooltip/tooltip.types";
 
 /**
@@ -16,6 +17,26 @@ export interface TableCellContext<T> {
 /** Alineación horizontal de una celda o header. */
 export type TableAlign = "start" | "center" | "end";
 
+/** Dirección de ordenamiento de una columna. */
+export type TableSortDirection = "asc" | "desc";
+
+/**
+ * Resultado de la funcion `fetchData` del UiTable.
+ *
+ * Dos formas equivalentes:
+ *  - **Solo items** (cliente-side o filtro client-side):
+ *      return User[];
+ *  - **Pagina completa** (server-side):
+ *      return { items, total, page, pageSize, totalPages };
+ *
+ * En ambos casos el padre solo pasa la funcion al UiTable.
+ * Si devuelve `PageData<T>`, ademas se llenan total/pageCount para
+ * la paginacion y el contador "Mostrando X-Y de Z".
+ */
+export type TableFetchResult<TRow> =
+  | TRow[]
+  | Pick<PageData<TRow>, "items" | "total" | "totalPages">;
+
 /**
  * Descriptor de una columna de `<UiTable>`.
  *
@@ -26,49 +47,58 @@ export type TableAlign = "start" | "center" | "end";
  *     en `cell` para contenido custom (avatar+texto, badge, etc.).
  */
 export interface TableColumn<T = unknown> {
-  /** Key del campo en el row. Se usa como id estable y para `trackBy` por defecto. */
   key: string;
-  /** Texto del header. */
   header: string;
-  /** Template opcional para render custom de la celda. */
   cell?: TemplateRef<TableCellContext<T>>;
-  /** Marca la columna como ordenable (visual; el ordenamiento real es del consumer). */
+  /**
+   * Si `true`, el header es clickeable. Al click, la columna cicla
+   * `null → asc → desc → null` y actualiza el `query` signal via
+   * `BaseQueryParams.setSort(...)`. El padre NO necesita manejar nada.
+   */
   sortable?: boolean;
-  /** Alineación horizontal del header y las celdas. Default `'start'`. */
+  /**
+   * Identificador enviado como `sortBy` (debe coincidir con la whitelist
+   * del backend en `BaseQueryParams.sortableColumns()`). Si esta ausente
+   * se usa `key`.
+   */
+  sortKey?: string;
   align?: TableAlign;
-  /** Ancho CSS de la columna (`'120px'`, `'20%'`, etc.). */
   width?: string;
-  /** Si `true` (default), esta columna participa en la búsqueda client-side. */
+  /**
+   * Si `true` (default), esta columna participa en la busqueda
+   * server-side (el campo `search` del `BaseQueryParams` se envia
+   * al backend, el server decide que matchear).
+   */
   searchable?: boolean;
-  /** Clases extra para el `<th>`. */
   headerClassName?: string;
-  /** Clases extra para los `<td>` de esta columna. */
   cellClassName?: string;
 }
 
 /**
- * Acción de fila. Se renderiza como un `<UiIconButton>` por acción,
+ * Accion de fila. Se renderiza como un `<UiIconButton>` por accion,
  * envuelto en un `<UiTooltip>` con `label`.
  */
 export interface TableAction<T = unknown> {
-  /** Key estable (id de la acción). */
   key: string;
-  /** Texto del tooltip. */
   label: string;
-  /** Componente ícono a renderizar dentro del botón. */
   icon: Type<unknown>;
-  /** Callback invocado al hacer click. */
   onClick: (row: T, index: number) => void;
-  /** Predicado de deshabilitado (opcional). */
   disabled?: (row: T) => boolean;
-  /** Lado del tooltip. Default `'top'` (las acciones suelen estar en la última columna). */
   tooltipSide?: TooltipSide;
 }
 
-/** Evento emitido cuando cambia la página o el page size. */
-export interface TablePageEvent {
-  page: number;
-  pageSize: number;
+/**
+ * Evento emitido cuando el usuario hace click en un header de columna
+ * ordenable. `null` en `direction` representa "sin orden" (tercer click
+ * quita el orden). El consumer decide si lo respeta o no.
+ *
+ * NOTA: en el modelo actual el UiTable aplica el sort automaticamente
+ * sobre el `query` signal. Este tipo queda para usos donde el consumer
+ * quiere suscribirse a los cambios (p.ej. logging).
+ */
+export interface TableSortEvent {
+  key: string;
+  direction: TableSortDirection | null;
 }
 
 /** Payload de `(rowSelect)`. */

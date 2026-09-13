@@ -13,11 +13,10 @@ import { FormsModule } from "@angular/forms";
 import { LookupsService } from "@core/lookups/lookups.service";
 import { resolverRegistroModulo } from "@core/modulos/modulo.registry";
 import type { ModuloResponse } from "@core/modulos/modulo.models";
-import { UiButtonComponent } from "@shared/ui/button";
+import { IconCheckComponent, IconXComponent } from "@shared/icons";
 import { UiFieldErrorComponent } from "@shared/ui/field-error";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiFormLabelComponent } from "@shared/ui/form-label";
-import { UiHeaderComponent } from "@shared/ui/header";
 import { UiInputComponent } from "@shared/ui/input";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
@@ -45,11 +44,9 @@ const DESCRIPTION_MAX = 500;
   imports: [
     FormsModule,
     PermissionsMatrixComponent,
-    UiButtonComponent,
     UiFieldErrorComponent,
     UiFlexComponent,
     UiFormLabelComponent,
-    UiHeaderComponent,
     UiInputComponent,
     UiLabelComponent,
     UiModalComponent,
@@ -64,9 +61,28 @@ export class RoleEditModalComponent {
   readonly isOpen = input<boolean>(false);
   readonly modules = input<ModuloResponse[]>([]);
   readonly permisosIniciales = input<string[]>([]);
+  readonly camposReadonly = input<boolean>(false);
+  /**
+   * Estado externo de guardado. Mientras es `true`, el botón
+   * "Guardar cambios" muestra spinner y se deshabilita para evitar
+   * doble submit. Lo controla el padre (quien ejecuta la llamada
+   * HTTP) pasándole el estado de su signal `saving`.
+   */
+  readonly saving = input<boolean>(false);
 
   readonly close = output<void>();
   readonly save = output<RoleEditPayload>();
+
+  protected readonly IconCheck = IconCheckComponent;
+  protected readonly IconX = IconXComponent;
+
+  protected readonly subtitleText = computed<string>(() => {
+    const r = this.role();
+    if (this.camposReadonly()) {
+      return "Rol del sistema: solo puedes ajustar los módulos del sidebar.";
+    }
+    return `Código ${r?.code ?? ""} (no modificable)`;
+  });
 
   private readonly lookups = inject(LookupsService);
 
@@ -115,9 +131,12 @@ export class RoleEditModalComponent {
     );
   });
 
-  protected readonly hasChanges = computed<boolean>(
-    () => this.camposCambiados() || this.permisosCambiados(),
-  );
+  protected readonly hasChanges = computed<boolean>(() => {
+    if (this.camposReadonly()) {
+      return this.permisosCambiados();
+    }
+    return this.camposCambiados() || this.permisosCambiados();
+  });
 
   constructor() {
     effect(() => {
@@ -174,22 +193,27 @@ export class RoleEditModalComponent {
     () => this.paginaInicioTouched() || this.submitAttempted(),
   );
 
-  protected readonly visibleNombreError = computed<string | undefined>(
-    () => (this.shouldShowNombre() ? this.nombreError() : undefined),
+  protected readonly visibleNombreError = computed<string | undefined>(() =>
+    this.shouldShowNombre() ? this.nombreError() : undefined,
   );
   protected readonly visibleDescripcionError = computed<string | undefined>(
     () => (this.shouldShowDescripcion() ? this.descripcionError() : undefined),
   );
   protected readonly visiblePaginaInicioError = computed<string | undefined>(
-    () => (this.shouldShowPaginaInicio() ? this.paginaInicioError() : undefined),
+    () =>
+      this.shouldShowPaginaInicio() ? this.paginaInicioError() : undefined,
   );
 
-  protected readonly isValid = computed<boolean>(
-    () =>
+  protected readonly isValid = computed<boolean>(() => {
+    if (this.camposReadonly()) {
+      return true;
+    }
+    return (
       this.nombreError() === undefined &&
       this.descripcionError() === undefined &&
-      this.paginaInicioError() === undefined,
-  );
+      this.paginaInicioError() === undefined
+    );
+  });
 
   protected patchNombre(value: string): void {
     this.nombre.set(value);
@@ -223,6 +247,14 @@ export class RoleEditModalComponent {
   protected onCancel(): void {
     this.resetTouched();
     this.close.emit();
+  }
+
+  protected onAction(side: "left" | "right"): void {
+    if (side === "left") {
+      this.onCancel();
+    } else {
+      this.onSave();
+    }
   }
 
   protected onSave(): void {

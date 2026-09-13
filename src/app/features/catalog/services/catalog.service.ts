@@ -99,9 +99,14 @@ export class CatalogService {
     }
   }
 
-  async deactivate(id: string): Promise<boolean> {
+  async deactivate(
+    id: string,
+    motivo = "Baja desde panel de administracion",
+  ): Promise<boolean> {
     try {
-      await firstValueFrom(this.api.eliminar(id));
+      await firstValueFrom(
+        this.api.eliminar(id, { motivoEliminacion: motivo }),
+      );
       this._items.update((arr) =>
         arr.map((i) => (i.id === id ? { ...i, status: "Inactivo" } : i)),
       );

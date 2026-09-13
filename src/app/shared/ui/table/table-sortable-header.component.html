@@ -1,0 +1,15 @@
+<button
+  type="button"
+  class="inline-flex w-full items-center gap-2 text-start focus:outline-none"
+  [class]="justifyClass()"
+  (click)="onClick()"
+  [attr.aria-label]="'Ordenar por ' + label()"
+  [attr.data-testid]="'sort-' + columnKey()"
+>
+  <UiLabel [type]="'bodyS'" [text]="label()"></UiLabel>
+  <span
+    class="text-xs"
+    [class]="iconClass()"
+    aria-hidden="true"
+  >{{ icon() }}</span>
+</button>

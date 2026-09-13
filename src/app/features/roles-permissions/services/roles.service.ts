@@ -109,18 +109,33 @@ export class RolesService {
 
   async loadPermissionsForRole(rolId: string): Promise<string[]> {
     if (this.lookups.getModulosPorRol(rolId).length > 0) {
-      return this.getPermissionsForRole(rolId);
+      const codigos = this.getPermissionsForRole(rolId);
+      this.syncRolePermissions(rolId, codigos);
+      return codigos;
     }
     try {
       const modulos = await this.lookups.loadModulesForRole(rolId);
-      return modulos.map((m) => m.codigo);
+      const codigos = modulos
+        .filter((m) => m.tipo !== "SECTION")
+        .map((m) => m.codigo);
+      this.syncRolePermissions(rolId, codigos);
+      return codigos;
     } catch {
       this._error.set("Error al cargar permisos del rol");
       return [];
     }
   }
 
-  async create(data: RoleFormData): Promise<Role | null> {
+  private syncRolePermissions(rolId: string, codigos: string[]): void {
+    this._roles.update((arr) =>
+      arr.map((r) => (r.id === rolId ? { ...r, permissions: codigos } : r)),
+    );
+  }
+
+  async create(
+    data: RoleFormData,
+    permisos: string[] = [],
+  ): Promise<Role | null> {
     const creado = await safeFirstValueFrom(
       this.api.create({
         codigo: data.code.trim().toUpperCase(),
@@ -130,22 +145,30 @@ export class RolesService {
       }),
       (msg) => this._error.set(msg),
     );
-    if (creado) {
-      const role: Role = {
-        id: creado.id,
-        code: creado.codigo,
-        name: creado.nombre,
-        description: creado.descripcion ?? "",
-        sistema: creado.sistema === true,
-        paginaInicioId: creado.paginaInicioId ?? null,
-        paginaInicioCodigo: creado.paginaInicioCodigo ?? null,
-        users: 0,
-        permissions: [],
-      };
-      this._roles.update((arr) => [role, ...arr]);
-      return role;
+    if (!creado) return null;
+
+    if (permisos.length > 0) {
+      const ok = await this.updatePermissions(creado.id, permisos);
+      if (!ok) {
+        this._error.set(
+          "Rol creado, pero no se pudieron asignar los permisos. Ajusta desde Editar.",
+        );
+      }
     }
-    return null;
+
+    const role: Role = {
+      id: creado.id,
+      code: creado.codigo,
+      name: creado.nombre,
+      description: creado.descripcion ?? "",
+      sistema: creado.sistema === true,
+      paginaInicioId: creado.paginaInicioId ?? null,
+      paginaInicioCodigo: creado.paginaInicioCodigo ?? null,
+      users: 0,
+      permissions: permisos,
+    };
+    this._roles.update((arr) => [role, ...arr]);
+    return role;
   }
 
   async update(
@@ -213,6 +236,7 @@ export class RolesService {
   getPermissionsForRole(rolId: string): string[] {
     return this.lookups
       .getModulosPorRol(rolId)
+      .filter((m) => m.tipo !== "SECTION")
       .map((m) => m.codigo);
   }
 

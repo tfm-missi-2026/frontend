@@ -11,7 +11,7 @@ import {
 import { FormsModule } from "@angular/forms";
 
 import { LookupsService } from "@core/lookups/lookups.service";
-import { ModuloQueryParams } from "@core/query-params";
+import type { ModuloQueryParams } from "@core/query-params";
 import { CommonBreadcrumbComponent } from "@shared/common/page-breadcrumb";
 import {
   IconEditPencilComponent,
@@ -28,7 +28,6 @@ import type { SelectOption } from "@shared/ui/select";
 import {
   UiTableComponent,
   TableColumn,
-  TablePageEvent,
   type TableCellContext,
 } from "@shared/ui/table";
 
@@ -52,6 +51,11 @@ const ESTADO_FILTRO: SelectOption[] = [
   { value: "0", label: "Deshabilitados" },
 ];
 
+/**
+ * Pagina de administracion de modulos. Patron declarativo:
+ * UiTable recibe `[(query)]` + `[fetchData]` y se auto-gestiona.
+ * El componente solo filtra por dominio y dispara mutaciones.
+ */
 @Component({
   selector: "ModulosAdminListPage",
   standalone: true,
@@ -73,7 +77,7 @@ const ESTADO_FILTRO: SelectOption[] = [
   templateUrl: "./modulos-admin-list.component.html",
 })
 export class ModulosAdminListComponent implements OnInit {
-  private readonly service = inject(ModulosAdminService);
+  protected readonly service = inject(ModulosAdminService);
   private readonly lookups = inject(LookupsService);
 
   protected readonly plusIcon = IconPlusSimpleComponent;
@@ -84,36 +88,55 @@ export class ModulosAdminListComponent implements OnInit {
     { label: "Modulos" },
   ];
 
-  protected readonly loading = this.service.loading;
   protected readonly error = this.service.error;
-  protected readonly page = this.service.page;
-  protected readonly modulos = computed<ModuloResponse[]>(() => this.page()?.items ?? []);
+  protected readonly successAlert = signal<string | null>(null);
   protected readonly secciones = this.lookups.secciones;
-
-  protected readonly currentQuery = signal<ModuloQueryParams>(
-    new ModuloQueryParams({ pageSize: 20 }),
-  );
 
   protected readonly seccionesFiltro = SECCIONES_FILTRO;
   protected readonly estadoFiltro = ESTADO_FILTRO;
+  protected readonly pageSizeOptions: number[] = [10, 20, 50, 100];
+
+  /**
+   * Funcion de carga para el UiTable.
+   */
+  protected readonly fetchModulos = (q: Parameters<ModulosAdminService["fetchData"]>[0]) =>
+    this.service.fetchData(q);
 
   protected readonly createOpen = signal<boolean>(false);
   protected readonly editTarget = signal<ModuloResponse | null>(null);
   protected readonly disableTarget = signal<ModuloResponse | null>(null);
-  protected readonly successAlert = signal<string | null>(null);
 
   protected readonly seccionFiltroActual = signal<string>("");
   protected readonly estadoFiltroActual = signal<string>("1");
 
   protected readonly tableColumns = computed<TableColumn<ModuloResponse>[]>(() => [
-    { key: "codigo", header: "Codigo", width: "140px" },
-    { key: "nombre", header: "Nombre" },
-    { key: "seccion", header: "Seccion", width: "160px" },
+    {
+      key: "codigo",
+      header: "Código",
+      width: "140px",
+      sortable: true,
+      sortKey: "codigo",
+    },
+    {
+      key: "nombre",
+      header: "Nombre",
+      sortable: true,
+      sortKey: "nombre",
+    },
+    {
+      key: "seccion",
+      header: "Sección",
+      width: "160px",
+      sortable: true,
+      sortKey: "seccion",
+    },
     {
       key: "estado",
       header: "Estado",
       width: "180px",
       align: "center",
+      sortable: true,
+      sortKey: "estado",
       cell: this.estadoCell,
     },
     {
@@ -121,6 +144,7 @@ export class ModulosAdminListComponent implements OnInit {
       header: "Acciones",
       width: "200px",
       align: "end",
+      searchable: false,
       cell: this.accionesCell,
     },
   ]);
@@ -131,41 +155,31 @@ export class ModulosAdminListComponent implements OnInit {
   private accionesCell!: TemplateRef<TableCellContext<ModuloResponse>>;
 
   ngOnInit(): void {
-    void this.bootstrap();
+    // El `effect()` interno del UiTable dispara el primer fetch al construirse.
   }
 
-  private async bootstrap(): Promise<void> {
-    await this.service.load(this.currentQuery());
+  // ----- Sincronización query signal <-> UiTable -----
+
+  /** Unico handler del UiTable: aplica el query mutado al signal. */
+  protected onQueryChange(q: ModuloQueryParams): void {
+    this.service.query.set(q);
   }
 
-  protected onPageChange(event: TablePageEvent): void {
-    void this.service.load({
-      page: event.page,
-      pageSize: event.pageSize,
-    });
-  }
-
-  protected onSearchChange(term: string): void {
-    void this.service.load({ search: term, page: 1 });
-  }
+  // ----- Filtros de dominio -----
 
   protected onSeccionFiltroChange(value: unknown): void {
     const v = value == null ? "" : String(value);
     this.seccionFiltroActual.set(v);
-    void this.service.load({
-      seccion: v ? v : null,
-      page: 1,
-    });
+    this.service.filterBySeccion(v || null);
   }
 
   protected onEstadoFiltroChange(value: unknown): void {
     const v = value == null ? "" : String(value);
     this.estadoFiltroActual.set(v);
-    void this.service.load({
-      estado: v === "" ? null : (Number(v) as 0 | 1),
-      page: 1,
-    });
+    this.service.filterByEstado(v === "" ? null : (Number(v) as 0 | 1));
   }
+
+  // ----- Acciones (mutaciones via servicio) -----
 
   protected onCreate(): void {
     this.createOpen.set(true);
@@ -202,7 +216,6 @@ export class ModulosAdminListComponent implements OnInit {
     if (creado) {
       this.createOpen.set(false);
       this.successAlert.set(`Modulo "${creado.nombre}" creado.`);
-      await this.service.load(this.currentQuery());
     }
   }
 
@@ -221,7 +234,6 @@ export class ModulosAdminListComponent implements OnInit {
     if (actualizado) {
       this.editTarget.set(null);
       this.successAlert.set(`Modulo "${actualizado.nombre}" actualizado.`);
-      await this.service.load(this.currentQuery());
     }
   }
 
@@ -265,7 +277,6 @@ export class ModulosAdminListComponent implements OnInit {
       this.successAlert.set(
         `Modulo "${actualizado.nombre}" ${accion}do.`,
       );
-      await this.service.load(this.currentQuery());
     }
   }
 

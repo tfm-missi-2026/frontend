@@ -114,8 +114,14 @@
 
   @if (isOpen()) {
     <div
-      class="absolute left-0 right-0 top-[calc(100%+4px)] z-9999 bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-lg shadow-theme-lg p-1 max-h-65 overflow-y-auto"
-      [class.fixed]="menuPosition() === 'fixed'"
+      #menuRef
+      class="z-999999 bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-lg shadow-theme-lg p-1 overflow-y-auto"
+      [class]="effectiveMenuPosition() === 'fixed' ? '' : 'absolute left-0 right-0 top-[calc(100%+4px)] max-h-65'"
+      [class.fixed]="effectiveMenuPosition() === 'fixed'"
+      [style.top]="menuStyle()?.top ?? null"
+      [style.left]="menuStyle()?.left ?? null"
+      [style.width]="menuStyle()?.width ?? null"
+      [style.max-height]="menuStyle()?.maxHeight ?? null"
     >
       @if (showLoading()) {
         <div

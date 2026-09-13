@@ -12,11 +12,11 @@ import { FormsModule } from "@angular/forms";
 
 import { LookupsService } from "@core/lookups/lookups.service";
 import { resolverRegistroModulo } from "@core/modulos/modulo.registry";
-import { UiButtonComponent } from "@shared/ui/button";
+import type { ModuloResponse } from "@core/modulos/modulo.models";
+import { IconCheckComponent, IconXComponent } from "@shared/icons";
 import { UiFieldErrorComponent } from "@shared/ui/field-error";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiFormLabelComponent } from "@shared/ui/form-label";
-import { UiHeaderComponent } from "@shared/ui/header";
 import { UiInputComponent } from "@shared/ui/input";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
@@ -24,11 +24,13 @@ import { UiSelectComponent } from "@shared/ui/select";
 import type { SelectOption } from "@shared/ui/select";
 import { UiTextAreaComponent } from "@shared/ui/text-area";
 
+import { PermissionsMatrixComponent } from "../permissions-matrix/permissions-matrix.component";
 import type { RoleFormData } from "../../models/role";
 import { emptyRoleForm } from "../../models/role";
 
 export type RoleFormSavePayload = {
   data: RoleFormData;
+  permisos: string[];
 };
 
 const CODE_PATTERN = /^[A-Za-z0-9]{2,4}$/;
@@ -40,29 +42,34 @@ const DESCRIPTION_MAX = 500;
   standalone: true,
   imports: [
     FormsModule,
-    UiButtonComponent,
     UiFieldErrorComponent,
     UiFlexComponent,
     UiFormLabelComponent,
-    UiHeaderComponent,
     UiInputComponent,
     UiLabelComponent,
     UiModalComponent,
     UiSelectComponent,
     UiTextAreaComponent,
+    PermissionsMatrixComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./role-form-modal.component.html",
 })
 export class RoleFormModalComponent {
   readonly isOpen = input<boolean>(false);
+  readonly modules = input<ModuloResponse[]>([]);
+  readonly saving = input<boolean>(false);
 
   readonly close = output<void>();
   readonly save = output<RoleFormSavePayload>();
 
+  protected readonly IconCheck = IconCheckComponent;
+  protected readonly IconX = IconXComponent;
+
   private readonly lookups = inject(LookupsService);
 
   protected readonly form = signal<RoleFormData>(emptyRoleForm());
+  protected readonly permisos = signal<string[]>([]);
   protected readonly codeTouched = signal<boolean>(false);
   protected readonly nameTouched = signal<boolean>(false);
   protected readonly descriptionTouched = signal<boolean>(false);
@@ -81,11 +88,18 @@ export class RoleFormModalComponent {
       .map((m) => ({ value: m.id, label: m.nombre })),
   );
 
+  protected readonly landingCodigo = computed<string | null>(() => {
+    const id = this.form().paginaInicioId;
+    if (!id) return null;
+    return this.lookups.modulos().find((m) => m.id === id)?.codigo ?? null;
+  });
+
   constructor() {
     effect(() => {
       const open = this.isOpen();
       if (open) {
         this.form.set(emptyRoleForm());
+        this.permisos.set([]);
         this.resetTouched();
       }
     });
@@ -195,16 +209,38 @@ export class RoleFormModalComponent {
 
   protected onPaginaInicioChange(value: unknown): void {
     this.paginaInicioTouched.set(true);
-    this.patch({ paginaInicioId: value == null ? "" : String(value) });
+    const id = value == null ? "" : String(value);
+    this.patch({ paginaInicioId: id });
+    const codigo = id
+      ? (this.lookups.modulos().find((m) => m.id === id)?.codigo ?? null)
+      : null;
+    if (codigo && !this.permisos().includes(codigo)) {
+      this.permisos.update((arr) => [...arr, codigo]);
+    }
+  }
+
+  protected onPermisosChange(codigos: string[]): void {
+    this.permisos.set(codigos);
   }
 
   protected onCancel(): void {
     this.close.emit();
   }
 
+  protected onAction(side: "left" | "right"): void {
+    if (side === "left") {
+      this.onCancel();
+    } else {
+      this.onSave();
+    }
+  }
+
   protected onSave(): void {
     this.submitAttempted.set(true);
     if (!this.isValid()) return;
-    this.save.emit({ data: this.form() });
+    this.save.emit({
+      data: this.form(),
+      permisos: this.permisos(),
+    });
   }
 }
