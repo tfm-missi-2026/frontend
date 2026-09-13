@@ -11,10 +11,10 @@ import {
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 
+import { IconCheckComponent, IconXComponent } from "@shared/icons";
+
 import { UiAlertComponent } from "@shared/ui/alert";
-import { UiButtonComponent } from "@shared/ui/button";
 import { UiFieldErrorComponent } from "@shared/ui/field-error";
-import { UiFlexComponent } from "@shared/ui/flex";
 import { UiInputComponent } from "@shared/ui/input";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
@@ -40,9 +40,7 @@ const CODE_REGEX = /^[A-Z0-9-]+$/;
   imports: [
     FormsModule,
     UiAlertComponent,
-    UiButtonComponent,
     UiFieldErrorComponent,
-    UiFlexComponent,
     UiInputComponent,
     UiLabelComponent,
     UiModalComponent,
@@ -53,6 +51,9 @@ const CODE_REGEX = /^[A-Z0-9-]+$/;
   templateUrl: "./project-form-modal.component.html",
 })
 export class ProjectFormModalComponent {
+  protected readonly IconCheck = IconCheckComponent;
+  protected readonly IconX = IconXComponent;
+
   private readonly usersService = inject(UsersService);
   private readonly toastService = inject(ToastService);
 
@@ -138,6 +139,14 @@ export class ProjectFormModalComponent {
   protected onManagerChange(value: unknown): void {
     this.patch({ managerId: value == null ? "" : String(value) });
     this.managerError.set(null);
+  }
+
+  protected onAction(side: "left" | "right"): void {
+    if (side === "left") {
+      this.onCancel();
+    } else {
+      this.onSave();
+    }
   }
 
   protected onCancel(): void {
