@@ -1,25 +1,24 @@
-<UiFlex direction="column" [gap]="20">
+<UiFlex direction="column" [gap]="5">
   <CommonBreadcrumb [items]="breadcrumbItems" />
 
   <UiFlex
     direction="row"
-    alignItems="end"
+    alignItems="center"
     justifyContent="between"
-    [gap]="12"
+    [gap]="3"
     className="flex-wrap"
   >
-    <UiFlex direction="column" [gap]="4">
+    <UiFlex direction="column" [gap]="1">
       <UiHeader [level]="1" text="Proyectos" />
       <UiLabel
         type="bodyS"
         color="textWeak"
-        className="max-w-185"
       >
         Un proyecto es un
-        <strong class="text-gray-800 dark:text-white/90">sistema</strong>
+        sistema
         gestionado por el área. Las fechas y la prioridad se definen dentro de
         cada
-        <strong class="text-gray-800 dark:text-white/90">subproyecto</strong>,
+        subproyecto,
         no aquí.
       </UiLabel>
     </UiFlex>

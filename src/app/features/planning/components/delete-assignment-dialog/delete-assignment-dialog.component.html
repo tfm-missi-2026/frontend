@@ -1,0 +1,67 @@
+<UiModal
+  [isOpen]="isOpen()"
+  [showCloseButton]="true"
+  [showFooter]="true"
+  className="max-w-115"
+  title="Eliminar asignación"
+  subtitle="La asignación deja de contar en la carga del recurso."
+  [leftAction]="{ label: 'Cancelar', variant: 'secondary', icon: IconX }"
+  [rightAction]="{
+    label: 'Eliminar',
+    variant: 'primary',
+    styleType: 'danger',
+    icon: IconCheck,
+    disabled: saving(),
+    loading: saving(),
+  }"
+  (close)="cancel.emit()"
+  (action)="onAction($event)"
+>
+  <UiFlex direction="column" [gap]="4">
+    <UiLabel type="bodyS" color="textStrong">
+      Se dará de baja la asignación seleccionada. Las líneas base ya congeladas
+      la conservan.
+    </UiLabel>
+
+    <UiSurface variant="neutral" padding="md">
+      <UiFlex direction="column" [gap]="2">
+        <UiFlex direction="row" alignItems="center" justifyContent="between">
+          <UiLabel type="bodyXs" color="textWeak" text="Recurso técnico" />
+          <UiLabel
+            type="bodyXs"
+            weight="semibold"
+            color="textStrong"
+            [text]="resourceName()"
+          />
+        </UiFlex>
+        <UiFlex direction="row" alignItems="center" justifyContent="between">
+          <UiLabel type="bodyXs" color="textWeak" text="Tarea" />
+          <UiLabel
+            type="bodyXs"
+            weight="semibold"
+            color="textStrong"
+            [text]="taskName()"
+          />
+        </UiFlex>
+        <UiFlex direction="row" alignItems="center" justifyContent="between">
+          <UiLabel type="bodyXs" color="textWeak" text="Horas planificadas" />
+          <UiLabel
+            type="bodyXs"
+            weight="semibold"
+            color="textStrong"
+            [text]="plannedHours() + ' h'"
+          />
+        </UiFlex>
+        <UiFlex direction="row" alignItems="center" justifyContent="between">
+          <UiLabel type="bodyXs" color="textWeak" text="Periodo" />
+          <UiLabel
+            type="bodyXs"
+            weight="semibold"
+            color="textStrong"
+            [text]="periodLabel()"
+          />
+        </UiFlex>
+      </UiFlex>
+    </UiSurface>
+  </UiFlex>
+</UiModal>

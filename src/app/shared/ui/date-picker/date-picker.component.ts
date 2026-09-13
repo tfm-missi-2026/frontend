@@ -4,6 +4,7 @@ import {
   ChangeDetectorRef,
   Component,
   computed,
+  effect,
   ElementRef,
   forwardRef,
   inject,
@@ -14,6 +15,7 @@ import {
 } from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import flatpickr from "flatpickr";
+import { Spanish } from "flatpickr/dist/l10n/es.js";
 
 import { IconCalendar24Component } from "@shared/icons";
 import { UiFormLabelComponent } from "@shared/ui/form-label/form-label.component";
@@ -89,6 +91,18 @@ export class UiDatePickerComponent
   private flatpickrInstance: flatpickr.Instance | undefined;
   private cdr = inject(ChangeDetectorRef);
 
+  constructor() {
+    effect(() => {
+      const next = this.value();
+      const fp = this.flatpickrInstance;
+      if (!fp) return;
+      const incoming = Array.isArray(next) ? next.join(", ") : next ?? "";
+      if (incoming === this.internalValue) return;
+      this.internalValue = incoming;
+      fp.setDate(incoming, false);
+    });
+  }
+
   private onChangeFn: (value: string | string[]) => void = () => {};
   private onTouchedFn: () => void = () => {};
 
@@ -98,7 +112,10 @@ export class UiDatePickerComponent
 
     this.flatpickrInstance = flatpickr(el, {
       mode: this.mode(),
-      static: true,
+      static: false,
+      appendTo: document.body,
+      position: "auto",
+      locale: Spanish,
       monthSelectorType: "static",
       dateFormat: this.dateFormat(),
       defaultDate: this.defaultDate() ?? this.value() ?? undefined,

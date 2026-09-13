@@ -2,7 +2,7 @@ import {
   HttpErrorResponse,
   HttpInterceptorFn,
 } from "@angular/common/http";
-import { inject } from "@angular/core";
+import { Injector, inject } from "@angular/core";
 import { Router } from "@angular/router";
 import { catchError, throwError } from "rxjs";
 
@@ -32,7 +32,12 @@ const KNOWN_CODES = new Set<string>([
 
 // Paths que no muestran toast porque el caller los maneja (login, etc.)
 // o son pings de salud.
-const SILENT_PATHS = ["/api/auth/login", "/api/ping", "/api/ping/secure"];
+const SILENT_PATHS = [
+  "/api/auth/login",
+  "/api/ping",
+  "/api/ping/secure",
+  "/api/avance/por-proyecto",
+];
 
 export function parseProblem(error: HttpErrorResponse): ApiProblem | null {
   const body = error.error;
@@ -54,6 +59,7 @@ export function parseProblem(error: HttpErrorResponse): ApiProblem | null {
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
+  const injector = inject(Injector);
   return next(req).pipe(
     catchError((raw: unknown) => {
       const err = raw instanceof HttpErrorResponse ? raw : null;
@@ -64,25 +70,19 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         // bloqueado). `retryInterceptor` ya agoto sus reintentos; aca
         // solo notificamos al usuario una vez.
         void import("./toast.service").then(({ ToastService }) => {
-          try {
-            inject(ToastService).error(
+          injector
+            .get(ToastService)
+            .error(
               "No se pudo conectar con el servidor. Verifica tu conexión e intenta nuevamente.",
               "Sin conexión",
             );
-          } catch {
-            // Si ToastService no esta disponible (ej. tests), noop.
-          }
         });
       }
       const problem = parseProblem(err);
       if (problem && !isSilent && err.status !== 0) {
         // Lazy import para no romper el bootstrap si ngx-toastr no esta listo.
         void import("./toast.service").then(({ ToastService }) => {
-          try {
-            inject(ToastService).showProblem(problem);
-          } catch {
-            // Si ToastService no esta disponible (ej. tests), noop.
-          }
+          injector.get(ToastService).showProblem(problem);
         });
       }
       // 401 ya lo maneja jwtInterceptor (limpia sesion). Si llega aca,

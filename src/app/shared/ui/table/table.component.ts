@@ -317,10 +317,9 @@ export class UiTableComponent<
 
   protected thClass(col: TableColumn<TRow>): string {
     return [
-      "px-4 py-3 font-semibold text-gray-700 text-sm text-start",
+      "px-4 py-3 font-semibold text-gray-700 text-sm",
       "bg-gray-50 border-b border-gray-200 dark:bg-white/[0.02] dark:border-white/[0.05] dark:text-gray-300",
-      col.align === "center" ? "text-center" : "",
-      col.align === "end" ? "text-end" : "",
+      col.align === "center" ? "text-center" : col.align === "end" ? "text-end" : "text-start",
       col.sortable ? "cursor-pointer select-none hover:text-brand-600 dark:hover:text-brand-400" : "",
       tableWidthClass(col.width),
       col.headerClassName ?? "",
@@ -331,9 +330,8 @@ export class UiTableComponent<
 
   protected tdClass(col: TableColumn<TRow>): string {
     return [
-      "px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400",
-      col.align === "center" ? "text-center" : "",
-      col.align === "end" ? "text-end" : "",
+      "px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400",
+      col.align === "center" ? "text-center" : col.align === "end" ? "text-end" : "text-start",
       tableWidthClass(col.width),
       col.cellClassName ?? "",
     ]
