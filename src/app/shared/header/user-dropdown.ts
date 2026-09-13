@@ -111,6 +111,11 @@ const ACTION_CLASS =
           <UiLabel type="bodyXs" color="textWeak" className="block mt-0.5">
             {{ user().email }}
           </UiLabel>
+          @if (user().role; as rol) {
+            <UiLabel type="bodyXs" color="textWeak" className="block mt-0.5">
+              {{ rol }}
+            </UiLabel>
+          }
         </UiFlex>
 
         <ul [class]="MENU_LIST_CLASS">

@@ -152,19 +152,11 @@ export class VariationsService {
         catalog.byId.get(`__type__:${data.type}`) ??
         this.findCatalogIdByName("TIPO_VARIACION", data.type) ??
         "";
-      // Para "reportar" asumimos situacion = "Pendiente".
-      const situacionId =
-        this.findCatalogIdByName("SITUACION_VARIACION", "Pendiente") ?? "";
-      if (!tipoId || !situacionId) {
+      if (!tipoId) {
         this._error.set("No se encontraron los catalogos requeridos.");
         return null;
       }
-      const body = formDataToCrearApi(
-        data,
-        tipoId,
-        situacionId,
-        reportedById,
-      );
+      const body = formDataToCrearApi(data, tipoId, reportedById);
       const creada = await firstValueFrom(this.api.crear(body));
       const variation = variacionApiToVariation(creada, this.context());
       this._items.update((arr) => [variation, ...arr]);

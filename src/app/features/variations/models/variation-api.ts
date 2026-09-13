@@ -11,7 +11,7 @@ export interface VariacionApi {
   valorNuevo: string | null;
   fechaDeteccion: string; // ISO date
   reportadaPor: string;
-  situacionId: string;
+  situacionId: string | null;
   observacionResolucion: string | null;
   fechaResolucion: string | null; // ISO datetime
   resueltoPor: string | null;
@@ -27,7 +27,6 @@ export interface VariacionCrearApi {
   valorNuevo: string | null;
   fechaDeteccion: string;
   reportadaPor: string;
-  situacionId: string;
 }
 
 export interface VariacionResolverApi {

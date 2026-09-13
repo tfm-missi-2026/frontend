@@ -7,7 +7,6 @@ import {
 } from "@angular/core";
 
 import {
-  IconCalendar24Component,
   IconPlusSimpleComponent,
 } from "@shared/icons";
 import { UiBadgeComponent } from "@shared/ui/badge";
@@ -17,10 +16,10 @@ import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiSeparatorComponent } from "@shared/ui/separator";
 import { UiSurfaceComponent } from "@shared/ui/surface";
+import type { SelectOption } from "@shared/ui/select";
 import { compareKeys } from "@utils/collections";
 import type { TimesheetViewMode } from "../timesheet-toolbar/timesheet-toolbar.component";
 import {
-  TIMESHEET_TASKS,
   type TimesheetEntry,
 } from "../../models/timesheet-entry";
 
@@ -53,7 +52,6 @@ function blockDuration(start: string, end: string): string {
   selector: "TimesheetTimeline",
   standalone: true,
   imports: [
-    IconCalendar24Component,
     UiBadgeComponent,
     UiButtonComponent,
     UiFlexComponent,
@@ -69,6 +67,7 @@ export class TimesheetTimelineComponent {
   readonly entries = input<TimesheetEntry[]>([]);
   readonly heading = input<string>("");
   readonly mode = input<TimesheetViewMode>("day");
+  readonly taskOptions = input<SelectOption[]>([]);
 
   readonly edit = output<TimesheetEntry>();
   readonly remove = output<TimesheetEntry>();
@@ -90,9 +89,9 @@ export class TimesheetTimelineComponent {
       let linkCode: string | undefined;
 
       if (entry.kind === "task") {
-        const task = TIMESHEET_TASKS.find((t) => t.id === entry.task);
-        linkLabel = task?.name ?? "Tarea sin asignar";
-        linkCode = entry.taskCode ?? task?.code;
+        const opcion = this.taskOptions().find((o) => o.value === entry.task);
+        linkLabel = String(opcion?.label ?? "Tarea sin asignar");
+        linkCode = entry.taskCode;
       } else {
         linkLabel = entry.activity ?? "Actividad";
       }

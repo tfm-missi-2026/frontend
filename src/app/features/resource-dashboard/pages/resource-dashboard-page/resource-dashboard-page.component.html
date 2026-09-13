@@ -1,22 +1,22 @@
-<UiFlex direction="column" [gap]="20">
+<UiFlex direction="column" [gap]="5">
   <CommonBreadcrumb
     [items]="[{ label: 'Operación' }, { label: 'Dashboard Recurso' }]"
   />
 
   <UiFlex
     direction="row"
-    alignItems="end"
+    alignItems="center"
     justifyContent="between"
-    [gap]="12"
+    [gap]="3"
     className="flex-wrap"
   >
     <UiFlex direction="column" [gap]="6" className="flex-1 min-w-60">
       <UiHeader [level]="1" [text]="dashboard().greeting" />
       <UiLabel type="bodyS" color="textWeak">
         Mi trabajo · periodo
-        <strong class="font-semibold text-gray-800 dark:text-white/90">
+        
           {{ currentPeriod().label }}
-        </strong>
+        
         · {{ dashboard().activeTaskCount }} tareas activas.
       </UiLabel>
     </UiFlex>
@@ -77,7 +77,7 @@
   >
     <UiLabel type="bodyS" color="textWeak">
       El dashboard
-      <strong class="font-semibold text-gray-800 dark:text-white/90">solo agrega y enlaza</strong>
+      solo agrega y enlaza
       : muestra indicadores tomados de Planificación, Bitácora y Variaciones.
       La captura y edición ocurre en cada módulo.
     </UiLabel>

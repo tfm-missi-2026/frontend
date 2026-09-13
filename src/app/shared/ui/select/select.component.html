@@ -1,9 +1,7 @@
 <div
   #rootRef
-  class="relative flex flex-col gap-1.5 w-full font-outfit"
-  [class]="className()"
-  [class]="widthClass()"
-  [class]="minWidthClass()"
+  class="relative flex flex-col gap-1.5 w-full min-w-0 font-outfit"
+  [class]="rootExtraClasses()"
 >
   @if (labelText()) {
     <UiFormLabel

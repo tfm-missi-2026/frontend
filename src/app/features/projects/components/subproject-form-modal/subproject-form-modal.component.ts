@@ -16,9 +16,10 @@ import { userFullName } from "@features/users/models/user";
 import { ToastService } from "@core/http/toast.service";
 import { CatalogService } from "@features/catalog/services/catalog.service";
 
+import { IconCheckComponent, IconXComponent } from "@shared/icons";
+
 import { UiAlertComponent } from "@shared/ui/alert";
 import { UiBadgeComponent } from "@shared/ui/badge";
-import { UiButtonComponent } from "@shared/ui/button";
 import { UiDatePickerComponent } from "@shared/ui/date-picker";
 import { UiFieldErrorComponent } from "@shared/ui/field-error";
 import { UiFlexComponent } from "@shared/ui/flex";
@@ -57,7 +58,6 @@ function todayIso(): string {
     FormsModule,
     UiAlertComponent,
     UiBadgeComponent,
-    UiButtonComponent,
     UiDatePickerComponent,
     UiFieldErrorComponent,
     UiFlexComponent,
@@ -73,6 +73,9 @@ function todayIso(): string {
   templateUrl: "./subproject-form-modal.component.html",
 })
 export class SubprojectFormModalComponent {
+  protected readonly IconCheck = IconCheckComponent;
+  protected readonly IconX = IconXComponent;
+
   private readonly usersService = inject(UsersService);
   private readonly toastService = inject(ToastService);
   private readonly catalogService = inject(CatalogService);
@@ -256,6 +259,14 @@ export class SubprojectFormModalComponent {
 
   protected patch(partial: Partial<SubprojectFormData>): void {
     this.form.update((prev) => ({ ...prev, ...partial }));
+  }
+
+  protected onAction(side: "left" | "right"): void {
+    if (side === "left") {
+      this.onCancel();
+    } else {
+      this.onSave();
+    }
   }
 
   protected onCancel(): void {

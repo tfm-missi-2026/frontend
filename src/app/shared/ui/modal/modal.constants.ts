@@ -48,7 +48,7 @@ export const MODAL_HEADER_CLASSES = [
 ];
 
 export const MODAL_BODY_CLASSES = [
-  "flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto",
+  "flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto no-scrollbar",
   "px-4 sm:px-5 lg:px-6",
   "pt-4 sm:pt-5 lg:pt-6",
   "pb-4 sm:pb-5 lg:pb-6",
