@@ -66,16 +66,19 @@ export class VariationsService {
   private readonly context = computed(() => {
     const subs = this.subprojectsService.subs();
     const projectIdBySubprojectId = new Map<string, string>();
+    const ticketBySubprojectId = new Map<string, string | null>();
     const subprojectIdByTaskId = new Map<string, string>();
     for (const s of subs) {
       projectIdBySubprojectId.set(s.id, s.projectId);
+      ticketBySubprojectId.set(s.id, s.ticket);
     }
     const tasks = this.tasksService.tasks();
     const taskLabelByTaskId = new Map<string, string>();
     const taskRefByTaskId = new Map<string, string>();
     for (const t of tasks) {
       taskLabelByTaskId.set(t.id, t.name);
-      taskRefByTaskId.set(t.id, t.subprojectId);
+      const ticket = ticketBySubprojectId.get(t.subprojectId);
+      taskRefByTaskId.set(t.id, ticket ? `#${ticket}` : `#${t.subprojectId}`);
       subprojectIdByTaskId.set(t.id, t.subprojectId);
     }
     // userId -> "Nombre ApellidoP ApellidoM" para resolver UUIDs.
