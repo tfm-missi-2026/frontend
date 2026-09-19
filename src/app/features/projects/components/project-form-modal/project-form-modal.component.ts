@@ -60,6 +60,7 @@ export class ProjectFormModalComponent {
   readonly isOpen = input<boolean>(false);
   readonly mode = input<ProjectFormMode>("create");
   readonly project = input<Project | null>(null);
+  readonly saving = input<boolean>(false);
 
   readonly close = output<void>();
   readonly save = output<ProjectFormSavePayload>();
@@ -93,6 +94,13 @@ export class ProjectFormModalComponent {
     () => this.mode() === "edit",
   );
 
+  // Guarda local de doble-envio: se pone en true de forma sincronica dentro
+  // de `onSave()`, sin depender de que el input `saving` (que viene del
+  // padre, tras el ciclo de deteccion de cambios) ya haya llegado. Se
+  // resetea cuando `saving()` vuelve a false (el padre termino el intento,
+  // haya tenido exito o no) o de inmediato si la validacion local falla.
+  private readonly _submitting = signal(false);
+
   constructor() {
     effect(() => {
       const open = this.isOpen();
@@ -104,6 +112,7 @@ export class ProjectFormModalComponent {
       this.codeError.set(null);
       this.nameError.set(null);
       this.managerError.set(null);
+      this._submitting.set(false);
       if (m === "edit" && p) {
         this.form.set({
           code: p.code,
@@ -114,6 +123,10 @@ export class ProjectFormModalComponent {
       } else {
         this.form.set(emptyProjectForm());
       }
+    });
+
+    effect(() => {
+      if (!this.saving()) this._submitting.set(false);
     });
   }
 
@@ -158,6 +171,9 @@ export class ProjectFormModalComponent {
   }
 
   protected onSave(): void {
+    if (this._submitting()) return;
+    this._submitting.set(true);
+
     const f = this.form();
     const m = this.mode();
     const errors = this.validate(f);
@@ -166,6 +182,7 @@ export class ProjectFormModalComponent {
     this.managerError.set(errors.manager ?? null);
     if (Object.keys(errors).length > 0) {
       this.validationMessage.set("Revisa los campos marcados antes de guardar.");
+      this._submitting.set(false);
       return;
     }
     this.validationMessage.set(null);

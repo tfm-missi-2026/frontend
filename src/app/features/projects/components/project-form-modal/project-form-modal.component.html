@@ -14,6 +14,8 @@
     label: 'Guardar',
     variant: 'primary',
     icon: IconCheck,
+    disabled: saving(),
+    loading: saving(),
   }"
   (close)="onCancel()"
   (action)="onAction($event)"

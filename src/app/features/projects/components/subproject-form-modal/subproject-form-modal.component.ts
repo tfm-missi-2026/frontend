@@ -102,6 +102,8 @@ export class SubprojectFormModalComponent {
   /** Tickets activos de otros subproyectos del mismo proyecto, para detectar duplicados. */
   readonly existingTickets = input<readonly string[]>([]);
 
+  readonly saving = input<boolean>(false);
+
   readonly close = output<void>();
   readonly save = output<SubprojectFormSavePayload>();
 
@@ -177,12 +179,18 @@ export class SubprojectFormModalComponent {
     return selectedName === "Rechazado";
   });
 
+  // Ver comentario equivalente en project-form-modal.component.ts: guarda
+  // local de doble-envio, sincronica, independiente del ciclo de deteccion
+  // de cambios que trae el input `saving` desde el padre.
+  private readonly _submitting = signal(false);
+
   constructor() {
     effect(() => {
       const open = this.isOpen();
       if (!open) return;
       untracked(() => void this.usersService.cargar());
       this.resetErrors();
+      this._submitting.set(false);
       const m = this.mode();
       const s = this.subproject();
       if (m === "edit" && s) {
@@ -199,6 +207,10 @@ export class SubprojectFormModalComponent {
       } else {
         this.form.set(emptySubprojectForm());
       }
+    });
+
+    effect(() => {
+      if (!this.saving()) this._submitting.set(false);
     });
   }
 
@@ -278,6 +290,9 @@ export class SubprojectFormModalComponent {
   }
 
   protected onSave(): void {
+    if (this._submitting()) return;
+    this._submitting.set(true);
+
     const f = this.form();
     const errors = this.validate(f);
     this.typeError.set(errors.type);
@@ -292,6 +307,7 @@ export class SubprojectFormModalComponent {
       this.validationMessage.set(
         "Revisa los campos marcados antes de guardar.",
       );
+      this._submitting.set(false);
       return;
     }
     this.validationMessage.set(null);

@@ -185,8 +185,6 @@ export class UiInputComponent
     this.charCount.set(next.length);
   }
 
-  readonly hasLeftIcon = computed<boolean>(() => !!this.leftIcon());
-  readonly hasRightIcon = computed<boolean>(() => !!this.rightIcon());
   readonly hasError = computed<boolean>(() => !!this.errorMessage());
 
   readonly shouldShowPasswordToggle = computed<boolean>(
@@ -238,8 +236,13 @@ export class UiInputComponent
           ? "border-error-500"
           : "border-gray-300 dark:border-gray-700",
       getFocusStyling("within"),
-      this.hasLeftIcon() ? "pl-0" : "pl-3",
-      this.hasRightIcon() || this.shouldShowPasswordToggle() ? "pr-0" : "pr-3",
+      // El padding del contenedor solo se anula para el toggle de
+      // contraseña: es un boton de alto completo que necesita llegar
+      // hasta el borde para que su hover/rounded quede parejo. Un icono
+      // decorativo (izquierdo o derecho) no tiene padding propio, asi
+      // que debe conservar el inset estandar o queda pegado al borde.
+      "pl-3",
+      this.shouldShowPasswordToggle() ? "pr-0" : "pr-3",
     ];
     return baseLayout.filter(Boolean).join(" ");
   });

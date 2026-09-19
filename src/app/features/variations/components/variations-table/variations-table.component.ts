@@ -15,26 +15,6 @@ import { formatShortDate } from "@utils/date";
 
 import type { Variation } from "../../models/variation";
 
-const COLUMN_CLASSES = [
-  "flex-1 min-w-0",
-  "w-24 shrink-0 justify-center",
-  "flex-1 min-w-0",
-  "w-32 shrink-0",
-  "w-24 shrink-0",
-  "w-32 shrink-0 justify-center",
-  "flex-1 shrink-0 justify-end",
-] as const;
-
-const HEADER_LABELS = [
-  "Tarea afectada",
-  "Tipo",
-  "Descripción",
-  "Reportada por",
-  "Detección",
-  "Situación",
-  "",
-] as const;
-
 export interface VariationRowViewModel extends Variation {
   targetLabel: string;
   targetRef: string | null;
@@ -58,9 +38,6 @@ export class VariationsTableComponent {
 
   readonly view = output<Variation>();
   readonly resolve = output<Variation>();
-
-  protected readonly columnClasses = COLUMN_CLASSES;
-  protected readonly headerLabels = HEADER_LABELS;
 
   protected formatDate(iso: string): string {
     return formatShortDate(iso);
