@@ -107,6 +107,7 @@ export class UiDatePickerComponent
   private modelValue: string | string[] = "";
 
   private flatpickrInstance: flatpickr.Instance | undefined;
+  private readonly hostEl = inject<ElementRef<HTMLElement>>(ElementRef);
   private cdr = inject(ChangeDetectorRef);
 
   constructor() {
@@ -140,6 +141,12 @@ export class UiDatePickerComponent
   private onTouchedFn: () => void = () => {};
 
   ngAfterViewInit(): void {
+    // Angular refleja el atributo `id` en el host <ui-date-picker> aunque el
+    // componente lo declare como input. El id quedaria duplicado (host +
+    // input interno) y `label[for]` resolveria al primero (no enfocable).
+    // Se elimina del host, igual que en UiInput.
+    this.hostEl.nativeElement.removeAttribute("id");
+
     const el = this.inputEl()?.nativeElement;
     if (!el) return;
 
