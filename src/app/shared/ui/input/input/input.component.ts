@@ -114,7 +114,14 @@ export class UiInputComponent
   private onChangeFn: (value: string) => void = () => {};
   private onTouchedFn: () => void = () => {};
 
+  // Angular refleja el atributo `id` en el host <uiinput> aunque el
+  // componente lo declare como input. El id queda duplicado (host + input
+  // interno) y `label[for]` resuelve al primero (el host, no enfocable),
+  // rompiendo el click-to-focus del label. Se elimina del host.
+  private readonly hostEl = inject<ElementRef<HTMLElement>>(ElementRef);
+
   ngOnInit(): void {
+    this.hostEl.nativeElement.removeAttribute("id");
     this.syncFromValue();
   }
 

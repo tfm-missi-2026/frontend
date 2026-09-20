@@ -7,9 +7,9 @@ import {
 import { FormsModule } from "@angular/forms";
 
 import { UiButtonComponent } from "@shared/ui/button";
+import { UiDatePickerComponent } from "@shared/ui/date-picker";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiFormLabelComponent } from "@shared/ui/form-label";
-import { UiInputComponent } from "@shared/ui/input";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiSelectComponent } from "@shared/ui/select";
 import { UiSurfaceComponent } from "@shared/ui/surface";
@@ -34,9 +34,9 @@ const MES = mesActual();
   imports: [
     FormsModule,
     UiButtonComponent,
+    UiDatePickerComponent,
     UiFlexComponent,
     UiFormLabelComponent,
-    UiInputComponent,
     UiLabelComponent,
     UiSelectComponent,
     UiSurfaceComponent,
@@ -63,5 +63,15 @@ export class TeamLoadToolbarComponent {
     }
     const text = String(value);
     return text === "" ? null : text;
+  }
+
+  // UiDatePicker emite `string | string[]` aun en modo single; hacia el
+  // padre (y la API) siempre viaja un ISO `YYYY-MM-DD`.
+  protected onFromPick(value: string | string[]): void {
+    this.fromChange.emit(Array.isArray(value) ? value[0] ?? "" : value ?? "");
+  }
+
+  protected onToPick(value: string | string[]): void {
+    this.toChange.emit(Array.isArray(value) ? value[0] ?? "" : value ?? "");
   }
 }
