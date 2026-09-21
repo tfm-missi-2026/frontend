@@ -1,0 +1,53 @@
+<UiModal
+  [isOpen]="isOpen()"
+  [showCloseButton]="true"
+  [showFooter]="true"
+  className="max-w-115"
+  title="Congelar línea base"
+  subtitle="RF-05 · foto inmutable del plan"
+  [leftAction]="{ label: 'Cancelar', variant: 'secondary', icon: IconX }"
+  [rightAction]="{
+    label: 'Congelar',
+    variant: 'primary',
+    icon: IconCheck,
+    disabled: unchanged() || saving(),
+    loading: saving(),
+  }"
+  (close)="cancel.emit()"
+  (action)="onAction($event)"
+>
+  <UiFlex direction="column" [gap]="4">
+    @if (unchanged()) {
+      <UiAlert
+        variant="warning"
+        [message]="
+          'El plan no cambió desde la línea base v' +
+          currentVersion() +
+          '. Congelar de nuevo crearía una copia idéntica.'
+        "
+      />
+    }
+
+    <UiLabel type="bodyS" color="textStrong" [text]="explanation()" />
+
+    <UiSurface variant="neutral" padding="md">
+      <UiFlex direction="column" [gap]="2">
+        @for (row of rows(); track row.label) {
+          <UiFlex direction="row" alignItems="center" justifyContent="between">
+            <UiLabel type="bodyXs" color="textWeak" [text]="row.label" />
+            <UiLabel
+              type="bodyXs"
+              weight="semibold"
+              color="textStrong"
+              [text]="row.value"
+            />
+          </UiFlex>
+        }
+      </UiFlex>
+    </UiSurface>
+
+    <UiLabel type="bodyXs" color="textWeak">
+      Una línea base no se puede editar ni eliminar desde el sistema.
+    </UiLabel>
+  </UiFlex>
+</UiModal>

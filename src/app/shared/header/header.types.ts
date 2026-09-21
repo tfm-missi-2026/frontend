@@ -5,6 +5,7 @@ export interface HeaderUserInfo {
   name: string;
   email: string;
   avatar: string;
+  role?: string;
 }
 
 export interface HeaderUserMenuItem {

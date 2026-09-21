@@ -16,6 +16,8 @@ export interface TimesheetEntry {
   task: string;
   taskCode?: string;
   activity?: string;
+  /** Id del catalogo TIPO_ACTIVIDAD elegido al registrar una actividad. */
+  activityTypeId?: string;
   description: string;
   status: TimesheetEntryStatus;
 }
@@ -104,11 +106,9 @@ export const TIMESHEET_TASK_OPTIONS: SelectOption[] = TIMESHEET_TASKS.map((t) =>
   label: `${t.name} · ${t.code}`,
 }));
 
-const INITIAL_TASK = TIMESHEET_TASKS[0];
-
 export function emptyTimesheetEntry(
   date: string,
-  resourceId = "u5",
+  resourceId = "",
 ): Omit<TimesheetEntry, "id"> {
   return {
     resourceId,
@@ -117,10 +117,11 @@ export function emptyTimesheetEntry(
     endTime: "10:00",
     hours: 1,
     kind: "task",
-    project: INITIAL_TASK.projectId,
-    task: INITIAL_TASK.id,
-    taskCode: INITIAL_TASK.code,
-    activity: TIMESHEET_ACTIVITY_CATALOG[0],
+    project: "",
+    task: "",
+    taskCode: undefined,
+    activity: "",
+    activityTypeId: "",
     description: "",
     status: "draft",
   };

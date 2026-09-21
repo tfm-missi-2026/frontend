@@ -2,10 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  ElementRef,
   inject,
   signal,
-  viewChild,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NgClass } from '@angular/common';
@@ -16,6 +14,7 @@ import { SidebarService } from '../../services/sidebar.service';
 import { CommonThemeToggleComponent } from '@shared/common/theme-toggle';
 import {
   HeaderNotificationDropdownComponent,
+  HeaderNotificationsService,
   HeaderUserDropdownComponent,
   type HeaderNotificationItem,
   type HeaderUserInfo,
@@ -24,22 +23,14 @@ import {
 import {
   IconDotsVerticalComponent,
   IconHamburgerComponent,
-  IconInfoCircleBorderComponent,
   IconLogoutComponent,
-  IconSearchComponent,
-  IconSettingsComponent,
-  IconUserCircleComponent,
   IconXLargeComponent,
 } from '@shared/icons';
 import { UiFlexComponent } from '@shared/ui/flex';
 import { UiIconButtonComponent } from '@shared/ui/icon-button';
 import { UiImageComponent } from '@shared/ui/image';
 
-const USER_MENU_ITEMS: HeaderUserMenuItem[] = [
-  { to: '/profile', icon: IconUserCircleComponent, label: 'Editar perfil' },
-  { to: '/profile', icon: IconSettingsComponent, label: 'Configuración de la cuenta' },
-  { to: '/profile', icon: IconInfoCircleBorderComponent, label: 'Soporte' },
-];
+const USER_MENU_ITEMS: HeaderUserMenuItem[] = [];
 
 const SIGN_OUT_ITEM: HeaderUserMenuItem = {
   icon: IconLogoutComponent,
@@ -66,8 +57,7 @@ const SIGN_OUT_ITEM: HeaderUserMenuItem = {
     CommonThemeToggleComponent,
     HeaderNotificationDropdownComponent,
     HeaderUserDropdownComponent,
-    IconSearchComponent,
-    UiFlexComponent,
+      UiFlexComponent,
     UiIconButtonComponent,
     UiImageComponent,
   ],
@@ -78,6 +68,7 @@ export class AppHeaderComponent {
   private readonly sidebarService = inject(SidebarService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  protected readonly headerNotifications = inject(HeaderNotificationsService);
 
   protected readonly isMobileOpen = toSignal(this.sidebarService.isMobileOpen$, {
     initialValue: false,
@@ -91,24 +82,28 @@ export class AppHeaderComponent {
       name: usuario?.nombreCompleto ?? 'Usuario',
       email: usuario?.email ?? '',
       avatar: '/images/user/owner.png',
+      role: usuario?.rol?.nombre,
     };
   });
 
-  protected readonly notifications: HeaderNotificationItem[] = [];
+  protected readonly notifications = computed<HeaderNotificationItem[]>(() =>
+    this.headerNotifications.items(),
+  );
   protected readonly userMenuItems = USER_MENU_ITEMS;
   protected readonly signOutItem = SIGN_OUT_ITEM;
 
   protected readonly hamburgerIcon = IconHamburgerComponent;
   protected readonly closeIcon = IconXLargeComponent;
   protected readonly dotsIcon = IconDotsVerticalComponent;
-  protected readonly searchIcon = IconSearchComponent;
-
-  protected readonly searchInput =
-    viewChild<ElementRef<HTMLInputElement>>('searchInput');
-
   protected readonly mobileToggleBgClass = computed<string>(() =>
     this.isMobileOpen() ? 'bg-gray-100 dark:bg-white/[0.03]' : '',
   );
+
+  constructor() {
+    // Carga unica por sesion de la data del rol para las notificaciones
+    // (idempotente: reusa el cache de los servicios de dashboard).
+    void this.headerNotifications.cargar();
+  }
 
   protected handleToggle(): void {
     // `matchMedia` es más confiable que `window.innerWidth` para
@@ -118,10 +113,6 @@ export class AppHeaderComponent {
     const isDesktop = window.matchMedia('(min-width: 1280px)').matches;
     if (isDesktop) {
       this.sidebarService.toggleExpanded();
-      // Garantiza que el cambio sea visible de inmediato aunque haya
-      // hover residual sobre el aside (e.g. el cursor quedó encima
-      // mientras el usuario iba al botón del header).
-      this.sidebarService.setHovered(false);
     } else {
       this.sidebarService.toggleMobileOpen();
     }
@@ -136,18 +127,4 @@ export class AppHeaderComponent {
     this.isApplicationMenuOpen.update((v) => !v);
   }
 
-  private readonly handleKeyDown = (event: KeyboardEvent): void => {
-    if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
-      event.preventDefault();
-      this.searchInput()?.nativeElement.focus();
-    }
-  };
-
-  constructor() {
-    document.addEventListener('keydown', this.handleKeyDown);
-  }
-
-  ngOnDestroy(): void {
-    document.removeEventListener('keydown', this.handleKeyDown);
-  }
 }

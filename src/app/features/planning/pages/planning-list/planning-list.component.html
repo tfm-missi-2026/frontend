@@ -1,38 +1,49 @@
-<UiFlex direction="column" [gap]="20">
+<UiFlex direction="column" [gap]="5">
   <CommonBreadcrumb [items]="breadcrumbItems" />
 
-  <UiFlex
-    direction="row"
-    alignItems="end"
-    justifyContent="between"
-    [gap]="12"
-    className="flex-wrap"
-  >
-    <UiFlex direction="column" [gap]="4">
-      <UiHeader [level]="1" text="Planificación" />
-      <UiLabel
-        type="bodyS"
-        color="textWeak"
-        className="max-w-190"
-      >
-        Planificar es asignar recursos técnicos a
-        <strong class="font-semibold text-gray-800 dark:text-white/90">tareas</strong>
-        con horas estimadas por periodo. El conjunto de asignaciones establece la
-        <strong class="font-semibold text-gray-800 dark:text-white/90">línea base</strong>
-        del plan.
-      </UiLabel>
-    </UiFlex>
-    <UiButton
-      variant="primary"
-      label="Nueva asignación"
-      labelText="Nueva asignación"
-      [LeftIcon]="IconPlusSimpleComponent"
-      (click)="openCreate()"
-    />
+  <UiFlex direction="column" [gap]="1">
+    <UiHeader [level]="1" text="Planificación" />
+    <UiLabel type="bodyS" color="textWeak">
+      Asignar recursos técnicos a tareas con horas estimadas por periodo. El
+      conjunto de asignaciones establece la línea base del plan.
+    </UiLabel>
   </UiFlex>
 
   @if (freezeAlert(); as msg) {
     <UiAlert variant="success" [message]="msg" />
+  }
+
+  @if (sinLineaBase()) {
+    <UiAlert
+      variant="info"
+      message="Este proyecto todavía no tiene una línea base congelada. Congélala para poder seguir el avance."
+    />
+  }
+
+  <FreezeBaselineDialog
+    [isOpen]="freezeOpen()"
+    [projectLabel]="selectedProject()?.name ?? ''"
+    [assignmentCount]="assignments().length"
+    [resourceCount]="distinctResourceCount()"
+    [totalHours]="totalHours()"
+    [currentVersion]="currentBaseline()?.version ?? null"
+    [unchanged]="baselineUnchanged()"
+    [saving]="freezeSaving()"
+    (confirm)="onFreezeConfirm()"
+    (cancel)="onFreezeCancel()"
+  />
+
+  @if (deleteRow(); as row) {
+    <DeleteAssignmentDialog
+      [isOpen]="true"
+      [resourceName]="row.resourceName"
+      [taskName]="row.taskName"
+      [plannedHours]="row.plannedHours"
+      [periodLabel]="row.startDate + ' – ' + row.endDate"
+      [saving]="deleteSaving()"
+      (confirm)="onDeleteConfirm()"
+      (cancel)="onDeleteCancel()"
+    />
   }
 
   <PlanningToolbar
@@ -41,6 +52,7 @@
     [canFreeze]="canFreeze()"
     (projectChange)="onProjectChange($event)"
     (freeze)="onFreeze()"
+    (create)="openCreate()"
   />
 
   @if (!selectedProjectId()) {
@@ -49,62 +61,17 @@
       padding="lg"
       className="border-dashed text-center"
     >
-      <UiFlex
-        direction="column"
-        alignItems="center"
-        [gap]="12"
-      >
-        <UiFlex
-          direction="row"
-          alignItems="center"
-          justifyContent="center"
-          [gap]="0"
-          className="h-14 w-14 rounded-lg bg-gray-100 dark:bg-gray-800"
-        >
-          <UiLabel type="HeadingM" color="textWeak">∅</UiLabel>
-        </UiFlex>
+      <UiFlex direction="column" alignItems="center" [gap]="12">
         <UiHeader [level]="4" text="Selecciona un proyecto." />
         <UiLabel type="bodyS" color="textWeak">
           Elige un proyecto arriba para ver y crear asignaciones.
         </UiLabel>
       </UiFlex>
     </UiSurface>
-  } @else if (rows().length === 0) {
-    <UiSurface
-      variant="neutral"
-      padding="lg"
-      className="border-dashed text-center"
-    >
-      <UiFlex
-        direction="column"
-        alignItems="center"
-        [gap]="12"
-      >
-        <UiFlex
-          direction="row"
-          alignItems="center"
-          justifyContent="center"
-          [gap]="0"
-          className="h-14 w-14 rounded-lg bg-gray-100 dark:bg-gray-800"
-        >
-          <UiLabel type="HeadingM" color="textWeak">∅</UiLabel>
-        </UiFlex>
-        <UiHeader [level]="4" text="Este proyecto aún no tiene asignaciones." />
-        <UiLabel type="bodyS" color="textWeak">
-          Crea la primera para iniciar la línea base.
-        </UiLabel>
-        <UiButton
-          variant="primary"
-          label="Nueva asignación"
-          labelText="Nueva asignación"
-          [LeftIcon]="IconPlusSimpleComponent"
-          (click)="openCreate()"
-        />
-      </UiFlex>
-    </UiSurface>
   } @else {
     <PlanningTable
       [rows]="rows()"
+      emptyText="Este proyecto aún no tiene asignaciones. Crea la primera para iniciar la línea base."
       (edit)="onEdit($event)"
       (remove)="onRemove($event)"
     />
@@ -150,7 +117,7 @@
       × días hábiles (L–V) del periodo. Si una asignación supera la capacidad,
       SPSRT avisa de
       <strong class="font-semibold text-gray-800 dark:text-white/90">sobrecarga</strong>
-      antes de confirmar (RF-06).
+      antes de confirmar.
     </UiLabel>
   </UiSurface>
 </UiFlex>
@@ -163,6 +130,7 @@
   [taskOptions]="taskOptions()"
   [resourceOptions]="resourceOptions()"
   [resourceNames]="resourceNames()"
+  [saving]="formSaving()"
   (save)="onSave($event)"
   (close)="formOpen.set(false)"
   (overloadRequest)="onOverloadRequest($event)"

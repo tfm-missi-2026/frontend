@@ -4,6 +4,7 @@ import {
   ChangeDetectorRef,
   Component,
   computed,
+  effect,
   ElementRef,
   forwardRef,
   inject,
@@ -14,6 +15,17 @@ import {
 } from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import flatpickr from "flatpickr";
+import { Spanish } from "flatpickr/dist/l10n/es.js";
+
+import { toIsoDate } from "@utils/date";
+
+/** Formato en que se parsean y emiten los valores (`YYYY-MM-DD`). */
+const WIRE_DATE_FORMAT = "Y-m-d";
+
+/** Clave comparable para valores que pueden ser string o string[]. */
+function valueKey(value: string | string[] | null | undefined): string {
+  return Array.isArray(value) ? value.join(",") : value ?? "";
+}
 
 import { IconCalendar24Component } from "@shared/icons";
 import { UiFormLabelComponent } from "@shared/ui/form-label/form-label.component";
@@ -83,22 +95,67 @@ export class UiDatePickerComponent
   readonly inputEl =
     viewChild.required<ElementRef<HTMLInputElement>>("inputEl");
 
-  /** Valor interno (lo que muestra el `<input>`). */
+  /** Valor interno (lo que muestra el `<input>`, formateado segun `dateFormat`). */
   internalValue = "";
 
+  /**
+   * Ultimo valor en formato wire (ISO) visto, sea emitido por el usuario o
+   * recibido por `value`/`writeValue`. Se compara contra esto (y no contra
+   * `internalValue`, que esta en formato de presentacion) para no reaplicar
+   * en bucle un valor que ya esta puesto.
+   */
+  private modelValue: string | string[] = "";
+
   private flatpickrInstance: flatpickr.Instance | undefined;
+  private readonly hostEl = inject<ElementRef<HTMLElement>>(ElementRef);
   private cdr = inject(ChangeDetectorRef);
+
+  constructor() {
+    effect(() => {
+      const next = this.value();
+      if (!this.flatpickrInstance) return;
+      if (valueKey(next) === valueKey(this.modelValue)) return;
+      this.applyValue(next);
+    });
+  }
+
+  /**
+   * Aplica un valor ISO al calendario y refresca el texto visible. El tercer
+   * argumento de `setDate` fuerza a flatpickr a parsear en ISO: sin el usaria
+   * `dateFormat`, que en los formularios es `d/m/Y` y malinterpretaria la fecha.
+   */
+  private applyValue(value: string | string[] | null | undefined): void {
+    const fp = this.flatpickrInstance;
+    const dates = Array.isArray(value) ? value : value ? [value] : [];
+    this.modelValue = Array.isArray(value) ? [...value] : value ?? "";
+    if (!fp) {
+      this.internalValue = dates.join(", ");
+      return;
+    }
+    fp.setDate(dates.length ? dates : "", false, WIRE_DATE_FORMAT);
+    this.internalValue = fp.input.value;
+    this.cdr.markForCheck();
+  }
 
   private onChangeFn: (value: string | string[]) => void = () => {};
   private onTouchedFn: () => void = () => {};
 
   ngAfterViewInit(): void {
+    // Angular refleja el atributo `id` en el host <ui-date-picker> aunque el
+    // componente lo declare como input. El id quedaria duplicado (host +
+    // input interno) y `label[for]` resolveria al primero (no enfocable).
+    // Se elimina del host, igual que en UiInput.
+    this.hostEl.nativeElement.removeAttribute("id");
+
     const el = this.inputEl()?.nativeElement;
     if (!el) return;
 
     this.flatpickrInstance = flatpickr(el, {
       mode: this.mode(),
-      static: true,
+      static: false,
+      appendTo: document.body,
+      position: "auto",
+      locale: Spanish,
       monthSelectorType: "static",
       dateFormat: this.dateFormat(),
       defaultDate: this.defaultDate() ?? this.value() ?? undefined,
@@ -106,14 +163,22 @@ export class UiDatePickerComponent
       maxDate: this.max() ?? undefined,
       clickOpens: !this.disabled() && !this.readOnly(),
       onChange: (selectedDates, dateStr) => {
-        const next =
-          this.mode() === "single" ? dateStr : (dateStr as unknown as string[]);
+        // `dateStr` viene formateado segun `dateFormat` (presentacion). Hacia
+        // afuera siempre se emite ISO, que es el contrato documentado en
+        // `date-picker.types.ts` y el formato que espera el backend.
+        const iso = selectedDates.map(toIsoDate);
+        const next: string | string[] =
+          this.mode() === "single" ? iso[0] ?? "" : iso;
         this.internalValue = dateStr;
+        this.modelValue = next;
         this.onChangeFn(next);
         this.valueChange.emit(next);
         this.cdr.markForCheck();
       },
     });
+
+    const initial = this.value();
+    if (initial !== undefined) this.applyValue(initial);
   }
 
   ngOnDestroy(): void {
@@ -123,12 +188,7 @@ export class UiDatePickerComponent
   // ControlValueAccessor
 
   writeValue(value: string | string[] | null | undefined): void {
-    if (Array.isArray(value)) {
-      this.internalValue = value.join(", ");
-    } else {
-      this.internalValue = value ?? "";
-    }
-    this.flatpickrInstance?.setDate(value ?? "", false);
+    this.applyValue(value);
     this.cdr.markForCheck();
   }
 

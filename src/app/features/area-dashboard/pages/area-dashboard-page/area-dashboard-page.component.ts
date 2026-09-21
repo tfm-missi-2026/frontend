@@ -6,7 +6,6 @@ import {
   OnInit,
   signal,
 } from "@angular/core";
-import { Router } from "@angular/router";
 
 import { AuthService } from "@core/auth/auth.service";
 import { CommonBreadcrumbComponent } from "@shared/common/page-breadcrumb";
@@ -50,7 +49,6 @@ import { AreaDashboardService } from "../../services/area-dashboard.service";
 export class AreaDashboardPageComponent implements OnInit {
   private readonly dashboardService = inject(AreaDashboardService);
   private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
 
   ngOnInit(): void {
     void this.dashboardService.cargar();
@@ -80,8 +78,4 @@ export class AreaDashboardPageComponent implements OnInit {
   protected overloadsList = computed(() =>
     this.dashboard().teamWorkloads.filter((w) => w.utilizationPct > 100),
   );
-
-  protected onKpiClick(path: string): void {
-    void this.router.navigate([path]);
-  }
 }

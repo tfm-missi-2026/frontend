@@ -2,38 +2,35 @@
   direction="row"
   alignItems="center"
   justifyContent="between"
-  [gap]="12"
+  [gap]="3"
   className="flex-wrap"
 >
-  <UiFlex direction="row" alignItems="center" [gap]="8">
-    <UiLabel
-      type="bodyXs"
-      weight="medium"
-      color="textStrong"
-      className="uppercase"
-    >
-      Proyecto
-    </UiLabel>
+  <UiFlex direction="row" alignItems="center" [gap]="3" className="flex-wrap">
     <UiSelect
       [options]="projectOptions()"
-      placeholder="Selecciona un proyecto…"
+      placeholder="Proyecto: selecciona…"
       [searchable]="false"
       [ngModel]="projectId()"
       (ngModelChange)="projectChange.emit(asString($event))"
-      className="min-w-80"
+      [width]="'320px'"
     ></UiSelect>
+    <UiButton
+      variant="primary"
+      label="Nueva asignación"
+      labelText="Nueva asignación"
+      [LeftIcon]="plusIcon"
+      [disabled]="!projectId()"
+      [tooltip]="projectId() ? undefined : 'Selecciona un proyecto primero'"
+      (click)="create.emit()"
+    />
   </UiFlex>
 
-  <UiFlex direction="column" alignItems="end" [gap]="2">
-    <UiButton
-      variant="secondary"
-      label="❄ Congelar línea base"
-      labelText="Congelar línea base"
-      [disabled]="!canFreeze()"
-      (click)="freeze.emit()"
-    />
-    <UiLabel type="bodyXs" color="textWeak">
-      Fija una foto del plan actual · HU-02
-    </UiLabel>
-  </UiFlex>
+  <UiButton
+    variant="secondary"
+    label="Congelar línea base"
+    labelText="Congelar línea base"
+    [disabled]="!canFreeze()"
+    tooltip="Fija una foto del plan actual"
+    (click)="freeze.emit()"
+  />
 </UiFlex>

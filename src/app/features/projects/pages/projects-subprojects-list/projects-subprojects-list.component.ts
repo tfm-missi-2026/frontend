@@ -158,6 +158,7 @@ export class ProjectsSubprojectsListComponent implements OnInit {
   protected readonly formOpen = signal<boolean>(false);
   protected readonly formMode = signal<"create" | "edit">("create");
   protected readonly selectedSub = signal<Subproject | null>(null);
+  protected readonly formSaving = signal<boolean>(false);
 
   protected readonly existingTicketsForForm = computed<string[]>(() => {
     const editingId = this.selectedSub()?.id;
@@ -212,19 +213,25 @@ export class ProjectsSubprojectsListComponent implements OnInit {
   }
 
   protected async onSave(payload: SubprojectFormSavePayload): Promise<void> {
-    if (payload.mode === "create") {
-      const created = await this.subprojectsService.create(
-        payload.projectId,
-        payload.data,
-      );
-      if (created) this.formOpen.set(false);
-    } else {
-      const updated = await this.subprojectsService.update(
-        payload.projectId,
-        payload.id,
-        payload.data,
-      );
-      if (updated) this.formOpen.set(false);
+    if (this.formSaving()) return;
+    this.formSaving.set(true);
+    try {
+      if (payload.mode === "create") {
+        const created = await this.subprojectsService.create(
+          payload.projectId,
+          payload.data,
+        );
+        if (created) this.formOpen.set(false);
+      } else {
+        const updated = await this.subprojectsService.update(
+          payload.projectId,
+          payload.id,
+          payload.data,
+        );
+        if (updated) this.formOpen.set(false);
+      }
+    } finally {
+      this.formSaving.set(false);
     }
   }
 

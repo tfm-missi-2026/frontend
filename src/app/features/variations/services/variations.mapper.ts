@@ -36,10 +36,10 @@ export interface VariationContext {
 
 function lookupOr<T extends string>(
   map: CatalogLookup,
-  id: string,
+  id: string | null,
   fallback: T,
 ): T {
-  return (map.byId.get(id) as T) ?? fallback;
+  return (id ? (map.byId.get(id) as T) : undefined) ?? fallback;
 }
 
 export function variacionApiToVariation(
@@ -91,7 +91,6 @@ export function variacionApiToVariation(
 export function formDataToCrearApi(
   data: VariationFormData,
   tipoVariacionId: string,
-  situacionId: string,
   reportadaPorId: string,
 ): VariacionCrearApi {
   return {
@@ -103,7 +102,6 @@ export function formDataToCrearApi(
     valorNuevo: data.newValue.trim() || null,
     fechaDeteccion: data.detectionDate,
     reportadaPor: reportadaPorId,
-    situacionId,
   };
 }
 

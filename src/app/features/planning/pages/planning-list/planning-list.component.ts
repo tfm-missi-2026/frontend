@@ -7,10 +7,8 @@ import {
   signal,
 } from "@angular/core";
 
-import { IconPlusSimpleComponent } from "@shared/icons";
 import { CommonBreadcrumbComponent } from "@shared/common/page-breadcrumb";
 import { UiAlertComponent } from "@shared/ui/alert";
-import { UiButtonComponent } from "@shared/ui/button";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
@@ -24,6 +22,8 @@ import {
 import {
   OverloadDialogComponent,
 } from "../../components/overload-dialog/overload-dialog.component";
+import { FreezeBaselineDialogComponent } from "../../components/freeze-baseline-dialog/freeze-baseline-dialog.component";
+import { DeleteAssignmentDialogComponent } from "../../components/delete-assignment-dialog/delete-assignment-dialog.component";
 import {
   PlanningTableComponent,
   type AssignmentRowViewModel,
@@ -37,6 +37,7 @@ import type {
   OverloadRequest,
 } from "../../models/assignment-form";
 import { AssignmentsService } from "../../services/assignments.service";
+import type { LineaBaseApi } from "../../models/linea-base-api";
 import { LineaBaseService } from "../../services/linea-base.service";
 import { ProjectsService } from "@features/projects/services/projects.service";
 import { SubprojectsService } from "@features/projects/services/subprojects.service";
@@ -52,10 +53,11 @@ const WORKDAY_HOURS = 8;
     AssignmentFormModalComponent,
     CommonBreadcrumbComponent,
     OverloadDialogComponent,
+    FreezeBaselineDialogComponent,
+    DeleteAssignmentDialogComponent,
     PlanningTableComponent,
     PlanningToolbarComponent,
     UiAlertComponent,
-    UiButtonComponent,
     UiFlexComponent,
     UiHeaderComponent,
     UiLabelComponent,
@@ -73,16 +75,21 @@ export class PlanningListComponent implements OnInit {
   private readonly lineaBaseService = inject(LineaBaseService);
 
   ngOnInit(): void {
-    void this.projectsService.cargar();
-    void this.subprojectsService.cargar();
-    void this.tasksService.cargar();
-    void this.usersService.cargar();
-    void this.assignmentsService.cargar();
-    const pid = this.selectedProjectId();
-    if (pid) void this.lineaBaseService.cargarPorProyecto(pid);
+    void this.cargarDatos();
   }
 
-  protected readonly IconPlusSimpleComponent = IconPlusSimpleComponent;
+  private async cargarDatos(): Promise<void> {
+    await Promise.all([
+      this.projectsService.cargar(),
+      this.subprojectsService.cargar(),
+      this.tasksService.cargar(),
+      this.usersService.cargar(),
+    ]);
+    await this.assignmentsService.cargar();
+    const pid = this.selectedProjectId();
+    if (pid) await this.lineaBaseService.cargarPorProyecto(pid);
+  }
+
 
   protected readonly projects = this.projectsService.projects;
 
@@ -92,7 +99,7 @@ export class PlanningListComponent implements OnInit {
       .map((p) => ({ value: p.id, label: `${p.code} · ${p.name}` })),
   );
 
-  protected readonly selectedProjectId = signal<string | null>("p-sigtramites");
+  protected readonly selectedProjectId = signal<string | null>(null);
 
   protected readonly selectedProject = computed(() => {
     const id = this.selectedProjectId();
@@ -113,10 +120,9 @@ export class PlanningListComponent implements OnInit {
     const subs = this.subprojectsInProject();
     return this.tasksInProject().map((t) => {
       const sub = subs.find((s) => s.id === t.subprojectId);
-      const subLabel = sub?.ticket ?? t.subprojectId;
       return {
         value: t.id,
-        label: `${t.name} · #${subLabel}`,
+        label: sub ? `${sub.description} · ${t.name}` : t.name,
       };
     });
   });
@@ -142,7 +148,16 @@ export class PlanningListComponent implements OnInit {
   protected readonly assignments = computed<Assignment[]>(() => {
     const id = this.selectedProjectId();
     if (!id) return [];
-    return this.assignmentsService.getByProject(id);
+    const subIds = new Set(this.subprojectsInProject().map((s) => s.id));
+    const taskIds = new Set(
+      this.tasksService
+        .tasks()
+        .filter((t) => subIds.has(t.subprojectId))
+        .map((t) => t.id),
+    );
+    return this.assignmentsService
+      .assignments()
+      .filter((a) => a.active && taskIds.has(a.taskId));
   });
 
   protected readonly rows = computed<AssignmentRowViewModel[]>(() => {
@@ -156,9 +171,8 @@ export class PlanningListComponent implements OnInit {
       return {
         ...a,
         taskName: t?.name ?? "Tarea sin asignar",
-        taskSubprojectLabel: sub
-          ? `#${sub.ticket ?? sub.id} · ${sub.type}`
-          : "—",
+        subprojectName: sub ? `${sub.description} · ${sub.type}` : "—",
+        subprojectPriority: sub?.priority ?? null,
         resourceName: r
           ? `${r.firstName} ${r.lastNamePaternal} ${r.lastNameMaternal}`
           : "Sin recurso",
@@ -192,6 +206,12 @@ export class PlanningListComponent implements OnInit {
 
   protected readonly freezeAlert = signal<string | null>(null);
 
+  protected readonly sinLineaBase = computed<boolean>(() => {
+    const id = this.selectedProjectId();
+    if (!id) return false;
+    return this.lineaBaseService.latestByProject()[id] === undefined;
+  });
+
   protected readonly formOpen = signal<boolean>(false);
   protected readonly formMode = signal<"create" | "edit">("create");
   protected readonly selectedAssignment = signal<Assignment | null>(null);
@@ -202,19 +222,53 @@ export class PlanningListComponent implements OnInit {
   protected onProjectChange(value: string | null): void {
     this.selectedProjectId.set(value);
     this.formOpen.set(false);
+    if (value) void this.lineaBaseService.cargarPorProyecto(value);
   }
 
-  protected async onFreeze(): Promise<void> {
+  protected readonly freezeOpen = signal<boolean>(false);
+  protected readonly freezeSaving = signal<boolean>(false);
+
+  protected readonly currentBaseline = computed<LineaBaseApi | null>(() => {
     const id = this.selectedProjectId();
-    if (!id) return;
-    const ok = await this.lineaBaseService.congelar(
-      id,
-      `Snapshot ${todayIso()}`,
+    if (!id) return null;
+    return this.lineaBaseService.latestByProject()[id] ?? null;
+  });
+
+  protected readonly baselineUnchanged = computed<boolean>(() => {
+    const base = this.currentBaseline();
+    if (!base) return false;
+    const actuales = this.assignments();
+    if (actuales.length !== base.asignaciones.length) return false;
+    const congeladas = new Set(
+      base.asignaciones.map((a) => `${a.tareaId}|${a.usuarioId}`),
     );
-    if (ok) {
-      this.flashAlert(
-        `Línea base v${ok.version} congelada correctamente.`,
+    return actuales.every((a) => congeladas.has(`${a.taskId}|${a.resourceId}`));
+  });
+
+  protected onFreeze(): void {
+    if (!this.selectedProjectId()) return;
+    this.freezeOpen.set(true);
+  }
+
+  protected onFreezeCancel(): void {
+    this.freezeOpen.set(false);
+  }
+
+  protected async onFreezeConfirm(): Promise<void> {
+    const id = this.selectedProjectId();
+    if (!id || this.freezeSaving()) return;
+    this.freezeSaving.set(true);
+    try {
+      const ok = await this.lineaBaseService.congelar(
+        id,
+        `Snapshot ${todayIso()}`,
       );
+      if (ok) {
+        this.freezeOpen.set(false);
+        this.flashAlert(`Línea base v${ok.version} congelada correctamente.`);
+      }
+    } finally {
+      this.freezeSaving.set(false);
     }
   }
 
@@ -232,13 +286,53 @@ export class PlanningListComponent implements OnInit {
     this.formOpen.set(true);
   }
 
+  protected readonly deleteTarget = signal<Assignment | null>(null);
+  protected readonly deleteSaving = signal<boolean>(false);
+
+  protected readonly deleteRow = computed<AssignmentRowViewModel | null>(() => {
+    const target = this.deleteTarget();
+    if (!target) return null;
+    return this.rows().find((r) => r.id === target.id) ?? null;
+  });
+
   protected onRemove(a: Assignment): void {
-    const id = this.selectedProjectId();
-    if (!id) return;
-    void this.assignmentsService.deactivate(id, a.id);
+    this.deleteTarget.set(a);
   }
 
+  protected onDeleteCancel(): void {
+    this.deleteTarget.set(null);
+  }
+
+  protected async onDeleteConfirm(): Promise<void> {
+    const target = this.deleteTarget();
+    const id = this.selectedProjectId();
+    if (!target || !id || this.deleteSaving()) return;
+    this.deleteSaving.set(true);
+    try {
+      const ok = await this.assignmentsService.deactivate(id, target.id);
+      if (ok) {
+        const nombre = this.deleteRow()?.resourceName ?? "la asignación";
+        this.deleteTarget.set(null);
+        this.flashAlert(`Se eliminó la asignación de ${nombre}.`);
+      }
+    } finally {
+      this.deleteSaving.set(false);
+    }
+  }
+
+  protected readonly formSaving = signal<boolean>(false);
+
   protected async onSave(payload: AssignmentFormSavePayload): Promise<void> {
+    if (this.formSaving()) return;
+    this.formSaving.set(true);
+    try {
+      await this.guardar(payload);
+    } finally {
+      this.formSaving.set(false);
+    }
+  }
+
+  private async guardar(payload: AssignmentFormSavePayload): Promise<void> {
     if (payload.mode === "create") {
       const created = await this.assignmentsService.create(
         payload.projectId,

@@ -1,29 +1,29 @@
-<UiFlex direction="column" [gap]="20">
+<UiFlex direction="column" [gap]="5">
   <CommonBreadcrumb [items]="breadcrumbItems" />
+
+  <UiFlex direction="column" [gap]="1">
+    <UiHeader [level]="1" text="Mi bitácora" />
+    <UiLabel type="bodyS" color="textWeak">
+      Registra tu dedicación real en bloques de tiempo. Cada bloque es trabajo
+      en una tarea o participación en una actividad, nunca ambos.
+    </UiLabel>
+  </UiFlex>
 
   <UiFlex
     direction="row"
-    alignItems="end"
+    alignItems="center"
     justifyContent="between"
-    [gap]="12"
+    [gap]="3"
     className="flex-wrap"
   >
-    <UiFlex direction="column" [gap]="4">
-      <UiHeader [level]="1" text="Mi bitácora" />
-      <UiLabel
-        type="bodyS"
-        color="textWeak"
-        className="max-w-200"
-      >
-        Registra tu dedicación real en
-        <strong class="text-gray-800 dark:text-white/90">bloques</strong>
-        de tiempo. Cada bloque es trabajo en una
-        <strong class="text-gray-800 dark:text-white/90">tarea</strong>
-        o participación en una
-        <strong class="text-gray-800 dark:text-white/90">actividad</strong>
-        — nunca ambos.
-      </UiLabel>
-    </UiFlex>
+    <TimesheetToolbar
+      [mode]="mode()"
+      [date]="date()"
+      [range]="range()"
+      (modeChange)="onModeChange($event)"
+      (dateChange)="onDateChange($event)"
+      (rangeChange)="onRangeChange($event)"
+    />
     <UiButton
       variant="primary"
       label="Registrar bloque"
@@ -33,15 +33,6 @@
     />
   </UiFlex>
 
-  <TimesheetToolbar
-    [mode]="mode()"
-    [date]="date()"
-    [range]="range()"
-    (modeChange)="onModeChange($event)"
-    (dateChange)="onDateChange($event)"
-    (rangeChange)="onRangeChange($event)"
-  />
-
   @if (showAlert(); as msg) {
     <UiAlert variant="success" [message]="msg" />
   }
@@ -50,23 +41,17 @@
     [entries]="visibleEntries()"
     [heading]="timelineHeading()"
     [mode]="mode()"
+    [taskOptions]="taskOptions()"
     (edit)="openEdit($event)"
     (remove)="onDeleteEntry($event)"
     (register)="openCreate()"
   />
 
-  <UiSurface
-    variant="neutral"
-    padding="md"
-    className="max-w-150 border-dashed"
-  >
+  <UiSurface variant="neutral" padding="md">
     <UiLabel type="bodyS" color="textWeak">
-      Un bloque vincula a una
-      <strong class="text-gray-800 dark:text-white/90">tarea</strong>
-      (vía tu asignación) o a una
-      <strong class="text-gray-800 dark:text-white/90">actividad</strong>
-      (reunión, capacitación, soporte), nunca a las dos. La suma de bloques
-      alimenta tus horas registradas en Carga del equipo.
+      Un bloque vincula a una tarea, a través de tu asignación, o a una
+      actividad como una reunión, capacitación o soporte, nunca a las dos. La
+      suma de bloques alimenta tus horas registradas en Carga del equipo.
     </UiLabel>
   </UiSurface>
 </UiFlex>
@@ -76,6 +61,9 @@
   [mode]="formMode()"
   [entry]="selectedEntry()"
   [defaultDate]="date()"
+  [taskOptions]="taskOptions()"
+  [activityTypeOptions]="activityTypeOptions()"
+  [saving]="formSaving()"
   (save)="onSaveEntry($event)"
   (close)="formOpen.set(false)"
 />

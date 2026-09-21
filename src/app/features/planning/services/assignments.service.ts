@@ -104,7 +104,7 @@ export class AssignmentsService {
     try {
       const creada = await firstValueFrom(this.api.crear(body));
       const assignment = asignacionApiToAssignment(creada, this.context());
-      this._assignments.update((arr) => [assignment, ...arr]);
+      await this.cargar();
       return assignment;
     } catch (err) {
       this._error.set(extractProblemMessage(err));
@@ -133,9 +133,7 @@ export class AssignmentsService {
       await firstValueFrom(
         this.api.eliminar(id, "Baja desde panel de planificacion"),
       );
-      this._assignments.update((arr) =>
-        arr.map((a) => (a.id === id ? { ...a, active: false } : a)),
-      );
+      await this.cargar();
       return true;
     } catch (err) {
       this._error.set(extractProblemMessage(err));

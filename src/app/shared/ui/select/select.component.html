@@ -1,9 +1,7 @@
 <div
   #rootRef
-  class="relative flex flex-col gap-1.5 w-full font-outfit"
-  [class]="className()"
-  [class]="widthClass()"
-  [class]="minWidthClass()"
+  class="relative flex flex-col gap-1.5 w-full min-w-0 font-outfit"
+  [class]="rootExtraClasses()"
 >
   @if (labelText()) {
     <UiFormLabel
@@ -18,6 +16,7 @@
 
   <div
     class="flex items-center gap-1.5 min-h-11 w-full py-1 px-3 rounded-lg border bg-white border-gray-300 cursor-pointer transition-colors dark:bg-gray-900 dark:border-gray-700"
+    [attr.id]="!searchable() ? inputId() || null : null"
     [class.flex-wrap]="isMulti()"
     [class.py-1.5]="isMulti()"
     [class.border-brand-500]="isOpen() && !errorMessage()"

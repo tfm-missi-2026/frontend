@@ -281,6 +281,12 @@ export class UiSelectComponent implements ControlValueAccessor {
     return v ? `min-w-[${v}]` : "";
   });
 
+  protected readonly rootExtraClasses = computed<string>(() =>
+    [this.className(), this.widthClass(), this.minWidthClass()]
+      .filter(Boolean)
+      .join(" "),
+  );
+
   readonly resolveMessage = resolveMessage;
   readonly trackByValue = trackByValue;
 

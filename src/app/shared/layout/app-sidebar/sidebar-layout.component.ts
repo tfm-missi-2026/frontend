@@ -39,9 +39,6 @@ export class SidebarLayoutComponent {
   protected readonly isExpanded = toSignal(this.sidebarService.isExpanded$, {
     initialValue: true,
   });
-  protected readonly isHovered = toSignal(this.sidebarService.isHovered$, {
-    initialValue: false,
-  });
   protected readonly isMobileOpen = toSignal(
     this.sidebarService.isMobileOpen$,
     {
@@ -50,7 +47,7 @@ export class SidebarLayoutComponent {
   );
 
   protected readonly isVisible = computed<boolean>(
-    () => this.isExpanded() || this.isHovered() || this.isMobileOpen(),
+    () => this.isExpanded() || this.isMobileOpen(),
   );
 
   protected readonly navSections = computed(() =>
@@ -63,13 +60,4 @@ export class SidebarLayoutComponent {
     });
   }
 
-  protected onSidebarMouseEnter(): void {
-    if (!this.isExpanded()) {
-      this.sidebarService.setHovered(true);
-    }
-  }
-
-  protected onSidebarMouseLeave(): void {
-    this.sidebarService.setHovered(false);
-  }
 }

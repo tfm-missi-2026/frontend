@@ -10,31 +10,22 @@ import {
 import { FormsModule } from "@angular/forms";
 
 import { UiAlertComponent } from "@shared/ui/alert";
-import { UiButtonComponent } from "@shared/ui/button";
 import { UiDatePickerComponent } from "@shared/ui/date-picker";
 import { UiFieldErrorComponent } from "@shared/ui/field-error";
-import { UiFlexComponent } from "@shared/ui/flex";
 import { UiFormLabelComponent } from "@shared/ui/form-label";
 import { UiGridComponent } from "@shared/ui/grid";
-import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
 import { UiRadioComponent } from "@shared/ui/radio";
 import { UiSelectComponent } from "@shared/ui/select";
-import { UiSeparatorComponent } from "@shared/ui/separator";
+import type { SelectOption } from "@shared/ui/select";
 import { UiTextAreaComponent } from "@shared/ui/text-area";
-import { UiTimePickerComponent } from "@shared/ui/time-picker";
 
 import type {
   TimesheetEntry,
   TimesheetEntryKind,
 } from "../../models/timesheet-entry";
-import {
-  TIMESHEET_ACTIVITY_OPTIONS,
-  TIMESHEET_TASK_OPTIONS,
-  TIMESHEET_TASKS,
-  emptyTimesheetEntry,
-} from "../../models/timesheet-entry";
+import { emptyTimesheetEntry } from "../../models/timesheet-entry";
 
 export type EntryFormMode = "create" | "edit";
 
@@ -45,6 +36,14 @@ export interface EntryFormPayload {
 }
 
 const TIME_REGEX = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+const TIME_SLOTS: SelectOption[] = Array.from({ length: 27 }, (_, i) => {
+  const minutos = 7 * 60 + i * 30;
+  const hh = String(Math.floor(minutos / 60)).padStart(2, "0");
+  const mm = String(minutos % 60).padStart(2, "0");
+  const valor = `${hh}:${mm}`;
+  return { value: valor, label: valor };
+});
 
 function timeToMinutes(value: string): number {
   if (!TIME_REGEX.test(value)) return -1;
@@ -72,20 +71,15 @@ const KIND_CARD_IDLE =
   imports: [
     FormsModule,
     UiAlertComponent,
-    UiButtonComponent,
     UiDatePickerComponent,
     UiFieldErrorComponent,
-    UiFlexComponent,
     UiFormLabelComponent,
     UiGridComponent,
-    UiHeaderComponent,
     UiLabelComponent,
     UiModalComponent,
     UiRadioComponent,
     UiSelectComponent,
-    UiSeparatorComponent,
     UiTextAreaComponent,
-    UiTimePickerComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./entry-form-modal.component.html",
@@ -95,12 +89,14 @@ export class EntryFormModalComponent {
   readonly mode = input<EntryFormMode>("create");
   readonly entry = input<TimesheetEntry | null>(null);
   readonly defaultDate = input<string>("");
+  readonly taskOptions = input<SelectOption[]>([]);
+  readonly activityTypeOptions = input<SelectOption[]>([]);
+  readonly saving = input<boolean>(false);
+
+  protected readonly timeOptions = TIME_SLOTS;
 
   readonly close = output<void>();
   readonly save = output<EntryFormPayload>();
-
-  protected readonly taskOptions = TIMESHEET_TASK_OPTIONS;
-  protected readonly activityOptions = TIMESHEET_ACTIVITY_OPTIONS;
 
   protected readonly form = signal<Omit<TimesheetEntry, "id">>(
     emptyTimesheetEntry(this.defaultDate() || ""),
@@ -116,7 +112,9 @@ export class EntryFormModalComponent {
       : "Modifica los datos del bloque y guarda los cambios.",
   );
 
-  protected readonly errors = computed(() => {
+  private readonly intentoGuardar = signal<boolean>(false);
+
+  private readonly erroresCrudos = computed(() => {
     const f = this.form();
     const out: {
       date?: string;
@@ -137,10 +135,14 @@ export class EntryFormModalComponent {
       out.endTime = "La hora fin debe ser posterior a la hora de inicio.";
     }
     if (f.kind === "task" && !f.task) out.task = "Selecciona una tarea.";
-    if (f.kind === "activity" && !f.activity)
-      out.activity = "Selecciona una actividad.";
+    if (f.kind === "activity" && !f.activityTypeId)
+      out.activity = "Selecciona un tipo de actividad.";
     return out;
   });
+
+  protected readonly errors = computed(() =>
+    this.intentoGuardar() ? this.erroresCrudos() : {},
+  );
 
   protected readonly formError = computed<string | null>(() => {
     const errs = this.errors();
@@ -154,6 +156,7 @@ export class EntryFormModalComponent {
     effect(() => {
       const open = this.isOpen();
       if (!open) return;
+      this.intentoGuardar.set(false);
       const m = this.mode();
       const e = this.entry();
       if (m === "edit" && e) {
@@ -181,17 +184,11 @@ export class EntryFormModalComponent {
   }
 
   protected onTaskChange(value: unknown): void {
-    const taskId = String(value ?? "");
-    const task = TIMESHEET_TASKS.find((t) => t.id === taskId);
-    this.patch({
-      task: taskId,
-      taskCode: task?.code,
-      project: task?.projectId ?? "",
-    });
+    this.patch({ task: String(value ?? "") });
   }
 
-  protected onActivityChange(value: unknown): void {
-    this.patch({ activity: String(value ?? "") });
+  protected onActivityTypeChange(value: unknown): void {
+    this.patch({ activityTypeId: String(value ?? "") });
   }
 
   protected asString(value: string | string[]): string {
@@ -203,8 +200,14 @@ export class EntryFormModalComponent {
     this.close.emit();
   }
 
+  protected onAction(side: "left" | "right"): void {
+    if (side === "left") this.onCancel();
+    else this.onSave();
+  }
+
   protected onSave(): void {
-    if (this.formError()) return;
+    this.intentoGuardar.set(true);
+    if (Object.keys(this.erroresCrudos()).length > 0) return;
     const f = this.form();
     const m = this.mode();
     const e = this.entry();

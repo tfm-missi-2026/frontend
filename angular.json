@@ -16,7 +16,7 @@
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": ["zone.js"],
-            "allowedCommonJsDependencies": ["prismjs", "polylabel"],
+            "allowedCommonJsDependencies": ["prismjs", "polylabel", "flatpickr/dist/l10n/es.js"],
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {

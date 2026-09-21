@@ -1,16 +1,16 @@
-<UiFlex direction="column" [gap]="20">
+<UiFlex direction="column" [gap]="5">
   <CommonBreadcrumb [items]="breadcrumbItems" />
 
-  <UiFlex direction="column" [gap]="4">
+  <UiFlex direction="column" [gap]="1">
     <UiHeader [level]="1" text="Carga del equipo" />
     <UiLabel type="bodyS" color="textWeak" className="max-w-190">
       Compara
-      <strong class="font-semibold text-gray-800 dark:text-white/90">horas planificadas</strong>
+      horas planificadas
       (lo asignado) con
-      <strong class="font-semibold text-gray-800 dark:text-white/90">horas registradas</strong>
+      horas registradas
       (lo trabajado, de la bitácora) en un rango de fechas. % Utilización = registradas ÷
       planificadas; hay
-      <strong class="font-semibold text-gray-800 dark:text-white/90">sobrecarga</strong>
+      sobrecarga
       cuando registradas &gt; planificadas.
     </UiLabel>
   </UiFlex>
@@ -89,9 +89,9 @@
         </UiFlex>
         <UiLabel type="bodyXs" color="textWeak">
           Rango consultado:
-          <strong class="font-semibold text-gray-800 dark:text-white/90">
+          
             {{ rangeLabel() }}
-          </strong>
+          
         </UiLabel>
       </UiFlex>
     </UiSurface>
@@ -104,9 +104,9 @@
   >
     <UiLabel type="bodyS" color="textWeak">
       Si un recurso no tiene plan (planificadas = 0), su % de utilización es
-      <strong class="font-semibold text-gray-800 dark:text-white/90">0</strong>
+      0
       y
-      <strong class="font-semibold text-gray-800 dark:text-white/90">no</strong>
+      no
       se marca sobrecarga, aunque tenga horas registradas.
     </UiLabel>
   </UiSurface>

@@ -25,6 +25,11 @@ const BASE_STYLES = "text-xs text-error-500 leading-4";
   selector: "UiFieldError",
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // `display: contents`: sin mensaje el host no ocupa lugar. De lo contrario,
+  // en padres flex con gap (p. ej. el root de UiSelect) el host vacio cuenta
+  // como flex child y reserva el gap, desalineando el campo 6px respecto de
+  // sus vecinos.
+  host: { class: "contents" },
   template: `
     @if (resolvedMessage(); as msg) {
       <span

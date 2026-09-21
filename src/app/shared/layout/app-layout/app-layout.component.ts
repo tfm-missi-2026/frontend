@@ -60,9 +60,6 @@ export class AppLayoutComponent {
   protected readonly isExpanded = toSignal(this.sidebarService.isExpanded$, {
     initialValue: true,
   });
-  protected readonly isHovered = toSignal(this.sidebarService.isHovered$, {
-    initialValue: false,
-  });
   protected readonly isMobileOpen = toSignal(
     this.sidebarService.isMobileOpen$,
     {
@@ -71,7 +68,7 @@ export class AppLayoutComponent {
   );
 
   protected readonly containerClasses = computed<string>(() => {
-    const expanded = this.isExpanded() || this.isHovered();
+    const expanded = this.isExpanded();
     const mobile = this.isMobileOpen();
     return [
       "flex-1",
@@ -102,22 +99,14 @@ export class AppLayoutComponent {
    * mueve al borde derecho del sidebar más 12px hacia el centro
    * para que se vea como un asa.
    */
-  protected readonly toggleLeft = computed<string>(() => {
-    const expanded = this.isExpanded() || this.isHovered();
-    return expanded ? "278px" : "78px";
-  });
+  protected readonly toggleLeft = computed<string>(() =>
+    this.isExpanded() ? "278px" : "78px",
+  );
 
-  /**
-   * Toggle del sidebar. Renderizado como hermano del `SidebarLayout`
-   * (no como hijo) para que el `mouseenter` del aside no se active
-   * al posicionar el cursor sobre el botón — eso era lo que
-   * impedía que el click colapsara el sidebar.
-   */
   protected handleToggle(): void {
     const isDesktop = window.matchMedia("(min-width: 1280px)").matches;
     if (isDesktop) {
       this.sidebarService.toggleExpanded();
-      this.sidebarService.setHovered(false);
     } else {
       this.sidebarService.toggleMobileOpen();
     }

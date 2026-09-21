@@ -8,29 +8,13 @@
     <UiFlex
       direction="column"
       alignItems="center"
-      justifyContent="center"
-      [gap]="12"
+      [gap]="2"
+      className="text-center"
     >
-      <UiFlex
-        direction="row"
-        alignItems="center"
-        justifyContent="center"
-        [gap]="0"
-        className="h-16 w-16 rounded-full bg-gray-100 dark:bg-gray-800"
-      >
-        <IconCalendar24 [size]="32" />
-      </UiFlex>
       <UiHeader [level]="4" [text]="emptyTitle()" />
       <UiLabel type="bodyS" color="textWeak">
         {{ emptyDescription() }}
       </UiLabel>
-      <UiButton
-        variant="primary"
-        label="Registrar bloque"
-        labelText="Registrar bloque"
-        [LeftIcon]="IconPlusSimpleComponent"
-        (click)="register.emit()"
-      />
     </UiFlex>
   </UiSurface>
 } @else {
@@ -43,7 +27,7 @@
       direction="row"
       alignItems="center"
       justifyContent="between"
-      [gap]="12"
+      [gap]="3"
       className="mb-4 flex-wrap"
     >
       <UiLabel
@@ -64,7 +48,7 @@
         <UiFlex
           direction="row"
           alignItems="stretch"
-          [gap]="16"
+          [gap]="4"
           className="py-4"
         >
           <UiFlex
@@ -165,7 +149,7 @@
       direction="row"
       alignItems="center"
       justifyContent="between"
-      [gap]="12"
+      [gap]="3"
       className="pt-1 flex-wrap"
     >
       <UiLabel type="bodyXs" color="textWeak">

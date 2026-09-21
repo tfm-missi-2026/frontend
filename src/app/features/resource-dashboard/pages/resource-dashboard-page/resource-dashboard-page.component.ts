@@ -72,10 +72,6 @@ export class ResourceDashboardPageComponent implements OnInit {
     if (periodId) this.periodId.set(periodId);
   }
 
-  protected onKpiClick(path: string): void {
-    void this.router.navigate([path]);
-  }
-
   protected onRegisterBlock(): void {
     void this.router.navigate(["/app/seguimiento/mi-bitacora"]);
   }

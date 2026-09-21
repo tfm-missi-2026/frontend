@@ -6,9 +6,9 @@ import {
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 
+import { IconPlusSimpleComponent } from "@shared/icons";
 import { UiButtonComponent } from "@shared/ui/button";
 import { UiFlexComponent } from "@shared/ui/flex";
-import { UiLabelComponent } from "@shared/ui/label";
 import { UiSelectComponent } from "@shared/ui/select";
 import type { SelectOption } from "@shared/ui/select";
 
@@ -19,7 +19,6 @@ import type { SelectOption } from "@shared/ui/select";
     FormsModule,
     UiButtonComponent,
     UiFlexComponent,
-    UiLabelComponent,
     UiSelectComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,6 +31,9 @@ export class PlanningToolbarComponent {
 
   readonly projectChange = output<string | null>();
   readonly freeze = output<void>();
+  readonly create = output<void>();
+
+  protected readonly plusIcon = IconPlusSimpleComponent;
 
   protected asString(value: unknown): string | null {
     if (value === null || value === undefined) return null;

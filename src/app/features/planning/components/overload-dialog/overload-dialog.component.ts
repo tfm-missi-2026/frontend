@@ -6,40 +6,23 @@ import {
   output,
 } from "@angular/core";
 
-import { UiBadgeComponent } from "@shared/ui/badge";
-import { UiButtonComponent } from "@shared/ui/button";
+import { IconCheckComponent, IconXComponent } from "@shared/icons";
+import { UiAlertComponent } from "@shared/ui/alert";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
-import { formatDateRange, formatShortDate } from "@utils/date";
-
-const WIDTH_BUCKETS = [
-  { max: 5, cls: "w-0" },
-  { max: 15, cls: "w-1/12" },
-  { max: 30, cls: "w-1/4" },
-  { max: 45, cls: "w-2/5" },
-  { max: 55, cls: "w-1/2" },
-  { max: 70, cls: "w-2/3" },
-  { max: 85, cls: "w-5/6" },
-  { max: 100, cls: "w-full" },
-] as const;
-
-function widthClassFor(percent: number): string {
-  for (const bucket of WIDTH_BUCKETS) {
-    if (percent <= bucket.max) return bucket.cls;
-  }
-  return "w-full";
-}
+import { UiSurfaceComponent } from "@shared/ui/surface";
+import { formatDateRange } from "@utils/date";
 
 @Component({
   selector: "OverloadDialog",
   standalone: true,
   imports: [
-    UiBadgeComponent,
-    UiButtonComponent,
+    UiAlertComponent,
     UiFlexComponent,
     UiLabelComponent,
     UiModalComponent,
+    UiSurfaceComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./overload-dialog.component.html",
@@ -57,42 +40,41 @@ export class OverloadDialogComponent {
   readonly confirm = output<void>();
   readonly cancel = output<void>();
 
+  protected readonly IconCheck = IconCheckComponent;
+  protected readonly IconX = IconXComponent;
+
   protected readonly totalHours = computed<number>(
     () => this.committedHours() + this.newHours(),
   );
 
-  protected readonly committedPercent = computed<number>(() => {
-    const total = this.totalHours();
-    if (total <= 0) return 0;
-    return (this.committedHours() / total) * 100;
-  });
+  protected readonly excessHours = computed<number>(() =>
+    Math.max(0, this.totalHours() - this.capacityHours()),
+  );
 
-  protected readonly newPercent = computed<number>(() => {
-    const total = this.totalHours();
-    if (total <= 0) return 0;
-    return (this.newHours() / total) * 100;
-  });
-
-  protected readonly capacityPercent = computed<number>(() => {
-    const total = this.totalHours();
-    if (total <= 0) return 0;
-    return (this.capacityHours() / total) * 100;
-  });
-
-  protected readonly periodLabel = computed<string>(
-    () => formatDateRange(this.periodStart(), this.periodEnd()),
+  protected readonly periodLabel = computed<string>(() =>
+    formatDateRange(this.periodStart(), this.periodEnd()),
   );
 
   protected readonly explanationLabel = computed<string>(
     () =>
-      `${this.resourceName()} quedaría con ${this.totalHours()} h planificadas frente a ${this.capacityHours()} h de capacidad en el periodo (${this.businessDays()} días hábiles × 8 h).`,
+      `${this.resourceName()} quedaría con ${this.totalHours()} h planificadas frente a ${this.capacityHours()} h de capacidad en el periodo.`,
   );
 
-  protected committedBarClass(): string {
-    return widthClassFor(this.committedPercent());
-  }
+  protected readonly rows = computed<{ label: string; value: string }[]>(() => [
+    { label: "Recurso técnico", value: this.resourceName() },
+    { label: "Periodo", value: this.periodLabel() },
+    {
+      label: "Capacidad",
+      value: `${this.capacityHours()} h · ${this.businessDays()} días hábiles × 8 h`,
+    },
+    { label: "Ya comprometido", value: `${this.committedHours()} h` },
+    { label: "Esta asignación", value: `${this.newHours()} h` },
+    { label: "Total resultante", value: `${this.totalHours()} h` },
+    { label: "Exceso", value: `${this.excessHours()} h` },
+  ]);
 
-  protected newBarClass(): string {
-    return widthClassFor(this.newPercent());
+  protected onAction(side: "left" | "right"): void {
+    if (side === "left") this.cancel.emit();
+    else this.confirm.emit();
   }
 }
