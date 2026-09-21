@@ -14,6 +14,7 @@ import { SidebarService } from '../../services/sidebar.service';
 import { CommonThemeToggleComponent } from '@shared/common/theme-toggle';
 import {
   HeaderNotificationDropdownComponent,
+  HeaderNotificationsService,
   HeaderUserDropdownComponent,
   type HeaderNotificationItem,
   type HeaderUserInfo,
@@ -67,6 +68,7 @@ export class AppHeaderComponent {
   private readonly sidebarService = inject(SidebarService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  protected readonly headerNotifications = inject(HeaderNotificationsService);
 
   protected readonly isMobileOpen = toSignal(this.sidebarService.isMobileOpen$, {
     initialValue: false,
@@ -84,7 +86,9 @@ export class AppHeaderComponent {
     };
   });
 
-  protected readonly notifications: HeaderNotificationItem[] = [];
+  protected readonly notifications = computed<HeaderNotificationItem[]>(() =>
+    this.headerNotifications.items(),
+  );
   protected readonly userMenuItems = USER_MENU_ITEMS;
   protected readonly signOutItem = SIGN_OUT_ITEM;
 
@@ -94,6 +98,12 @@ export class AppHeaderComponent {
   protected readonly mobileToggleBgClass = computed<string>(() =>
     this.isMobileOpen() ? 'bg-gray-100 dark:bg-white/[0.03]' : '',
   );
+
+  constructor() {
+    // Carga unica por sesion de la data del rol para las notificaciones
+    // (idempotente: reusa el cache de los servicios de dashboard).
+    void this.headerNotifications.cargar();
+  }
 
   protected handleToggle(): void {
     // `matchMedia` es más confiable que `window.innerWidth` para
