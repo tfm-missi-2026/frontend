@@ -36,7 +36,7 @@
       [valueSuffix]="' de ' + dashboard().totalUsersActive"
       sub="% utilización &gt; 100"
       linkLabel="Ver carga del equipo →"
-      (linkClick)="onKpiClick('/app/operacion/carga-equipo')"
+      [linkTo]="'/app/operacion/carga-equipo'"
     />
     <CommonKpiCard
       label="% Utilización media del equipo"
@@ -98,7 +98,7 @@
       [value]="dashboard().variationsTotal"
       sub="por resolver en el área"
       linkLabel="Ver variaciones →"
-      (linkClick)="onKpiClick('/app/operacion/variaciones')"
+      [linkTo]="'/app/operacion/variaciones'"
     />
   </UiGrid>
 

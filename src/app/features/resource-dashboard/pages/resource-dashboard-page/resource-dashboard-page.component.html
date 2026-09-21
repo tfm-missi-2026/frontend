@@ -33,7 +33,7 @@
       [value]="dashboard().activeTaskCount"
       sub="asignadas en el período"
       linkLabel="Ir a Seguimiento →"
-      (linkClick)="onKpiClick('/app/seguimiento/mi-bitacora')"
+      [linkTo]="'/app/seguimiento/mi-bitacora'"
     />
     <CommonKpiCard
       label="Horas registradas"
@@ -41,7 +41,7 @@
       valueSuffix="h"
       sub="en el período"
       linkLabel="Ver mi bitácora →"
-      (linkClick)="onKpiClick('/app/seguimiento/mi-bitacora')"
+      [linkTo]="'/app/seguimiento/mi-bitacora'"
     />
     <CommonKpiCard
       [alert]="dashboard().isOverload"
@@ -56,7 +56,7 @@
       [value]="dashboard().variationsTotal"
       sub="reportadas por mí"
       linkLabel="Ver variaciones →"
-      (linkClick)="onKpiClick('/app/operacion/variaciones')"
+      [linkTo]="'/app/operacion/variaciones'"
     />
   </UiGrid>
 
