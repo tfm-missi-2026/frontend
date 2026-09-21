@@ -1,21 +1,12 @@
-@if (isLink()) {
-  <a
-    [routerLink]="to()"
-    [ngClass]="containerClasses()"
-    [attr.aria-disabled]="disabled() ? 'true' : null"
-    (click)="handleClick($event)"
-    data-testid="dropdown-item"
-  >
-    <ng-content></ng-content>
-  </a>
-} @else {
-  <button
-    [type]="type()"
-    [ngClass]="containerClasses()"
-    [disabled]="disabled()"
-    (click)="handleClick($event)"
-    data-testid="dropdown-item"
-  >
-    <ng-content></ng-content>
-  </button>
-}
+<a
+  [routerLink]="to() || null"
+  [ngClass]="containerClasses()"
+  [attr.role]="isLink() ? null : 'button'"
+  [attr.tabindex]="isLink() ? null : '0'"
+  [attr.aria-disabled]="disabled() ? 'true' : null"
+  (click)="handleClick($event)"
+  (keydown.enter)="onEnterKey($event)"
+  data-testid="dropdown-item"
+>
+  <ng-content></ng-content>
+</a>
