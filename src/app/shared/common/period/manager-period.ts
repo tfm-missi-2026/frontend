@@ -11,7 +11,7 @@ function trimestresCercanos(): ManagerPeriod[] {
   const trimestreActual = Math.floor(mesActual / 3);
   const anio = hoy.getFullYear();
 
-  const rangos = [1, 0, 2].map((offset) => {
+  const rangos = [2, 1, 0].map((offset) => {
     const t = trimestreActual - offset;
     const ajusteAnio = Math.floor(t / 4);
     const tAbs = ((t % 4) + 4) % 4;
@@ -35,4 +35,5 @@ function trimestresCercanos(): ManagerPeriod[] {
 
 export const DEFAULT_PERIODS: ManagerPeriod[] = trimestresCercanos();
 
-export const DEFAULT_PERIOD_ID = DEFAULT_PERIODS[0].id;
+export const DEFAULT_PERIOD_ID =
+  DEFAULT_PERIODS[DEFAULT_PERIODS.length - 1].id;

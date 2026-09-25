@@ -238,7 +238,7 @@ export class UiInputComponent
           ? "border-error-500"
           : "border-gray-300 dark:border-gray-700",
       getFocusStyling("within"),
-      this.hasLeftIcon() ? "pl-0" : "pl-3",
+      "pl-3",
       this.hasRightIcon() || this.shouldShowPasswordToggle() ? "pr-0" : "pr-3",
     ];
     return baseLayout.filter(Boolean).join(" ");
