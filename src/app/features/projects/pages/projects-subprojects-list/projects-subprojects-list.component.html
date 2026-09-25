@@ -137,6 +137,7 @@
   [projectId]="projectId() ?? ''"
   [subproject]="selectedSub()"
   [existingTickets]="existingTicketsForForm()"
+  [saving]="formSaving()"
   (save)="onSave($event)"
   (close)="formOpen.set(false)"
 />

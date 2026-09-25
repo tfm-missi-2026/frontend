@@ -63,7 +63,7 @@ export class UiDropdownItemComponent {
   /** Emite cuando el usuario interactúa con el item. */
   readonly itemClick = output<void>();
 
-  /** `true` si debe renderizarse como `<a routerLink>`. */
+  /** `true` si navega con `routerLink` (item de enlace). */
   readonly isLink = computed<boolean>(() => this.tag() === "a" || !!this.to());
 
   readonly containerClasses = computed<string>(() =>
@@ -78,5 +78,11 @@ export class UiDropdownItemComponent {
     }
     this.click.emit();
     this.itemClick.emit();
+  }
+
+  /** Un `<a role="button">` no dispara `click` con Enter por defecto. */
+  protected onEnterKey(event: Event): void {
+    if (this.isLink()) return;
+    this.handleClick(event);
   }
 }

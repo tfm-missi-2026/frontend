@@ -24,4 +24,74 @@
       }
     </UiFlex>
   </UiSurface>
+
+  <UiSurface variant="neutral" padding="lg">
+    <UiFlex direction="column" [gap]="4" className="max-w-120">
+      <UiFlex direction="column" [gap]="1">
+        <UiHeader [level]="3" text="Seguridad" />
+        <UiLabel type="bodyS" color="textWeak">
+          Cambia tu contraseña. Debe tener al menos 8 caracteres. A partir del
+          cambio, en tu próximo inicio de sesión deberás usar la nueva
+          contraseña.
+        </UiLabel>
+      </UiFlex>
+
+      <UiForm
+        (submit)="onSubmitPassword()"
+        className="flex flex-col gap-4"
+      >
+        <UiInput
+          id="account-current-password"
+          name="currentPassword"
+          type="password"
+          labelText="Contraseña actual"
+          placeholder="Ingresa tu contraseña actual"
+          [required]="true"
+          [showPasswordToggle]="true"
+          [value]="contraseniaActual()"
+          [disabled]="saving()"
+          (valueChange)="onContraseniaActualChange($event)"
+        />
+
+        <UiInput
+          id="account-new-password"
+          name="newPassword"
+          type="password"
+          labelText="Nueva contraseña"
+          placeholder="Ingresa tu nueva contraseña"
+          [required]="true"
+          [showPasswordToggle]="true"
+          [value]="contraseniaNueva()"
+          [disabled]="saving()"
+          [errorMessage]="nuevaError()"
+          (valueChange)="onContraseniaNuevaChange($event)"
+        />
+
+        <UiInput
+          id="account-confirm-password"
+          name="confirmPassword"
+          type="password"
+          labelText="Confirmar nueva contraseña"
+          placeholder="Confirma tu nueva contraseña"
+          [required]="true"
+          [showPasswordToggle]="true"
+          [value]="contraseniaConfirmar()"
+          [disabled]="saving()"
+          [errorMessage]="confirmarError()"
+          (valueChange)="onContraseniaConfirmarChange($event)"
+        />
+
+        <UiFlex direction="row" justifyContent="start">
+          <UiButton
+            variant="primary"
+            label="Actualizar contraseña"
+            labelText="Actualizar contraseña"
+            [isSubmit]="true"
+            [isLoading]="saving()"
+            [disabled]="!canSubmit()"
+          />
+        </UiFlex>
+      </UiForm>
+    </UiFlex>
+  </UiSurface>
 </UiFlex>

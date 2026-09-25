@@ -1,35 +1,30 @@
 <UiSurface
   variant="neutral"
   padding="md"
-  className="border-2 border-gray-300 dark:border-gray-700"
+  className="border border-gray-200 dark:border-gray-800"
 >
-  <UiFlex
-    direction="row"
-    alignItems="end"
-    [gap]="16"
-    className="flex-wrap"
-  >
-    <UiFlex direction="column" [gap]="6" className="min-w-40">
-      <UiFormLabel labelText="Desde" labelFor="tl-from" />
-      <UiInput
-        id="tl-from"
-        type="date"
-        [value]="fromIso()"
-        (valueChange)="fromChange.emit($event)"
-      />
-    </UiFlex>
+  <UiFlex direction="row" alignItems="end" [gap]="6" className="flex-wrap">
+    <UiDatePicker
+      id="tl-from"
+      labelText="Desde"
+      placeholder="aaaa-mm-dd"
+      dateFormat="Y-m-d"
+      width="w-40"
+      [value]="fromIso()"
+      (valueChange)="onFromPick($event)"
+    />
 
-    <UiFlex direction="column" [gap]="6" className="min-w-40">
-      <UiFormLabel labelText="Hasta" labelFor="tl-to" />
-      <UiInput
-        id="tl-to"
-        type="date"
-        [value]="toIso()"
-        (valueChange)="toChange.emit($event)"
-      />
-    </UiFlex>
+    <UiDatePicker
+      id="tl-to"
+      labelText="Hasta"
+      placeholder="aaaa-mm-dd"
+      dateFormat="Y-m-d"
+      width="w-40"
+      [value]="toIso()"
+      (valueChange)="onToPick($event)"
+    />
 
-    <UiFlex direction="column" [gap]="6" className="min-w-50">
+    <UiFlex direction="column" [gap]="1" className="min-w-50">
       <UiFormLabel labelText="Proyecto (opcional)" labelFor="tl-project" />
       <UiSelect
         inputId="tl-project"
@@ -42,23 +37,20 @@
       />
     </UiFlex>
 
-    <UiFlex direction="column" [gap]="6">
-      <UiFormLabel labelText=" " labelFor="tl-consult" />
-      <UiButton
-        variant="primary"
-        label="Consultar"
-        (click)="consult.emit()"
-      />
-    </UiFlex>
+    <UiButton variant="primary" label="Consultar" (click)="consult.emit()" />
 
-    <UiFlex className="flex-1 min-w-50" justifyContent="end">
+    <UiFlex
+      className="flex-1 min-w-50"
+      direction="row"
+      justifyContent="end"
+      alignItems="end"
+    >
       <UiLabel
         type="bodyXs"
         color="textWeak"
-        className="italic self-end pb-2 text-right"
-      >
-        El filtro por proyecto acota a sus tareas · RF-07
-      </UiLabel>
+        className="italic text-right"
+        [text]="'El filtro por proyecto acota a sus tareas · RF-07'"
+      />
     </UiFlex>
   </UiFlex>
 </UiSurface>

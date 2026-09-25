@@ -131,18 +131,14 @@ export class ManagerDashboardService {
     managerFirstName: string,
     period: ManagerPeriod,
   ): DashboardData {
-    const periodStart = period.startIso;
-    const periodEnd = period.endIso;
-
+    // El proyecto (msp_proyecto) no tiene fecha propia: las fechas viven en
+    // sus subproyectos/tareas. "Mis proyectos" es por tanto todo proyecto
+    // activo a cargo del gestor, sin acotar por periodo; el periodo aqui
+    // solo etiqueta el encabezado (igual que en los otros dashboards, donde
+    // acota actividad con fecha propia, nunca la seleccion de proyectos).
     const projects = this.projectsService
       .projects()
-      .filter(
-        (p) =>
-          p.status === "active" &&
-          p.managerId === managerId &&
-          p.startDate >= periodStart &&
-          p.startDate <= periodEnd,
-      );
+      .filter((p) => p.status === "active" && p.managerId === managerId);
 
     const projectProgress: ProjectProgressItem[] = projects.map((p) => {
       const progress =

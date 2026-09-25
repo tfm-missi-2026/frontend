@@ -6,7 +6,6 @@ import {
   OnInit,
   signal,
 } from "@angular/core";
-import { Router } from "@angular/router";
 
 import { AuthService } from "@core/auth/auth.service";
 import { CommonBreadcrumbComponent } from "@shared/common/page-breadcrumb";
@@ -52,7 +51,6 @@ import { ManagerDashboardService } from "../../services/manager-dashboard.servic
 export class ManagerDashboardPageComponent implements OnInit {
   private readonly dashboardService = inject(ManagerDashboardService);
   private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
 
   ngOnInit(): void {
     void this.dashboardService.cargar();
@@ -77,9 +75,5 @@ export class ManagerDashboardPageComponent implements OnInit {
 
   protected onPeriodChange(periodId: string): void {
     if (periodId) this.periodId.set(periodId);
-  }
-
-  protected onKpiClick(path: string): void {
-    void this.router.navigate([path]);
   }
 }

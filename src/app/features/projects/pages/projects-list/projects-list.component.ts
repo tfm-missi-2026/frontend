@@ -78,6 +78,7 @@ export class ProjectsListComponent implements OnInit {
   protected readonly formOpen = signal<boolean>(false);
   protected readonly formMode = signal<"create" | "edit">("create");
   protected readonly selectedProject = signal<Project | null>(null);
+  protected readonly formSaving = signal<boolean>(false);
 
   protected openCreate(): void {
     this.formMode.set("create");
@@ -111,27 +112,33 @@ export class ProjectsListComponent implements OnInit {
   }
 
   protected async onSaveProject(payload: ProjectFormSavePayload): Promise<void> {
-    if (payload.mode === "create") {
-      const created = await this.projectsService.create(payload.data);
-      if (created) {
-        this.formOpen.set(false);
-        this.toastService.success(
-          `El proyecto "${created.name}" se creó correctamente.`,
-          "Proyecto creado",
+    if (this.formSaving()) return;
+    this.formSaving.set(true);
+    try {
+      if (payload.mode === "create") {
+        const created = await this.projectsService.create(payload.data);
+        if (created) {
+          this.formOpen.set(false);
+          this.toastService.success(
+            `El proyecto "${created.name}" se creó correctamente.`,
+            "Proyecto creado",
+          );
+        }
+      } else {
+        const updated = await this.projectsService.update(
+          payload.id,
+          payload.data,
         );
+        if (updated) {
+          this.formOpen.set(false);
+          this.toastService.success(
+            `El proyecto "${updated.name}" se actualizó correctamente.`,
+            "Proyecto actualizado",
+          );
+        }
       }
-    } else {
-      const updated = await this.projectsService.update(
-        payload.id,
-        payload.data,
-      );
-      if (updated) {
-        this.formOpen.set(false);
-        this.toastService.success(
-          `El proyecto "${updated.name}" se actualizó correctamente.`,
-          "Proyecto actualizado",
-        );
-      }
+    } finally {
+      this.formSaving.set(false);
     }
   }
 

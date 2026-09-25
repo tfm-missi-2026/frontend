@@ -31,7 +31,7 @@
       [value]="dashboard().kpiProjectCount"
       sub="proyectos a tu cargo, activos"
       linkLabel="Ver proyectos →"
-      (linkClick)="onKpiClick('/app/operacion/proyectos')"
+      [linkTo]="'/app/operacion/proyectos'"
     />
     <CommonKpiCard
       label="Avance promedio"
@@ -40,7 +40,7 @@
       sub="de proyectos con línea base"
       [progressPct]="dashboard().kpiAverageProgressPct"
       linkLabel="Ver avance →"
-      (linkClick)="onKpiClick('/app/operacion/avance')"
+      [linkTo]="'/app/operacion/avance'"
     />
     <CommonKpiCard
       [alert]="true"
@@ -48,14 +48,14 @@
       [value]="dashboard().kpiPendingVariationsCount"
       sub="debes aprobar o rechazar"
       linkLabel="Ver variaciones →"
-      (linkClick)="onKpiClick('/app/operacion/variaciones')"
+      [linkTo]="'/app/operacion/variaciones'"
     />
     <CommonKpiCard
       label="Planificación"
       [value]="dashboard().kpiWithoutBaselineCount"
       sub="proyectos sin línea base congelada"
       linkLabel="Ir a Planificación →"
-      (linkClick)="onKpiClick('/app/operacion/planificacion')"
+      [linkTo]="'/app/operacion/planificacion'"
     />
   </UiGrid>
 

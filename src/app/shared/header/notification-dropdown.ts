@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  effect,
   input,
   signal,
 } from "@angular/core";
@@ -116,7 +117,7 @@ const VIEW_ALL_CLASS =
         </div>
 
         <ul [class]="LIST_CLASS">
-          @for (item of items(); track $index) {
+          @for (item of items(); track item.target) {
             <li>
               <UiDropdownItem
                 (itemClick)="closeDropdown()"
@@ -150,6 +151,24 @@ const VIEW_ALL_CLASS =
                   </div>
                 </UiFlex>
               </UiDropdownItem>
+            </li>
+          }
+
+          @if (items().length === 0) {
+            <li>
+              <UiFlex
+                direction="column"
+                alignItems="center"
+                [gap]="1.5"
+                className="py-10 text-center"
+              >
+                <UiLabel type="bodyS" color="textWeak">
+                  No hay notificaciones pendientes.
+                </UiLabel>
+                <UiLabel type="bodyXs" color="textWeakest">
+                  Aquí verás las acciones que requieren tu atención.
+                </UiLabel>
+              </UiFlex>
             </li>
           }
         </ul>
@@ -204,7 +223,13 @@ export class HeaderNotificationDropdownComponent {
   protected readonly VIEW_ALL_CLASS = VIEW_ALL_CLASS;
 
   constructor() {
-    this.showBadge.set(this.notifying());
+    // Reactivo al input `notifying`: la data del header carga de forma
+    // asincrona, asi que el badge debe encenderse cuando llegan items
+    // (no solo en la construccion). Al abrir el panel se apaga y no
+    // vuelve a encenderse hasta que `notifying` cambie.
+    effect(() => {
+      if (this.notifying()) this.showBadge.set(true);
+    });
   }
 
   protected toggleDropdown(): void {

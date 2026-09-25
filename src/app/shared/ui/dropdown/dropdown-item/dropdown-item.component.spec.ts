@@ -55,12 +55,14 @@ describe("UiDropdownItem", () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it("renders a <button> by default", () => {
+  it("renders an <a role=button tabindex=0> by default (sin navegacion)", () => {
     const el: HTMLElement = fixture.debugElement.query(
       By.css('[data-testid="dropdown-item"]'),
     ).nativeElement;
-    expect(el.tagName.toLowerCase()).toBe("button");
-    expect(el.getAttribute("type")).toBe("button");
+    expect(el.tagName.toLowerCase()).toBe("a");
+    expect(el.getAttribute("role")).toBe("button");
+    expect(el.getAttribute("tabindex")).toBe("0");
+    expect(el.getAttribute("href")).toBeNull();
   });
 
   it("renders an <a> when tag is 'a'", () => {
@@ -71,6 +73,7 @@ describe("UiDropdownItem", () => {
       By.css('[data-testid="dropdown-item"]'),
     ).nativeElement;
     expect(el.tagName.toLowerCase()).toBe("a");
+    expect(el.getAttribute("role")).toBeNull();
     expect(el.getAttribute("href")).toBe("/profile");
   });
 
@@ -106,10 +109,11 @@ describe("UiDropdownItem", () => {
   it("does not emit itemClick when disabled", () => {
     host.disabled = true;
     fixture.detectChanges();
-    const el: HTMLButtonElement = fixture.debugElement.query(
+    const el: HTMLElement = fixture.debugElement.query(
       By.css('[data-testid="dropdown-item"]'),
     ).nativeElement;
     el.click();
+    expect(el.getAttribute("aria-disabled")).toBe("true");
     expect(host.clicked).toBe(0);
   });
 });

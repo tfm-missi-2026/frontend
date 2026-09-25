@@ -16,9 +16,10 @@ import { userFullName } from "@features/users/models/user";
 import { ToastService } from "@core/http/toast.service";
 import { CatalogService } from "@features/catalog/services/catalog.service";
 
+import { IconCheckComponent, IconXComponent } from "@shared/icons";
+
 import { UiAlertComponent } from "@shared/ui/alert";
 import { UiBadgeComponent } from "@shared/ui/badge";
-import { UiButtonComponent } from "@shared/ui/button";
 import { UiDatePickerComponent } from "@shared/ui/date-picker";
 import { UiFieldErrorComponent } from "@shared/ui/field-error";
 import { UiFlexComponent } from "@shared/ui/flex";
@@ -57,7 +58,6 @@ function todayIso(): string {
     FormsModule,
     UiAlertComponent,
     UiBadgeComponent,
-    UiButtonComponent,
     UiDatePickerComponent,
     UiFieldErrorComponent,
     UiFlexComponent,
@@ -73,6 +73,9 @@ function todayIso(): string {
   templateUrl: "./subproject-form-modal.component.html",
 })
 export class SubprojectFormModalComponent {
+  protected readonly IconCheck = IconCheckComponent;
+  protected readonly IconX = IconXComponent;
+
   private readonly usersService = inject(UsersService);
   private readonly toastService = inject(ToastService);
   private readonly catalogService = inject(CatalogService);
@@ -98,6 +101,8 @@ export class SubprojectFormModalComponent {
   readonly subproject = input<Subproject | null>(null);
   /** Tickets activos de otros subproyectos del mismo proyecto, para detectar duplicados. */
   readonly existingTickets = input<readonly string[]>([]);
+
+  readonly saving = input<boolean>(false);
 
   readonly close = output<void>();
   readonly save = output<SubprojectFormSavePayload>();
@@ -174,12 +179,18 @@ export class SubprojectFormModalComponent {
     return selectedName === "Rechazado";
   });
 
+  // Ver comentario equivalente en project-form-modal.component.ts: guarda
+  // local de doble-envio, sincronica, independiente del ciclo de deteccion
+  // de cambios que trae el input `saving` desde el padre.
+  private readonly _submitting = signal(false);
+
   constructor() {
     effect(() => {
       const open = this.isOpen();
       if (!open) return;
       untracked(() => void this.usersService.cargar());
       this.resetErrors();
+      this._submitting.set(false);
       const m = this.mode();
       const s = this.subproject();
       if (m === "edit" && s) {
@@ -196,6 +207,10 @@ export class SubprojectFormModalComponent {
       } else {
         this.form.set(emptySubprojectForm());
       }
+    });
+
+    effect(() => {
+      if (!this.saving()) this._submitting.set(false);
     });
   }
 
@@ -258,6 +273,14 @@ export class SubprojectFormModalComponent {
     this.form.update((prev) => ({ ...prev, ...partial }));
   }
 
+  protected onAction(side: "left" | "right"): void {
+    if (side === "left") {
+      this.onCancel();
+    } else {
+      this.onSave();
+    }
+  }
+
   protected onCancel(): void {
     this.toastService.warning(
       "No se guardaron los cambios del subproyecto.",
@@ -267,6 +290,9 @@ export class SubprojectFormModalComponent {
   }
 
   protected onSave(): void {
+    if (this._submitting()) return;
+    this._submitting.set(true);
+
     const f = this.form();
     const errors = this.validate(f);
     this.typeError.set(errors.type);
@@ -281,6 +307,7 @@ export class SubprojectFormModalComponent {
       this.validationMessage.set(
         "Revisa los campos marcados antes de guardar.",
       );
+      this._submitting.set(false);
       return;
     }
     this.validationMessage.set(null);
