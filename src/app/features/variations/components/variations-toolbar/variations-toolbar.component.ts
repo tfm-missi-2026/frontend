@@ -6,7 +6,8 @@ import {
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 
-import { IconSearchLightComponent } from "@shared/icons";
+import { IconPlusSimpleComponent, IconSearchLightComponent } from "@shared/icons";
+import { UiButtonComponent } from "@shared/ui/button";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiInputComponent } from "@shared/ui/input";
 import { UiSelectComponent } from "@shared/ui/select";
@@ -17,6 +18,7 @@ import type { SelectOption } from "@shared/ui/select";
   standalone: true,
   imports: [
     FormsModule,
+    UiButtonComponent,
     UiFlexComponent,
     UiInputComponent,
     UiSelectComponent,
@@ -34,8 +36,10 @@ export class VariationsToolbarComponent {
   readonly searchChange = output<string>();
   readonly typeChange = output<string | null>();
   readonly statusChange = output<string | null>();
+  readonly report = output<void>();
 
   protected readonly IconSearchLightComponent = IconSearchLightComponent;
+  protected readonly plusIcon = IconPlusSimpleComponent;
 
   protected asString(value: unknown): string | null {
     if (value === null || value === undefined) return null;

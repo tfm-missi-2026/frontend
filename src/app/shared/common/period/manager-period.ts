@@ -43,8 +43,5 @@ function trimestresCercanos(): ManagerPeriod[] {
 
 export const DEFAULT_PERIODS: ManagerPeriod[] = trimestresCercanos();
 
-// El trimestre anterior al actual: el mas probable de tener datos completos
-// para reportar (el actual recien esta en curso).
-const DEFAULT_OFFSET_FROM_LAST = 1;
 export const DEFAULT_PERIOD_ID =
-  DEFAULT_PERIODS[DEFAULT_PERIODS.length - 1 - DEFAULT_OFFSET_FROM_LAST].id;
+  DEFAULT_PERIODS[DEFAULT_PERIODS.length - 1].id;

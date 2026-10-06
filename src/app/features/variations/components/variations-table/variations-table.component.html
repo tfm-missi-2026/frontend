@@ -1,137 +1,90 @@
-<UiSurface
-  variant="neutral"
-  padding="none"
-  className="border border-gray-200 dark:border-gray-800"
-  ariaLabel="Tabla de variaciones"
->
-  <div class="overflow-x-auto">
-    <table class="w-full text-left text-sm text-gray-700 dark:text-gray-300">
-      <thead
-        class="border-b border-gray-200 text-xs uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400"
-      >
-        <tr>
-          <th class="px-4 py-3 font-medium">Tarea afectada</th>
-          <th class="w-28 px-4 py-3 text-center font-medium">Tipo</th>
-          <th class="px-4 py-3 font-medium">Descripción</th>
-          <th class="w-36 px-4 py-3 font-medium">Reportada por</th>
-          <th class="w-28 px-4 py-3 font-medium">Detección</th>
-          <th class="w-32 px-4 py-3 text-center font-medium">Situación</th>
-          <th class="w-36 px-4 py-3 text-right font-medium">Acciones</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-        @for (row of rows(); track row.id) {
-          <tr class="hover:bg-gray-50 dark:hover:bg-white/3">
-            <td class="px-4 py-3.5">
-              <UiFlex direction="column" [gap]="0" className="min-w-0">
-                <UiLabel
-                  type="bodyS"
-                  weight="semibold"
-                  color="textStrong"
-                  [text]="row.targetLabel"
-                />
-                @if (row.targetRef) {
-                  <UiLabel
-                    type="bodyXs"
-                    weight="medium"
-                    color="textWeak"
-                    className="font-mono whitespace-nowrap"
-                  >
-                    {{ row.targetRef }}
-                  </UiLabel>
-                }
-              </UiFlex>
-            </td>
-            <td class="px-4 py-3.5 text-center">
-              <UiBadge variant="solid" color="dark" size="sm">
-                {{ row.type }}
-              </UiBadge>
-            </td>
-            <td class="max-w-80 px-4 py-3.5">
-              <UiLabel
-                type="bodyS"
-                color="textWeak"
-                [text]="row.description"
-                className="line-clamp-2"
-              />
-            </td>
-            <td class="px-4 py-3.5">
-              <UiLabel
-                type="bodyS"
-                color="textStrong"
-                [text]="row.reportedBy"
-              />
-            </td>
-            <td class="px-4 py-3.5">
-              <UiLabel
-                type="bodyXs"
-                color="textStrong"
-                className="font-mono whitespace-nowrap"
-              >
-                {{ formatDate(row.detectionDate) }}
-              </UiLabel>
-            </td>
-            <td class="px-4 py-3.5 text-center">
-              @if (isPending(row)) {
-                <UiBadge
-                  variant="light"
-                  color="warning"
-                  size="md"
-                  [className]="pendingBadgeClass()"
-                >
-                  {{ row.status }}
-                </UiBadge>
-              } @else {
-                <UiBadge
-                  [variant]="statusBadgeVariant(row.status)"
-                  [color]="statusBadgeColor(row.status)"
-                  size="md"
-                >
-                  {{ row.status }}
-                </UiBadge>
-              }
-            </td>
-            <td class="px-4 py-3.5">
-              <UiFlex
-                direction="row"
-                alignItems="center"
-                justifyContent="end"
-                [gap]="8"
-                className="whitespace-nowrap"
-              >
-                <UiLink
-                  variant="primary"
-                  size="sm"
-                  labelText="Ver variación"
-                  (click)="view.emit(row)"
-                >
-                  Ver
-                </UiLink>
-                <UiLabel type="bodyXs" color="textWeak">·</UiLabel>
-                @if (isPending(row)) {
-                  <UiLink
-                    variant="primary"
-                    size="sm"
-                    labelText="Resolver variación"
-                    (click)="resolve.emit(row)"
-                  >
-                    Resolver
-                  </UiLink>
-                } @else {
-                  <UiLabel
-                    type="bodyS"
-                    color="textWeak"
-                    className="cursor-not-allowed"
-                    title="Solo en variaciones Pendientes"
-                  >
-                    Resolver
-                  </UiLabel>
-                }
-              </UiFlex>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-</UiSurface>
+<UiTable
+  [query]="query()"
+  [data]="rows()"
+  [columns]="columns()"
+  [emptyText]="emptyText()"
+  [hasActions]="false"
+></UiTable>
+
+<ng-template #tareaCell let-row>
+  <UiFlex direction="column" [gap]="0" className="min-w-0">
+    <UiLabel
+      type="bodyS"
+      weight="semibold"
+      color="textStrong"
+      [text]="row.targetLabel"
+    />
+    @if (row.targetRef) {
+      <UiLabel
+        type="bodyXs"
+        weight="medium"
+        color="textWeak"
+        className="font-mono whitespace-nowrap"
+        [text]="row.targetRef"
+      />
+    }
+  </UiFlex>
+</ng-template>
+
+<ng-template #tipoCell let-row>
+  <UiFlex direction="row" justifyContent="center" alignItems="center">
+    <UiBadge variant="light" color="primary" size="sm">
+      {{ row.type }}
+    </UiBadge>
+  </UiFlex>
+</ng-template>
+
+<ng-template #descripcionCell let-row>
+  <UiLabel
+    type="bodyS"
+    color="textWeak"
+    className="min-w-0"
+    [text]="row.description"
+  />
+</ng-template>
+
+<ng-template #reportadaCell let-row>
+  <UiLabel type="bodyS" color="textStrong" [text]="row.reportedBy" />
+</ng-template>
+
+<ng-template #deteccionCell let-row>
+  <UiLabel
+    type="bodyXs"
+    color="textStrong"
+    className="font-mono whitespace-nowrap"
+    [text]="formatDate(row.detectionDate)"
+  />
+</ng-template>
+
+<ng-template #situacionCell let-row>
+  <UiFlex direction="row" justifyContent="center" alignItems="center">
+    <UiBadge
+      [variant]="statusBadgeVariant(row.status)"
+      [color]="statusBadgeColor(row.status)"
+      size="md"
+    >
+      {{ row.status }}
+    </UiBadge>
+  </UiFlex>
+</ng-template>
+
+<ng-template #accionesCell let-row>
+  <UiFlex [gap]="2" alignItems="center" justifyContent="end" [noWrap]="true">
+    <UiButton
+      variant="secondary"
+      size="sm"
+      [LeftIcon]="viewIcon"
+      labelText="Ver variación"
+      (click)="view.emit(row)"
+    />
+    <UiButton
+      variant="primary"
+      size="sm"
+      [LeftIcon]="resolveIcon"
+      labelText="Resolver variación"
+      [disabled]="!isPending(row)"
+      [tooltip]="isPending(row) ? undefined : 'Solo en variaciones Pendientes'"
+      (click)="resolve.emit(row)"
+    />
+  </UiFlex>
+</ng-template>

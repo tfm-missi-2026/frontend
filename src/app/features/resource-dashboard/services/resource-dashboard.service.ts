@@ -24,7 +24,7 @@ export interface ResourceMyTask {
   ref: string;
   situation: TaskSituation;
   loggedHours: number;
-  estimatedHours: number;
+  plannedHours: number;
 }
 
 export interface ResourceMyVariation {
@@ -84,6 +84,12 @@ export class ResourceDashboardService {
     this._error.set(null);
     try {
       await Promise.all([
+        this.usersService.count() === 0
+          ? this.usersService.cargar()
+          : Promise.resolve(),
+        this.assignmentsService.count() === 0
+          ? this.assignmentsService.cargar()
+          : Promise.resolve(),
         this.tasksService.count() === 0
           ? this.tasksService.cargar()
           : Promise.resolve(),
@@ -129,13 +135,10 @@ export class ResourceDashboardService {
       const ref = sub?.ticket
         ? `#REQ-${sub.ticket.replace(/^[A-Z]+-/, "")}`
         : `#${task?.subprojectId ?? a.taskId}`;
-      const loggedHours = task
-        ? this.timesheetService.totalHoursForResourceInRange(
-            resourceId,
-            a.startDate,
-            a.endDate,
-          )
-        : 0;
+      const loggedHours = this.timesheetService
+        .entriesForResourceInRange(resourceId, a.startDate, a.endDate)
+        .filter((e) => e.kind === "task" && e.task === a.id)
+        .reduce((acc, e) => acc + e.hours, 0);
       return {
         assignmentId: a.id,
         taskId: a.taskId,
@@ -143,7 +146,7 @@ export class ResourceDashboardService {
         ref,
         situation: task?.situation ?? "Pendiente",
         loggedHours,
-        estimatedHours: task?.estimatedHours ?? a.plannedHours,
+        plannedHours: a.plannedHours,
       };
     });
 
@@ -164,7 +167,8 @@ export class ResourceDashboardService {
       plannedHoursTotal > 0
         ? Math.round((loggedHoursTotal / plannedHoursTotal) * 100)
         : 0;
-    const isOverload = loggedHoursTotal > plannedHoursTotal;
+    const isOverload =
+      plannedHoursTotal > 0 && loggedHoursTotal > plannedHoursTotal;
 
     const myVariations: ResourceMyVariation[] = this.variationsService
       .items()

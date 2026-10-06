@@ -8,9 +8,7 @@ import {
 } from "@angular/core";
 
 import { CommonBreadcrumbComponent } from "@shared/common/page-breadcrumb";
-import { IconPlusSimpleComponent } from "@shared/icons";
 import { UiBadgeComponent } from "@shared/ui/badge";
-import { UiButtonComponent } from "@shared/ui/button";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
@@ -66,7 +64,6 @@ function nombreActual(auth: AuthService): string {
     ReportVariationModalComponent,
     ResolveVariationModalComponent,
     UiBadgeComponent,
-    UiButtonComponent,
     UiFlexComponent,
     UiHeaderComponent,
     UiLabelComponent,
@@ -92,8 +89,6 @@ export class VariationsListComponent implements OnInit {
     void this.tasksService.cargar();
     void this.variationsService.cargar();
   }
-
-  protected readonly IconPlusSimpleComponent = IconPlusSimpleComponent;
 
   protected readonly VARIATION_TYPE_FILTER_OPTIONS =
     VARIATION_TYPE_FILTER_OPTIONS;
