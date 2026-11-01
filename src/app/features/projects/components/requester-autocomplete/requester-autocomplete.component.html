@@ -1,0 +1,35 @@
+<UiInput
+  autocomplete="off"
+  [placeholder]="placeholder()"
+  [value]="value()"
+  (valueChange)="onInput($event)"
+  (keyDown)="onKeyDown($event)"
+  (blurEvt)="close()"
+/>
+
+@if (isPanelVisible()) {
+  <div
+    role="listbox"
+    class="fixed z-999999 bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-800 rounded-lg shadow-theme-lg p-1 overflow-y-auto"
+    [style.top]="panelStyle()?.top ?? null"
+    [style.bottom]="panelStyle()?.bottom ?? null"
+    [style.left]="panelStyle()?.left ?? null"
+    [style.width]="panelStyle()?.width ?? null"
+    [style.max-height]="panelStyle()?.maxHeight ?? null"
+  >
+    @for (name of suggestions(); track name; let i = $index) {
+      <div
+        role="option"
+        class="py-2 px-3 rounded-md text-sm cursor-pointer truncate text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        [attr.aria-selected]="activeIndex() === i"
+        [class.bg-gray-100]="activeIndex() === i"
+        [class.dark:bg-gray-800]="activeIndex() === i"
+        [class.font-medium]="activeIndex() === i"
+        (mousedown)="$event.preventDefault()"
+        (click)="select(name)"
+      >
+        {{ name }}
+      </div>
+    }
+  </div>
+}

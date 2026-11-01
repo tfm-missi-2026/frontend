@@ -1,3 +1,4 @@
+import type { BadgeColor } from "@shared/ui/badge";
 import type { SelectOption } from "@shared/ui/select";
 
 export type SubprojectType =
@@ -20,17 +21,58 @@ export interface Subproject {
   type: SubprojectType;
   description: string;
   priority: SubprojectPriority;
-  /** UUID del usuario solicitante (msa_usuario.id). */
-  requesterId: string;
-  /** Nombre completo resuelto del solicitante, para mostrar en UI. */
   requester: string;
-  requestDate: string;
+  requestDate: string | null;
   /** UUID del catalogo (grupo SITUACION) que representa la situacion actual. */
   situationId: string;
   situation: SubprojectSituation;
   rejectionReason: string | null;
   taskCount: number;
   active: boolean;
+}
+
+export function subprojectRequiresRequestData(type: SubprojectType): boolean {
+  return type !== "Desarrollo modular";
+}
+
+const SUBPROJECT_LABEL_MAX_LENGTH = 40;
+
+export function subprojectDisplayLabel(
+  subproject: Pick<Subproject, "ticket" | "description">,
+): string {
+  if (subproject.ticket) return subproject.ticket;
+  const { description } = subproject;
+  return description.length > SUBPROJECT_LABEL_MAX_LENGTH
+    ? `${description.slice(0, SUBPROJECT_LABEL_MAX_LENGTH).trimEnd()}…`
+    : description;
+}
+
+export const REQUESTER_MAX_LENGTH = 150;
+export const REQUESTER_SUGGESTION_MIN_CHARS = 5;
+export const REQUESTER_SUGGESTION_LIMIT = 8;
+
+export function normalizeRequesterName(name: string): string {
+  return name
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+export function filterRequesterSuggestions(
+  names: readonly string[],
+  query: string,
+): string[] {
+  const normalizedQuery = normalizeRequesterName(query);
+  if (normalizedQuery.length < REQUESTER_SUGGESTION_MIN_CHARS) return [];
+  const matches = names.filter((name) =>
+    normalizeRequesterName(name).includes(normalizedQuery),
+  );
+  const isOnlyExactMatch =
+    matches.length === 1 &&
+    normalizeRequesterName(matches[0]) === normalizedQuery;
+  return isOnlyExactMatch ? [] : matches.slice(0, REQUESTER_SUGGESTION_LIMIT);
 }
 
 export const SUBPROJECT_TYPE_LABELS: Record<SubprojectType, string> = {
@@ -43,6 +85,18 @@ export const SUBPROJECT_PRIORITY_LABELS: Record<SubprojectPriority, string> = {
   Alta: "Alta",
   Media: "Media",
   Baja: "Baja",
+};
+
+export const SUBPROJECT_PRIORITY_COLOR: Record<SubprojectPriority, BadgeColor> = {
+  Alta: "warning",
+  Media: "primary",
+  Baja: "dark",
+};
+
+export const SUBPROJECT_PRIORITY_ARROW: Record<SubprojectPriority, string> = {
+  Alta: "↑",
+  Media: "→",
+  Baja: "↓",
 };
 
 export const SUBPROJECT_SITUATION_LABELS: Record<SubprojectSituation, string> = {

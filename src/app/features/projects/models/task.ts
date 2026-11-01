@@ -11,6 +11,7 @@ export interface Task {
   subprojectId: string;
   name: string;
   description: string;
+  estimatedDays: number;
   startDate: string | null;
   endDate: string | null;
   estimatedHours: number;
@@ -21,7 +22,6 @@ export interface Task {
   origenVariacionId: string | null;
   origin: TaskOrigin;
   originLabel: string;
-  dependsOnIds: string[];
   active: boolean;
 }
 

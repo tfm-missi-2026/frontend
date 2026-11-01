@@ -4,8 +4,8 @@
   className="max-w-130"
   (close)="onCancel()"
 >
-  <UiFlex direction="column" [gap]="16">
-    <UiFlex direction="column" [gap]="4">
+  <UiFlex direction="column" [gap]="4">
+    <UiFlex direction="column" [gap]="1">
       <UiLabel type="HeadingM" weight="semibold" color="textStrong">
         {{ heading() }}
       </UiLabel>
@@ -25,7 +25,7 @@
       <UiAlert variant="error" [message]="msg" />
     }
 
-    <UiFlex direction="column" [gap]="6">
+    <UiFlex direction="column" [gap]="1">
       <UiFormLabel
         labelText="Nombre"
         labelFor="task-name"
@@ -43,7 +43,7 @@
       }
     </UiFlex>
 
-    <UiFlex direction="column" [gap]="6">
+    <UiFlex direction="column" [gap]="1">
       <UiFormLabel
         labelText="Descripción"
         labelFor="task-description"
@@ -58,69 +58,58 @@
       ></UiTextArea>
     </UiFlex>
 
-    <UiGrid [columns]="3" gap="gap-4">
-      <UiFlex direction="column" [gap]="6">
+    <UiGrid [columns]="2" gap="gap-4">
+      <UiFlex direction="column" [gap]="1">
         <UiFormLabel
-          labelText="Inicio planif."
-          labelFor="task-start"
+          labelText="Días est."
+          labelFor="task-days"
+          [required]="true"
           weight="medium"
         />
-        <UiDatePicker
-          inputId="task-start"
-          mode="single"
-          dateFormat="d/m/Y"
-          placeholder="dd/mm/aaaa"
-          [value]="form().startDate ?? ''"
-          (valueChange)="onStartDateChange($event)"
-          className="max-w-55"
+        <UiInput
+          id="task-days"
+          type="number"
+          placeholder="p. ej. 2"
+          [disabled]="effortLocked()"
+          [value]="form().estimatedDays ?? ''"
+          (valueChange)="onDaysChange($event)"
         />
       </UiFlex>
-      <UiFlex direction="column" [gap]="6">
-        <UiFormLabel
-          labelText="Fin planif."
-          labelFor="task-end"
-          weight="medium"
-        />
-        <UiDatePicker
-          inputId="task-end"
-          mode="single"
-          dateFormat="d/m/Y"
-          placeholder="dd/mm/aaaa"
-          [value]="form().endDate ?? ''"
-          (valueChange)="onEndDateChange($event)"
-          className="max-w-55"
-        />
-      </UiFlex>
-      <UiFlex direction="column" [gap]="6">
+      <UiFlex direction="column" [gap]="1">
         <UiFormLabel
           labelText="Horas est."
           labelFor="task-hours"
+          [required]="true"
           weight="medium"
         />
         <UiInput
           id="task-hours"
           type="number"
           placeholder="p. ej. 16"
+          [disabled]="effortLocked()"
           [value]="form().estimatedHours ?? ''"
           (valueChange)="onHoursChange($event)"
-          className="max-w-30"
         />
-        @if (hoursError(); as msg) {
-          <UiFieldError [message]="msg" />
-        }
       </UiFlex>
     </UiGrid>
 
-    @if (dateRangeError(); as msg) {
+    @if (daysError(); as msg) {
       <UiFieldError [message]="msg" />
     }
 
-    <UiLabel type="bodyXs" color="textWeak">
-      {{ jornadaLabel() }}
-    </UiLabel>
+    @if (hoursError(); as msg) {
+      <UiFieldError [message]="msg" />
+    }
+
+    @if (effortLocked()) {
+      <UiAlert
+        variant="info"
+        message="La tarea ya está asignada: días y horas no se pueden cambiar."
+      />
+    }
 
     @if (mode() === "edit") {
-      <UiFlex direction="column" [gap]="6">
+      <UiFlex direction="column" [gap]="1">
         <UiFormLabel
           labelText="Situación"
           labelFor="task-situation"
@@ -146,57 +135,6 @@
         }
       </UiFlex>
     }
-
-    <UiSurface variant="neutral" padding="md" className="border-dashed">
-      <UiFlex direction="column" [gap]="12">
-        <UiFlex direction="row" alignItems="center" [gap]="8">
-          <UiBadge variant="light" color="warning" size="sm">
-            propuesta — requiere ajuste de modelo
-          </UiBadge>
-        </UiFlex>
-        <UiLabel type="bodyXs" color="textWeak">
-          Multiselección de otras tareas del subproyecto. Aún no existe en el modelo de datos; se muestra como propuesta para validación.
-        </UiLabel>
-        @if (candidatesList().length === 0) {
-          <UiLabel type="bodyXs" color="textWeak">
-            (sin otras tareas en este subproyecto)
-          </UiLabel>
-        } @else {
-          <UiFlex direction="column" [gap]="6">
-            @for (c of candidatesList(); track c.id) {
-              <UiFlex
-                direction="row"
-                alignItems="center"
-                [gap]="10"
-                className="border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2"
-              >
-                <UiFlex
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="center"
-                  [gap]="0"
-                  className="h-4 w-4 rounded border border-gray-400 dark:border-gray-600"
-                ></UiFlex>
-                <UiLabel
-                  type="bodyS"
-                  weight="semibold"
-                  className="flex-1"
-                >
-                  {{ c.name }}
-                </UiLabel>
-                <UiLabel
-                  type="bodyXs"
-                  color="textWeak"
-                  className="font-mono"
-                >
-                  {{ c.estimatedHours }} h
-                </UiLabel>
-              </UiFlex>
-            }
-          </UiFlex>
-        }
-      </UiFlex>
-    </UiSurface>
 
     <UiFlex
       direction="row"

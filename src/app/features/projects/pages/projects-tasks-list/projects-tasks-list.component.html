@@ -99,35 +99,10 @@
         <UiFlex
           direction="row"
           alignItems="center"
-          justifyContent="between"
+          justifyContent="end"
           [gap]="12"
           className="flex-wrap"
         >
-          <UiFlex
-            direction="row"
-            alignItems="center"
-            [gap]="8"
-            className="flex-wrap"
-          >
-            <UiLabel type="bodyXs" color="textWeak">Situación:</UiLabel>
-            <UiBadge variant="light" color="light" size="sm">
-              <UiLabel type="bodyXs" className="mr-1">○</UiLabel>
-              Pendiente
-            </UiBadge>
-            <UiBadge variant="light" color="info" size="sm">
-              <UiLabel type="bodyXs" className="mr-1">◐</UiLabel>
-              En atención
-            </UiBadge>
-            <UiBadge variant="light" color="success" size="sm">
-              <UiLabel type="bodyXs" className="mr-1">●</UiLabel>
-              Culminado
-            </UiBadge>
-            <UiBadge variant="light" color="error" size="sm">
-              <UiLabel type="bodyXs" className="mr-1">✕</UiLabel>
-              Rechazado
-            </UiBadge>
-          </UiFlex>
-
           <UiFlex direction="row" alignItems="center" [gap]="6">
             <UiLabel type="bodyXs" color="textWeak">
               Total horas estimadas:
@@ -144,18 +119,6 @@
         </UiFlex>
       </UiSurface>
     }
-
-    <UiSurface variant="neutral" padding="md" className="border-dashed max-w-140">
-      <UiFlex direction="row" [gap]="4" className="flex-wrap">
-        <UiLabel type="bodyS" color="textWeak">Una tarea nace de la</UiLabel>
-        <UiLabel type="bodyS" weight="semibold" color="textStrong">línea base</UiLabel>
-        <UiLabel type="bodyS" color="textWeak">del subproyecto o tiene origen en una</UiLabel>
-        <UiLabel type="bodyS" weight="semibold" color="textStrong">variación</UiLabel>
-        <UiLabel type="bodyS" color="textWeak">(#V-###). Jornada base de cálculo:</UiLabel>
-        <UiLabel type="bodyS" weight="semibold" color="textStrong">8 h/día</UiLabel>
-        <UiLabel type="bodyS" color="textWeak">. La situación de cada tarea alimenta la del subproyecto.</UiLabel>
-      </UiFlex>
-    </UiSurface>
   } @else {
     <UiSurface variant="neutral" padding="lg" className="text-center">
       <UiFlex direction="column" alignItems="center" [gap]="12">
@@ -178,10 +141,10 @@
 <TaskFormModal
   [isOpen]="formOpen()"
   [mode]="formMode()"
-  [subprojectCode]="subproject()?.ticket ?? ''"
+  [subprojectLabel]="subprojectLabel()"
   [subprojectId]="subId() ?? ''"
   [task]="selectedTask()"
-  [candidates]="candidates()"
+  [effortLocked]="selectedTaskAssigned()"
   (save)="onSave($event)"
   (close)="formOpen.set(false)"
 />

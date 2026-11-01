@@ -44,11 +44,9 @@
             <th class="w-27 px-4 py-3 font-medium">Tipo</th>
             <th class="px-4 py-3 font-medium">Descripción</th>
             <th class="w-21 px-4 py-3 font-medium">Prioridad</th>
-            <th class="w-29.5 px-4 py-3 font-medium">Solicitante</th>
-            <th class="w-24 px-4 py-3 font-medium">Fecha sol.</th>
             <th class="w-29.5 px-4 py-3 font-medium">Situación</th>
             <th class="w-20 px-4 py-3 font-medium">Estado</th>
-            <th class="w-14 px-4 py-3 text-center font-medium">Tareas</th>
+            <th class="w-16 px-4 py-3 text-center font-medium">Tareas</th>
             <th class="px-4 py-3 text-right font-medium">Acciones</th>
           </tr>
         </thead>
@@ -63,7 +61,7 @@
                 </span>
               </td>
               <td class="px-4 py-3.5">
-                <UiBadge variant="solid" color="dark" size="sm">
+                <UiBadge variant="solid" color="dark" size="md">
                   {{ typeLabel(s.type) }}
                 </UiBadge>
               </td>
@@ -77,72 +75,62 @@
                 </UiLabel>
               </td>
               <td class="px-4 py-3.5">
-                <UiBadge variant="light" [color]="priorityColor(s.priority)" size="sm">
-                  <span class="mr-1">{{ priorityDot(s.priority) }}</span>
+                <UiBadge variant="light" [color]="priorityColor(s.priority)" size="md">
+                  <span class="mr-1">{{ priorityArrow(s.priority) }}</span>
                   {{ priorityLabel(s.priority) }}
                 </UiBadge>
               </td>
-              <td class="px-4 py-3.5 text-sm text-gray-700 dark:text-gray-300">
-                {{ s.requester }}
-              </td>
-              <td class="px-4 py-3.5 font-mono text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
-                {{ formatDate(s.requestDate) }}
-              </td>
               <td class="px-4 py-3.5">
-                <UiBadge variant="light" [color]="situationColor(s.situation)" size="sm">
+                <UiBadge variant="light" [color]="situationColor(s.situation)" size="md">
                   <span class="mr-1">{{ situationPrefix(s.situation) }}</span>
                   {{ situationLabel(s.situation) }}
                 </UiBadge>
               </td>
               <td class="px-4 py-3.5">
                 @if (s.active) {
-                  <UiBadge variant="light" color="success" size="sm">
+                  <UiBadge variant="light" color="success" size="md">
                     Activo
                   </UiBadge>
                 } @else {
-                  <UiBadge variant="light" color="light" size="sm">
+                  <UiBadge variant="light" color="light" size="md">
                     Inactivo
                   </UiBadge>
                 }
               </td>
               <td class="px-4 py-3.5 text-center">
-                <UiBadge variant="light" color="dark" size="sm">
-                  {{ s.taskCount }}
+                <UiBadge variant="light" color="dark" size="md">
+                  {{ s.doneTaskCount }}/{{ s.taskCount }}
                 </UiBadge>
               </td>
               <td class="px-4 py-3.5">
-                <UiFlex
-                  direction="row"
-                  alignItems="center"
-                  [justifyContent]="'end'"
-                  [gap]="10"
-                  className="whitespace-nowrap"
-                >
-                  <UiLink
-                    variant="primary"
-                    size="sm"
+                <UiFlex [gap]="2" [alignItems]="'center'" [justifyContent]="'end'" [noWrap]="true">
+                  <UiIconButton
+                    [Icon]="viewIcon"
+                    variant="secondary"
+                    tooltip="Ver tareas"
+                    tooltipSide="top"
+                    labelText="Ver tareas"
                     (click)="view.emit(s)"
-                  >
-                    Ver tareas
-                  </UiLink>
-                  <span class="text-gray-300 dark:text-gray-600">·</span>
-                  <UiLink
-                    variant="primary"
-                    size="sm"
+                  />
+                  <UiIconButton
+                    [Icon]="editIcon"
+                    variant="secondary"
+                    tooltip="Editar"
+                    tooltipSide="top"
+                    labelText="Editar"
                     [disabled]="!s.active"
                     (click)="edit.emit(s)"
-                  >
-                    Editar
-                  </UiLink>
-                  <span class="text-gray-300 dark:text-gray-600">·</span>
-                  <UiLink
-                    variant="danger"
-                    size="sm"
+                  />
+                  <UiIconButton
+                    [Icon]="trashIcon"
+                    variant="secondary"
+                    styleType="danger"
+                    tooltip="Dar de baja"
+                    tooltipSide="top"
+                    labelText="Dar de baja"
                     [disabled]="!s.active"
                     (click)="deactivate.emit(s)"
-                  >
-                    Dar de baja
-                  </UiLink>
+                  />
                 </UiFlex>
               </td>
             </tr>

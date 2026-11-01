@@ -8,12 +8,17 @@ import {
   output,
   signal,
 } from "@angular/core";
-import { RouterModule } from "@angular/router";
+import { Router } from "@angular/router";
 
+import {
+  IconEditPencilComponent,
+  IconEyeComponent,
+  IconTrashComponent,
+} from "@shared/icons";
 import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiFlexComponent } from "@shared/ui/flex";
+import { UiIconButtonComponent } from "@shared/ui/icon-button";
 import { UiLabelComponent } from "@shared/ui/label";
-import { UiLinkComponent } from "@shared/ui/link";
 
 import { UsersService } from "@features/users/services/users.service";
 import { SubprojectsService } from "../../services/subprojects.service";
@@ -34,17 +39,21 @@ interface ProjectRow extends Project {
   selector: "ProjectsTable",
   standalone: true,
   imports: [
-    RouterModule,
     UiBadgeComponent,
     UiFlexComponent,
+    UiIconButtonComponent,
     UiLabelComponent,
-    UiLinkComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./projects-table.component.html",
 })
 export class ProjectsTableComponent {
+  private readonly router = inject(Router);
   private readonly usersService = inject(UsersService);
+
+  protected readonly viewIcon = IconEyeComponent;
+  protected readonly editIcon = IconEditPencilComponent;
+  protected readonly trashIcon = IconTrashComponent;
   private readonly subprojectsService = inject(SubprojectsService);
 
   readonly projects = input<Project[]>([]);
@@ -55,6 +64,11 @@ export class ProjectsTableComponent {
   readonly clearFilters = output<void>();
 
   protected readonly currentPage = signal(1);
+
+  protected openSubprojects(project: Project): void {
+    void this.router.navigate(["/app/operacion/proyectos", project.id, "subproyectos"]);
+    this.view.emit(project);
+  }
 
   protected readonly rows = computed<ProjectRow[]>(() => {
     const users = this.usersService.users();

@@ -16,7 +16,6 @@ import {
   IconPlusSimpleComponent,
 } from "@shared/icons";
 import { CommonBreadcrumbComponent } from "@shared/common/page-breadcrumb";
-import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiButtonComponent } from "@shared/ui/button";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
@@ -43,11 +42,13 @@ import {
   type TaskActiveFilter,
   type TaskSituation,
 } from "../../models/task";
+import { subprojectDisplayLabel } from "../../models/subproject";
 import type { TaskFormSavePayload } from "../../models/task-form";
 import { ProjectsService } from "../../services/projects.service";
 import { SubprojectsService } from "../../services/subprojects.service";
 import { TasksService } from "../../services/tasks.service";
 import { ToastService } from "@core/http/toast.service";
+import { AssignmentsService } from "@features/planning/services/assignments.service";
 
 @Component({
   selector: "ProjectsTasksListPage",
@@ -58,7 +59,6 @@ import { ToastService } from "@core/http/toast.service";
     ProjectsTasksTableComponent,
     ProjectsTasksToolbarComponent,
     TaskFormModalComponent,
-    UiBadgeComponent,
     UiButtonComponent,
     UiFlexComponent,
     UiHeaderComponent,
@@ -75,11 +75,13 @@ export class ProjectsTasksListComponent implements OnInit {
   private readonly subprojectsService = inject(SubprojectsService);
   private readonly tasksService = inject(TasksService);
   private readonly toastService = inject(ToastService);
+  private readonly assignmentsService = inject(AssignmentsService);
 
   ngOnInit(): void {
     void this.projectsService.cargar();
     void this.subprojectsService.cargar();
     void this.tasksService.cargar();
+    void this.assignmentsService.cargar();
   }
 
   constructor() {
@@ -118,14 +120,15 @@ export class ProjectsTasksListComponent implements OnInit {
     return id ? this.subprojectsService.getById(id) : undefined;
   });
 
+  protected readonly subprojectLabel = computed<string>(() => {
+    const s = this.subproject();
+    return s ? subprojectDisplayLabel(s) : "";
+  });
+
   protected readonly tasks = computed<Task[]>(() => {
     const id = this.subId();
     return id ? this.tasksService.getBySubproject(id) : [];
   });
-
-  protected readonly candidates = computed<Task[]>(() =>
-    this.tasks().filter((t) => t.id !== this.selectedTask()?.id),
-  );
 
   protected readonly searchTerm = signal<string>("");
   protected readonly filterSituation = signal<TaskSituation | null>(null);
@@ -193,6 +196,16 @@ export class ProjectsTasksListComponent implements OnInit {
   protected readonly formMode = signal<"create" | "edit">("create");
   protected readonly selectedTask = signal<Task | null>(null);
 
+  protected readonly selectedTaskAssigned = computed<boolean>(() => {
+    const id = this.selectedTask()?.id;
+    return (
+      !!id &&
+      this.assignmentsService
+        .assignments()
+        .some((a) => a.active && a.taskId === id)
+    );
+  });
+
   protected openCreate(): void {
     const s = this.subproject();
     if (s && !s.active) {
@@ -220,10 +233,16 @@ export class ProjectsTasksListComponent implements OnInit {
     this.formOpen.set(true);
   }
 
-  protected onDeactivate(t: Task): void {
+  protected async onDeactivate(t: Task): Promise<void> {
     const subId = this.subId();
     if (!subId) return;
-    void this.tasksService.deactivate(subId, t.id);
+    const deactivated = await this.tasksService.deactivate(subId, t.id);
+    if (deactivated) {
+      this.toastService.success(
+        `La tarea "${t.name}" se dio de baja correctamente.`,
+        "Tarea dada de baja",
+      );
+    }
   }
 
   protected async onSave(payload: TaskFormSavePayload): Promise<void> {

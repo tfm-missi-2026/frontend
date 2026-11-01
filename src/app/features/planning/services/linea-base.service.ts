@@ -84,7 +84,7 @@ export class LineaBaseService {
     );
     const tasks = this.tasksService
       .tasks()
-      .filter((t) => subIds.has(t.subprojectId));
+      .filter((t) => t.active && subIds.has(t.subprojectId));
     const taskIds = new Set(tasks.map((t) => t.id));
     const assignments = this.assignmentsService
       .assignments()
@@ -97,8 +97,8 @@ export class LineaBaseService {
         tareaId: t.id,
         nombre: t.name,
         descripcion: t.description || null,
-        fechaInicioPlanificada: t.startDate || "1970-01-01",
-        fechaFinPlanificada: t.endDate || "1970-01-01",
+        fechaInicioPlanificada: t.startDate,
+        fechaFinPlanificada: t.endDate,
         horasEstimadas: t.estimatedHours,
       })),
       asignaciones: assignments.map((a) => ({

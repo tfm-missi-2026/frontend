@@ -39,6 +39,7 @@ import type {
 import { AssignmentsService } from "../../services/assignments.service";
 import type { LineaBaseApi } from "../../models/linea-base-api";
 import { LineaBaseService } from "../../services/linea-base.service";
+import { subprojectDisplayLabel } from "@features/projects/models/subproject";
 import { ProjectsService } from "@features/projects/services/projects.service";
 import { SubprojectsService } from "@features/projects/services/subprojects.service";
 import { TasksService } from "@features/projects/services/tasks.service";
@@ -118,13 +119,20 @@ export class PlanningListComponent implements OnInit {
 
   protected readonly taskOptions = computed<SelectOption[]>(() => {
     const subs = this.subprojectsInProject();
-    return this.tasksInProject().map((t) => {
-      const sub = subs.find((s) => s.id === t.subprojectId);
-      return {
-        value: t.id,
-        label: sub ? `${sub.description} · ${t.name}` : t.name,
-      };
-    });
+    const assignedTaskIds = new Set(this.assignments().map((a) => a.taskId));
+    const editingTaskId = this.selectedAssignment()?.taskId;
+    return this.tasksInProject()
+      .filter(
+        (t) =>
+          t.active && (!assignedTaskIds.has(t.id) || t.id === editingTaskId),
+      )
+      .map((t) => {
+        const sub = subs.find((s) => s.id === t.subprojectId);
+        return {
+          value: t.id,
+          label: sub ? `${subprojectDisplayLabel(sub)} · ${t.name}` : t.name,
+        };
+      });
   });
 
   protected readonly resourceOptions = computed<SelectOption[]>(() =>
@@ -195,8 +203,8 @@ export class PlanningListComponent implements OnInit {
     return ids.size;
   });
 
-  protected readonly canFreeze = computed<boolean>(
-    () => this.assignments().length > 0,
+  protected readonly canFreeze = computed<boolean>(() =>
+    this.tasksInProject().some((t) => t.active),
   );
 
   protected readonly breadcrumbItems = [

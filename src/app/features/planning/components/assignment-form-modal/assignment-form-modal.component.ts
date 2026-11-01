@@ -16,18 +16,21 @@ import { UiDatePickerComponent } from "@shared/ui/date-picker";
 import { UiFieldErrorComponent } from "@shared/ui/field-error";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiFormLabelComponent } from "@shared/ui/form-label";
-import { UiGridComponent } from "@shared/ui/grid";
-import { UiInputComponent } from "@shared/ui/input";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
 import { UiSelectComponent } from "@shared/ui/select";
 import type { SelectOption } from "@shared/ui/select";
+import { formatShortDate } from "@utils/date";
+
+import type { Task } from "@features/projects/models/task";
 
 import { AssignmentsService } from "../../services/assignments.service";
 import {
   computeCapacityHours,
   computeCommittedHours,
+  computeEndDate,
   countBusinessDays,
+  isBusinessDay,
   isOverload,
 } from "../../services/capacity.util";
 import type { Assignment } from "../../models/assignment";
@@ -40,8 +43,6 @@ import {
 
 export type AssignmentFormMode = "create" | "edit";
 
-const WORKDAY_HOURS = 8;
-
 @Component({
   selector: "AssignmentFormModal",
   standalone: true,
@@ -52,8 +53,6 @@ const WORKDAY_HOURS = 8;
     UiFieldErrorComponent,
     UiFlexComponent,
     UiFormLabelComponent,
-    UiGridComponent,
-    UiInputComponent,
     UiLabelComponent,
     UiModalComponent,
     UiSelectComponent,
@@ -70,6 +69,7 @@ export class AssignmentFormModalComponent {
   readonly projectId = input<string>("");
   readonly assignment = input<Assignment | null>(null);
   readonly taskOptions = input<SelectOption[]>([]);
+  readonly tasks = input<Task[]>([]);
   readonly resourceOptions = input<SelectOption[]>([]);
   readonly resourceNames = input<Record<string, string>>({});
 
@@ -84,38 +84,34 @@ export class AssignmentFormModalComponent {
   protected readonly validationMessage = signal<string | null>(null);
   protected readonly taskError = signal<string | null>(null);
   protected readonly resourceError = signal<string | null>(null);
-  protected readonly hoursError = signal<string | null>(null);
   protected readonly startError = signal<string | null>(null);
-  protected readonly endError = signal<string | null>(null);
-  protected readonly dateRangeError = signal<string | null>(null);
 
   protected readonly heading = computed<string>(() =>
     this.mode() === "create" ? "Nueva asignación" : "Editar asignación",
   );
 
-  protected readonly hoursPerDay = signal<number>(WORKDAY_HOURS);
-
   protected readonly formInvalid = computed<boolean>(
     () =>
       this.taskError() !== null ||
       this.resourceError() !== null ||
-      this.hoursError() !== null ||
-      this.startError() !== null ||
-      this.endError() !== null ||
-      this.dateRangeError() !== null,
+      this.startError() !== null,
   );
 
-  protected readonly businessDays = computed<number>(() => {
-    const f = this.form();
-    if (!f.startDate || !f.endDate) return 0;
-    return countBusinessDays(f.startDate, f.endDate);
-  });
+  protected readonly selectedTask = computed<Task | undefined>(() =>
+    this.tasks().find((t) => t.id === this.form().taskId),
+  );
 
-  protected readonly jornadaLabel = computed<string>(() => {
-    const dias = this.businessDays();
-    if (dias === 0) return "Elige el periodo para calcular el total.";
-    const total = this.form().plannedHours;
-    return `${this.hoursPerDay()} h/día × ${dias} días hábiles = ${total} h`;
+  protected readonly scheduleLabel = computed<string>(() => {
+    const task = this.selectedTask();
+    if (!task) return "Elige la tarea para calcular la fecha de fin.";
+    const days =
+      task.estimatedDays === 1
+        ? "1 día hábil"
+        : `${task.estimatedDays} días hábiles`;
+    const effort = `${days} · ${task.estimatedHours} h`;
+    const { startDate, endDate } = this.form();
+    if (!startDate || !endDate) return effort;
+    return `Del ${formatShortDate(startDate)} al ${formatShortDate(endDate)} · ${effort}`;
   });
 
   constructor() {
@@ -133,15 +129,8 @@ export class AssignmentFormModalComponent {
           startDate: a.startDate,
           endDate: a.endDate,
         });
-        const dias = countBusinessDays(a.startDate, a.endDate);
-        this.hoursPerDay.set(
-          dias > 0
-            ? Math.min(WORKDAY_HOURS, a.plannedHours / dias)
-            : WORKDAY_HOURS,
-        );
       } else {
         this.form.set(emptyAssignmentForm());
-        this.hoursPerDay.set(WORKDAY_HOURS);
       }
     });
   }
@@ -150,14 +139,12 @@ export class AssignmentFormModalComponent {
     this.validationMessage.set(null);
     this.taskError.set(null);
     this.resourceError.set(null);
-    this.hoursError.set(null);
     this.startError.set(null);
-    this.endError.set(null);
-    this.dateRangeError.set(null);
   }
 
   protected onTaskChange(value: unknown): void {
     this.patch({ taskId: value == null ? "" : String(value) });
+    this.syncFromTask();
     this.taskError.set(null);
   }
 
@@ -166,49 +153,30 @@ export class AssignmentFormModalComponent {
     this.resourceError.set(null);
   }
 
-  protected onHoursChange(value: string | number | undefined): void {
-    if (value === undefined || value === null || value === "") {
-      this.hoursPerDay.set(0);
-      this.recalcularTotal();
-      this.hoursError.set(null);
-      return;
-    }
-    const num = Number(value);
-    if (!Number.isFinite(num) || num <= 0) {
-      this.hoursPerDay.set(0);
-      this.recalcularTotal();
-      this.hoursError.set("Número inválido.");
-      return;
-    }
-    if (num > WORKDAY_HOURS) {
-      this.hoursPerDay.set(num);
-      this.recalcularTotal();
-      this.hoursError.set(`La jornada base es de ${WORKDAY_HOURS} horas.`);
-      return;
-    }
-    this.hoursPerDay.set(num);
-    this.recalcularTotal();
-    this.hoursError.set(null);
-  }
-
-  private recalcularTotal(): void {
-    this.patch({ plannedHours: this.hoursPerDay() * this.businessDays() });
-  }
-
   protected onStartDateChange(value: string | string[]): void {
     const iso = Array.isArray(value) ? value[0] ?? "" : value ?? "";
     this.patch({ startDate: iso });
-    this.recalcularTotal();
-    this.startError.set(null);
-    this.dateRangeError.set(null);
+    this.syncFromTask();
+    this.startError.set(this.startDateError(iso));
   }
 
-  protected onEndDateChange(value: string | string[]): void {
-    const iso = Array.isArray(value) ? value[0] ?? "" : value ?? "";
-    this.patch({ endDate: iso });
-    this.recalcularTotal();
-    this.endError.set(null);
-    this.dateRangeError.set(null);
+  private syncFromTask(): void {
+    const task = this.selectedTask();
+    const { startDate } = this.form();
+    this.patch({
+      plannedHours: task?.estimatedHours ?? 0,
+      endDate:
+        task && startDate && isBusinessDay(startDate)
+          ? computeEndDate(startDate, task.estimatedDays)
+          : "",
+    });
+  }
+
+  private startDateError(iso: string): string | null {
+    if (!iso) return null;
+    return isBusinessDay(iso)
+      ? null
+      : "La fecha de inicio debe ser un día hábil.";
   }
 
   private patch(partial: Partial<AssignmentFormData>): void {
@@ -232,19 +200,9 @@ export class AssignmentFormModalComponent {
     const errors = this.validate(f);
     this.taskError.set(errors.task);
     this.resourceError.set(errors.resource);
-    this.hoursError.set(errors.hours);
     this.startError.set(errors.start);
-    this.endError.set(errors.end);
-    this.dateRangeError.set(errors.dateRange);
 
-    if (
-      errors.task ||
-      errors.resource ||
-      errors.hours ||
-      errors.start ||
-      errors.end ||
-      errors.dateRange
-    ) {
+    if (errors.task || errors.resource || errors.start) {
       this.validationMessage.set(
         "Revisa los campos marcados antes de guardar.",
       );
@@ -311,40 +269,14 @@ export class AssignmentFormModalComponent {
   private validate(form: AssignmentFormData): {
     task: string | null;
     resource: string | null;
-    hours: string | null;
     start: string | null;
-    end: string | null;
-    dateRange: string | null;
   } {
-    const errors = {
-      task: null,
-      resource: null,
-      hours: null,
-      start: null,
-      end: null,
-      dateRange: null,
-    } as {
-      task: string | null;
-      resource: string | null;
-      hours: string | null;
-      start: string | null;
-      end: string | null;
-      dateRange: string | null;
+    return {
+      task: form.taskId ? null : "Selecciona una tarea.",
+      resource: form.resourceId ? null : "Selecciona un recurso técnico.",
+      start: form.startDate
+        ? this.startDateError(form.startDate)
+        : "Selecciona fecha de inicio.",
     };
-    if (!form.taskId) errors.task = "Selecciona una tarea.";
-    if (!form.resourceId)
-      errors.resource = "Selecciona un recurso técnico.";
-    if (!form.plannedHours || form.plannedHours <= 0) {
-      errors.hours = "Ingresa las horas planificadas.";
-    } else if (form.plannedHours > 999) {
-      errors.hours = "Máximo 999 horas.";
-    }
-    if (!form.startDate) errors.start = "Selecciona fecha de inicio.";
-    if (!form.endDate) errors.end = "Selecciona fecha de fin.";
-    if (form.startDate && form.endDate && form.endDate < form.startDate) {
-      errors.dateRange =
-        "La fecha de fin debe ser posterior o igual a la de inicio.";
-    }
-    return errors;
   }
 }

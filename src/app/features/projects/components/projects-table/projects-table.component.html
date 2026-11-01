@@ -69,57 +69,52 @@
                 {{ p.managerName }}
               </td>
               <td class="px-4 py-3.5 text-center">
-                <UiBadge variant="light" color="light" size="sm">
+                <UiBadge variant="light" color="light" size="md">
                   {{ p.subCount }}
                 </UiBadge>
               </td>
               <td class="px-4 py-3.5">
                 @if (p.status === "active") {
-                  <UiBadge variant="light" color="success" size="sm">
+                  <UiBadge variant="light" color="success" size="md">
                     <span class="mr-1 text-success-500">●</span>
                     {{ statusLabel(p.status) }}
                   </UiBadge>
                 } @else {
-                  <UiBadge variant="light" color="error" size="sm">
+                  <UiBadge variant="light" color="error" size="md">
                     <span class="mr-1 text-error-500">○</span>
                     {{ statusLabel(p.status) }}
                   </UiBadge>
                 }
               </td>
               <td class="px-4 py-3.5">
-                <UiFlex
-                  direction="row"
-                  alignItems="center"
-                  [justifyContent]="'end'"
-                  [gap]="10"
-                  className="whitespace-nowrap"
-                >
-                  <UiLink
-                    variant="primary"
-                    size="sm"
-                    [routerLink]="['/app/operacion/proyectos', p.id, 'subproyectos']"
-                    (click)="view.emit(p)"
-                  >
-                    Ver subproyectos
-                  </UiLink>
-                  <span class="text-gray-300 dark:text-gray-600">·</span>
-                  <UiLink
-                    variant="primary"
-                    size="sm"
+                <UiFlex [gap]="2" [alignItems]="'center'" [justifyContent]="'end'" [noWrap]="true">
+                  <UiIconButton
+                    [Icon]="viewIcon"
+                    variant="secondary"
+                    tooltip="Ver subproyectos"
+                    tooltipSide="top"
+                    labelText="Ver subproyectos"
+                    (click)="openSubprojects(p)"
+                  />
+                  <UiIconButton
+                    [Icon]="editIcon"
+                    variant="secondary"
+                    tooltip="Editar"
+                    tooltipSide="top"
+                    labelText="Editar"
                     [disabled]="p.status !== 'active'"
                     (click)="edit.emit(p)"
-                  >
-                    Editar
-                  </UiLink>
-                  <span class="text-gray-300 dark:text-gray-600">·</span>
-                  <UiLink
-                    variant="danger"
-                    size="sm"
+                  />
+                  <UiIconButton
+                    [Icon]="trashIcon"
+                    variant="secondary"
+                    styleType="danger"
+                    tooltip="Dar de baja"
+                    tooltipSide="top"
+                    labelText="Dar de baja"
                     [disabled]="p.status !== 'active'"
                     (click)="deactivate.emit(p)"
-                  >
-                    Dar de baja
-                  </UiLink>
+                  />
                 </UiFlex>
               </td>
             </tr>

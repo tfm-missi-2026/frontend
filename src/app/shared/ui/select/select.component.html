@@ -119,7 +119,9 @@
       [class.fixed]="effectiveMenuPosition() === 'fixed'"
       [style.top]="menuStyle()?.top ?? null"
       [style.left]="menuStyle()?.left ?? null"
-      [style.width]="menuStyle()?.width ?? null"
+      [style.width]="effectiveMenuPosition() === 'fixed' ? 'max-content' : null"
+      [style.min-width]="menuStyle()?.minWidth ?? null"
+      [style.max-width]="menuStyle()?.maxWidth ?? null"
       [style.max-height]="menuStyle()?.maxHeight ?? null"
     >
       @if (showLoading()) {

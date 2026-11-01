@@ -107,8 +107,14 @@ export class ProjectsListComponent implements OnInit {
     this.formOpen.set(true);
   }
 
-  protected onDeactivate(p: Project): void {
-    void this.projectsService.deactivate(p.id);
+  protected async onDeactivate(p: Project): Promise<void> {
+    const deactivated = await this.projectsService.deactivate(p.id);
+    if (deactivated) {
+      this.toastService.success(
+        `El proyecto "${p.name}" se dio de baja correctamente.`,
+        "Proyecto dado de baja",
+      );
+    }
   }
 
   protected async onSaveProject(payload: ProjectFormSavePayload): Promise<void> {

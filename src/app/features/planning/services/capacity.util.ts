@@ -25,6 +25,23 @@ export function countBusinessDays(
   return days.length;
 }
 
+export function isBusinessDay(isoDate: string): boolean {
+  return countBusinessDays(isoDate, isoDate) === 1;
+}
+
+export function computeEndDate(isoStart: string, days: number): string {
+  const start = parseIsoDate(isoStart);
+  if (!start || days <= 0) return "";
+  const cursor = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+  let remaining = days - 1;
+  while (remaining > 0) {
+    cursor.setDate(cursor.getDate() + 1);
+    const day = cursor.getDay();
+    if (day !== 0 && day !== 6) remaining--;
+  }
+  return toIsoDate(cursor);
+}
+
 export function computeCapacityHours(
   isoStart: string,
   isoEnd: string,

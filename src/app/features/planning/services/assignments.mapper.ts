@@ -54,9 +54,7 @@ export function formDataToCrearApi(
   return {
     tareaId: data.taskId,
     usuarioId: data.resourceId,
-    horasPlanificadas: data.plannedHours || null,
-    fechaInicioPlanificada: data.startDate || null,
-    fechaFinPlanificada: data.endDate || null,
+    fechaInicioPlanificada: data.startDate,
     confirmarSobrecarga,
   };
 }

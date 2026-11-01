@@ -11,8 +11,6 @@ import {
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 
-import { UsersService } from "@features/users/services/users.service";
-import { userFullName } from "@features/users/models/user";
 import { ToastService } from "@core/http/toast.service";
 import { CatalogService } from "@features/catalog/services/catalog.service";
 
@@ -30,6 +28,7 @@ import { UiModalComponent } from "@shared/ui/modal";
 import { UiSelectComponent } from "@shared/ui/select";
 import { UiSurfaceComponent } from "@shared/ui/surface";
 import { UiTextAreaComponent } from "@shared/ui/text-area";
+import { todayIso } from "@utils/date";
 
 import {
   emptySubprojectForm,
@@ -37,25 +36,26 @@ import {
   type SubprojectFormSavePayload,
 } from "../../models/subproject-form";
 import {
+  REQUESTER_MAX_LENGTH,
   SUBPROJECT_PRIORITY_OPTIONS,
   SUBPROJECT_TYPE_OPTIONS,
+  subprojectRequiresRequestData,
   TICKET_REGEX,
   type Subproject,
 } from "../../models/subproject";
+import { SubprojectsService } from "../../services/subprojects.service";
+import { RequesterAutocompleteComponent } from "../requester-autocomplete/requester-autocomplete.component";
 
 export type SubprojectFormMode = "create" | "edit";
 
 const DESCRIPTION_MIN_LENGTH = 10;
-
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
-}
 
 @Component({
   selector: "SubprojectFormModal",
   standalone: true,
   imports: [
     FormsModule,
+    RequesterAutocompleteComponent,
     UiAlertComponent,
     UiBadgeComponent,
     UiDatePickerComponent,
@@ -76,7 +76,7 @@ export class SubprojectFormModalComponent {
   protected readonly IconCheck = IconCheckComponent;
   protected readonly IconX = IconXComponent;
 
-  private readonly usersService = inject(UsersService);
+  private readonly subprojectsService = inject(SubprojectsService);
   private readonly toastService = inject(ToastService);
   private readonly catalogService = inject(CatalogService);
 
@@ -110,15 +110,14 @@ export class SubprojectFormModalComponent {
   protected readonly typeOptions = SUBPROJECT_TYPE_OPTIONS;
   protected readonly priorityOptions = SUBPROJECT_PRIORITY_OPTIONS;
 
-  protected readonly requesterOptions = computed(() =>
-    this.usersService
-      .users()
-      .filter((u) => u.status === "active")
-      .map((u) => ({ value: u.id, label: userFullName(u) })),
-  );
+  protected readonly requesterNames = this.subprojectsService.requesterNames;
 
   protected readonly form = signal<SubprojectFormData>(
     emptySubprojectForm(),
+  );
+
+  protected readonly requiresRequestData = computed<boolean>(() =>
+    subprojectRequiresRequestData(this.form().type),
   );
 
   protected readonly validationMessage = signal<string | null>(null);
@@ -188,7 +187,7 @@ export class SubprojectFormModalComponent {
     effect(() => {
       const open = this.isOpen();
       if (!open) return;
-      untracked(() => void this.usersService.cargar());
+      untracked(() => void this.subprojectsService.cargarSolicitantes());
       this.resetErrors();
       this._submitting.set(false);
       const m = this.mode();
@@ -199,13 +198,13 @@ export class SubprojectFormModalComponent {
           ticket: s.ticket,
           description: s.description,
           priority: s.priority,
-          requesterId: s.requesterId,
-          requestDate: s.requestDate,
+          requester: s.requester,
+          requestDate: s.requestDate ?? "",
           situationId: s.situationId,
           rejectionReason: s.rejectionReason,
         });
       } else {
-        this.form.set(emptySubprojectForm());
+        this.form.set({ ...emptySubprojectForm(), requestDate: todayIso() });
       }
     });
 
@@ -225,7 +224,15 @@ export class SubprojectFormModalComponent {
   }
 
   protected onTypeChange(value: unknown): void {
-    this.patch({ type: (value as SubprojectFormData["type"]) ?? "Incidencia" });
+    const type = (value as SubprojectFormData["type"]) ?? "Incidencia";
+    if (subprojectRequiresRequestData(type)) {
+      this.patch({ type, requestDate: this.form().requestDate || todayIso() });
+    } else {
+      this.patch({ type, ticket: null, requester: "", requestDate: "" });
+      this.ticketError.set(null);
+      this.requesterError.set(null);
+      this.dateError.set(null);
+    }
     this.typeError.set(null);
   }
 
@@ -247,10 +254,8 @@ export class SubprojectFormModalComponent {
     this.priorityError.set(null);
   }
 
-  protected onRequesterChange(value: unknown): void {
-    this.patch({
-      requesterId: value == null ? "" : String(value),
-    });
+  protected onRequesterChange(value: string): void {
+    this.patch({ requester: value });
     this.requesterError.set(null);
   }
 
@@ -320,7 +325,7 @@ export class SubprojectFormModalComponent {
           : null,
       description: f.description.trim(),
       priority: f.priority,
-      requesterId: f.requesterId,
+      requester: f.requester.trim(),
       requestDate: f.requestDate,
       situationId: f.situationId,
       rejectionReason:
@@ -377,11 +382,18 @@ export class SubprojectFormModalComponent {
       errors.description = `Describe con más detalle (mínimo ${DESCRIPTION_MIN_LENGTH} caracteres).`;
     }
     if (!form.priority) errors.priority = "Selecciona una prioridad.";
-    if (!form.requesterId) errors.requester = "Selecciona un solicitante.";
-    if (!form.requestDate) {
-      errors.date = "Selecciona una fecha.";
-    } else if (form.requestDate > todayIso()) {
-      errors.date = "La fecha de solicitud no puede ser futura.";
+    if (subprojectRequiresRequestData(form.type)) {
+      const requester = form.requester.trim();
+      if (!requester) {
+        errors.requester = "Escribe el nombre del solicitante.";
+      } else if (requester.length > REQUESTER_MAX_LENGTH) {
+        errors.requester = `Máximo ${REQUESTER_MAX_LENGTH} caracteres.`;
+      }
+      if (!form.requestDate) {
+        errors.date = "Selecciona una fecha.";
+      } else if (form.requestDate > todayIso()) {
+        errors.date = "La fecha de solicitud no puede ser futura.";
+      }
     }
     if (this.mode() === "edit") {
       if (!form.situationId) {

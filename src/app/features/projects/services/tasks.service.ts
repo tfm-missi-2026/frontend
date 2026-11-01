@@ -35,12 +35,15 @@ export class TasksService {
   readonly error = this._error.asReadonly();
   readonly count = computed(() => this._tasks().length);
 
-  // Cuenta todas las tareas del subproyecto, sin importar su estado
-  // (activo/inactivo) — la baja logica no reduce la asociacion al padre.
-  readonly countBySubproject = computed<Record<string, number>>(() => {
-    const map: Record<string, number> = {};
+  readonly progressBySubproject = computed<
+    Record<string, { done: number; total: number }>
+  >(() => {
+    const map: Record<string, { done: number; total: number }> = {};
     for (const t of this._tasks()) {
-      map[t.subprojectId] = (map[t.subprojectId] ?? 0) + 1;
+      if (!t.active || t.situation === "Rechazado") continue;
+      const entry = (map[t.subprojectId] ??= { done: 0, total: 0 });
+      entry.total += 1;
+      if (t.situation === "Culminado") entry.done += 1;
     }
     return map;
   });
@@ -138,11 +141,10 @@ export class TasksService {
       }
       if (
         !data.name.trim() ||
-        !data.startDate ||
-        !data.endDate ||
+        !data.estimatedDays ||
         !data.estimatedHours
       ) {
-        this._error.set("Faltan datos requeridos (nombre, fechas u horas).");
+        this._error.set("Faltan datos requeridos (nombre, días u horas).");
         return null;
       }
       const creado = await firstValueFrom(
@@ -172,11 +174,10 @@ export class TasksService {
       }
       if (
         !data.name.trim() ||
-        !data.startDate ||
-        !data.endDate ||
+        !data.estimatedDays ||
         !data.estimatedHours
       ) {
-        this._error.set("Faltan datos requeridos (nombre, fechas u horas).");
+        this._error.set("Faltan datos requeridos (nombre, días u horas).");
         return null;
       }
       const actualizado = await firstValueFrom(

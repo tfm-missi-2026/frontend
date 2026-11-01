@@ -22,7 +22,8 @@ import {
 type MenuPositionStyle = {
   top: string;
   left: string;
-  width: string;
+  minWidth: string;
+  maxWidth: string;
   maxHeight: string;
 };
 
@@ -156,23 +157,20 @@ export class UiSelectComponent implements ControlValueAccessor {
   private readonly _lastDebouncedTerm = signal<string | null>(null);
 
   /**
-   * Detect once at construction whether the host lives inside a
-   * `UiModalShell` (marks its root with `data-ui-modal-shell`). If so,
-   * `effectiveMenuPosition` resolves `"auto"` to `"fixed"` so the menu
-   * escapes the modal body's `overflow-y-auto` clipping.
+   * Detecta al abrir el menu si el host esta dentro de un `UiModalShell`. Si lo esta,
+   * `"auto"` se resuelve a `"fixed"` para que el menu no quede recortado por el
+   * `overflow-y-auto` del cuerpo del modal. No se detecta al construir porque el
+   * contenido proyectado todavia no esta conectado al modal.
    */
   private readonly _hostElement = inject(ElementRef<HTMLElement>);
-  private readonly _insideModalShell = detectInsideModalShell(
-    this._hostElement.nativeElement,
-  );
   protected readonly effectiveMenuPosition = computed<
     "absolute" | "fixed"
   >(() => {
     const requested = this.menuPosition();
-    if (requested === "auto") {
-      return this._insideModalShell ? "fixed" : "absolute";
-    }
-    return requested;
+    if (requested !== "auto") return requested;
+    return this.isOpen() && detectInsideModalShell(this._hostElement.nativeElement)
+      ? "fixed"
+      : "absolute";
   });
 
   private onChangeFn: (value: unknown) => void = () => {};
@@ -356,10 +354,23 @@ export class UiSelectComponent implements ControlValueAccessor {
     const top = openAbove
       ? `${Math.max(8, rect.top - maxHeight - 4)}px`
       : `${rect.bottom + 4}px`;
+    const viewportMargin = 8;
+    const minWidth = `${rect.width}px`;
+    const maxWidth = `${window.innerWidth - viewportMargin * 2}px`;
+    menu.style.minWidth = minWidth;
+    menu.style.maxWidth = maxWidth;
+    const left = Math.max(
+      viewportMargin,
+      Math.min(
+        rect.left,
+        window.innerWidth - menu.offsetWidth - viewportMargin,
+      ),
+    );
     this.menuStyle.set({
       top,
-      left: `${rect.left}px`,
-      width: `${rect.width}px`,
+      left: `${left}px`,
+      minWidth,
+      maxWidth,
       maxHeight: `${Math.max(120, maxHeight)}px`,
     });
   }

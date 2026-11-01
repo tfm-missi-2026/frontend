@@ -45,11 +45,12 @@
 
       <UiFlex [direction]="'row'" [className]="columnClasses[1]">
         <UiLabel
-          type="bodyXs"
-          color="textWeak"
-          className="font-mono text-xs whitespace-nowrap"
+          type="bodyS"
+          weight="semibold"
+          color="textStrong"
+          className="font-mono whitespace-nowrap"
         >
-          {{ formatDate(t.startDate) }}
+          {{ t.estimatedDays }}
         </UiLabel>
       </UiFlex>
 
@@ -59,11 +60,21 @@
           color="textWeak"
           className="font-mono text-xs whitespace-nowrap"
         >
-          {{ formatDate(t.endDate) }}
+          {{ formatDate(t.startDate) }}
         </UiLabel>
       </UiFlex>
 
       <UiFlex [direction]="'row'" [className]="columnClasses[3]">
+        <UiLabel
+          type="bodyXs"
+          color="textWeak"
+          className="font-mono text-xs whitespace-nowrap"
+        >
+          {{ formatDate(t.endDate) }}
+        </UiLabel>
+      </UiFlex>
+
+      <UiFlex [direction]="'row'" [className]="columnClasses[4]">
         <UiLabel
           type="HeadingM"
           weight="semibold"
@@ -74,11 +85,11 @@
         </UiLabel>
       </UiFlex>
 
-      <UiFlex [direction]="'row'" [className]="columnClasses[4]">
+      <UiFlex [direction]="'row'" [className]="columnClasses[5]">
         <UiBadge
           variant="light"
           [color]="situationColor(t.situation)"
-          size="sm"
+          size="md"
         >
           <UiLabel type="bodyXs" className="mr-1">
             {{ situationPrefix(t.situation) }}
@@ -87,19 +98,19 @@
         </UiBadge>
       </UiFlex>
 
-      <UiFlex [direction]="'row'" [className]="columnClasses[5]">
+      <UiFlex [direction]="'row'" [className]="columnClasses[6]">
         @if (t.active) {
-          <UiBadge variant="light" color="success" size="sm">
+          <UiBadge variant="light" color="success" size="md">
             Activo
           </UiBadge>
         } @else {
-          <UiBadge variant="light" color="light" size="sm">
+          <UiBadge variant="light" color="light" size="md">
             Inactivo
           </UiBadge>
         }
       </UiFlex>
 
-      <UiFlex [direction]="'row'" [className]="columnClasses[6]">
+      <UiFlex [direction]="'row'" [className]="columnClasses[7]">
         @if (t.origin === "base") {
           <UiLabel
             type="bodyXs"
@@ -108,48 +119,38 @@
             {{ t.originLabel }}
           </UiLabel>
         } @else {
-          <UiBadge variant="solid" color="dark" size="sm">
+          <UiBadge variant="solid" color="dark" size="md">
             {{ t.originLabel }}
           </UiBadge>
         }
       </UiFlex>
 
-      <UiFlex [direction]="'row'" [className]="columnClasses[7]">
-        <UiLabel
-          type="bodyXs"
-          color="textWeak"
-          className="font-mono text-xs"
-        >
-          {{ dependsLabel(t, tasks()) }}
-        </UiLabel>
-      </UiFlex>
-
       <UiFlex
-        direction="row"
-        alignItems="center"
-        justifyContent="end"
-        [gap]="8"
-        className="flex-1 shrink-0 whitespace-nowrap"
+        [gap]="2"
+        [alignItems]="'center'"
+        [justifyContent]="'end'"
+        [noWrap]="true"
+        className="flex-1 shrink-0"
       >
-        <UiLink
-          variant="primary"
-          size="sm"
+        <UiIconButton
+          [Icon]="editIcon"
+          variant="secondary"
+          tooltip="Editar"
+          tooltipSide="top"
+          labelText="Editar tarea"
           [disabled]="!t.active"
           (click)="edit.emit(t)"
-          labelText="Editar tarea"
-        >
-          Editar
-        </UiLink>
-        <UiLabel type="bodyXs" color="textWeak">·</UiLabel>
-        <UiLink
-          variant="danger"
-          size="sm"
+        />
+        <UiIconButton
+          [Icon]="trashIcon"
+          variant="secondary"
+          styleType="danger"
+          tooltip="Dar de baja"
+          tooltipSide="top"
+          labelText="Dar de baja tarea"
           [disabled]="!t.active"
           (click)="deactivate.emit(t)"
-          labelText="Dar de baja tarea"
-        >
-          Dar de baja
-        </UiLink>
+        />
       </UiFlex>
     </UiFlex>
   }

@@ -104,6 +104,7 @@ export class AssignmentsService {
     try {
       const creada = await firstValueFrom(this.api.crear(body));
       const assignment = asignacionApiToAssignment(creada, this.context());
+      await this.tasksService.cargar();
       await this.cargar();
       return assignment;
     } catch (err) {

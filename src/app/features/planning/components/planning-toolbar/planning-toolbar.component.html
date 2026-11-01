@@ -12,7 +12,8 @@
       [searchable]="false"
       [ngModel]="projectId()"
       (ngModelChange)="projectChange.emit(asString($event))"
-      [width]="'320px'"
+      width="w-80"
+      menuPosition="fixed"
     ></UiSelect>
     <UiButton
       variant="primary"

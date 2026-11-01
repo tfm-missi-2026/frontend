@@ -36,12 +36,15 @@
       (blur)="onBlurHandler()"
       data-testid="datepicker"
     />
-    <span
-      class="inline-flex items-center justify-center shrink-0 text-gray-500 dark:text-gray-400 pointer-events-none"
-      aria-hidden="true"
+    <button
+      type="button"
+      aria-label="Abrir calendario"
+      class="inline-flex items-center justify-center shrink-0 cursor-pointer text-gray-500 dark:text-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
+      [disabled]="isEffectivelyDisabled()"
+      (mousedown)="onToggleCalendar($event)"
     >
       <IconCalendar24 [size]="20" />
-    </span>
+    </button>
   </div>
 
   @if (legend(); as lgd) {
