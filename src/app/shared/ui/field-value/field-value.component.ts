@@ -5,7 +5,7 @@ import {
   input,
 } from "@angular/core";
 
-const VALUE_CLASSES = "text-sm text-gray-800 dark:text-white truncate";
+const VALUE_CLASSES = "block text-sm text-gray-800 dark:text-white truncate";
 const PLACEHOLDER_CLASSES = "text-sm text-gray-400 dark:text-gray-500 m-0";
 
 /**
@@ -28,6 +28,7 @@ const PLACEHOLDER_CLASSES = "text-sm text-gray-400 dark:text-gray-500 m-0";
   selector: "UiFieldValue",
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: "block min-w-0 max-w-full" },
   template: `
     @if (value(); as v) {
       <span [class]="valueClasses()">{{ v }}</span>

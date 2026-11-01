@@ -4,8 +4,8 @@
   <UiFlex direction="column" [gap]="1">
     <UiHeader [level]="1" text="Planificación" />
     <UiLabel type="bodyS" color="textWeak">
-      Asignar recursos técnicos a tareas con horas estimadas por periodo. El
-      conjunto de asignaciones establece la línea base del plan.
+      Asigna cada tarea a un recurso técnico y elige la fecha de inicio. La
+      fecha de fin y las horas salen de la tarea.
     </UiLabel>
   </UiFlex>
 
@@ -71,7 +71,7 @@
   } @else {
     <PlanningTable
       [rows]="rows()"
-      emptyText="Este proyecto aún no tiene asignaciones. Crea la primera para iniciar la línea base."
+      emptyText="Este proyecto aún no tiene asignaciones."
       (edit)="onEdit($event)"
       (remove)="onRemove($event)"
     />
@@ -105,21 +105,6 @@
       </UiFlex>
     </UiSurface>
   }
-
-  <UiSurface
-    variant="neutral"
-    padding="md"
-    className="border-dashed max-w-140"
-  >
-    <UiLabel type="bodyS" color="textWeak">
-      Capacidad del recurso = jornada base
-      <strong class="font-semibold text-gray-800 dark:text-white/90">8 h/día</strong>
-      × días hábiles (L–V) del periodo. Si una asignación supera la capacidad,
-      SPSRT avisa de
-      <strong class="font-semibold text-gray-800 dark:text-white/90">sobrecarga</strong>
-      antes de confirmar.
-    </UiLabel>
-  </UiSurface>
 </UiFlex>
 
 <AssignmentFormModal
@@ -128,6 +113,7 @@
   [projectId]="selectedProjectId() ?? ''"
   [assignment]="selectedAssignment()"
   [taskOptions]="taskOptions()"
+  [tasks]="tasksInProject()"
   [resourceOptions]="resourceOptions()"
   [resourceNames]="resourceNames()"
   [saving]="formSaving()"

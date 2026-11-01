@@ -23,8 +23,8 @@ export interface SubproyectoApi {
   codigoTicket: string | null;
   prioridadId: string;
   descripcion: string;
-  solicitanteId: string;
-  fechaSolicitud: string;
+  solicitante: string | null;
+  fechaSolicitud: string | null;
   situacionId: string;
   justificacionRechazo: string | null;
   estado: number | null;
@@ -36,8 +36,8 @@ export interface SubproyectoCrearApi {
   codigoTicket: string | null;
   prioridadId: string;
   descripcion: string;
-  solicitanteId: string;
-  fechaSolicitud: string;
+  solicitante: string | null;
+  fechaSolicitud: string | null;
   situacionId: string;
 }
 
@@ -46,6 +46,8 @@ export interface SubproyectoActualizarApi {
   codigoTicket: string | null;
   prioridadId: string;
   descripcion: string;
+  solicitante: string | null;
+  fechaSolicitud: string | null;
   situacionId: string;
   justificacionRechazo: string | null;
 }
@@ -55,8 +57,9 @@ export interface TareaApi {
   subproyectoId: string;
   nombre: string;
   descripcion: string | null;
-  fechaInicioPlanificada: string;
-  fechaFinPlanificada: string;
+  diasEstimados: number;
+  fechaInicioPlanificada: string | null;
+  fechaFinPlanificada: string | null;
   horasEstimadas: number;
   situacionId: string;
   origenVariacionId: string | null;
@@ -67,8 +70,7 @@ export interface TareaCrearApi {
   subproyectoId: string;
   nombre: string;
   descripcion: string | null;
-  fechaInicioPlanificada: string;
-  fechaFinPlanificada: string;
+  diasEstimados: number;
   horasEstimadas: number;
   situacionId: string;
   origenVariacionId: string | null;
@@ -77,8 +79,7 @@ export interface TareaCrearApi {
 export interface TareaActualizarApi {
   nombre: string;
   descripcion: string | null;
-  fechaInicioPlanificada: string;
-  fechaFinPlanificada: string;
+  diasEstimados: number;
   horasEstimadas: number;
   situacionId: string;
   origenVariacionId: string | null;

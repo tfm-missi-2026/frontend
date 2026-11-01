@@ -14,17 +14,13 @@ import { UiSurfaceComponent } from "@shared/ui/surface";
 import { formatShortDate } from "@utils/date";
 
 import {
+  SUBPROJECT_PRIORITY_ARROW,
+  SUBPROJECT_PRIORITY_COLOR,
   SUBPROJECT_PRIORITY_LABELS,
   type Subproject,
   type SubprojectPriority,
 } from "../../models/subproject";
 import type { TaskSituation } from "../../models/task";
-
-const PRIORITY_COLOR: Record<SubprojectPriority, BadgeColor> = {
-  Alta: "error",
-  Media: "warning",
-  Baja: "light",
-};
 
 const SITUATION_COLOR: Record<TaskSituation, BadgeColor> = {
   Pendiente: "light",
@@ -51,11 +47,15 @@ export class ProjectsTasksHeaderComponent {
   readonly projectName = input<string>("");
 
   protected readonly priorityColor = computed<BadgeColor>(
-    () => PRIORITY_COLOR[this.subproject().priority],
+    () => SUBPROJECT_PRIORITY_COLOR[this.subproject().priority],
   );
 
   protected readonly situationColor = computed<BadgeColor>(
     () => SITUATION_COLOR[this.subproject().situation],
+  );
+
+  protected readonly priorityArrow = computed<string>(
+    () => SUBPROJECT_PRIORITY_ARROW[this.subproject().priority],
   );
 
   protected readonly priorityLabel = computed<string>(

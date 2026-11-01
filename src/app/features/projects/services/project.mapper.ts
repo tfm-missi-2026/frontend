@@ -19,7 +19,7 @@ import type { TaskSituation } from "../models/task";
 import type { TaskFormData } from "../models/task-form";
 
 // Mapeos puros sin DI. Reciben maps de lookup para resolver IDs
-// del backend (catalog, users) a strings de UI. Si no resuelve,
+// del backend (catalog) a strings de UI. Si no resuelve,
 // devuelve defaults seguros (no rompe la pantalla).
 
 export type EstadoActivo = 0 | 1;
@@ -39,15 +39,6 @@ export function buildCatalogLookup(
   items: ReadonlyArray<{ id: string; name: string }>,
 ): CatalogLookup {
   return { byId: new Map(items.map((i) => [i.id, i.name])) };
-}
-
-// Mismo shape que CatalogLookup (id -> nombre a mostrar), pero construido
-// desde msa_usuario para resolver gestores/solicitantes en la UI.
-export type UserLookup = CatalogLookup;
-export function buildUserLookup(
-  users: ReadonlyArray<{ id: string; fullName: string }>,
-): UserLookup {
-  return { byId: new Map(users.map((u) => [u.id, u.fullName])) };
 }
 
 export const SUBPROJECT_TYPE_FALLBACK: SubprojectType = "Incidencia";
@@ -96,7 +87,6 @@ export function projectFormDataToCrearApi(
 export function subproyectoApiToSubproject(
   api: SubproyectoApi,
   catalog: CatalogLookup,
-  users: UserLookup,
 ): import("../models/subproject").Subproject {
   return {
     id: api.id,
@@ -113,8 +103,7 @@ export function subproyectoApiToSubproject(
       api.prioridadId,
       SUBPROJECT_PRIORITY_FALLBACK,
     ) as SubprojectPriority) ?? SUBPROJECT_PRIORITY_FALLBACK,
-    requesterId: api.solicitanteId,
-    requester: users.byId.get(api.solicitanteId) ?? "",
+    requester: api.solicitante ?? "",
     requestDate: api.fechaSolicitud,
     situationId: api.situacionId,
     situation: (lookupOr(
@@ -139,8 +128,8 @@ export function subprojectFormDataToCrearApi(
     codigoTicket: data.ticket,
     prioridadId: data.priority,
     descripcion: data.description,
-    solicitanteId: data.requesterId,
-    fechaSolicitud: data.requestDate,
+    solicitante: data.requester || null,
+    fechaSolicitud: data.requestDate || null,
     situacionId: SUBPROJECT_SITUATION_FALLBACK, // "Pendiente" por defecto al crear
   };
 }
@@ -157,6 +146,7 @@ export function tareaApiToTask(
     subprojectId: api.subproyectoId,
     name: api.nombre,
     description: api.descripcion ?? "",
+    estimatedDays: api.diasEstimados,
     startDate: api.fechaInicioPlanificada,
     endDate: api.fechaFinPlanificada,
     estimatedHours: api.horasEstimadas,
@@ -169,7 +159,6 @@ export function tareaApiToTask(
     origenVariacionId: api.origenVariacionId,
     origin: api.origenVariacionId ? "var" : "base",
     originLabel: api.origenVariacionId ? "Variación" : "Línea base",
-    dependsOnIds: [], // no persistido en backend
     active: api.estado === 1,
   };
 }
@@ -183,8 +172,7 @@ export function taskFormDataToCrearApi(
     subproyectoId: subprojectId,
     nombre: data.name,
     descripcion: data.description || null,
-    fechaInicioPlanificada: data.startDate ?? "",
-    fechaFinPlanificada: data.endDate ?? "",
+    diasEstimados: data.estimatedDays ?? 0,
     horasEstimadas: data.estimatedHours ?? 0,
     situacionId: situationId,
     origenVariacionId: null,
@@ -199,8 +187,7 @@ export function taskFormDataToActualizarApi(
   return {
     nombre: data.name,
     descripcion: data.description || null,
-    fechaInicioPlanificada: data.startDate ?? "",
-    fechaFinPlanificada: data.endDate ?? "",
+    diasEstimados: data.estimatedDays ?? 0,
     horasEstimadas: data.estimatedHours ?? 0,
     situacionId: situationId,
     origenVariacionId,

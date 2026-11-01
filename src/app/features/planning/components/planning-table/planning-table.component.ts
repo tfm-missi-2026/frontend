@@ -20,6 +20,11 @@ import { UiSurfaceComponent } from "@shared/ui/surface";
 import { UiTableComponent } from "@shared/ui/table";
 import type { TableCellContext, TableColumn } from "@shared/ui/table";
 import { formatDateRange } from "@utils/date";
+import {
+  SUBPROJECT_PRIORITY_ARROW,
+  SUBPROJECT_PRIORITY_COLOR,
+  type SubprojectPriority,
+} from "@features/projects/models/subproject";
 
 import type { Assignment } from "../../models/assignment";
 
@@ -32,12 +37,6 @@ export interface AssignmentRowViewModel extends Assignment {
 }
 
 type Cell = TemplateRef<TableCellContext<AssignmentRowViewModel>>;
-
-const PRIORITY_COLOR: Record<string, BadgeColor> = {
-  Alta: "error",
-  Media: "warning",
-  Baja: "success",
-};
 
 @Component({
   selector: "PlanningTable",
@@ -124,6 +123,10 @@ export class PlanningTableComponent {
   }
 
   protected priorityColor(row: AssignmentRowViewModel): BadgeColor {
-    return PRIORITY_COLOR[row.subprojectPriority ?? ""] ?? "primary";
+    return SUBPROJECT_PRIORITY_COLOR[row.subprojectPriority as SubprojectPriority] ?? "primary";
+  }
+
+  protected priorityArrow(row: AssignmentRowViewModel): string {
+    return SUBPROJECT_PRIORITY_ARROW[row.subprojectPriority as SubprojectPriority] ?? "";
   }
 }

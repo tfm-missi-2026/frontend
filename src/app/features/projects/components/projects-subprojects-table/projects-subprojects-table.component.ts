@@ -9,16 +9,22 @@ import {
   signal,
 } from "@angular/core";
 
+import {
+  IconEditPencilComponent,
+  IconEyeComponent,
+  IconTrashComponent,
+} from "@shared/icons";
 import { UiBadgeComponent, type BadgeColor } from "@shared/ui/badge";
 import { UiFlexComponent } from "@shared/ui/flex";
+import { UiIconButtonComponent } from "@shared/ui/icon-button";
 import { UiLabelComponent } from "@shared/ui/label";
-import { UiLinkComponent } from "@shared/ui/link";
-import { formatShortDate } from "@utils/date";
 import { range } from "@utils/collections";
 
 import { TasksService } from "../../services/tasks.service";
 
 import {
+  SUBPROJECT_PRIORITY_ARROW,
+  SUBPROJECT_PRIORITY_COLOR,
   SUBPROJECT_PRIORITY_LABELS,
   SUBPROJECT_SITUATION_LABELS,
   SUBPROJECT_TYPE_LABELS,
@@ -29,11 +35,9 @@ import {
 
 const PAGE_SIZE = 6;
 
-const PRIORITY_COLOR: Record<SubprojectPriority, BadgeColor> = {
-  Alta: "error",
-  Media: "warning",
-  Baja: "light",
-};
+interface SubprojectRow extends Subproject {
+  doneTaskCount: number;
+}
 
 const SITUATION_COLOR: Record<SubprojectSituation, BadgeColor> = {
   Pendiente: "light",
@@ -49,26 +53,24 @@ const SITUATION_PREFIX: Record<SubprojectSituation, string> = {
   Rechazado: "✕",
 };
 
-const PRIORITY_DOT: Record<SubprojectPriority, string> = {
-  Alta: "●",
-  Media: "●",
-  Baja: "○",
-};
-
 @Component({
   selector: "ProjectsSubprojectsTable",
   standalone: true,
   imports: [
     UiBadgeComponent,
     UiFlexComponent,
+    UiIconButtonComponent,
     UiLabelComponent,
-    UiLinkComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./projects-subprojects-table.component.html",
 })
 export class ProjectsSubprojectsTableComponent {
   private readonly tasksService = inject(TasksService);
+
+  protected readonly viewIcon = IconEyeComponent;
+  protected readonly editIcon = IconEditPencilComponent;
+  protected readonly trashIcon = IconTrashComponent;
 
   readonly subprojects = input<Subproject[]>([]);
 
@@ -79,11 +81,12 @@ export class ProjectsSubprojectsTableComponent {
 
   protected readonly currentPage = signal(1);
 
-  protected readonly rows = computed<Subproject[]>(() => {
-    const counts = this.tasksService.countBySubproject();
+  protected readonly rows = computed<SubprojectRow[]>(() => {
+    const progress = this.tasksService.progressBySubproject();
     return this.subprojects().map((s) => ({
       ...s,
-      taskCount: counts[s.id] ?? 0,
+      taskCount: progress[s.id]?.total ?? 0,
+      doneTaskCount: progress[s.id]?.done ?? 0,
     }));
   });
 
@@ -91,7 +94,7 @@ export class ProjectsSubprojectsTableComponent {
     Math.max(1, Math.ceil(this.rows().length / PAGE_SIZE)),
   );
 
-  protected readonly pagedRows = computed<Subproject[]>(() => {
+  protected readonly pagedRows = computed<SubprojectRow[]>(() => {
     const all = this.rows();
     const start = (this.currentPage() - 1) * PAGE_SIZE;
     return all.slice(start, start + PAGE_SIZE);
@@ -144,11 +147,11 @@ export class ProjectsSubprojectsTableComponent {
   }
 
   protected priorityColor(priority: SubprojectPriority): BadgeColor {
-    return PRIORITY_COLOR[priority];
+    return SUBPROJECT_PRIORITY_COLOR[priority];
   }
 
-  protected priorityDot(priority: SubprojectPriority): string {
-    return PRIORITY_DOT[priority];
+  protected priorityArrow(priority: SubprojectPriority): string {
+    return SUBPROJECT_PRIORITY_ARROW[priority];
   }
 
   protected situationLabel(situation: SubprojectSituation): string {
@@ -163,7 +166,4 @@ export class ProjectsSubprojectsTableComponent {
     return SITUATION_PREFIX[situation];
   }
 
-  protected formatDate(iso: string): string {
-    return formatShortDate(iso);
-  }
 }

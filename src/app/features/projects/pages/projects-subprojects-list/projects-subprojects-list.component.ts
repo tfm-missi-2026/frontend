@@ -34,6 +34,7 @@ import {
   SUBPROJECT_ACTIVE_OPTIONS,
   SUBPROJECT_SITUATION_OPTIONS,
   SUBPROJECT_TYPE_OPTIONS,
+  subprojectDisplayLabel,
   type Subproject,
   type SubprojectActiveFilter,
   type SubprojectSituation,
@@ -206,10 +207,16 @@ export class ProjectsSubprojectsListComponent implements OnInit {
     ]);
   }
 
-  protected onDeactivate(s: Subproject): void {
+  protected async onDeactivate(s: Subproject): Promise<void> {
     const pid = this.projectId();
     if (!pid) return;
-    void this.subprojectsService.deactivate(pid, s.id);
+    const deactivated = await this.subprojectsService.deactivate(pid, s.id);
+    if (deactivated) {
+      this.toastService.success(
+        `El subproyecto "${subprojectDisplayLabel(s)}" se dio de baja correctamente.`,
+        "Subproyecto dado de baja",
+      );
+    }
   }
 
   protected async onSave(payload: SubprojectFormSavePayload): Promise<void> {
@@ -221,14 +228,26 @@ export class ProjectsSubprojectsListComponent implements OnInit {
           payload.projectId,
           payload.data,
         );
-        if (created) this.formOpen.set(false);
+        if (created) {
+          this.formOpen.set(false);
+          this.toastService.success(
+            `El subproyecto "${subprojectDisplayLabel(created)}" se creó correctamente.`,
+            "Subproyecto creado",
+          );
+        }
       } else {
         const updated = await this.subprojectsService.update(
           payload.projectId,
           payload.id,
           payload.data,
         );
-        if (updated) this.formOpen.set(false);
+        if (updated) {
+          this.formOpen.set(false);
+          this.toastService.success(
+            `El subproyecto "${subprojectDisplayLabel(updated)}" se actualizó correctamente.`,
+            "Subproyecto actualizado",
+          );
+        }
       }
     } finally {
       this.formSaving.set(false);

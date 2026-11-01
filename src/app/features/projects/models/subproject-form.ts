@@ -9,8 +9,7 @@ export interface SubprojectFormData {
   ticket: string | null;
   description: string;
   priority: SubprojectPriority;
-  /** UUID del usuario solicitante. */
-  requesterId: string;
+  requester: string;
   requestDate: string;
   /** UUID del catalogo (grupo SITUACION) seleccionado. Vacio en modo creacion. */
   situationId: string;
@@ -27,7 +26,7 @@ export function emptySubprojectForm(): SubprojectFormData {
     ticket: null,
     description: "",
     priority: "Media",
-    requesterId: "",
+    requester: "",
     requestDate: "",
     situationId: "",
     rejectionReason: null,

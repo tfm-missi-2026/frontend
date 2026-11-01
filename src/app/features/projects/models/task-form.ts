@@ -1,8 +1,7 @@
 export interface TaskFormData {
   name: string;
   description: string;
-  startDate: string | null;
-  endDate: string | null;
+  estimatedDays: number | null;
   estimatedHours: number | null;
   /** UUID del catalogo (grupo SITUACION) seleccionado. Vacio en modo creacion. */
   situationId: string;
@@ -16,8 +15,7 @@ export function emptyTaskForm(): TaskFormData {
   return {
     name: "",
     description: "",
-    startDate: null,
-    endDate: null,
+    estimatedDays: null,
     estimatedHours: null,
     situationId: "",
   };

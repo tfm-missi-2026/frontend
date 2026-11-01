@@ -112,6 +112,7 @@ export class UiButtonComponent {
       event.stopPropagation();
       return;
     }
+    event.stopPropagation();
     this.click.emit(event);
   }
 

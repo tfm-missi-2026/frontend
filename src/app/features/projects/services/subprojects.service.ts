@@ -8,17 +8,19 @@ import { firstValueFrom } from "rxjs";
 
 import { CatalogService } from "@features/catalog/services/catalog.service";
 import { UsersService } from "@features/users/services/users.service";
-import { userFullName } from "@features/users/models/user";
 
 import type {
   SubproyectoApi,
   SubproyectoCrearApi,
 } from "../models/project-api";
-import type { Subproject } from "../models/subproject";
+import {
+  normalizeRequesterName,
+  subprojectRequiresRequestData,
+  type Subproject,
+} from "../models/subproject";
 import type { SubprojectFormData } from "../models/subproject-form";
 import {
   buildCatalogLookup,
-  buildUserLookup,
   subproyectoApiToSubproject,
 } from "./project.mapper";
 import { SubproyectosApiService } from "./subprojects-api.service";
@@ -38,8 +40,10 @@ export class SubprojectsService {
   private readonly _subs = signal<Subproject[]>([]);
   private readonly _loading = signal<boolean>(false);
   private readonly _error = signal<string | null>(null);
+  private readonly _requesterNames = signal<string[]>([]);
 
   readonly subs = this._subs.asReadonly();
+  readonly requesterNames = this._requesterNames.asReadonly();
   readonly loading = this._loading.asReadonly();
   readonly error = this._error.asReadonly();
   readonly count = computed(() => this._subs().length);
@@ -56,12 +60,6 @@ export class SubprojectsService {
 
   private readonly catalogLookup = computed(() =>
     buildCatalogLookup(this.catalogService.items()),
-  );
-
-  private readonly userLookup = computed(() =>
-    buildUserLookup(
-      this.usersService.users().map((u) => ({ id: u.id, fullName: userFullName(u) })),
-    ),
   );
 
   private async ensureCatalog(): Promise<void> {
@@ -112,10 +110,7 @@ export class SubprojectsService {
       await Promise.all([this.ensureCatalog(), this.ensureUsers()]);
       const data = await firstValueFrom(this.api.listar());
       const lookup = this.catalogLookup();
-      const users = this.userLookup();
-      const mapped = data.map((api) =>
-        subproyectoApiToSubproject(api, lookup, users),
-      );
+      const mapped = data.map((api) => subproyectoApiToSubproject(api, lookup));
       this._subs.set(mapped);
     } catch (err) {
       this._error.set(extractProblemMessage(err));
@@ -133,10 +128,7 @@ export class SubprojectsService {
         this.api.listarPorProyecto(proyectoId),
       );
       const lookup = this.catalogLookup();
-      const users = this.userLookup();
-      const mapped = data.map((api) =>
-        subproyectoApiToSubproject(api, lookup, users),
-      );
+      const mapped = data.map((api) => subproyectoApiToSubproject(api, lookup));
       this._subs.update((arr) => {
         const others = arr.filter((s) => s.projectId !== proyectoId);
         return [...mapped, ...others];
@@ -145,6 +137,24 @@ export class SubprojectsService {
       this._error.set(extractProblemMessage(err));
     } finally {
       this._loading.set(false);
+    }
+  }
+
+  async cargarSolicitantes(): Promise<void> {
+    try {
+      const data = await firstValueFrom(this.api.listar());
+      const uniqueNames = new Map<string, string>();
+      for (const sub of data) {
+        const name = sub.solicitante?.trim();
+        if (sub.estado !== 1 || !name) continue;
+        const key = normalizeRequesterName(name);
+        if (!uniqueNames.has(key)) uniqueNames.set(key, name);
+      }
+      this._requesterNames.set(
+        [...uniqueNames.values()].sort((a, b) => a.localeCompare(b, "es")),
+      );
+    } catch (err) {
+      this._error.set(extractProblemMessage(err));
     }
   }
 
@@ -161,30 +171,30 @@ export class SubprojectsService {
     data: SubprojectFormData,
   ): Promise<Subproject | null> {
     try {
-      await Promise.all([this.ensureCatalog(), this.ensureUsers()]);
+      await this.ensureCatalog();
       const tipoId =
         this.findCatalogIdByOpcion("TIPO_SUBPROYECTO", data.type) ?? "";
       const prioridadId =
         this.findCatalogIdByOpcion("PRIORIDAD", data.priority) ?? "";
       const situacionId =
         this.findCatalogIdByOpcion("SITUACION", PENDIENTE_BACKEND) ?? "";
-      const solicitanteId = data.requesterId.trim();
+      const solicitante = data.requester.trim();
+      const requiereSolicitud = subprojectRequiresRequestData(data.type);
       const body: SubproyectoCrearApi = {
         proyectoId: projectId,
         tipoSubproyectoId: tipoId,
         codigoTicket: data.ticket,
         prioridadId,
         descripcion: data.description,
-        solicitanteId,
-        fechaSolicitud: data.requestDate,
+        solicitante: solicitante || null,
+        fechaSolicitud: data.requestDate || null,
         situacionId,
       };
       if (
         !tipoId ||
         !prioridadId ||
         !situacionId ||
-        !solicitanteId ||
-        !data.requestDate
+        (requiereSolicitud && (!solicitante || !data.requestDate))
       ) {
         this._error.set(
           "Faltan datos requeridos (tipo, prioridad, situacion, solicitante o fecha).",
@@ -193,7 +203,7 @@ export class SubprojectsService {
       }
       const creado = await firstValueFrom(this.api.crear(body));
       const lookup = this.catalogLookup();
-      const sub = subproyectoApiToSubproject(creado, lookup, this.userLookup());
+      const sub = subproyectoApiToSubproject(creado, lookup);
       if (sub) {
         this._subs.update((arr) => [sub, ...arr]);
       }
@@ -210,7 +220,7 @@ export class SubprojectsService {
     data: SubprojectFormData,
   ): Promise<Subproject | null> {
     try {
-      await Promise.all([this.ensureCatalog(), this.ensureUsers()]);
+      await this.ensureCatalog();
       const current = this.getById(id);
       const situacionId = data.situationId || current?.situationId || "";
       const tipoId =
@@ -227,6 +237,8 @@ export class SubprojectsService {
           codigoTicket: data.ticket,
           prioridadId,
           descripcion: data.description,
+          solicitante: data.requester.trim() || null,
+          fechaSolicitud: data.requestDate || null,
           situacionId,
           justificacionRechazo: data.rejectionReason,
         }),
@@ -234,7 +246,6 @@ export class SubprojectsService {
       const sub = subproyectoApiToSubproject(
         actualizado,
         this.catalogLookup(),
-        this.userLookup(),
       );
       if (sub) {
         this._subs.update((arr) =>

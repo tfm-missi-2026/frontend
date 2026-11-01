@@ -20,12 +20,12 @@
   (close)="onCancel()"
   (action)="onAction($event)"
 >
-  <UiFlex direction="column" [gap]="4">
+  <UiFlex direction="column" [gap]="4" [noWrap]="true">
     @if (validationMessage(); as msg) {
       <UiAlert variant="error" [message]="msg" />
     }
 
-    <UiFlex direction="column" [gap]="1">
+    <UiFlex direction="column" [gap]="1" [noWrap]="true">
       <UiFormLabel
         labelText="Tarea"
         labelFor="assignment-task"
@@ -51,7 +51,7 @@
       }
     </UiFlex>
 
-    <UiFlex direction="column" [gap]="1">
+    <UiFlex direction="column" [gap]="1" [noWrap]="true">
       <UiFormLabel
         labelText="Recurso técnico"
         labelFor="assignment-resource"
@@ -77,69 +77,24 @@
       }
     </UiFlex>
 
-    <UiGrid [columns]="2" gap="gap-4">
-      <UiFlex direction="column" [gap]="1" className="min-w-0">
-        <UiFormLabel
-          labelText="Fecha inicio"
-          labelFor="assignment-start"
-          [required]="true"
-        />
-        <UiDatePicker
-          inputId="assignment-start"
-          mode="single"
-          dateFormat="Y-m-d"
-          placeholder="aaaa-mm-dd"
-          [value]="form().startDate"
-          (valueChange)="onStartDateChange($event)"
-        />
-        @if (startError(); as msg) {
-          <UiFieldError [message]="msg" />
-        }
-      </UiFlex>
-
-      <UiFlex direction="column" [gap]="1" className="min-w-0">
-        <UiFormLabel
-          labelText="Fecha fin"
-          labelFor="assignment-end"
-          [required]="true"
-        />
-        <UiDatePicker
-          inputId="assignment-end"
-          mode="single"
-          dateFormat="Y-m-d"
-          placeholder="aaaa-mm-dd"
-          [value]="form().endDate"
-          (valueChange)="onEndDateChange($event)"
-        />
-        @if (endError(); as msg) {
-          <UiFieldError [message]="msg" />
-        }
-      </UiFlex>
-    </UiGrid>
-
-    @if (dateRangeError(); as msg) {
-      <UiFieldError [message]="msg" />
-    }
-
-    <UiFlex direction="column" [gap]="1">
+    <UiFlex direction="column" [gap]="1" [noWrap]="true">
       <UiFormLabel
-        labelText="Horas por día"
-        labelFor="assignment-hours"
+        labelText="Fecha inicio"
+        labelFor="assignment-start"
         [required]="true"
       />
-      <UiInput
-        id="assignment-hours"
-        type="number"
-        placeholder="p. ej. 3"
-        sufix="h/día"
-        [value]="hoursPerDay()"
-        (valueChange)="onHoursChange($event)"
-        [errorMessage]="hoursError() ?? undefined"
+      <UiDatePicker
+        inputId="assignment-start"
+        mode="single"
+        dateFormat="d/m/Y"
+        placeholder="dd/mm/aaaa"
+        [value]="form().startDate"
+        (valueChange)="onStartDateChange($event)"
       />
-      @if (hoursError(); as msg) {
+      @if (startError(); as msg) {
         <UiFieldError [message]="msg" />
       } @else {
-        <UiLabel type="bodyXs" color="textWeak" [text]="jornadaLabel()" />
+        <UiLabel type="bodyXs" color="textWeak" [text]="scheduleLabel()" />
       }
     </UiFlex>
   </UiFlex>

@@ -14,8 +14,6 @@ export interface AsignacionApi {
 export interface AsignacionCrearApi {
   tareaId: string;
   usuarioId: string;
-  horasPlanificadas: number | null;
-  fechaInicioPlanificada: string | null;
-  fechaFinPlanificada: string | null;
+  fechaInicioPlanificada: string;
   confirmarSobrecarga: boolean;
 }

@@ -54,6 +54,7 @@
     <UiLabel type="bodyXs" color="textWeak" [text]="row.subprojectName" />
     @if (row.subprojectPriority) {
       <UiBadge variant="light" [color]="priorityColor(row)" size="sm">
+        <span class="mr-1">{{ priorityArrow(row) }}</span>
         {{ row.subprojectPriority }}
       </UiBadge>
     }

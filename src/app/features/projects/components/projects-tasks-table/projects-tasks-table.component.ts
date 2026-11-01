@@ -6,11 +6,12 @@ import {
   output,
 } from "@angular/core";
 
+import { IconEditPencilComponent, IconTrashComponent } from "@shared/icons";
 import type { BadgeColor } from "@shared/ui/badge";
 import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiFlexComponent } from "@shared/ui/flex";
+import { UiIconButtonComponent } from "@shared/ui/icon-button";
 import { UiLabelComponent } from "@shared/ui/label";
-import { UiLinkComponent } from "@shared/ui/link";
 import { UiSurfaceComponent } from "@shared/ui/surface";
 import { formatShortDate } from "@utils/date";
 
@@ -32,25 +33,25 @@ const SITUATION_PREFIX: Record<TaskSituation, string> = {
 
 const COLUMN_CLASSES = [
   "flex-1 min-w-0",
+  "w-16 shrink-0 justify-center",
   "w-24 shrink-0",
   "w-24 shrink-0",
   "w-21 shrink-0 justify-center",
   "w-30 shrink-0",
   "w-22 shrink-0",
   "w-32 shrink-0",
-  "w-30 shrink-0",
   "flex-1 shrink-0 justify-end",
 ] as const;
 
 const HEADER_LABELS = [
   "Nombre",
+  "Días",
   "Inicio planif.",
   "Fin planif.",
   "Horas est.",
   "Situación",
   "Estado",
   "Origen",
-  "Depende de",
   "Acciones",
 ];
 
@@ -60,14 +61,17 @@ const HEADER_LABELS = [
   imports: [
     UiBadgeComponent,
     UiFlexComponent,
+    UiIconButtonComponent,
     UiLabelComponent,
-    UiLinkComponent,
     UiSurfaceComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./projects-tasks-table.component.html",
 })
 export class ProjectsTasksTableComponent {
+  protected readonly editIcon = IconEditPencilComponent;
+  protected readonly trashIcon = IconTrashComponent;
+
   readonly tasks = input<Task[]>([]);
 
   readonly edit = output<Task>();
@@ -90,14 +94,6 @@ export class ProjectsTasksTableComponent {
 
   protected formatDate(iso: string | null): string {
     return formatShortDate(iso);
-  }
-
-  protected dependsLabel(t: Task, all: Task[]): string {
-    if (!t.dependsOnIds.length) return "—";
-    const names = t.dependsOnIds
-      .map((id) => all.find((x) => x.id === id)?.name)
-      .filter((n): n is string => !!n);
-    return names.length ? names.join(" · ") : "—";
   }
 
   protected rowClasses(_index: number, _total: number): string {

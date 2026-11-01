@@ -1,5 +1,5 @@
 <UiSurface variant="neutral" padding="md" className="border border-gray-200 dark:border-gray-700">
-  <UiFlex direction="column" [gap]="12">
+  <UiFlex direction="column" [gap]="3">
     <UiFlex direction="row" alignItems="center" [gap]="8" className="flex-wrap">
       <UiBadge variant="light" color="dark" size="sm">
         {{ subproject().type }}
@@ -12,27 +12,20 @@
       </UiLabel>
 
       <UiBadge variant="light" [color]="priorityColor()" size="sm">
+        <span class="mr-1">{{ priorityArrow() }}</span>
         {{ priorityLabel() }}
       </UiBadge>
 
       <UiBadge variant="light" [color]="situationColor()" size="sm">
         {{ situationLabel() }}
       </UiBadge>
-
-      <UiLabel
-        type="bodyXs"
-        color="textWeak"
-        className="ml-auto"
-      >
-        Situación derivada de las tareas
-      </UiLabel>
     </UiFlex>
 
     <UiHeader [level]="3" [text]="subproject().description" className="text-xl" />
 
     <UiLabel type="bodyS" color="textWeak">
       Solicitante:
-      <strong class="font-semibold text-gray-800 dark:text-white/90">{{ subproject().requester }}</strong>
+      <strong class="font-semibold text-gray-800 dark:text-white/90">{{ subproject().requester || "—" }}</strong>
       · Fecha de solicitud:
       <strong class="font-semibold text-gray-800 dark:text-white/90">{{ formatRequestDate() }}</strong>
       · Proyecto:

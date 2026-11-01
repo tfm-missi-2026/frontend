@@ -58,29 +58,31 @@
         <UiFieldError [message]="msg" className="mt-1" />
       }
     </div>
-    <div>
-      <UiLabel
-        type="bodyXs"
-        color="textStrong"
-        weight="medium"
-        className="mb-2 block uppercase"
-      >
-        Código de ticket
-        <span class="ml-1 font-normal text-gray-500">(opcional)</span>
-      </UiLabel>
-      <UiInput
-        placeholder="p. ej. SD-4821 / JIRA-117"
-        [value]="form().ticket ?? ''"
-        (valueChange)="onTicketChange($event)"
-        className="font-mono"
-      />
-      @if (ticketError(); as msg) {
-        <UiFieldError [message]="msg" className="mt-1" />
-      }
-      <UiLabel type="bodyXs" color="textWeak" className="mt-1 block">
-        Identificador externo opcional (mesa de ayuda, JIRA…).
-      </UiLabel>
-    </div>
+    @if (requiresRequestData()) {
+      <div>
+        <UiLabel
+          type="bodyXs"
+          color="textStrong"
+          weight="medium"
+          className="mb-2 block uppercase"
+        >
+          Código de ticket
+          <span class="ml-1 font-normal text-gray-500">(opcional)</span>
+        </UiLabel>
+        <UiInput
+          placeholder="p. ej. SD-4821 / JIRA-117"
+          [value]="form().ticket ?? ''"
+          (valueChange)="onTicketChange($event)"
+          className="font-mono"
+        />
+        @if (ticketError(); as msg) {
+          <UiFieldError [message]="msg" className="mt-1" />
+        }
+        <UiLabel type="bodyXs" color="textWeak" className="mt-1 block">
+          Identificador externo opcional (mesa de ayuda, JIRA…).
+        </UiLabel>
+      </div>
+    }
   </UiGrid>
 
   <div class="mb-4">
@@ -125,49 +127,54 @@
         <UiFieldError [message]="msg" className="mt-1" />
       }
     </div>
-    <div>
+    @if (requiresRequestData()) {
+      <div>
+        <UiLabel
+          type="bodyXs"
+          color="textStrong"
+          weight="medium"
+          className="mb-2 block uppercase"
+        >
+          Solicitante
+          <span class="ml-1 font-normal text-gray-500">(obligatorio)</span>
+        </UiLabel>
+        <RequesterAutocomplete
+          placeholder="Nombre del solicitante"
+          [names]="requesterNames()"
+          [value]="form().requester"
+          (valueChange)="onRequesterChange($event)"
+        />
+        @if (requesterError(); as msg) {
+          <UiFieldError [message]="msg" className="mt-1" />
+        }
+      </div>
+    }
+  </UiGrid>
+
+  @if (requiresRequestData()) {
+    <div class="mb-4">
       <UiLabel
         type="bodyXs"
         color="textStrong"
         weight="medium"
         className="mb-2 block uppercase"
       >
-        Solicitante
+        Fecha de solicitud
+        <span class="ml-1 font-normal text-gray-500">(obligatoria)</span>
       </UiLabel>
-      <UiSelect
-        [options]="requesterOptions()"
-        placeholder="Selecciona un solicitante…"
-        [searchable]="true"
-        [ngModel]="form().requesterId"
-        (ngModelChange)="onRequesterChange($event)"
+      <UiDatePicker
+        mode="single"
+        dateFormat="d/m/Y"
+        placeholder="dd/mm/aaaa"
+        [value]="form().requestDate"
+        (valueChange)="onDateChange($event)"
+        className="max-w-55"
       />
-      @if (requesterError(); as msg) {
+      @if (dateError(); as msg) {
         <UiFieldError [message]="msg" className="mt-1" />
       }
     </div>
-  </UiGrid>
-
-  <div class="mb-4">
-    <UiLabel
-      type="bodyXs"
-      color="textStrong"
-      weight="medium"
-      className="mb-2 block uppercase"
-    >
-      Fecha de solicitud
-    </UiLabel>
-    <UiDatePicker
-      mode="single"
-      dateFormat="d/m/Y"
-      placeholder="dd/mm/aaaa"
-      [value]="form().requestDate"
-      (valueChange)="onDateChange($event)"
-      className="max-w-55"
-    />
-    @if (dateError(); as msg) {
-      <UiFieldError [message]="msg" className="mt-1" />
-    }
-  </div>
+  }
 
   @if (mode() === "edit") {
     <div class="mb-4">
@@ -225,8 +232,8 @@
         (valueChange)="onRejectionReasonChange($event)"
       />
       <UiLabel type="bodyXs" color="textWeak" className="mt-1 block">
-        Aparece únicamente cuando la situación derivada es Rechazado; queda
-        como registro de la decisión.
+        Aparece únicamente cuando la situación es Rechazado; queda como
+        registro de la decisión.
       </UiLabel>
     </UiSurface>
   }

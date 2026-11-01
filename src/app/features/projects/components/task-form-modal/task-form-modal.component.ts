@@ -11,9 +11,7 @@ import {
 import { FormsModule } from "@angular/forms";
 
 import { UiAlertComponent } from "@shared/ui/alert";
-import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiButtonComponent } from "@shared/ui/button";
-import { UiDatePickerComponent } from "@shared/ui/date-picker";
 import { UiFieldErrorComponent } from "@shared/ui/field-error";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiFormLabelComponent } from "@shared/ui/form-label";
@@ -22,7 +20,6 @@ import { UiInputComponent } from "@shared/ui/input";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
 import { UiSelectComponent } from "@shared/ui/select";
-import { UiSurfaceComponent } from "@shared/ui/surface";
 import { UiTextAreaComponent } from "@shared/ui/text-area";
 
 import { CatalogService } from "@features/catalog/services/catalog.service";
@@ -39,20 +36,13 @@ export type TaskFormMode = "create" | "edit";
 
 const WORKDAY_HOURS = 8;
 
-function formatJornadas(hours: number | null): string {
-  if (!hours || hours <= 0) return "0.00";
-  return (hours / WORKDAY_HOURS).toFixed(2);
-}
-
 @Component({
   selector: "TaskFormModal",
   standalone: true,
   imports: [
     FormsModule,
     UiAlertComponent,
-    UiBadgeComponent,
     UiButtonComponent,
-    UiDatePickerComponent,
     UiFieldErrorComponent,
     UiFlexComponent,
     UiFormLabelComponent,
@@ -61,7 +51,6 @@ function formatJornadas(hours: number | null): string {
     UiLabelComponent,
     UiModalComponent,
     UiSelectComponent,
-    UiSurfaceComponent,
     UiTextAreaComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -84,10 +73,10 @@ export class TaskFormModalComponent {
 
   readonly isOpen = input<boolean>(false);
   readonly mode = input<TaskFormMode>("create");
-  readonly subprojectCode = input<string>("");
+  readonly subprojectLabel = input<string>("");
   readonly subprojectId = input<string>("");
   readonly task = input<Task | null>(null);
-  readonly candidates = input<Task[]>([]);
+  readonly effortLocked = input<boolean>(false);
 
   readonly close = output<void>();
   readonly save = output<TaskFormSavePayload>();
@@ -95,8 +84,8 @@ export class TaskFormModalComponent {
   protected readonly form = signal<TaskFormData>(emptyTaskForm());
   protected readonly validationMessage = signal<string | null>(null);
   protected readonly nameError = signal<string | null>(null);
+  protected readonly daysError = signal<string | null>(null);
   protected readonly hoursError = signal<string | null>(null);
-  protected readonly dateRangeError = signal<string | null>(null);
   protected readonly situationError = signal<string | null>(null);
 
   private readonly situationCatalogItems = computed(() =>
@@ -128,8 +117,6 @@ export class TaskFormModalComponent {
     );
   });
 
-  protected readonly candidatesList = computed(() => this.candidates());
-
   protected readonly heading = computed<string>(() => {
     if (this.mode() === "create") return "Nueva tarea";
     const t = this.task();
@@ -137,18 +124,8 @@ export class TaskFormModalComponent {
   });
 
   protected readonly subheading = computed<string>(
-    () =>
-      `Pieza ejecutable bajo #${
-        this.subprojectCode() || this.subprojectId() || "—"
-      }.`,
+    () => `Subproyecto: ${this.subprojectLabel() || "—"}`,
   );
-
-  protected readonly jornadaLabel = computed<string>(() => {
-    const hours = this.form().estimatedHours ?? 0;
-    return `Jornada base de cálculo: ${WORKDAY_HOURS} h/día. ${hours} h ≈ ${formatJornadas(
-      hours,
-    )} jornadas.`;
-  });
 
   constructor() {
     effect(() => {
@@ -161,8 +138,7 @@ export class TaskFormModalComponent {
         this.form.set({
           name: t.name,
           description: t.description,
-          startDate: t.startDate,
-          endDate: t.endDate,
+          estimatedDays: t.estimatedDays || null,
           estimatedHours: t.estimatedHours || null,
           situationId: t.situationId,
         });
@@ -175,8 +151,8 @@ export class TaskFormModalComponent {
   private resetErrors(): void {
     this.validationMessage.set(null);
     this.nameError.set(null);
+    this.daysError.set(null);
     this.hoursError.set(null);
-    this.dateRangeError.set(null);
     this.situationError.set(null);
   }
 
@@ -194,16 +170,31 @@ export class TaskFormModalComponent {
     this.patch({ description: value });
   }
 
-  protected onStartDateChange(value: string | string[]): void {
-    const iso = Array.isArray(value) ? value[0] ?? "" : value ?? "";
-    this.patch({ startDate: iso === "" ? null : iso });
-    this.dateRangeError.set(null);
+  protected onDaysChange(value: string | number | undefined): void {
+    if (value === undefined || value === null || value === "") {
+      this.patch({ estimatedDays: null, estimatedHours: null });
+      this.daysError.set(null);
+      this.hoursError.set(null);
+      return;
+    }
+    const days = Number(value);
+    if (!Number.isInteger(days) || days <= 0) {
+      this.patch({ estimatedDays: null, estimatedHours: null });
+      this.daysError.set("Ingresa un número entero de días, mayor a 0.");
+      this.hoursError.set(null);
+      return;
+    }
+    this.patch({ estimatedDays: days, estimatedHours: days * WORKDAY_HOURS });
+    this.daysError.set(null);
+    this.hoursError.set(null);
   }
 
-  protected onEndDateChange(value: string | string[]): void {
-    const iso = Array.isArray(value) ? value[0] ?? "" : value ?? "";
-    this.patch({ endDate: iso === "" ? null : iso });
-    this.dateRangeError.set(null);
+  private maxHoursError(hours: number, days: number | null): string | null {
+    if (!days) return null;
+    const max = days * WORKDAY_HOURS;
+    if (hours <= max) return null;
+    const daysLabel = days === 1 ? "1 día" : `${days} días`;
+    return `Máximo ${max} h para ${daysLabel} (${WORKDAY_HOURS} h por día).`;
   }
 
   protected onHoursChange(value: string | number | undefined): void {
@@ -215,7 +206,7 @@ export class TaskFormModalComponent {
     const num = Number(value);
     if (Number.isFinite(num) && num >= 0) {
       this.patch({ estimatedHours: num });
-      this.hoursError.set(null);
+      this.hoursError.set(this.maxHoursError(num, this.form().estimatedDays));
     } else {
       this.patch({ estimatedHours: null });
       this.hoursError.set("Número inválido.");
@@ -238,11 +229,11 @@ export class TaskFormModalComponent {
     const f = this.form();
     const errors = this.validate(f);
     this.nameError.set(errors.name);
+    this.daysError.set(errors.days);
     this.hoursError.set(errors.hours);
-    this.dateRangeError.set(errors.dateRange);
     this.situationError.set(errors.situation);
 
-    if (errors.name || errors.hours || errors.dateRange || errors.situation) {
+    if (errors.name || errors.days || errors.hours || errors.situation) {
       this.validationMessage.set(
         "Revisa los campos marcados antes de guardar.",
       );
@@ -253,8 +244,7 @@ export class TaskFormModalComponent {
     const data: TaskFormData = {
       name: f.name.trim(),
       description: f.description.trim(),
-      startDate: f.startDate,
-      endDate: f.endDate,
+      estimatedDays: f.estimatedDays ?? 0,
       estimatedHours: f.estimatedHours ?? 0,
       situationId: f.situationId,
     };
@@ -270,32 +260,34 @@ export class TaskFormModalComponent {
 
   private validate(form: TaskFormData): {
     name: string | null;
+    days: string | null;
     hours: string | null;
-    dateRange: string | null;
     situation: string | null;
   } {
     const errors = {
       name: null,
+      days: null,
       hours: null,
-      dateRange: null,
       situation: null,
     } as {
       name: string | null;
+      days: string | null;
       hours: string | null;
-      dateRange: string | null;
       situation: string | null;
     };
     if (!form.name.trim()) errors.name = "El nombre es obligatorio.";
+    if (!form.estimatedDays) {
+      errors.days = "Ingresa los días estimados.";
+    }
     if (form.estimatedHours === null || form.estimatedHours <= 0) {
       errors.hours = "Ingresa las horas estimadas (mayor a 0).";
     } else if (form.estimatedHours > 999) {
       errors.hours = "Las horas deben estar entre 0 y 999.";
-    }
-    if (!form.startDate || !form.endDate) {
-      errors.dateRange = "Selecciona fecha de inicio y fin.";
-    } else if (form.endDate < form.startDate) {
-      errors.dateRange =
-        "La fecha de fin debe ser posterior o igual a la de inicio.";
+    } else {
+      errors.hours = this.maxHoursError(
+        form.estimatedHours,
+        form.estimatedDays,
+      );
     }
     if (this.mode() === "edit" && !form.situationId) {
       errors.situation = "Selecciona una situación.";

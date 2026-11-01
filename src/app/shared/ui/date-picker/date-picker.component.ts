@@ -214,6 +214,12 @@ export class UiDatePickerComponent
     this.focusEvt.emit();
   }
 
+  protected onToggleCalendar(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.flatpickrInstance?.toggle();
+  }
+
   // Computed styling
 
   readonly hasError = computed<boolean>(() => !!this.errorMessage());
