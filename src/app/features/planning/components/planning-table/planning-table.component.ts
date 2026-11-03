@@ -10,7 +10,11 @@ import {
 } from "@angular/core";
 
 import { BaseQueryParams } from "@core/query-params";
-import { IconEditPencilComponent, IconTrashComponent } from "@shared/icons";
+import {
+  IconEditPencilComponent,
+  IconEyeComponent,
+  IconTrashComponent,
+} from "@shared/icons";
 import { UiBadgeComponent } from "@shared/ui/badge";
 import type { BadgeColor } from "@shared/ui/badge";
 import { UiButtonComponent } from "@shared/ui/button";
@@ -34,6 +38,8 @@ export interface AssignmentRowViewModel extends Assignment {
   taskName: string;
   subprojectName: string;
   subprojectPriority: string | null;
+  taskDays: number;
+  frozen: boolean;
 }
 
 type Cell = TemplateRef<TableCellContext<AssignmentRowViewModel>>;
@@ -58,11 +64,13 @@ export class PlanningTableComponent {
 
   readonly edit = output<Assignment>();
   readonly remove = output<Assignment>();
+  readonly view = output<AssignmentRowViewModel>();
 
   protected readonly query = signal(new BaseQueryParams({ pageSize: 100 }));
 
   protected readonly editIcon = IconEditPencilComponent;
   protected readonly trashIcon = IconTrashComponent;
+  protected readonly viewIcon = IconEyeComponent;
 
   private readonly recursoCell = viewChild.required<Cell>("recursoCell");
   private readonly tareaCell = viewChild.required<Cell>("tareaCell");

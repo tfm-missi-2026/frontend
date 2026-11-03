@@ -39,6 +39,12 @@ export class AssignmentsApiService {
     return this.http.post<AsignacionApi>(this.baseUrl, body);
   }
 
+  actualizarSituacion(id: string, situacionId: string): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/${id}/situacion`, {
+      situacionId,
+    });
+  }
+
   eliminar(id: string, motivo: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`, {
       body: { motivoEliminacion: motivo },

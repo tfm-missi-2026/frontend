@@ -108,34 +108,6 @@
       />
     }
 
-    @if (mode() === "edit") {
-      <UiFlex direction="column" [gap]="1">
-        <UiFormLabel
-          labelText="Situación"
-          labelFor="task-situation"
-          weight="medium"
-        />
-        @if (isSituationTerminal()) {
-          <UiAlert
-            variant="info"
-            message="Esta situación es definitiva; ya no admite más cambios."
-          />
-        } @else {
-          <UiSelect
-            id="task-situation"
-            [options]="situationOptions()"
-            placeholder="Selecciona una situación…"
-            [searchable]="false"
-            [ngModel]="form().situationId"
-            (ngModelChange)="onSituationChange($event)"
-          />
-        }
-        @if (situationError(); as msg) {
-          <UiFieldError [message]="msg" />
-        }
-      </UiFlex>
-    }
-
     <UiFlex
       direction="row"
       justifyContent="end"

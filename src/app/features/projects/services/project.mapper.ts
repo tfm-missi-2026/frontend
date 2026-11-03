@@ -54,6 +54,15 @@ function lookupOr(
   return map.byId.get(id) ?? fallback;
 }
 
+const SITUATION_LABEL_BY_CATALOG_NAME: Readonly<Record<string, string>> = {
+  "En atencion": "En atención",
+};
+
+function situationLabel(map: CatalogLookup, id: string, fallback: string): string {
+  const name = lookupOr(map, id, fallback);
+  return SITUATION_LABEL_BY_CATALOG_NAME[name] ?? name;
+}
+
 // --- Proyectos ---
 
 export function proyectoApiToProject(
@@ -106,7 +115,7 @@ export function subproyectoApiToSubproject(
     requester: api.solicitante ?? "",
     requestDate: api.fechaSolicitud,
     situationId: api.situacionId,
-    situation: (lookupOr(
+    situation: (situationLabel(
       catalog,
       api.situacionId,
       SUBPROJECT_SITUATION_FALLBACK,
@@ -151,7 +160,7 @@ export function tareaApiToTask(
     endDate: api.fechaFinPlanificada,
     estimatedHours: api.horasEstimadas,
     situationId: api.situacionId,
-    situation: (lookupOr(
+    situation: (situationLabel(
       catalog,
       api.situacionId,
       TASK_SITUATION_FALLBACK,

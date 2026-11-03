@@ -14,13 +14,12 @@
       color="textStrong"
       [text]="row.targetLabel"
     />
-    @if (row.targetRef) {
+    @if (row.projectName) {
       <UiLabel
         type="bodyXs"
         weight="medium"
         color="textWeak"
-        className="font-mono whitespace-nowrap"
-        [text]="row.targetRef"
+        [text]="row.projectName"
       />
     }
   </UiFlex>
@@ -75,6 +74,8 @@
       size="sm"
       [LeftIcon]="viewIcon"
       labelText="Ver variación"
+      tooltip="Ver detalle"
+      tooltipSide="top"
       (click)="view.emit(row)"
     />
     <UiButton
@@ -83,8 +84,22 @@
       [LeftIcon]="resolveIcon"
       labelText="Resolver variación"
       [disabled]="!isPending(row)"
-      [tooltip]="isPending(row) ? undefined : 'Solo en variaciones Pendientes'"
+      [tooltip]="isPending(row) ? 'Resolver' : 'Solo en variaciones Pendientes'"
+      tooltipSide="top"
       (click)="resolve.emit(row)"
     />
+    @if (canDelete()) {
+      <UiButton
+        variant="secondary"
+        styleType="danger"
+        size="sm"
+        [LeftIcon]="trashIcon"
+        labelText="Eliminar variación"
+        [disabled]="!isPending(row)"
+        [tooltip]="isPending(row) ? 'Eliminar' : 'Solo en variaciones Pendientes'"
+        tooltipSide="top"
+        (click)="remove.emit(row)"
+      />
+    }
   </UiFlex>
 </ng-template>

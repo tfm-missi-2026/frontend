@@ -503,6 +503,12 @@
 .flatpickr-wrapper {
   @apply w-full;
 }
+.flatpickr-day.ui-day-partial {
+  background: rgba(245, 158, 11, 0.25);
+}
+.flatpickr-day.ui-day-full {
+  background: rgba(239, 68, 68, 0.3);
+}
 .flatpickr-calendar {
   @apply mt-2 z-[100000]! bg-white! rounded-xl! p-5! border! border-gray-200! dark:border-white/5! text-gray-500! dark:bg-gray-dark! dark:text-gray-400! dark:shadow-theme-xl!;
 }
@@ -663,6 +669,74 @@ span.flatpickr-weekday,
 }
 .flatpickr-calendar.hasTime .flatpickr-time {
   border: transparent !important;
+}
+.fc .ts-event-task {
+  background-color: var(--color-brand-500);
+  border-color: var(--color-brand-500);
+}
+.fc .ts-event-task .fc-event-main,
+.fc .ts-event-activity .fc-event-main {
+  color: #fff;
+}
+.fc .ts-event-activity {
+  background-color: var(--color-warning-500);
+  border-color: var(--color-warning-500);
+}
+.fc .ts-event-planned {
+  background-color: rgb(70 95 255 / 0.24);
+  border: 1px dashed var(--color-brand-500);
+}
+.fc .ts-event-planned .fc-event-main {
+  @apply text-gray-800 dark:text-white/90;
+}
+.fc .ts-event-task,
+.fc .ts-event-activity,
+.fc .ts-event-planned {
+  @apply rounded-md;
+}
+.fc .ts-event-task .fc-event-main,
+.fc .ts-event-activity .fc-event-main,
+.fc .ts-event-planned .fc-event-main {
+  padding: 4px 6px;
+  white-space: normal;
+}
+.fc .fc-daygrid-event-harness {
+  margin-bottom: 4px;
+}
+.ts-event-time {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+.ts-event-text {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1.3;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.fc .fc-daygrid-day-frame {
+  min-height: 110px;
+  padding: 4px;
+}
+.fc .fc-day-sat,
+.fc .fc-day-sun {
+  @apply bg-gray-50 dark:bg-white/3;
+}
+.ts-legend {
+  @apply inline-block h-3 w-3 rounded-sm;
+}
+.ts-legend.ts-event-task {
+  background-color: var(--color-brand-500);
+}
+.ts-legend.ts-event-activity {
+  background-color: var(--color-warning-500);
+}
+.ts-legend.ts-event-planned {
+  background-color: rgb(70 95 255 / 0.14);
+  border: 1px dashed var(--color-brand-500);
 }
 .fc .fc-view-harness {
   @apply max-w-full overflow-x-auto custom-scrollbar;

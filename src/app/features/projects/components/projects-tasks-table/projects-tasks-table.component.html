@@ -132,25 +132,36 @@
         [noWrap]="true"
         className="flex-1 shrink-0"
       >
-        <UiIconButton
-          [Icon]="editIcon"
-          variant="secondary"
-          tooltip="Editar"
-          tooltipSide="top"
-          labelText="Editar tarea"
-          [disabled]="!t.active"
-          (click)="edit.emit(t)"
-        />
-        <UiIconButton
-          [Icon]="trashIcon"
-          variant="secondary"
-          styleType="danger"
-          tooltip="Dar de baja"
-          tooltipSide="top"
-          labelText="Dar de baja tarea"
-          [disabled]="!t.active"
-          (click)="deactivate.emit(t)"
-        />
+        @if (frozen()) {
+          <UiIconButton
+            [Icon]="viewIcon"
+            variant="secondary"
+            tooltip="Ver detalle"
+            tooltipSide="top"
+            labelText="Ver detalle"
+            (click)="view.emit(t)"
+          />
+        } @else {
+          <UiIconButton
+            [Icon]="editIcon"
+            variant="secondary"
+            tooltip="Editar"
+            tooltipSide="top"
+            labelText="Editar tarea"
+            [disabled]="!t.active"
+            (click)="edit.emit(t)"
+          />
+          <UiIconButton
+            [Icon]="trashIcon"
+            variant="secondary"
+            styleType="danger"
+            tooltip="Dar de baja"
+            tooltipSide="top"
+            labelText="Dar de baja tarea"
+            [disabled]="!t.active"
+            (click)="deactivate.emit(t)"
+          />
+        }
       </UiFlex>
     </UiFlex>
   }

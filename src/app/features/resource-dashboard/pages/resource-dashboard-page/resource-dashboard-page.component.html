@@ -61,7 +61,11 @@
   </UiGrid>
 
   <UiGrid [columns]="2" gap="gap-5">
-    <MyTasksList [tasks]="dashboard().myTasks" />
+    <MyTasksList
+      [tasks]="dashboard().myTasks"
+      [saving]="situationSaving()"
+      (advance)="onAdvanceTask($event.task, $event.situation)"
+    />
     <MyBitacora
       [todayLabel]="dashboard().todayLabel"
       [entries]="dashboard().todayEntries"

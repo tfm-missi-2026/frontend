@@ -7,6 +7,7 @@ import {
 import { FormsModule } from "@angular/forms";
 
 import { IconPlusSimpleComponent } from "@shared/icons";
+import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiButtonComponent } from "@shared/ui/button";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiSelectComponent } from "@shared/ui/select";
@@ -17,6 +18,7 @@ import type { SelectOption } from "@shared/ui/select";
   standalone: true,
   imports: [
     FormsModule,
+    UiBadgeComponent,
     UiButtonComponent,
     UiFlexComponent,
     UiSelectComponent,
@@ -28,6 +30,10 @@ export class PlanningToolbarComponent {
   readonly projectOptions = input<SelectOption[]>([]);
   readonly projectId = input<string | null>(null);
   readonly canFreeze = input<boolean>(false);
+  readonly freezeHint = input<string>("");
+  readonly assignedTaskCount = input<number>(0);
+  readonly activeTaskCount = input<number>(0);
+  readonly allFrozen = input<boolean>(false);
 
   readonly projectChange = output<string | null>();
   readonly freeze = output<void>();

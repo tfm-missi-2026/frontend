@@ -4,6 +4,10 @@
 export interface AvanceTareaApi {
   tareaId: string;
   nombre: string;
+  fechaInicioPlanificada: string;
+  fechaFinPlanificada: string;
+  primeraFechaRegistrada: string | null;
+  ultimaFechaRegistrada: string | null;
   horasEstimadas: number;
   horasRegistradas: number;
   porcentajeAvance: number;

@@ -1,3 +1,4 @@
+import { subprojectDisplayLabel } from "@features/projects/models/subproject";
 import { Injectable, inject } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 
@@ -62,11 +63,17 @@ export class ProgressService {
         const sub = task ? subById.get(task.subprojectId) : undefined;
         const ref = sub?.ticket
           ? `#${sub.ticket}`
-          : `#${task?.subprojectId ?? t.tareaId}`;
+          : sub
+            ? subprojectDisplayLabel(sub)
+            : "";
         return {
           taskId: t.tareaId,
           taskName: t.nombre,
           taskRef: ref,
+          plannedStart: t.fechaInicioPlanificada,
+          plannedEnd: t.fechaFinPlanificada,
+          firstLogged: t.primeraFechaRegistrada,
+          lastLogged: t.ultimaFechaRegistrada,
           estimatedHours: t.horasEstimadas,
           loggedHours: t.horasRegistradas,
           progressPct: t.porcentajeAvance,
@@ -78,7 +85,7 @@ export class ProgressService {
 
     const hasBaseline = avance.lineaBaseId !== null;
     const baselineLabel = hasBaseline
-      ? `Línea base v${avance.version ?? "?"}`
+      ? "Línea base"
       : "Sin línea base congelada";
     const baselineDate = ""; // backend no expone fecha_congelacion en este DTO
 

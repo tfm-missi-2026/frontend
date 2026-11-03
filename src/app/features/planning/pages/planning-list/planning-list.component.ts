@@ -24,6 +24,7 @@ import {
 } from "../../components/overload-dialog/overload-dialog.component";
 import { FreezeBaselineDialogComponent } from "../../components/freeze-baseline-dialog/freeze-baseline-dialog.component";
 import { DeleteAssignmentDialogComponent } from "../../components/delete-assignment-dialog/delete-assignment-dialog.component";
+import { AssignmentDetailDialogComponent } from "../../components/assignment-detail-dialog/assignment-detail-dialog.component";
 import {
   PlanningTableComponent,
   type AssignmentRowViewModel,
@@ -40,6 +41,7 @@ import { AssignmentsService } from "../../services/assignments.service";
 import type { LineaBaseApi } from "../../models/linea-base-api";
 import { LineaBaseService } from "../../services/linea-base.service";
 import { subprojectDisplayLabel } from "@features/projects/models/subproject";
+import type { Task } from "@features/projects/models/task";
 import { ProjectsService } from "@features/projects/services/projects.service";
 import { SubprojectsService } from "@features/projects/services/subprojects.service";
 import { TasksService } from "@features/projects/services/tasks.service";
@@ -51,6 +53,7 @@ const WORKDAY_HOURS = 8;
   selector: "PlanningListPage",
   standalone: true,
   imports: [
+    AssignmentDetailDialogComponent,
     AssignmentFormModalComponent,
     CommonBreadcrumbComponent,
     OverloadDialogComponent,
@@ -117,23 +120,33 @@ export class PlanningListComponent implements OnInit {
     return subs.flatMap((s) => this.tasksService.getBySubproject(s.id));
   });
 
-  protected readonly taskOptions = computed<SelectOption[]>(() => {
-    const subs = this.subprojectsInProject();
-    const assignedTaskIds = new Set(this.assignments().map((a) => a.taskId));
+  protected readonly assignableTasks = computed<Task[]>(() => {
+    const assigned = this.assignedTaskIds();
+    const frozen = this.frozenTaskIds();
     const editingTaskId = this.selectedAssignment()?.taskId;
-    return this.tasksInProject()
-      .filter(
-        (t) =>
-          t.active && (!assignedTaskIds.has(t.id) || t.id === editingTaskId),
-      )
-      .map((t) => {
-        const sub = subs.find((s) => s.id === t.subprojectId);
-        return {
-          value: t.id,
-          label: sub ? `${subprojectDisplayLabel(sub)} · ${t.name}` : t.name,
-        };
-      });
+    const tasks = this.tasksInProject();
+    const frozenSubprojects = new Set(
+      tasks.filter((t) => frozen.has(t.id)).map((t) => t.subprojectId),
+    );
+    return tasks.filter(
+      (t) =>
+        t.id === editingTaskId ||
+        (t.active &&
+          !assigned.has(t.id) &&
+          !frozenSubprojects.has(t.subprojectId)),
+    );
   });
+
+  protected readonly assignableSubprojectOptions = computed<SelectOption[]>(
+    () => {
+      const withTasks = new Set(
+        this.assignableTasks().map((t) => t.subprojectId),
+      );
+      return this.subprojectsInProject()
+        .filter((s) => withTasks.has(s.id))
+        .map((s) => ({ value: s.id, label: subprojectDisplayLabel(s) }));
+    },
+  );
 
   protected readonly resourceOptions = computed<SelectOption[]>(() =>
     this.usersService
@@ -172,6 +185,7 @@ export class PlanningListComponent implements OnInit {
     const tasks = this.tasksInProject();
     const subs = this.subprojectsInProject();
     const resources = this.usersService.users();
+    const frozen = this.frozenTaskIds();
     return this.assignments().map((a) => {
       const t = tasks.find((x) => x.id === a.taskId);
       const sub = t ? subs.find((s) => s.id === t.subprojectId) : undefined;
@@ -185,6 +199,8 @@ export class PlanningListComponent implements OnInit {
           ? `${r.firstName} ${r.lastNamePaternal} ${r.lastNameMaternal}`
           : "Sin recurso",
         resourceRole: r ? "Recurso Técnico" : "—",
+        taskDays: t?.estimatedDays ?? 0,
+        frozen: frozen.has(a.taskId),
       };
     });
   });
@@ -203,9 +219,84 @@ export class PlanningListComponent implements OnInit {
     return ids.size;
   });
 
-  protected readonly canFreeze = computed<boolean>(() =>
-    this.tasksInProject().some((t) => t.active),
+  private readonly frozenTaskIds = computed<ReadonlySet<string>>(
+    () => new Set(this.currentBaseline()?.tareas.map((t) => t.tareaId) ?? []),
   );
+
+  private readonly assignedTaskIds = computed<ReadonlySet<string>>(
+    () => new Set(this.assignments().map((a) => a.taskId)),
+  );
+
+  private readonly pendingGroups = computed(() => {
+    const tasks = this.tasksInProject();
+    const frozen = this.frozenTaskIds();
+    return this.subprojectsInProject()
+      .filter((s) => s.active)
+      .map((s) => ({
+        all: tasks.filter((t) => t.subprojectId === s.id),
+        active: tasks.filter((t) => t.subprojectId === s.id && t.active),
+      }))
+      .filter((g) => g.active.length > 0 && !g.all.some((t) => frozen.has(t.id)))
+      .map((g) => g.active);
+  });
+
+  private readonly pendingTasks = computed(() => this.pendingGroups().flat());
+
+  private readonly tasksToFreeze = computed<ReadonlySet<string>>(() => {
+    const assigned = this.assignedTaskIds();
+    return new Set(
+      this.pendingGroups()
+        .filter((group) => group.every((t) => assigned.has(t.id)))
+        .flat()
+        .map((t) => t.id),
+    );
+  });
+
+  private readonly assignmentsToFreeze = computed(() => {
+    const ids = this.tasksToFreeze();
+    return this.assignments().filter((a) => ids.has(a.taskId));
+  });
+
+  protected readonly freezeAssignmentCount = computed<number>(
+    () => this.assignmentsToFreeze().length,
+  );
+
+  protected readonly freezeResourceCount = computed<number>(
+    () => new Set(this.assignmentsToFreeze().map((a) => a.resourceId)).size,
+  );
+
+  protected readonly freezeHours = computed<number>(() =>
+    this.assignmentsToFreeze().reduce((acc, a) => acc + a.plannedHours, 0),
+  );
+
+  protected readonly activeTaskCount = computed<number>(
+    () => this.pendingTasks().length,
+  );
+
+  protected readonly assignedTaskCount = computed<number>(() => {
+    const assigned = this.assignedTaskIds();
+    return this.pendingTasks().filter((t) => assigned.has(t.id)).length;
+  });
+
+  protected readonly allFrozen = computed<boolean>(
+    () => !!this.currentBaseline() && this.pendingTasks().length === 0,
+  );
+
+  protected readonly canFreeze = computed<boolean>(
+    () => this.tasksToFreeze().size > 0,
+  );
+
+  protected readonly freezeHint = computed<string>(() => {
+    if (this.allFrozen()) {
+      return "Todos los subproyectos ya están congelados.";
+    }
+    if (this.pendingTasks().length === 0) {
+      return "El proyecto todavía no tiene tareas.";
+    }
+    return this.canFreeze()
+      ? "Guarda el plan actual como referencia."
+      : "Asigna todas las tareas de un subproyecto para poder congelar.";
+  });
 
   protected readonly breadcrumbItems = [
     { label: "Operación" },
@@ -213,12 +304,6 @@ export class PlanningListComponent implements OnInit {
   ];
 
   protected readonly freezeAlert = signal<string | null>(null);
-
-  protected readonly sinLineaBase = computed<boolean>(() => {
-    const id = this.selectedProjectId();
-    if (!id) return false;
-    return this.lineaBaseService.latestByProject()[id] === undefined;
-  });
 
   protected readonly formOpen = signal<boolean>(false);
   protected readonly formMode = signal<"create" | "edit">("create");
@@ -242,17 +327,6 @@ export class PlanningListComponent implements OnInit {
     return this.lineaBaseService.latestByProject()[id] ?? null;
   });
 
-  protected readonly baselineUnchanged = computed<boolean>(() => {
-    const base = this.currentBaseline();
-    if (!base) return false;
-    const actuales = this.assignments();
-    if (actuales.length !== base.asignaciones.length) return false;
-    const congeladas = new Set(
-      base.asignaciones.map((a) => `${a.tareaId}|${a.usuarioId}`),
-    );
-    return actuales.every((a) => congeladas.has(`${a.taskId}|${a.resourceId}`));
-  });
-
   protected onFreeze(): void {
     if (!this.selectedProjectId()) return;
     this.freezeOpen.set(true);
@@ -270,10 +344,11 @@ export class PlanningListComponent implements OnInit {
       const ok = await this.lineaBaseService.congelar(
         id,
         `Snapshot ${todayIso()}`,
+        this.tasksToFreeze(),
       );
       if (ok) {
         this.freezeOpen.set(false);
-        this.flashAlert(`Línea base v${ok.version} congelada correctamente.`);
+        this.flashAlert("Línea base congelada correctamente.");
       }
     } finally {
       this.freezeSaving.set(false);
@@ -293,6 +368,8 @@ export class PlanningListComponent implements OnInit {
     this.selectedAssignment.set(a);
     this.formOpen.set(true);
   }
+
+  protected readonly detailRow = signal<AssignmentRowViewModel | null>(null);
 
   protected readonly deleteTarget = signal<Assignment | null>(null);
   protected readonly deleteSaving = signal<boolean>(false);
@@ -361,28 +438,6 @@ export class PlanningListComponent implements OnInit {
     this.pendingOverload.set(req);
     this.formOpen.set(false);
     this.overloadOpen.set(true);
-  }
-
-  protected async onOverloadConfirm(): Promise<void> {
-    const req = this.pendingOverload();
-    if (!req) {
-      this.overloadOpen.set(false);
-      return;
-    }
-    const p = req.payload;
-    if (p.mode === "create") {
-      await this.assignmentsService.create(p.projectId, p.data, true);
-    } else {
-      await this.assignmentsService.update(
-        p.projectId,
-        p.id,
-        p.data,
-        true,
-      );
-    }
-    this.pendingOverload.set(null);
-    this.overloadOpen.set(false);
-    this.formOpen.set(false);
   }
 
   protected onOverloadCancel(): void {

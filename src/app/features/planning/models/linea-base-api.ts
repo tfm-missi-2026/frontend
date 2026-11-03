@@ -18,8 +18,8 @@ export interface LbTareaApi {
   tareaId: string;
   nombre: string;
   descripcion: string | null;
-  fechaInicioPlanificada: string | null;
-  fechaFinPlanificada: string | null;
+  fechaInicioPlanificada: string;
+  fechaFinPlanificada: string;
   horasEstimadas: number;
 }
 
@@ -42,8 +42,8 @@ export interface TareaSnapshotApi {
   tareaId: string;
   nombre: string;
   descripcion: string | null;
-  fechaInicioPlanificada: string | null;
-  fechaFinPlanificada: string | null;
+  fechaInicioPlanificada: string;
+  fechaFinPlanificada: string;
   horasEstimadas: number;
 }
 

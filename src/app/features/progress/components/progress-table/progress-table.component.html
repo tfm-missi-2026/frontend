@@ -32,7 +32,11 @@
           : 'border-b border-gray-100 dark:border-gray-800 px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-white/3'
       "
     >
-      <UiFlex direction="column" [gap]="0" className="min-w-0 pr-3">
+      <UiFlex
+        direction="column"
+        [gap]="0"
+        [className]="columnClasses[0] + ' pr-3'"
+      >
         <UiLabel
           type="bodyS"
           weight="semibold"
@@ -48,10 +52,31 @@
         />
       </UiFlex>
 
+      <UiFlex direction="row" alignItems="center" [className]="columnClasses[1]">
+        <UiLabel
+          type="bodyXs"
+          color="textWeak"
+          className="font-mono whitespace-nowrap"
+        >
+          {{ rangeLabel(row.plannedStart, row.plannedEnd) }}
+        </UiLabel>
+      </UiFlex>
+
+      <UiFlex direction="row" alignItems="center" [className]="columnClasses[2]">
+        <UiLabel
+          type="bodyXs"
+          color="textWeak"
+          className="font-mono whitespace-nowrap"
+        >
+          {{ rangeLabel(row.firstLogged, row.lastLogged) }}
+        </UiLabel>
+      </UiFlex>
+
       <UiFlex
         direction="row"
         justifyContent="center"
         alignItems="center"
+        [className]="columnClasses[3]"
       >
         <UiLabel
           type="bodyS"
@@ -67,6 +92,7 @@
         direction="row"
         justifyContent="center"
         alignItems="center"
+        [className]="columnClasses[4]"
       >
         <UiLabel
           type="bodyS"
@@ -78,12 +104,17 @@
         </UiLabel>
       </UiFlex>
 
-      <UiFlex direction="row" alignItems="center" [gap]="8" className="pr-3 w-full min-w-30">
+      <UiFlex
+        direction="row"
+        alignItems="center"
+        [gap]="8"
+        [className]="columnClasses[5] + ' pr-3'"
+      >
         <UiFlex
           direction="row"
           alignItems="center"
           [gap]="0"
-          className="relative h-5 flex-1 min-w-30 overflow-hidden rounded border-2 border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900"
+          className="relative h-5 flex-1 min-w-0 overflow-hidden rounded border-2 border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900"
         >
           <UiFlex
             direction="row"
@@ -110,6 +141,7 @@
         direction="row"
         justifyContent="center"
         alignItems="center"
+        [className]="columnClasses[6]"
       >
         @if (row.deviationHours === 0) {
           <UiBadge

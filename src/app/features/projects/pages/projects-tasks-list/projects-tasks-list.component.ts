@@ -33,6 +33,9 @@ import {
   ProjectsTasksToolbarComponent,
 } from "../../components/projects-tasks-toolbar/projects-tasks-toolbar.component";
 import {
+  TaskDetailDialogComponent,
+} from "../../components/task-detail-dialog/task-detail-dialog.component";
+import {
   TaskFormModalComponent,
 } from "../../components/task-form-modal/task-form-modal.component";
 import {
@@ -49,6 +52,8 @@ import { SubprojectsService } from "../../services/subprojects.service";
 import { TasksService } from "../../services/tasks.service";
 import { ToastService } from "@core/http/toast.service";
 import { AssignmentsService } from "@features/planning/services/assignments.service";
+import { LineaBaseService } from "@features/planning/services/linea-base.service";
+import { UsersService } from "@features/users/services/users.service";
 
 @Component({
   selector: "ProjectsTasksListPage",
@@ -58,6 +63,7 @@ import { AssignmentsService } from "@features/planning/services/assignments.serv
     ProjectsTasksHeaderComponent,
     ProjectsTasksTableComponent,
     ProjectsTasksToolbarComponent,
+    TaskDetailDialogComponent,
     TaskFormModalComponent,
     UiButtonComponent,
     UiFlexComponent,
@@ -76,12 +82,15 @@ export class ProjectsTasksListComponent implements OnInit {
   private readonly tasksService = inject(TasksService);
   private readonly toastService = inject(ToastService);
   private readonly assignmentsService = inject(AssignmentsService);
+  private readonly lineaBaseService = inject(LineaBaseService);
+  private readonly usersService = inject(UsersService);
 
   ngOnInit(): void {
     void this.projectsService.cargar();
     void this.subprojectsService.cargar();
     void this.tasksService.cargar();
     void this.assignmentsService.cargar();
+    void this.usersService.cargar();
   }
 
   constructor() {
@@ -91,6 +100,10 @@ export class ProjectsTasksListComponent implements OnInit {
       if (sid) {
         void this.tasksService.cargarPorSubproyecto(sid);
       }
+    });
+    effect(() => {
+      const pid = this.projectId();
+      if (pid) void this.lineaBaseService.cargarPorProyecto(pid);
     });
   }
 
@@ -128,6 +141,13 @@ export class ProjectsTasksListComponent implements OnInit {
   protected readonly tasks = computed<Task[]>(() => {
     const id = this.subId();
     return id ? this.tasksService.getBySubproject(id) : [];
+  });
+
+  protected readonly subprojectFrozen = computed<boolean>(() => {
+    const pid = this.projectId();
+    const baseline = pid ? this.lineaBaseService.latestByProject()[pid] : null;
+    const frozen = new Set(baseline?.tareas.map((t) => t.tareaId) ?? []);
+    return this.tasks().some((t) => frozen.has(t.id));
   });
 
   protected readonly searchTerm = signal<string>("");
@@ -185,7 +205,7 @@ export class ProjectsTasksListComponent implements OnInit {
       // No existe una pagina de detalle de subproyecto aparte de esta
       // lista de tareas: se muestra como texto, no como link.
       items.push({
-        label: `Subproyecto ${s.ticket ?? s.id}`,
+        label: `Subproyecto ${subprojectDisplayLabel(s)}`,
       });
     }
     items.push({ label: "Tareas" });
@@ -196,6 +216,8 @@ export class ProjectsTasksListComponent implements OnInit {
   protected readonly formMode = signal<"create" | "edit">("create");
   protected readonly selectedTask = signal<Task | null>(null);
 
+  protected readonly detailTask = signal<Task | null>(null);
+
   protected readonly selectedTaskAssigned = computed<boolean>(() => {
     const id = this.selectedTask()?.id;
     return (
@@ -205,6 +227,18 @@ export class ProjectsTasksListComponent implements OnInit {
         .some((a) => a.active && a.taskId === id)
     );
   });
+
+  protected assignedResourceName(taskId: string): string {
+    const assignment = this.assignmentsService
+      .assignments()
+      .find((a) => a.active && a.taskId === taskId);
+    const user = this.usersService
+      .users()
+      .find((u) => u.id === assignment?.resourceId);
+    return user
+      ? `${user.firstName} ${user.lastNamePaternal} ${user.lastNameMaternal}`
+      : "";
+  }
 
   protected openCreate(): void {
     const s = this.subproject();

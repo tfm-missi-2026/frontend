@@ -4,63 +4,208 @@
   className="max-w-140"
   (close)="onCancel()"
 >
-  <UiFlex direction="column" [gap]="16">
-    <UiFlex direction="column" [gap]="4">
-      <UiLabel type="HeadingM" weight="semibold" color="textStrong">
-        Reportar variación
-      </UiLabel>
-      <UiLabel type="bodyS" color="textWeak">
-        Un cambio formal sobre el plan. La justificación es obligatoria y
-        queda en el histórico.
-      </UiLabel>
-    </UiFlex>
+  <UiFlex direction="column" [gap]="4" [noWrap]="true">
+    <UiLabel type="HeadingM" weight="semibold" color="textStrong">
+      Reportar variación
+    </UiLabel>
 
     @if (validationMessage(); as msg) {
       <UiAlert variant="error" [message]="msg" />
     }
 
-    <UiGrid [columns]="2" gap="gap-3">
-      <UiFlex direction="column" [gap]="6">
-        <UiFormLabel
-          labelText="Tarea afectada"
-          labelFor="report-target"
-        />
-        <UiSelect
-          inputId="report-target"
-          [options]="targetSelectOptions()"
-          placeholder="Selecciona una tarea o subproyecto…"
-          [searchable]="false"
-          [ngModel]="selectedTargetValue()"
-          (ngModelChange)="onTargetChange($event)"
-        />
-        <UiLabel type="bodyXs" color="textWeak">
-          Puede dejarse a nivel de subproyecto.
-        </UiLabel>
-      </UiFlex>
-      <UiFlex direction="column" [gap]="6">
-        <UiFormLabel
-          labelText="Tipo"
-          labelFor="report-type"
-          [required]="true"
-        />
-        <UiSelect
-          inputId="report-type"
-          [options]="VARIATION_TYPE_OPTIONS"
-          placeholder="Selecciona el tipo…"
-          [searchable]="false"
-          [ngModel]="form().type"
-          (ngModelChange)="onTypeChange($event)"
-        />
-        <UiLabel type="bodyXs" color="textWeak">
-          Alcance · Plazo · Recursos.
-        </UiLabel>
-      </UiFlex>
-    </UiGrid>
+    @if (projects().length === 0) {
+      <UiAlert
+        variant="info"
+        message="Todavía no hay proyectos con línea base congelada."
+      />
+    }
 
-    <UiFlex direction="column" [gap]="6">
+    <UiFlex direction="column" [gap]="1" [noWrap]="true">
+      <UiFormLabel
+        labelText="Proyecto"
+        labelFor="report-project"
+        [required]="true"
+      />
+      <UiSelect
+        inputId="report-project"
+        [options]="projectSelectOptions()"
+        placeholder="Selecciona un proyecto…"
+        [searchable]="false"
+        [ngModel]="selectedProjectId()"
+        (ngModelChange)="onProjectChange($event)"
+      />
+    </UiFlex>
+    <UiFlex direction="column" [gap]="1" [noWrap]="true">
+      <UiFormLabel
+        labelText="Subproyecto"
+        labelFor="report-subproject"
+        [required]="true"
+      />
+      <UiSelect
+        inputId="report-subproject"
+        [options]="subprojectSelectOptions()"
+        placeholder="Selecciona un subproyecto…"
+        [searchable]="false"
+        [isDisabled]="!selectedProjectId()"
+        [ngModel]="selectedSubprojectId()"
+        (ngModelChange)="onSubprojectChange($event)"
+      />
+    </UiFlex>
+    <UiFlex direction="column" [gap]="1" [noWrap]="true">
+      <UiFormLabel
+        labelText="Tarea afectada"
+        labelFor="report-task"
+        [required]="true"
+      />
+      <UiSelect
+        inputId="report-task"
+        [options]="taskSelectOptions()"
+        placeholder="Selecciona una tarea…"
+        [searchable]="false"
+        [isDisabled]="!selectedSubprojectId()"
+        [ngModel]="selectedTaskId()"
+        (ngModelChange)="onTaskChange($event)"
+      />
+    </UiFlex>
+    <UiFlex direction="column" [gap]="1" [noWrap]="true">
+      <UiFormLabel
+        labelText="Tipo"
+        labelFor="report-type"
+        [required]="true"
+      />
+      <UiSelect
+        inputId="report-type"
+        [options]="VARIATION_TYPE_OPTIONS"
+        placeholder="Selecciona el tipo…"
+        [searchable]="false"
+        [ngModel]="selectedType()"
+        (ngModelChange)="onTypeChange($event)"
+      />
+      <UiLabel type="bodyXs" color="textWeak">
+        Plazo: nueva fecha de inicio · Recursos: otra persona y fecha · Alcance:
+        nuevo tiempo estimado.
+      </UiLabel>
+    </UiFlex>
+
+    @if (canEditDetail()) {
+      <UiSurface variant="neutral" padding="md">
+        <UiFlex direction="column" [gap]="1" [noWrap]="true">
+          <UiLabel type="bodyXs" weight="medium" color="textWeak" text="Situación actual" />
+          <UiLabel type="bodyS" color="textStrong">
+            {{ currentResourceName() }} · {{ currentPeriod() }} · {{ currentEffort() }}
+          </UiLabel>
+        </UiFlex>
+      </UiSurface>
+
+      @if (selectedType() === "Recursos") {
+        <UiFlex direction="column" [gap]="1" [noWrap]="true">
+          <UiFormLabel
+            labelText="Nuevo recurso"
+            labelFor="report-new-resource"
+            [required]="true"
+          />
+          <UiSelect
+            inputId="report-new-resource"
+            [options]="resourceOptions()"
+            placeholder="Selecciona un recurso…"
+            [searchable]="false"
+            [ngModel]="newResourceId()"
+            (ngModelChange)="onNewResourceChange($event)"
+          />
+        </UiFlex>
+      }
+
+      @if (selectedType() === "Plazo" || (selectedType() === "Recursos" && newResourceId())) {
+        <UiFlex direction="column" [gap]="1" [noWrap]="true">
+          <UiFormLabel
+            labelText="Nueva fecha de inicio"
+            labelFor="report-new-start"
+            [required]="true"
+          />
+          <UiDatePicker
+            inputId="report-new-start"
+            mode="single"
+            dateFormat="d/m/Y"
+            placeholder="dd/mm/aaaa"
+            [value]="newStartDate()"
+            [isDateDisabled]="isDateDisabled()"
+            [dayMark]="dayMark()"
+            (valueChange)="onNewStartDateChange($event)"
+          />
+          @if (newEndLabel(); as label) {
+            <UiLabel type="bodyXs" weight="semibold" color="textStrong" [text]="label" />
+          }
+          <UiFlex
+            direction="row"
+            alignItems="center"
+            justifyContent="between"
+            [gap]="3"
+          >
+            <UiLabel type="bodyS" color="textStrong" [text]="firstAvailableLabel()" />
+            @if (firstAvailableDate()) {
+              <UiButton
+                variant="secondary"
+                label="Usar"
+                (click)="useFirstAvailableDate()"
+              />
+            }
+          </UiFlex>
+          <UiLabel
+            type="bodyXs"
+            color="textWeak"
+            text="En el calendario: amarillo, con horas asignadas; rojo, jornada completa. Las fechas que causarían sobrecarga están deshabilitadas."
+          />
+        </UiFlex>
+      }
+
+      @if (selectedType() === "Alcance") {
+        <UiGrid [columns]="2" gap="gap-3">
+          <UiFlex direction="column" [gap]="1" [noWrap]="true">
+            <UiFormLabel
+              labelText="Nuevos días"
+              labelFor="report-new-days"
+              [required]="true"
+            />
+            <UiInput
+              id="report-new-days"
+              type="number"
+              placeholder="p. ej. 5"
+              [value]="newDays() ?? ''"
+              (valueChange)="onNewDaysChange($event)"
+            />
+          </UiFlex>
+          <UiFlex direction="column" [gap]="1" [noWrap]="true">
+            <UiFormLabel
+              labelText="Nuevas horas"
+              labelFor="report-new-hours"
+              [required]="true"
+            />
+            <UiInput
+              id="report-new-hours"
+              type="number"
+              placeholder="p. ej. 40"
+              [value]="newHours() ?? ''"
+              (valueChange)="onNewHoursChange($event)"
+            />
+          </UiFlex>
+        </UiGrid>
+        @if (hoursError(); as msg) {
+          <UiFieldError [message]="msg" />
+        }
+        @if (newEndLabel(); as label) {
+          <UiLabel type="bodyXs" weight="semibold" color="textStrong" [text]="label" />
+        }
+        @if (scopeOverloadMessage(); as msg) {
+          <UiAlert variant="warning" [message]="msg" />
+        }
+      }
+    }
+
+    <UiFlex direction="column" [gap]="1" [noWrap]="true">
       <UiFormLabel
         labelText="Descripción"
         labelFor="report-description"
+        [required]="true"
       />
       <UiTextArea
         inputId="report-description"
@@ -76,7 +221,7 @@
       padding="md"
       className="border-2 border-gray-300 dark:border-gray-700"
     >
-      <UiFlex direction="column" [gap]="6">
+      <UiFlex direction="column" [gap]="1" [noWrap]="true">
         <UiFormLabel
           labelText="Justificación"
           labelFor="report-justification"
@@ -89,44 +234,14 @@
           [value]="form().justification"
           (valueChange)="onJustificationChange($event)"
         ></UiTextArea>
-        <UiLabel type="bodyXs" color="textWeak">
-          <strong class="font-semibold">Campo obligatorio.</strong>
-          Sin justificación no se puede reportar.
-        </UiLabel>
       </UiFlex>
     </UiSurface>
 
-    <UiGrid [columns]="2" gap="gap-3">
-      <UiFlex direction="column" [gap]="6">
-        <UiFormLabel
-          labelText="Valor anterior"
-          labelFor="report-prev"
-        />
-        <UiInput
-          id="report-prev"
-          placeholder="p. ej. fin 30/05/2026"
-          [value]="form().previousValue"
-          (valueChange)="onPreviousValueChange($event)"
-        />
-      </UiFlex>
-      <UiFlex direction="column" [gap]="6">
-        <UiFormLabel
-          labelText="Valor nuevo"
-          labelFor="report-new"
-        />
-        <UiInput
-          id="report-new"
-          placeholder="p. ej. fin 06/06/2026"
-          [value]="form().newValue"
-          (valueChange)="onNewValueChange($event)"
-        />
-      </UiFlex>
-    </UiGrid>
-
-    <UiFlex direction="column" [gap]="6">
+    <UiFlex direction="column" [gap]="1" [noWrap]="true">
       <UiFormLabel
         labelText="Fecha de detección"
         labelFor="report-detection"
+        [required]="true"
       />
       <UiInput
         id="report-detection"

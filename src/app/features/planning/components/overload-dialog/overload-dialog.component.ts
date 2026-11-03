@@ -6,7 +6,7 @@ import {
   output,
 } from "@angular/core";
 
-import { IconCheckComponent, IconXComponent } from "@shared/icons";
+import { IconCheckComponent } from "@shared/icons";
 import { UiAlertComponent } from "@shared/ui/alert";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiLabelComponent } from "@shared/ui/label";
@@ -37,11 +37,9 @@ export class OverloadDialogComponent {
   readonly periodEnd = input<string>("");
   readonly businessDays = input<number>(0);
 
-  readonly confirm = output<void>();
   readonly cancel = output<void>();
 
   protected readonly IconCheck = IconCheckComponent;
-  protected readonly IconX = IconXComponent;
 
   protected readonly totalHours = computed<number>(
     () => this.committedHours() + this.newHours(),
@@ -72,9 +70,4 @@ export class OverloadDialogComponent {
     { label: "Total resultante", value: `${this.totalHours()} h` },
     { label: "Exceso", value: `${this.excessHours()} h` },
   ]);
-
-  protected onAction(side: "left" | "right"): void {
-    if (side === "left") this.cancel.emit();
-    else this.confirm.emit();
-  }
 }

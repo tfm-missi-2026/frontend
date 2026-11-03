@@ -13,6 +13,8 @@
           <th class="w-52 px-4 py-3 font-medium">Recurso técnico</th>
           <th class="w-26 px-4 py-3 text-center font-medium">Planif.</th>
           <th class="w-26 px-4 py-3 text-center font-medium">Registr.</th>
+          <th class="w-24 px-4 py-3 text-center font-medium">En tareas</th>
+          <th class="w-24 px-4 py-3 text-center font-medium">En actividades</th>
           <th class="w-24 px-4 py-3 text-center font-medium">Tareas act.</th>
           <th class="px-4 py-3 font-medium">% Utilización</th>
           <th class="w-32 px-4 py-3 text-center font-medium">Estado</th>
@@ -62,6 +64,24 @@
                 className="font-mono whitespace-nowrap"
               >
                 {{ row.loggedHours }} h
+              </UiLabel>
+            </td>
+            <td class="px-4 py-3.5 text-center">
+              <UiLabel
+                type="bodyS"
+                color="textStrong"
+                className="font-mono whitespace-nowrap"
+              >
+                {{ row.taskHours }} h
+              </UiLabel>
+            </td>
+            <td class="px-4 py-3.5 text-center">
+              <UiLabel
+                type="bodyS"
+                color="textStrong"
+                className="font-mono whitespace-nowrap"
+              >
+                {{ row.activityHours }} h
               </UiLabel>
             </td>
             <td class="px-4 py-3.5 text-center">

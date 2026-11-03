@@ -10,7 +10,11 @@ import {
 } from "@angular/core";
 
 import { BaseQueryParams } from "@core/query-params";
-import { IconCheckComponent, IconEyeComponent } from "@shared/icons";
+import {
+  IconCheckComponent,
+  IconEyeComponent,
+  IconTrashComponent,
+} from "@shared/icons";
 import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiButtonComponent } from "@shared/ui/button";
 import { UiFlexComponent } from "@shared/ui/flex";
@@ -23,7 +27,7 @@ import type { Variation } from "../../models/variation";
 
 export interface VariationRowViewModel extends Variation {
   targetLabel: string;
-  targetRef: string | null;
+  projectName: string | null;
 }
 
 type Cell = TemplateRef<TableCellContext<VariationRowViewModel>>;
@@ -44,14 +48,17 @@ type Cell = TemplateRef<TableCellContext<VariationRowViewModel>>;
 export class VariationsTableComponent {
   readonly rows = input<VariationRowViewModel[]>([]);
   readonly emptyText = input<string>("No hay variaciones.");
+  readonly canDelete = input<boolean>(false);
 
   readonly view = output<Variation>();
   readonly resolve = output<Variation>();
+  readonly remove = output<Variation>();
 
   protected readonly query = signal(new BaseQueryParams({ pageSize: 100 }));
 
   protected readonly viewIcon = IconEyeComponent;
   protected readonly resolveIcon = IconCheckComponent;
+  protected readonly trashIcon = IconTrashComponent;
 
   private readonly tareaCell = viewChild.required<Cell>("tareaCell");
   private readonly tipoCell = viewChild.required<Cell>("tipoCell");

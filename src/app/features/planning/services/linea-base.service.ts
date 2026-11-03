@@ -66,7 +66,8 @@ export class LineaBaseService {
 
   async congelar(
     proyectoId: string,
-    descripcion = "Snapshot inicial del plan",
+    descripcion: string,
+    taskIds: ReadonlySet<string>,
   ): Promise<LineaBaseApi | null> {
     // Asegurar dependencias cargadas.
     if (this.tasksService.count() === 0) await this.tasksService.cargar();
@@ -76,16 +77,9 @@ export class LineaBaseService {
       await this.assignmentsService.cargar();
 
     // Construir snapshot desde el estado actual.
-    const subIds = new Set(
-      this.subprojectsService
-        .subs()
-        .filter((s) => s.projectId === proyectoId)
-        .map((s) => s.id),
-    );
     const tasks = this.tasksService
       .tasks()
-      .filter((t) => t.active && subIds.has(t.subprojectId));
-    const taskIds = new Set(tasks.map((t) => t.id));
+      .filter((t) => taskIds.has(t.id));
     const assignments = this.assignmentsService
       .assignments()
       .filter((a) => a.projectId === proyectoId && taskIds.has(a.taskId));
@@ -97,8 +91,8 @@ export class LineaBaseService {
         tareaId: t.id,
         nombre: t.name,
         descripcion: t.description || null,
-        fechaInicioPlanificada: t.startDate,
-        fechaFinPlanificada: t.endDate,
+        fechaInicioPlanificada: t.startDate ?? "",
+        fechaFinPlanificada: t.endDate ?? "",
         horasEstimadas: t.estimatedHours,
       })),
       asignaciones: assignments.map((a) => ({
@@ -112,7 +106,7 @@ export class LineaBaseService {
       const creada = await firstValueFrom(this.api.congelar(body));
       this._byProject.update((m) => ({
         ...m,
-        [proyectoId]: [creada, ...(m[proyectoId] ?? [])],
+        [proyectoId]: [creada],
       }));
       // Marcar assignments locales como frozen para que progress muestre
       // hasBaseline=true inmediatamente.

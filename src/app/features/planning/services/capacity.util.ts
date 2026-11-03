@@ -1,4 +1,4 @@
-import { parseIsoDate, toIsoDate } from "@utils/date";
+import { formatShortDate, parseIsoDate, toIsoDate } from "@utils/date";
 
 import type { Assignment } from "../models/assignment";
 
@@ -8,10 +8,14 @@ export function countBusinessDays(
   isoStart: string,
   isoEnd: string,
 ): number {
+  return listBusinessDays(isoStart, isoEnd).length;
+}
+
+export function listBusinessDays(isoStart: string, isoEnd: string): string[] {
   const start = parseIsoDate(isoStart);
   const end = parseIsoDate(isoEnd);
-  if (!start || !end) return 0;
-  if (end < start) return 0;
+  if (!start || !end) return [];
+  if (end < start) return [];
 
   const days: string[] = [];
   const cursor = new Date(start.getFullYear(), start.getMonth(), start.getDate());
@@ -22,7 +26,7 @@ export function countBusinessDays(
     }
     cursor.setTime(cursor.getTime() + DAY_MS);
   }
-  return days.length;
+  return days;
 }
 
 export function isBusinessDay(isoDate: string): boolean {
@@ -75,6 +79,57 @@ export function computeCommittedHours(
         rangesOverlap(a.startDate, a.endDate, periodStart, periodEnd),
     )
     .reduce((acc, a) => acc + a.plannedHours, 0);
+}
+
+export interface DayLoad {
+  hours: number;
+  names: string[];
+}
+
+export function computeDayLoads(
+  assignments: readonly Assignment[],
+  taskNames: ReadonlyMap<string, string>,
+): Map<string, DayLoad> {
+  const loads = new Map<string, DayLoad>();
+  for (const a of assignments) {
+    const days = listBusinessDays(a.startDate, a.endDate);
+    for (const day of days) {
+      const load = loads.get(day) ?? { hours: 0, names: [] };
+      load.hours += a.plannedHours / days.length;
+      load.names.push(taskNames.get(a.taskId) ?? "Tarea");
+      loads.set(day, load);
+    }
+  }
+  return loads;
+}
+
+export function dayLoadMark(
+  loads: ReadonlyMap<string, DayLoad>,
+  iso: string,
+  hoursPerDay = 8,
+): { className: string; title: string } | null {
+  const load = loads.get(iso);
+  if (!load) return null;
+  const hours = Math.round(load.hours * 100) / 100;
+  return {
+    className: hours >= hoursPerDay ? "ui-day-full" : "ui-day-partial",
+    title: `${formatShortDate(iso)}: ${hours} h · ${load.names.join(", ")}`,
+  };
+}
+
+export function findFirstDate(
+  fromIso: string,
+  matches: (iso: string) => boolean,
+  searchDays = 365,
+): string | null {
+  const cursor = parseIsoDate(fromIso);
+  if (!cursor) return null;
+  for (let i = 0; i < searchDays; i++) {
+    const iso = toIsoDate(cursor);
+    if (matches(iso)) return iso;
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return null;
 }
 
 export function isOverload(

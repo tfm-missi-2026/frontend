@@ -15,5 +15,4 @@ export interface AsignacionCrearApi {
   tareaId: string;
   usuarioId: string;
   fechaInicioPlanificada: string;
-  confirmarSobrecarga: boolean;
 }

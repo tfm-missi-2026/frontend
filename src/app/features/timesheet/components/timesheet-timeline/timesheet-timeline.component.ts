@@ -18,7 +18,6 @@ import { UiSeparatorComponent } from "@shared/ui/separator";
 import { UiSurfaceComponent } from "@shared/ui/surface";
 import type { SelectOption } from "@shared/ui/select";
 import { compareKeys } from "@utils/collections";
-import type { TimesheetViewMode } from "../timesheet-toolbar/timesheet-toolbar.component";
 import {
   type TimesheetEntry,
 } from "../../models/timesheet-entry";
@@ -66,7 +65,6 @@ function blockDuration(start: string, end: string): string {
 export class TimesheetTimelineComponent {
   readonly entries = input<TimesheetEntry[]>([]);
   readonly heading = input<string>("");
-  readonly mode = input<TimesheetViewMode>("day");
   readonly taskOptions = input<SelectOption[]>([]);
 
   readonly edit = output<TimesheetEntry>();
@@ -122,21 +120,9 @@ export class TimesheetTimelineComponent {
     () => `${roundHalf(this.totalHours())} h`,
   );
 
-  protected readonly sumExplanation = computed<string>(() =>
-    this.mode() === "day"
-      ? "Dedicación real del día = suma de los bloques."
-      : "Dedicación real del período = suma de los bloques.",
-  );
+  protected readonly sumExplanation = "Dedicación real del día = suma de los bloques.";
 
-  protected readonly emptyTitle = computed<string>(() =>
-    this.mode() === "day"
-      ? "No registraste bloques este día."
-      : "No registraste bloques en este período.",
-  );
+  protected readonly emptyTitle = "No registraste bloques este día.";
 
-  protected readonly emptyDescription = computed<string>(() =>
-    this.mode() === "day"
-      ? "Pulsa “Registrar bloque” para empezar."
-      : "Ajusta el rango o registra un nuevo bloque.",
-  );
+  protected readonly emptyDescription = "Pulsa “Registrar bloque” para empezar.";
 }

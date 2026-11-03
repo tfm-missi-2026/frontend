@@ -19,10 +19,8 @@
     <TimesheetToolbar
       [mode]="mode()"
       [date]="date()"
-      [range]="range()"
       (modeChange)="onModeChange($event)"
       (dateChange)="onDateChange($event)"
-      (rangeChange)="onRangeChange($event)"
     />
     <UiButton
       variant="primary"
@@ -40,21 +38,31 @@
   <TimesheetTimeline
     [entries]="visibleEntries()"
     [heading]="timelineHeading()"
-    [mode]="mode()"
     [taskOptions]="taskOptions()"
     (edit)="openEdit($event)"
     (remove)="onDeleteEntry($event)"
     (register)="openCreate()"
   />
-
-  <UiSurface variant="neutral" padding="md">
-    <UiLabel type="bodyS" color="textWeak">
-      Un bloque vincula a una tarea, a través de tu asignación, o a una
-      actividad como una reunión, capacitación o soporte, nunca a las dos. La
-      suma de bloques alimenta tus horas registradas en Carga del equipo.
-    </UiLabel>
-  </UiSurface>
 </UiFlex>
+
+@if (mode() === "month") {
+  <UiModal
+    [isOpen]="true"
+    [showCloseButton]="true"
+    size="4xl"
+    className="w-full max-w-7xl"
+    title="Bitácora del mes"
+    (close)="mode.set('day')"
+  >
+    <TimesheetMonthCalendar
+      [entries]="entries()"
+      [plannedTasks]="plannedTasks()"
+      [initialDate]="date()"
+      (edit)="onCalendarEntryClick($event)"
+      (dayClick)="onCalendarDayClick($event)"
+    />
+  </UiModal>
+}
 
 <EntryFormModal
   [isOpen]="formOpen()"

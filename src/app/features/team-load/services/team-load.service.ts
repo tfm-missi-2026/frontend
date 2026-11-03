@@ -53,6 +53,8 @@ export class TeamLoadService {
           resourceRole: "Recurso Técnico",
           plannedHours: c.horasPlanificadas,
           loggedHours: c.horasRegistradas,
+          taskHours: c.horasTareas,
+          activityHours: c.horasActividades,
           activeTaskCount: c.numeroTareasActivas,
           utilizationPct: c.porcentajeUtilizacion,
           hasPlan: c.horasPlanificadas > 0,

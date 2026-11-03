@@ -78,7 +78,7 @@ export class VariationsService {
     for (const t of tasks) {
       taskLabelByTaskId.set(t.id, t.name);
       const ticket = ticketBySubprojectId.get(t.subprojectId);
-      taskRefByTaskId.set(t.id, ticket ? `#${ticket}` : `#${t.subprojectId}`);
+      taskRefByTaskId.set(t.id, ticket ? `#${ticket}` : "");
       subprojectIdByTaskId.set(t.id, t.subprojectId);
     }
     // userId -> "Nombre ApellidoP ApellidoM" para resolver UUIDs.
@@ -195,6 +195,17 @@ export class VariationsService {
     } catch (err) {
       this._error.set(extractProblemMessage(err));
       return null;
+    }
+  }
+
+  async remove(id: string, reason: string): Promise<boolean> {
+    try {
+      await firstValueFrom(this.api.eliminar(id, reason));
+      this._items.update((arr) => arr.filter((v) => v.id !== id));
+      return true;
+    } catch (err) {
+      this._error.set(extractProblemMessage(err));
+      return false;
     }
   }
 

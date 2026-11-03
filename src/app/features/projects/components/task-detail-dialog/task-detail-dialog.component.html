@@ -1,0 +1,39 @@
+<UiModal
+  [isOpen]="true"
+  [showCloseButton]="true"
+  [showFooter]="true"
+  className="max-w-115"
+  title="Detalle de la tarea"
+  subtitle="Pertenece a una línea base congelada: no se puede modificar."
+  [leftAction]="{ label: 'Cerrar', variant: 'secondary', icon: IconX }"
+  (close)="close.emit()"
+  (action)="close.emit()"
+>
+  <UiSurface variant="neutral" padding="md">
+    <UiFlex direction="column" [gap]="2" [noWrap]="true">
+      @for (field of fields(); track field.label) {
+        <UiFlex
+          direction="row"
+          alignItems="center"
+          justifyContent="between"
+          [gap]="4"
+          [noWrap]="true"
+        >
+          <UiLabel
+            type="bodyXs"
+            color="textWeak"
+            className="shrink-0"
+            [text]="field.label"
+          />
+          <UiLabel
+            type="bodyXs"
+            weight="semibold"
+            color="textStrong"
+            className="text-right"
+            [text]="field.value"
+          />
+        </UiFlex>
+      }
+    </UiFlex>
+  </UiSurface>
+</UiModal>

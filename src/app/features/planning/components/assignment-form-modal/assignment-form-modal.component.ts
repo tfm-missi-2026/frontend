@@ -7,11 +7,13 @@ import {
   input,
   output,
   signal,
+  untracked,
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 
 import { IconCheckComponent, IconXComponent } from "@shared/icons";
 import { UiAlertComponent } from "@shared/ui/alert";
+import { UiButtonComponent } from "@shared/ui/button";
 import { UiDatePickerComponent } from "@shared/ui/date-picker";
 import { UiFieldErrorComponent } from "@shared/ui/field-error";
 import { UiFlexComponent } from "@shared/ui/flex";
@@ -20,16 +22,20 @@ import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
 import { UiSelectComponent } from "@shared/ui/select";
 import type { SelectOption } from "@shared/ui/select";
-import { formatShortDate } from "@utils/date";
+import { formatShortDate, todayIso } from "@utils/date";
 
 import type { Task } from "@features/projects/models/task";
+import { TasksService } from "@features/projects/services/tasks.service";
 
 import { AssignmentsService } from "../../services/assignments.service";
 import {
   computeCapacityHours,
   computeCommittedHours,
+  computeDayLoads,
   computeEndDate,
   countBusinessDays,
+  dayLoadMark,
+  findFirstDate,
   isBusinessDay,
   isOverload,
 } from "../../services/capacity.util";
@@ -49,6 +55,7 @@ export type AssignmentFormMode = "create" | "edit";
   imports: [
     FormsModule,
     UiAlertComponent,
+    UiButtonComponent,
     UiDatePickerComponent,
     UiFieldErrorComponent,
     UiFlexComponent,
@@ -62,13 +69,14 @@ export type AssignmentFormMode = "create" | "edit";
 })
 export class AssignmentFormModalComponent {
   private readonly assignmentsService = inject(AssignmentsService);
+  private readonly tasksService = inject(TasksService);
 
   readonly isOpen = input<boolean>(false);
   readonly saving = input<boolean>(false);
   readonly mode = input<AssignmentFormMode>("create");
   readonly projectId = input<string>("");
   readonly assignment = input<Assignment | null>(null);
-  readonly taskOptions = input<SelectOption[]>([]);
+  readonly subprojectOptions = input<SelectOption[]>([]);
   readonly tasks = input<Task[]>([]);
   readonly resourceOptions = input<SelectOption[]>([]);
   readonly resourceNames = input<Record<string, string>>({});
@@ -81,10 +89,12 @@ export class AssignmentFormModalComponent {
   protected readonly IconX = IconXComponent;
 
   protected readonly form = signal<AssignmentFormData>(emptyAssignmentForm());
+  protected readonly selectedSubprojectId = signal<string | null>(null);
   protected readonly validationMessage = signal<string | null>(null);
   protected readonly taskError = signal<string | null>(null);
   protected readonly resourceError = signal<string | null>(null);
   protected readonly startError = signal<string | null>(null);
+  protected readonly showResourceAssignments = signal<boolean>(false);
 
   protected readonly heading = computed<string>(() =>
     this.mode() === "create" ? "Nueva asignación" : "Editar asignación",
@@ -96,6 +106,13 @@ export class AssignmentFormModalComponent {
       this.resourceError() !== null ||
       this.startError() !== null,
   );
+
+  protected readonly taskSelectOptions = computed<SelectOption[]>(() => {
+    const subprojectId = this.selectedSubprojectId();
+    return this.tasks()
+      .filter((t) => t.subprojectId === subprojectId)
+      .map((t) => ({ value: t.id, label: t.name }));
+  });
 
   protected readonly selectedTask = computed<Task | undefined>(() =>
     this.tasks().find((t) => t.id === this.form().taskId),
@@ -114,14 +131,91 @@ export class AssignmentFormModalComponent {
     return `Del ${formatShortDate(startDate)} al ${formatShortDate(endDate)} · ${effort}`;
   });
 
+  private readonly resourceAssignments = computed<Assignment[]>(() => {
+    const resourceId = this.form().resourceId;
+    const excludedId = this.assignment()?.id;
+    return this.assignmentsService
+      .assignments()
+      .filter(
+        (a) =>
+          a.active && a.resourceId === resourceId && a.id !== excludedId,
+      );
+  });
+
+  private readonly dayLoads = computed(() => {
+    const names = new Map(this.tasksService.tasks().map((t) => [t.id, t.name]));
+    return computeDayLoads(this.resourceAssignments(), names);
+  });
+
+  protected readonly dayMark = computed(() => {
+    const loads = this.dayLoads();
+    return (iso: string) => dayLoadMark(loads, iso);
+  });
+
+  private readonly canStartOn = computed(() => {
+    const task = this.selectedTask();
+    const resourceId = this.form().resourceId;
+    const assignments = this.resourceAssignments();
+    return (iso: string): boolean => {
+      if (!isBusinessDay(iso)) return false;
+      if (!task || !resourceId) return true;
+      const end = computeEndDate(iso, task.estimatedDays);
+      return !isOverload(
+        computeCommittedHours(assignments, resourceId, iso, end),
+        task.estimatedHours,
+        computeCapacityHours(iso, end),
+      );
+    };
+  });
+
+  protected readonly isDateDisabled = computed(() => {
+    const canStart = this.canStartOn();
+    return (iso: string): boolean => !canStart(iso);
+  });
+
+  protected readonly hasTaskAndResource = computed<boolean>(
+    () => !!this.selectedTask() && !!this.form().resourceId,
+  );
+
+  protected readonly firstAvailableDate = computed<string | null>(() => {
+    if (!this.hasTaskAndResource()) return null;
+    return findFirstDate(todayIso(), this.canStartOn());
+  });
+
+  protected readonly firstAvailableLabel = computed<string>(() => {
+    const date = this.firstAvailableDate();
+    return date
+      ? `Primera fecha disponible: ${formatShortDate(date)}`
+      : "Sin fechas disponibles en el próximo año.";
+  });
+
+  protected readonly resourceName = computed<string>(
+    () => this.resourceNames()[this.form().resourceId] ?? "el recurso",
+  );
+
+  protected readonly resourceAssignmentRows = computed(() => {
+    const names = new Map(this.tasksService.tasks().map((t) => [t.id, t.name]));
+    return [...this.resourceAssignments()]
+      .sort((a, b) => a.startDate.localeCompare(b.startDate))
+      .map((a) => ({
+        id: a.id,
+        label: `${formatShortDate(a.startDate)} – ${formatShortDate(a.endDate)} · ${names.get(a.taskId) ?? "Tarea"} · ${a.plannedHours} h`,
+      }));
+  });
+
   constructor() {
     effect(() => {
       const open = this.isOpen();
       if (!open) return;
       this.resetErrors();
+      this.showResourceAssignments.set(false);
       const m = this.mode();
       const a = this.assignment();
       if (m === "edit" && a) {
+        this.selectedSubprojectId.set(
+          untracked(() => this.tasks()).find((t) => t.id === a.taskId)
+            ?.subprojectId ?? null,
+        );
         this.form.set({
           taskId: a.taskId,
           resourceId: a.resourceId,
@@ -130,6 +224,7 @@ export class AssignmentFormModalComponent {
           endDate: a.endDate,
         });
       } else {
+        this.selectedSubprojectId.set(null);
         this.form.set(emptyAssignmentForm());
       }
     });
@@ -142,6 +237,13 @@ export class AssignmentFormModalComponent {
     this.startError.set(null);
   }
 
+  protected onSubprojectChange(value: unknown): void {
+    this.selectedSubprojectId.set(value == null ? null : String(value));
+    this.patch({ taskId: "", plannedHours: 0, startDate: "", endDate: "" });
+    this.taskError.set(null);
+    this.startError.set(null);
+  }
+
   protected onTaskChange(value: unknown): void {
     this.patch({ taskId: value == null ? "" : String(value) });
     this.syncFromTask();
@@ -151,6 +253,16 @@ export class AssignmentFormModalComponent {
   protected onResourceChange(value: unknown): void {
     this.patch({ resourceId: value == null ? "" : String(value) });
     this.resourceError.set(null);
+    this.showResourceAssignments.set(false);
+  }
+
+  protected useFirstAvailableDate(): void {
+    const date = this.firstAvailableDate();
+    if (date) this.onStartDateChange(date);
+  }
+
+  protected toggleResourceAssignments(): void {
+    this.showResourceAssignments.update((shown) => !shown);
   }
 
   protected onStartDateChange(value: string | string[]): void {

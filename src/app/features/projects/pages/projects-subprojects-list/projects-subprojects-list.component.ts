@@ -43,6 +43,8 @@ import {
 import type { SubprojectFormSavePayload } from "../../models/subproject-form";
 import { ProjectsService } from "../../services/projects.service";
 import { SubprojectsService } from "../../services/subprojects.service";
+import { TasksService } from "../../services/tasks.service";
+import { LineaBaseService } from "@features/planning/services/linea-base.service";
 import { UsersService } from "@features/users/services/users.service";
 import { ToastService } from "@core/http/toast.service";
 
@@ -71,11 +73,14 @@ export class ProjectsSubprojectsListComponent implements OnInit {
   private readonly subprojectsService = inject(SubprojectsService);
   private readonly usersService = inject(UsersService);
   private readonly toastService = inject(ToastService);
+  private readonly tasksService = inject(TasksService);
+  private readonly lineaBaseService = inject(LineaBaseService);
 
   ngOnInit(): void {
     void this.projectsService.cargar();
     void this.subprojectsService.cargar();
     void this.usersService.cargar();
+    void this.tasksService.cargar();
   }
 
   constructor() {
@@ -84,6 +89,7 @@ export class ProjectsSubprojectsListComponent implements OnInit {
       const pid = this.projectId();
       if (pid) {
         void this.subprojectsService.cargarPorProyecto(pid);
+        void this.lineaBaseService.cargarPorProyecto(pid);
       }
     });
   }
@@ -108,6 +114,18 @@ export class ProjectsSubprojectsListComponent implements OnInit {
   protected readonly subprojects = computed<Subproject[]>(() => {
     const id = this.projectId();
     return id ? this.subprojectsService.getByProject(id) : [];
+  });
+
+  protected readonly frozenSubprojectIds = computed<ReadonlySet<string>>(() => {
+    const pid = this.projectId();
+    const baseline = pid ? this.lineaBaseService.latestByProject()[pid] : null;
+    const frozenTasks = new Set(baseline?.tareas.map((t) => t.tareaId) ?? []);
+    return new Set(
+      this.tasksService
+        .tasks()
+        .filter((t) => frozenTasks.has(t.id))
+        .map((t) => t.subprojectId),
+    );
   });
 
   protected readonly managerName = computed<string>(() => {

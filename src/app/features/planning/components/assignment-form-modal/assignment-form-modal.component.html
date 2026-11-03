@@ -25,6 +25,29 @@
       <UiAlert variant="error" [message]="msg" />
     }
 
+    @if (subprojectOptions().length === 0) {
+      <UiAlert
+        variant="info"
+        message="No hay tareas pendientes de asignar en este proyecto."
+      />
+    }
+
+    <UiFlex direction="column" [gap]="1" [noWrap]="true">
+      <UiFormLabel
+        labelText="Subproyecto"
+        labelFor="assignment-subproject"
+        [required]="true"
+      />
+      <UiSelect
+        inputId="assignment-subproject"
+        [options]="subprojectOptions()"
+        placeholder="Selecciona un subproyecto…"
+        [searchable]="false"
+        [ngModel]="selectedSubprojectId()"
+        (ngModelChange)="onSubprojectChange($event)"
+      />
+    </UiFlex>
+
     <UiFlex direction="column" [gap]="1" [noWrap]="true">
       <UiFormLabel
         labelText="Tarea"
@@ -33,9 +56,10 @@
       />
       <UiSelect
         inputId="assignment-task"
-        [options]="taskOptions()"
+        [options]="taskSelectOptions()"
         placeholder="Selecciona una tarea…"
         [searchable]="false"
+        [isDisabled]="!selectedSubprojectId()"
         [ngModel]="form().taskId"
         (ngModelChange)="onTaskChange($event)"
         [errorMessage]="taskError() ?? undefined"
@@ -46,7 +70,7 @@
         <UiLabel
           type="bodyXs"
           color="textWeak"
-          text="Tareas de los subproyectos del proyecto seleccionado."
+          text="Solo tareas sin asignar de subproyectos sin congelar."
         />
       }
     </UiFlex>
@@ -89,6 +113,8 @@
         dateFormat="d/m/Y"
         placeholder="dd/mm/aaaa"
         [value]="form().startDate"
+        [isDateDisabled]="isDateDisabled()"
+        [dayMark]="dayMark()"
         (valueChange)="onStartDateChange($event)"
       />
       @if (startError(); as msg) {
@@ -97,5 +123,47 @@
         <UiLabel type="bodyXs" color="textWeak" [text]="scheduleLabel()" />
       }
     </UiFlex>
+
+    @if (hasTaskAndResource()) {
+      <UiFlex direction="column" [gap]="2" [noWrap]="true">
+        <UiFlex
+          direction="row"
+          alignItems="center"
+          justifyContent="between"
+          [gap]="3"
+        >
+          <UiLabel type="bodyS" color="textStrong" [text]="firstAvailableLabel()" />
+          @if (firstAvailableDate()) {
+            <UiButton
+              variant="secondary"
+              label="Usar"
+              (click)="useFirstAvailableDate()"
+            />
+          }
+        </UiFlex>
+        <UiLabel
+          type="bodyXs"
+          color="textWeak"
+          text="En el calendario: amarillo, con horas asignadas; rojo, jornada completa. Las fechas que causarían sobrecarga están deshabilitadas."
+        />
+        <UiButton
+          variant="tertiary"
+          [label]="
+            (showResourceAssignments() ? 'Ocultar asignaciones de ' : 'Ver asignaciones de ') +
+            resourceName()
+          "
+          (click)="toggleResourceAssignments()"
+        />
+        @if (showResourceAssignments()) {
+          <UiFlex direction="column" [gap]="1" [noWrap]="true">
+            @for (row of resourceAssignmentRows(); track row.id) {
+              <UiLabel type="bodyXs" color="textWeak" [text]="row.label" />
+            } @empty {
+              <UiLabel type="bodyXs" color="textWeak" text="Sin asignaciones." />
+            }
+          </UiFlex>
+        }
+      </UiFlex>
+    }
   </UiFlex>
 </UiModal>

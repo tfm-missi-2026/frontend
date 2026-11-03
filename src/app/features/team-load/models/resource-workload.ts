@@ -4,6 +4,8 @@ export interface ResourceWorkload {
   resourceRole: "Recurso Técnico";
   plannedHours: number;
   loggedHours: number;
+  taskHours: number;
+  activityHours: number;
   activeTaskCount: number;
   utilizationPct: number;
   hasPlan: boolean;

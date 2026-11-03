@@ -6,7 +6,11 @@ import {
   output,
 } from "@angular/core";
 
-import { IconEditPencilComponent, IconTrashComponent } from "@shared/icons";
+import {
+  IconEditPencilComponent,
+  IconEyeComponent,
+  IconTrashComponent,
+} from "@shared/icons";
 import type { BadgeColor } from "@shared/ui/badge";
 import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiFlexComponent } from "@shared/ui/flex";
@@ -36,7 +40,7 @@ const COLUMN_CLASSES = [
   "w-16 shrink-0 justify-center",
   "w-24 shrink-0",
   "w-24 shrink-0",
-  "w-21 shrink-0 justify-center",
+  "w-28 shrink-0 justify-center",
   "w-30 shrink-0",
   "w-22 shrink-0",
   "w-32 shrink-0",
@@ -71,11 +75,14 @@ const HEADER_LABELS = [
 export class ProjectsTasksTableComponent {
   protected readonly editIcon = IconEditPencilComponent;
   protected readonly trashIcon = IconTrashComponent;
+  protected readonly viewIcon = IconEyeComponent;
 
   readonly tasks = input<Task[]>([]);
+  readonly frozen = input<boolean>(false);
 
   readonly edit = output<Task>();
   readonly deactivate = output<Task>();
+  readonly view = output<Task>();
 
   protected readonly columnClasses = COLUMN_CLASSES;
   protected readonly headerLabels = HEADER_LABELS;

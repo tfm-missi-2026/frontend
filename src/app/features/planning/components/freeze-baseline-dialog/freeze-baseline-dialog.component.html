@@ -4,31 +4,24 @@
   [showFooter]="true"
   className="max-w-115"
   title="Congelar línea base"
-  subtitle="Foto inmutable del plan"
+  subtitle="Plan de referencia del proyecto"
   [leftAction]="{ label: 'Cancelar', variant: 'secondary', icon: IconX }"
   [rightAction]="{
     label: 'Congelar',
     variant: 'primary',
     icon: IconCheck,
-    disabled: unchanged() || saving(),
+    disabled: saving(),
     loading: saving(),
   }"
   (close)="cancel.emit()"
   (action)="onAction($event)"
 >
   <UiFlex direction="column" [gap]="4">
-    @if (unchanged()) {
-      <UiAlert
-        variant="warning"
-        [message]="
-          'El plan no cambió desde la línea base v' +
-          currentVersion() +
-          '. Congelar de nuevo crearía una copia idéntica.'
-        "
-      />
-    }
-
-    <UiLabel type="bodyS" color="textStrong" [text]="explanation()" />
+    <UiLabel
+      type="bodyS"
+      color="textStrong"
+      text="Se congelarán los subproyectos que tengan todas sus tareas asignadas. El módulo Avance comparará las horas registradas contra lo congelado."
+    />
 
     <UiSurface variant="neutral" padding="md">
       <UiFlex direction="column" [gap]="2">
@@ -47,7 +40,7 @@
     </UiSurface>
 
     <UiLabel type="bodyXs" color="textWeak">
-      Una línea base no se puede editar ni eliminar desde el sistema.
+      Un subproyecto se congela una sola vez y no se puede editar. Los cambios se registran como variaciones, y el trabajo nuevo, en otro subproyecto.
     </UiLabel>
   </UiFlex>
 </UiModal>

@@ -73,6 +73,7 @@ export class ProjectsSubprojectsTableComponent {
   protected readonly trashIcon = IconTrashComponent;
 
   readonly subprojects = input<Subproject[]>([]);
+  readonly frozenIds = input<ReadonlySet<string>>(new Set());
 
   readonly view = output<Subproject>();
   readonly edit = output<Subproject>();

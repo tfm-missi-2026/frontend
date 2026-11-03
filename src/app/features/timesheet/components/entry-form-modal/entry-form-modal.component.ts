@@ -219,6 +219,8 @@ export class EntryFormModalComponent {
     };
     if (data.kind === "task") {
       data.activity = "";
+      data.activityId = undefined;
+      data.activityTypeId = "";
     } else {
       data.task = "";
       data.taskCode = undefined;

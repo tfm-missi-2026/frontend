@@ -7,7 +7,7 @@
 ></UiTable>
 
 <ng-template #recursoCell let-row>
-  <UiFlex direction="row" alignItems="center" [gap]="8" className="min-w-0">
+  <UiFlex direction="row" alignItems="center" [gap]="8" [noWrap]="true" className="min-w-0">
     <UiSurface
       variant="neutral"
       padding="none"
@@ -85,19 +85,29 @@
 
 <ng-template #accionesCell let-row>
   <UiFlex [gap]="2" alignItems="center" justifyContent="end" [noWrap]="true">
-    <UiButton
-      variant="secondary"
-      size="sm"
-      [LeftIcon]="editIcon"
-      labelText="Editar asignación"
-      (click)="edit.emit(row)"
-    />
-    <UiButton
-      variant="primary"
-      size="sm"
-      [LeftIcon]="trashIcon"
-      labelText="Quitar asignación"
-      (click)="remove.emit(row)"
-    />
+    @if (row.frozen) {
+      <UiButton
+        variant="secondary"
+        size="sm"
+        [LeftIcon]="viewIcon"
+        labelText="Ver detalle"
+        (click)="view.emit(row)"
+      />
+    } @else {
+      <UiButton
+        variant="secondary"
+        size="sm"
+        [LeftIcon]="editIcon"
+        labelText="Editar asignación"
+        (click)="edit.emit(row)"
+      />
+      <UiButton
+        variant="primary"
+        size="sm"
+        [LeftIcon]="trashIcon"
+        labelText="Quitar asignación"
+        (click)="remove.emit(row)"
+      />
+    }
   </UiFlex>
 </ng-template>

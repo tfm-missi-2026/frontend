@@ -1,0 +1,64 @@
+<UiModal
+  [isOpen]="true"
+  [showCloseButton]="true"
+  [showFooter]="true"
+  className="max-w-115"
+  title="Eliminar variación"
+  subtitle="Deja de aparecer en el listado y en los contadores."
+  [leftAction]="{ label: 'Cancelar', variant: 'secondary', icon: IconX }"
+  [rightAction]="{
+    label: 'Eliminar',
+    variant: 'primary',
+    styleType: 'danger',
+    icon: IconCheck,
+    disabled: !canConfirm(),
+    loading: saving(),
+  }"
+  (close)="cancel.emit()"
+  (action)="onAction($event)"
+>
+  <UiFlex direction="column" [gap]="4" [noWrap]="true">
+    <UiSurface variant="neutral" padding="md">
+      <UiFlex direction="column" [gap]="2" [noWrap]="true">
+        @for (field of fields(); track field.label) {
+          <UiFlex
+            direction="row"
+            alignItems="center"
+            justifyContent="between"
+            [gap]="4"
+            [noWrap]="true"
+          >
+            <UiLabel
+              type="bodyXs"
+              color="textWeak"
+              className="shrink-0"
+              [text]="field.label"
+            />
+            <UiLabel
+              type="bodyXs"
+              weight="semibold"
+              color="textStrong"
+              className="text-right"
+              [text]="field.value"
+            />
+          </UiFlex>
+        }
+      </UiFlex>
+    </UiSurface>
+
+    <UiFlex direction="column" [gap]="1" [noWrap]="true">
+      <UiFormLabel
+        labelText="Motivo"
+        labelFor="delete-variation-reason"
+        [required]="true"
+      />
+      <UiTextArea
+        inputId="delete-variation-reason"
+        placeholder="¿Por qué se elimina esta variación?"
+        [rows]="2"
+        [value]="reason()"
+        (valueChange)="reason.set($event)"
+      ></UiTextArea>
+    </UiFlex>
+  </UiFlex>
+</UiModal>

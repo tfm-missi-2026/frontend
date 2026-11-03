@@ -16,6 +16,7 @@ export interface TimesheetEntry {
   task: string;
   taskCode?: string;
   activity?: string;
+  activityId?: string;
   /** Id del catalogo TIPO_ACTIVIDAD elegido al registrar una actividad. */
   activityTypeId?: string;
   description: string;

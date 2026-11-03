@@ -223,7 +223,7 @@ export class ManagerDashboardService {
     const upcomingTasks: TodoDueTask[] = allTasks
       .map((t) => {
         const sub = allSubprojects.find((s) => s.id === t.subprojectId);
-        const ref = sub?.ticket ? `#${sub.ticket}` : `#${t.subprojectId}`;
+        const ref = sub?.ticket ? `#${sub.ticket}` : "";
         return {
           taskId: t.id,
           taskName: t.name,
