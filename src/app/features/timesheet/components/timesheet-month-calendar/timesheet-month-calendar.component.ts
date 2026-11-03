@@ -34,6 +34,11 @@ export interface TimesheetPlannedTask {
   name: string;
   startDate: string;
   endDate: string;
+  plannedHours: number;
+}
+
+function roundHours(value: number): number {
+  return Math.round(value * 100) / 100;
 }
 
 const TASK_COLORS = ["#465fff", "#12b76a", "#7a5af8", "#ee46bc", "#0ba5ec", "#15b79e"];
@@ -63,12 +68,17 @@ function nextDay(iso: string): string {
   return toIsoDate(d);
 }
 
-function entryTooltip(entry: TimesheetEntry, timeText: string): string {
+function entryTooltip(
+  entry: TimesheetEntry,
+  title: string,
+  timeText: string,
+): string {
+  const heading = `${timeText} · ${title}`;
   const description = entry.description.trim();
-  if (!description) return `${timeText} · Sin descripción`;
+  if (!description) return `${heading}\nSin descripción`;
   return description.length <= TOOLTIP_MAX_LENGTH
-    ? `${timeText} · ${description}`
-    : `${timeText} · ${description.slice(0, TOOLTIP_MAX_LENGTH).trimEnd()}… Clic para ver el detalle`;
+    ? `${heading}\n${description}`
+    : `${heading}\n${description.slice(0, TOOLTIP_MAX_LENGTH).trimEnd()}… Clic para ver el detalle`;
 }
 
 @Component({
@@ -102,12 +112,29 @@ export class TimesheetMonthCalendarComponent {
     this.showPlanned.set((event.target as HTMLInputElement).checked);
   }
 
+  private readonly loggedHoursByTask = computed(() => {
+    const totals = new Map<string, number>();
+    for (const e of this.entries()) {
+      if (e.kind !== "task" || !e.task) continue;
+      totals.set(e.task, (totals.get(e.task) ?? 0) + e.hours);
+    }
+    return totals;
+  });
+
   protected readonly legendTasks = computed(() =>
-    this.plannedTasks().map((t, i) => ({
-      id: t.id,
-      name: t.name,
-      color: TASK_COLORS[i % TASK_COLORS.length],
-    })),
+    this.plannedTasks().map((t, i) => {
+      const loggedHours = roundHours(this.loggedHoursByTask().get(t.id) ?? 0);
+      const plannedHours = roundHours(t.plannedHours);
+      return {
+        id: t.id,
+        name: t.name,
+        color: TASK_COLORS[i % TASK_COLORS.length],
+        hoursText: `${loggedHours}/${plannedHours} h`,
+        overPlanned: loggedHours > plannedHours,
+        loggedHours,
+        plannedHours,
+      };
+    }),
   );
 
   private readonly taskById = computed(
@@ -139,10 +166,11 @@ export class TimesheetMonthCalendarComponent {
 
   private readonly plannedEvents = computed<EventInput[]>(() =>
     this.plannedTasks().map((t) => {
-      const color = this.taskById().get(t.id)?.color ?? TASK_COLORS[0];
+      const legend = this.taskById().get(t.id);
+      const color = legend?.color ?? TASK_COLORS[0];
       return {
         id: `planned-${t.id}`,
-        title: t.name,
+        title: legend ? `${t.name} · ${legend.hoursText}` : t.name,
         start: t.startDate,
         end: nextDay(t.endDate),
         allDay: true,
@@ -150,6 +178,11 @@ export class TimesheetMonthCalendarComponent {
         backgroundColor: `${color}${PLANNED_ALPHA}`,
         borderColor: color,
         classNames: ["ts-event-planned"],
+        extendedProps: {
+          plannedTooltip: legend
+            ? `Programado: ${formatShortDate(t.startDate)} – ${formatShortDate(t.endDate)} · ${legend.plannedHours} h · Registrado: ${legend.loggedHours} h`
+            : `Programado: ${t.name}`,
+        },
       };
     }),
   );
@@ -160,7 +193,7 @@ export class TimesheetMonthCalendarComponent {
         e.kind === "task" ? this.taskById().get(e.task)?.color : undefined;
       return {
         id: e.id,
-        title: this.entryTitle(e),
+        title: e.description.trim() || this.entryTitle(e),
         start: `${e.date}T${e.startTime}`,
         end: `${e.date}T${e.endTime}`,
         display: "block",
@@ -189,8 +222,8 @@ export class TimesheetMonthCalendarComponent {
     eventDidMount: (arg: EventMountArg) => {
       const entry = arg.event.extendedProps["entry"] as TimesheetEntry | undefined;
       arg.el.title = entry
-        ? entryTooltip(entry, arg.timeText)
-        : `Programado: ${arg.event.title}`;
+        ? entryTooltip(entry, this.entryTitle(entry), arg.timeText)
+        : String(arg.event.extendedProps["plannedTooltip"] ?? arg.event.title);
     },
     events: [
       ...(this.showPlanned() ? this.plannedEvents() : []),

@@ -20,17 +20,11 @@ import { UiFlexComponent } from "@shared/ui/flex";
 import { UiGridComponent } from "@shared/ui/grid";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
-import { UiSurfaceComponent } from "@shared/ui/surface";
 
 import { MyBitacoraComponent } from "../../components/my-bitacora/my-bitacora.component";
 import { MyTasksListComponent } from "../../components/my-tasks-list/my-tasks-list.component";
-import {
-  ResourceDashboardService,
-  type ResourceMyTask,
-  type ResourceTaskNextSituation,
-} from "../../services/resource-dashboard.service";
+import { ResourceDashboardService } from "../../services/resource-dashboard.service";
 import { AuthService } from "@core/auth/auth.service";
-import { ToastService } from "@core/http/toast.service";
 
 @Component({
   selector: "ResourceDashboardPage",
@@ -45,7 +39,6 @@ import { ToastService } from "@core/http/toast.service";
     UiGridComponent,
     UiHeaderComponent,
     UiLabelComponent,
-    UiSurfaceComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./resource-dashboard-page.component.html",
@@ -54,7 +47,6 @@ export class ResourceDashboardPageComponent implements OnInit {
   private readonly dashboardService = inject(ResourceDashboardService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
-  private readonly toastService = inject(ToastService);
 
   ngOnInit(): void {
     void this.dashboardService.cargar();
@@ -76,35 +68,6 @@ export class ResourceDashboardPageComponent implements OnInit {
 
   protected onPeriodChange(periodId: string): void {
     if (periodId) this.periodId.set(periodId);
-  }
-
-  protected readonly situationSaving = signal<boolean>(false);
-
-  protected async onAdvanceTask(
-    task: ResourceMyTask,
-    situation: ResourceTaskNextSituation,
-  ): Promise<void> {
-    if (this.situationSaving()) return;
-    this.situationSaving.set(true);
-    try {
-      const ok = await this.dashboardService.cambiarSituacion(
-        task.assignmentId,
-        situation,
-      );
-      if (ok) {
-        this.toastService.success(
-          `La tarea "${task.taskName}" se actualizó correctamente.`,
-          "Situación actualizada",
-        );
-      } else {
-        this.toastService.error(
-          this.dashboardService.error() ?? "No se pudo actualizar la situación.",
-          "Situación sin cambios",
-        );
-      }
-    } finally {
-      this.situationSaving.set(false);
-    }
   }
 
   protected onRegisterBlock(): void {

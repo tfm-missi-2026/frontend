@@ -13,6 +13,13 @@ import { UiLabelComponent } from "@shared/ui/label";
 
 import type { ModuloResponse } from "@core/modulos/modulo.models";
 
+const SECTION_ORDER = [
+  { key: "OPERACION", title: "Operación" },
+  { key: "SEGUIMIENTO", title: "Seguimiento" },
+  { key: "ADMINISTRACION", title: "Administración" },
+  { key: "CUENTA", title: "Mi cuenta" },
+] as const;
+
 @Component({
   selector: "PermissionsMatrix",
   standalone: true,
@@ -35,6 +42,17 @@ export class PermissionsMatrixComponent {
 
   protected readonly enabledSet = computed<Set<string>>(
     () => new Set(this.selected()),
+  );
+
+  protected readonly groups = computed(() =>
+    SECTION_ORDER.map((section) => ({
+      key: section.key,
+      title: section.title,
+      modules: this.modules()
+        .filter((m) => (m.seccion ?? "OPERACION") === section.key)
+        .slice()
+        .sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0)),
+    })).filter((g) => g.modules.length > 0),
   );
 
   protected isEnabled(id: string): boolean {

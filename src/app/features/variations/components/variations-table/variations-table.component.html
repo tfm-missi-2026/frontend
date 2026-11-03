@@ -78,17 +78,17 @@
       tooltipSide="top"
       (click)="view.emit(row)"
     />
-    <UiButton
-      variant="primary"
-      size="sm"
-      [LeftIcon]="resolveIcon"
-      labelText="Resolver variación"
-      [disabled]="!isPending(row)"
-      [tooltip]="isPending(row) ? 'Resolver' : 'Solo en variaciones Pendientes'"
-      tooltipSide="top"
-      (click)="resolve.emit(row)"
-    />
-    @if (canDelete()) {
+    @if (canManage()) {
+      <UiButton
+        variant="primary"
+        size="sm"
+        [LeftIcon]="resolveIcon"
+        labelText="Aprobar o rechazar variación"
+        [disabled]="!isPending(row)"
+        [tooltip]="isPending(row) ? 'Aprobar o rechazar' : 'Solo en variaciones Pendientes'"
+        tooltipSide="top"
+        (click)="resolve.emit(row)"
+      />
       <UiButton
         variant="secondary"
         styleType="danger"

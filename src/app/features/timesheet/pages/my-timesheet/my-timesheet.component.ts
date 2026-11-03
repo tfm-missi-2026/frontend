@@ -10,8 +10,10 @@ import {
 import { AuthService } from "@core/auth/auth.service";
 import { CatalogService } from "@features/catalog/services/catalog.service";
 import { AssignmentsService } from "@features/planning/services/assignments.service";
+import type { TaskSituation } from "@features/projects/models/task";
 import { SubprojectsService } from "@features/projects/services/subprojects.service";
 import { TasksService } from "@features/projects/services/tasks.service";
+import { ResourceDashboardService } from "@features/resource-dashboard/services/resource-dashboard.service";
 import { IconPlusSimpleComponent } from "@shared/icons";
 import { CommonBreadcrumbComponent } from "@shared/common/page-breadcrumb";
 import { UiAlertComponent } from "@shared/ui/alert";
@@ -32,6 +34,7 @@ import {
 } from "../../components/timesheet-month-calendar/timesheet-month-calendar.component";
 import {
   TimesheetToolbarComponent,
+  type TimesheetLoggedDay,
   type TimesheetViewMode,
   parseTimesheetIsoDate,
   TIMESHEET_DAY_NAMES,
@@ -69,12 +72,26 @@ export class MyTimesheetComponent implements OnInit {
   private readonly actividadesService = inject(ActividadesService);
   private readonly catalogService = inject(CatalogService);
   private readonly auth = inject(AuthService);
+  private readonly resourceDashboardService = inject(ResourceDashboardService);
+
+  protected readonly taskSituations = computed(() => {
+    const usuarioId = this.auth.usuario()?.id;
+    const tasks = this.tasksService.tasks();
+    const situations = new Map<string, TaskSituation>();
+    for (const a of this.assignmentsService.assignments()) {
+      if (!a.active || a.resourceId !== usuarioId) continue;
+      const tarea = tasks.find((t) => t.id === a.taskId);
+      if (tarea) situations.set(a.id, tarea.situation);
+    }
+    return situations;
+  });
 
   protected readonly taskOptions = computed<SelectOption[]>(() => {
     const usuarioId = this.auth.usuario()?.id;
     if (!usuarioId) return [];
     const tasks = this.tasksService.tasks();
     const subs = this.subprojectsService.subs();
+    const situations = this.taskSituations();
     return this.assignmentsService
       .assignments()
       .filter((a) => a.active && a.resourceId === usuarioId)
@@ -84,9 +101,13 @@ export class MyTimesheetComponent implements OnInit {
           ? subs.find((x) => x.id === tarea.subprojectId)
           : undefined;
         const nombre = tarea?.name ?? "Tarea sin nombre";
+        const label = sub ? `${sub.description} · ${nombre}` : nombre;
         return {
           value: a.id,
-          label: sub ? `${sub.description} · ${nombre}` : nombre,
+          label:
+            situations.get(a.id) === "Culminado"
+              ? `${label} (Culminada)`
+              : label,
         };
       });
   });
@@ -130,7 +151,20 @@ export class MyTimesheetComponent implements OnInit {
         name: tasks.find((t) => t.id === a.taskId)?.name ?? "Tarea",
         startDate: a.startDate,
         endDate: a.endDate,
+        plannedHours: a.plannedHours,
       }));
+  });
+
+  protected readonly loggedDays = computed(() => {
+    const days = new Map<string, TimesheetLoggedDay>();
+    for (const e of this.entries()) {
+      const day = days.get(e.date) ?? { blocks: 0, hours: 0 };
+      days.set(e.date, {
+        blocks: day.blocks + 1,
+        hours: Math.round((day.hours + e.hours) * 100) / 100,
+      });
+    }
+    return days;
   });
 
   protected readonly visibleEntries = computed<TimesheetEntry[]>(() => {
@@ -207,20 +241,49 @@ export class MyTimesheetComponent implements OnInit {
     if (!data) return;
     if (payload.mode === "create") {
       const created = await this.timesheetService.create(data);
-      if (created) this.flashAlert("Bloque registrado correctamente.");
+      if (created) {
+        const finished = await this.actualizarSituacion(data, payload.finishTask);
+        this.flashAlert(
+          finished
+            ? "Bloque registrado y tarea culminada."
+            : "Bloque registrado correctamente.",
+        );
+      }
     } else if (payload.id) {
       const updated = await this.timesheetService.update(payload.id, data);
       if (updated) {
-        this.flashAlert("Bloque actualizado correctamente.");
         if (previousActivityId && data.kind === "task") {
           await this.actividadesService.eliminar(
             previousActivityId,
             "El bloque de bitacora paso a ser de tarea",
           );
         }
+        const finished = await this.actualizarSituacion(data, payload.finishTask);
+        this.flashAlert(
+          finished
+            ? "Bloque actualizado y tarea culminada."
+            : "Bloque actualizado correctamente.",
+        );
       }
     }
     this.formOpen.set(false);
+  }
+
+  private async actualizarSituacion(
+    data: EntryFormPayload["data"],
+    finishTask: boolean,
+  ): Promise<boolean> {
+    if (data.kind !== "task" || !data.task) return false;
+    const situation = this.taskSituations().get(data.task);
+    if (situation === "Pendiente") {
+      const started = await this.resourceDashboardService.cambiarSituacion(
+        data.task,
+        "En atencion",
+      );
+      if (!started) return false;
+    }
+    if (!finishTask || situation === "Culminado") return false;
+    return this.resourceDashboardService.cambiarSituacion(data.task, "Culminado");
   }
 
   private async resolverActividad(

@@ -421,8 +421,11 @@ export class ReportVariationModalComponent {
     this.clearValidation();
   }
 
-  protected onDetectionDateChange(value: string): void {
-    this.form.update((f) => ({ ...f, detectionDate: value }));
+  protected readonly today = todayIso();
+
+  protected onDetectionDateChange(value: string | string[]): void {
+    const iso = Array.isArray(value) ? (value[0] ?? "") : value;
+    this.form.update((f) => ({ ...f, detectionDate: iso }));
   }
 
   protected onCancel(): void {

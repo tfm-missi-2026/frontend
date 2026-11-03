@@ -137,13 +137,6 @@
               [readonly]="true"
               [landingCodigo]="selectedRole()?.paginaInicioCodigo ?? null"
             />
-            @if (role.sistema) {
-              <UiLabel
-                type="bodyXs"
-                color="textWeak"
-                text="Los roles del sistema son de solo lectura en sus datos (nombre, descripción, página de inicio), pero puedes ajustar los módulos del sidebar desde 'Editar permisos'."
-              />
-            }
           </UiFlex>
         </UiCard>
       } @else {

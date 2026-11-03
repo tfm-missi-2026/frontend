@@ -20,7 +20,6 @@ import { UiFlexComponent } from "@shared/ui/flex";
 import { UiGridComponent } from "@shared/ui/grid";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
-import { UiSurfaceComponent } from "@shared/ui/surface";
 
 import {
   ManagerProjectsListComponent,
@@ -43,7 +42,6 @@ import { ManagerDashboardService } from "../../services/manager-dashboard.servic
     UiGridComponent,
     UiHeaderComponent,
     UiLabelComponent,
-    UiSurfaceComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./manager-dashboard-page.component.html",

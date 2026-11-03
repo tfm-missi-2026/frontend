@@ -7,21 +7,12 @@ import {
 import { ProjectsService } from "@features/projects/services/projects.service";
 import { SubprojectsService } from "@features/projects/services/subprojects.service";
 import { TasksService } from "@features/projects/services/tasks.service";
-import { UsersService } from "@features/users/services/users.service";
 import { VariationsService } from "@features/variations/services/variations.service";
 import { TeamLoadService } from "@features/team-load/services/team-load.service";
 
 import type { VariationType } from "@features/variations/models/variation";
 import { extractProblemMessage } from "@utils/problem-detail";
 import { compareIsoDateAsc, compareKeys } from "@utils/collections";
-import { todayIso } from "@utils/date";
-
-export interface AreaProjectStatus {
-  projectId: string;
-  code: string;
-  name: string;
-  statusTag: "En plazo" | "En riesgo" | "Retrasado";
-}
 
 export interface AlertOverload {
   resourceId: string;
@@ -34,6 +25,7 @@ export interface AreaTodoVariation {
   type: VariationType;
   taskName: string;
   ref: string;
+  projectName: string;
 }
 
 export interface AreaDashboardData {
@@ -46,10 +38,6 @@ export interface AreaDashboardData {
   teamAverageUtilizationPct: number;
   teamWorkloads: AlertOverload[];
   projectsTotal: number;
-  projectsBreakdown: AreaProjectStatus[];
-  enPlazoCount: number;
-  enRiesgoCount: number;
-  retrasadoCount: number;
   variationsTotal: number;
   pendingVariations: AreaTodoVariation[];
 }
@@ -59,7 +47,6 @@ export class AreaDashboardService {
   private readonly projectsService = inject(ProjectsService);
   private readonly subprojectsService = inject(SubprojectsService);
   private readonly tasksService = inject(TasksService);
-  private readonly usersService = inject(UsersService);
   private readonly variationsService = inject(VariationsService);
   private readonly teamLoadService = inject(TeamLoadService);
 
@@ -78,7 +65,6 @@ export class AreaDashboardService {
     this._loading.set(true);
     this._error.set(null);
     try {
-      const period = this._periodoPorDefecto();
       await Promise.all([
         this.projectsService.count() === 0
           ? this.projectsService.cargar()
@@ -93,30 +79,12 @@ export class AreaDashboardService {
           ? this.variationsService.cargar()
           : Promise.resolve(),
       ]);
-      // Carga inicial de carga del equipo con el periodo por defecto.
-      await this.teamLoadService.computeWorkloads({
-        fromIso: period.startIso,
-        toIso: period.endIso,
-      });
     } catch (err) {
       this._error.set(extractProblemMessage(err));
     } finally {
       this._loading.set(false);
     }
   }
-
-  private _periodoPorDefecto(): { startIso: string; endIso: string } {
-    // Mes calendario actual como rango default del dashboard del jefe de area.
-    const hoy = todayIso();
-    const [y, m] = hoy.split("-").map(Number);
-    const ultimoDia = new Date(y, m, 0).getDate();
-    const mm = String(m).padStart(2, "0");
-    return {
-      startIso: `${y}-${mm}-01`,
-      endIso: `${y}-${mm}-${String(ultimoDia).padStart(2, "0")}`,
-    };
-  }
-
 
   computeDashboard(
     managerId: string,
@@ -126,34 +94,10 @@ export class AreaDashboardService {
     const periodStart = period.startIso;
     const periodEnd = period.endIso;
 
-    const allUsers = this.usersService.users();
-    const totalUsersActive = allUsers.filter((u) => u.status === "active").length;
-
     const projects = this.projectsService
       .projects()
       .filter((p) => p.status === "active")
       .sort((a, b) => compareIsoDateAsc(a.startDate, b.startDate));
-
-    const projectStatuses: AreaProjectStatus[] = projects.map((p, idx) => {
-      const tag: AreaProjectStatus["statusTag"] =
-        idx === 0 ? "En riesgo" : idx === 1 ? "En plazo" : "Retrasado";
-      return {
-        projectId: p.id,
-        code: p.code,
-        name: p.name,
-        statusTag: tag,
-      };
-    });
-
-    const enPlazoCount = projectStatuses.filter(
-      (p) => p.statusTag === "En plazo",
-    ).length;
-    const enRiesgoCount = projectStatuses.filter(
-      (p) => p.statusTag === "En riesgo",
-    ).length;
-    const retrasadoCount = projectStatuses.filter(
-      (p) => p.statusTag === "Retrasado",
-    ).length;
 
     // Si el periodo del dashboard difiere del periodo cacheado, refrescar.
     if (
@@ -168,6 +112,7 @@ export class AreaDashboardService {
       });
     }
     const workloads = this.teamLoadService.workloads();
+    const totalUsersActive = workloads.length;
 
     const withPlan = workloads.filter((w) => w.hasPlan);
     const teamAverageUtilizationPct =
@@ -218,12 +163,23 @@ export class AreaDashboardService {
         return managerSubIds.has(task.subprojectId);
       })
       .sort((a, b) => compareIsoDateAsc(a.detectionDate, b.detectionDate))
-      .map((v) => ({
-        id: v.id,
-        type: v.type,
-        taskName: v.target?.label ?? "(sin tarea)",
-        ref: v.target?.ref ?? "",
-      }));
+      .map((v) => {
+        const subprojectId =
+          v.target?.kind === "subproject"
+            ? v.target.subprojectId
+            : v.target
+              ? this.tasksService.getById(v.target.taskId)?.subprojectId
+              : undefined;
+        const sub = allSubs.find((x) => x.id === subprojectId);
+        const project = projects.find((x) => x.id === sub?.projectId);
+        return {
+          id: v.id,
+          type: v.type,
+          taskName: v.target?.label ?? "(sin tarea)",
+          ref: v.target?.ref ?? "",
+          projectName: project?.name ?? "",
+        };
+      });
 
     return {
       managerId,
@@ -237,10 +193,6 @@ export class AreaDashboardService {
       teamAverageUtilizationPct,
       teamWorkloads: teamWorkloadsAll,
       projectsTotal: projects.length,
-      projectsBreakdown: projectStatuses,
-      enPlazoCount,
-      enRiesgoCount,
-      retrasadoCount,
       variationsTotal: pendingVariations.length,
       pendingVariations,
     };

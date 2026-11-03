@@ -243,12 +243,15 @@
         labelFor="report-detection"
         [required]="true"
       />
-      <UiInput
-        id="report-detection"
-        type="date"
+      <UiDatePicker
+        inputId="report-detection"
+        mode="single"
+        dateFormat="d/m/Y"
+        placeholder="dd/mm/aaaa"
+        className="max-w-55"
+        [max]="today"
         [value]="form().detectionDate"
         (valueChange)="onDetectionDateChange($event)"
-        className="max-w-55"
       />
     </UiFlex>
 

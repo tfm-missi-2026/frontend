@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
   inject,
   OnInit,
   signal,
@@ -80,25 +79,11 @@ export class TeamLoadListComponent implements OnInit {
     return opts;
   });
 
-  // Carga async disparada por effect cuando cambian los filtros.
   protected readonly workloads = this.teamLoadService.workloads;
 
   ngOnInit(): void {
     void this.projectsService.cargar();
-  }
-
-  constructor() {
-    effect(() => {
-      // Re-leer filtros (no usamos el valor, solo dispara el effect).
-      this.fromIso();
-      this.toIso();
-      this.projectId();
-      void this.teamLoadService.computeWorkloads({
-        fromIso: this.fromIso(),
-        toIso: this.toIso(),
-        projectId: this.projectId(),
-      });
-    });
+    this.onConsult();
   }
 
   protected readonly totalResources = computed<number>(
@@ -116,9 +101,15 @@ export class TeamLoadListComponent implements OnInit {
     return Math.round(sum / withPlan.length);
   });
 
-  protected readonly rangeLabel = computed<string>(
-    () => formatDateRange(this.fromIso(), this.toIso()),
-  );
+  private readonly consultedRange = signal<{ from: string; to: string }>({
+    from: "",
+    to: "",
+  });
+
+  protected readonly rangeLabel = computed<string>(() => {
+    const { from, to } = this.consultedRange();
+    return formatDateRange(from, to);
+  });
 
   protected onFromChange(value: string): void {
     this.fromIso.set(value);
@@ -133,9 +124,7 @@ export class TeamLoadListComponent implements OnInit {
   }
 
   protected onConsult(): void {
-    // El effect() detecta cambios via signals y dispara la consulta.
-    // Solo necesitamos forzar un bump para re-disparar si el usuario
-    // hace click sin haber cambiado ningun filtro.
+    this.consultedRange.set({ from: this.fromIso(), to: this.toIso() });
     void this.teamLoadService.computeWorkloads({
       fromIso: this.fromIso(),
       toIso: this.toIso(),

@@ -5,17 +5,15 @@ import {
   input,
 } from "@angular/core";
 
-import { UiFlexComponent } from "@shared/ui/flex";
-
 const MAX_FILL = 99;
 const DEFAULT_MARK_POS = 70;
 
 @Component({
   selector: "CommonProgressBar",
   standalone: true,
-  imports: [UiFlexComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./progress-bar.component.html",
+  host: { class: "block w-full min-w-0" },
 })
 export class CommonProgressBarComponent {
   readonly progressPct = input<number>(0);

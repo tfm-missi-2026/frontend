@@ -8,7 +8,6 @@ import {
 import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiLabelComponent } from "@shared/ui/label";
-import { IconChevronRightComponent } from "@shared/icons";
 
 import type { Role } from "../../models/role";
 
@@ -16,7 +15,6 @@ import type { Role } from "../../models/role";
   selector: "RoleListPanel",
   standalone: true,
   imports: [
-    IconChevronRightComponent,
     UiBadgeComponent,
     UiFlexComponent,
     UiLabelComponent,
@@ -44,6 +42,7 @@ export class RoleListPanelComponent {
   protected metaLine(r: Role): string {
     const total = this.totalModules();
     const kindLabel = r.sistema ? "Sistema" : "Personalizado";
-    return `${r.users} usuarios · ${r.permissions.length}/${total} módulos · ${kindLabel}`;
+    const users = r.users === 1 ? "1 usuario" : `${r.users} usuarios`;
+    return `${users} · ${r.permissions.length}/${total} módulos · ${kindLabel}`;
   }
 }

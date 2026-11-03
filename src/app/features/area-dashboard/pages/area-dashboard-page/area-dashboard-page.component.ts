@@ -16,12 +16,10 @@ import {
   DEFAULT_PERIOD_ID,
   type ManagerPeriod,
 } from "@shared/common";
-import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiGridComponent } from "@shared/ui/grid";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
-import { UiSurfaceComponent } from "@shared/ui/surface";
 
 import { AreaAlertsComponent } from "../../components/area-alerts/area-alerts.component";
 import { AreaLoadChartComponent } from "../../components/area-load-chart/area-load-chart.component";
@@ -36,12 +34,10 @@ import { AreaDashboardService } from "../../services/area-dashboard.service";
     CommonBreadcrumbComponent,
     CommonKpiCardComponent,
     CommonPeriodSelectorComponent,
-    UiBadgeComponent,
     UiFlexComponent,
     UiGridComponent,
     UiHeaderComponent,
     UiLabelComponent,
-    UiSurfaceComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./area-dashboard-page.component.html",

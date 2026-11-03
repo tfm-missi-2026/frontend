@@ -3,10 +3,10 @@
   padding="md"
   className="border-2 border-gray-300 dark:border-gray-700"
 >
-  <UiFlex direction="column" [gap]="16">
+  <UiFlex direction="column" [gap]="4" [noWrap]="true">
     <UiHeader [level]="4" text="Alertas" />
 
-    <UiFlex direction="column" [gap]="8">
+    <UiFlex direction="column" [gap]="2" [noWrap]="true">
       <UiLabel
         type="bodyXs"
         weight="medium"
@@ -21,56 +21,60 @@
           Sin recursos en sobrecarga en este período.
         </UiLabel>
       } @else {
-        @for (w of overloads(); track w.resourceId; let last = $last) {
-          <UiFlex
-            direction="row"
-            alignItems="center"
-            [gap]="8"
-            [className]="
-              last ? 'w-full' : 'w-full pb-2 border-b border-dashed border-gray-200 dark:border-gray-800'
-            "
-          >
-            <UiSurface
-              variant="neutral"
-              padding="none"
-              className="h-9 w-9 shrink-0 rounded-full bg-gray-100 dark:bg-gray-800"
-              ariaLabel="Avatar del recurso"
-            ></UiSurface>
-            <UiLabel
-              type="bodyS"
-              weight="bold"
-              color="textStrong"
-              className="flex-1 min-w-0 truncate"
-              [text]="w.resourceName"
-            />
-            <UiLabel
-              type="HeadingS"
-              weight="bold"
-              color="textStrong"
-              className="font-mono inline-flex items-center border-2 border-gray-400 rounded-md px-2 py-0.5 whitespace-nowrap dark:border-gray-600"
+        <UiFlex direction="column" [gap]="0" [noWrap]="true">
+          @for (w of overloads(); track w.resourceId; let last = $last) {
+            <UiFlex
+              direction="row"
+              alignItems="center"
+              justifyContent="between"
+              [gap]="3"
+              [noWrap]="true"
+              [className]="
+                last
+                  ? 'w-full py-2.5'
+                  : 'w-full py-2.5 border-b border-dashed border-gray-200 dark:border-gray-800'
+              "
             >
-              {{ w.utilizationPct }}%
-            </UiLabel>
-          </UiFlex>
-        }
+              <div class="flex-1 min-w-0 truncate">
+                <UiLabel
+                  type="bodyS"
+                  weight="semibold"
+                  color="textStrong"
+                  [text]="w.resourceName"
+                />
+              </div>
+              <UiLabel
+                type="bodyS"
+                weight="bold"
+                color="textStrong"
+                className="font-mono shrink-0 border-2 border-gray-400 rounded-md px-2 py-0.5 whitespace-nowrap dark:border-gray-600"
+              >
+                {{ w.utilizationPct }}%
+              </UiLabel>
+            </UiFlex>
+          }
+        </UiFlex>
       }
 
-      <UiLabel
-        type="bodyXs"
-        weight="medium"
-        color="textAction"
-        className="underline cursor-pointer"
+      <a
+        routerLink="/app/operacion/carga-equipo"
+        class="self-start text-xs font-medium text-brand-500 underline hover:text-brand-600 dark:text-brand-400"
       >
         Ir a Carga del equipo →
-      </UiLabel>
+      </a>
     </UiFlex>
 
-    <UiFlex direction="column" [gap]="8">
+    <UiFlex
+      direction="column"
+      [gap]="2"
+      [noWrap]="true"
+      className="border-t border-dashed border-gray-200 pt-4 dark:border-gray-800"
+    >
       <UiLabel
         type="bodyXs"
         weight="medium"
         color="textWeak"
-        className="uppercase border-t border-dashed border-gray-200 pt-3 dark:border-gray-800"
+        className="uppercase"
       >
         Variaciones por resolver
       </UiLabel>
@@ -80,38 +84,43 @@
           Sin variaciones pendientes en el área.
         </UiLabel>
       } @else {
-        @for (v of variations(); track v.id; let last = $last) {
-          <UiFlex
-            direction="row"
-            alignItems="center"
-            [gap]="8"
-            [className]="
-              last ? 'w-full' : 'w-full pb-2 border-b border-dashed border-gray-200 dark:border-gray-800'
-            "
-          >
-            <UiBadge variant="solid" color="dark" size="sm">
-              {{ v.type }}
-            </UiBadge>
-            <UiLabel
-              type="bodyS"
-              weight="semibold"
-              color="textStrong"
-              className="flex-1 min-w-0"
+        <UiFlex direction="column" [gap]="0" [noWrap]="true">
+          @for (v of variations(); track v.id; let last = $last) {
+            <UiFlex
+              direction="row"
+              alignItems="center"
+              [gap]="3"
+              [noWrap]="true"
+              [className]="
+                last
+                  ? 'w-full py-2.5'
+                  : 'w-full py-2.5 border-b border-dashed border-gray-200 dark:border-gray-800'
+              "
             >
-              {{ v.taskName }}{{ v.ref ? ' · ' + v.ref : '' }}
-            </UiLabel>
-          </UiFlex>
-        }
+              <div class="flex w-20 shrink-0">
+                <UiBadge variant="solid" color="dark" size="sm">
+                  {{ v.type }}
+                </UiBadge>
+              </div>
+              <UiFlex direction="column" [gap]="0" [noWrap]="true" className="flex-1 min-w-0">
+                <UiLabel type="bodyS" weight="semibold" color="textStrong">
+                  {{ v.taskName }}{{ v.ref ? ' · ' + v.ref : '' }}
+                </UiLabel>
+                @if (v.projectName) {
+                  <UiLabel type="bodyXs" color="textWeak" [text]="v.projectName" />
+                }
+              </UiFlex>
+            </UiFlex>
+          }
+        </UiFlex>
       }
 
-      <UiLabel
-        type="bodyXs"
-        weight="medium"
-        color="textAction"
-        className="underline cursor-pointer"
+      <a
+        routerLink="/app/operacion/variaciones"
+        class="self-start text-xs font-medium text-brand-500 underline hover:text-brand-600 dark:text-brand-400"
       >
         Ir a Variaciones →
-      </UiLabel>
+      </a>
     </UiFlex>
   </UiFlex>
 </UiSurface>

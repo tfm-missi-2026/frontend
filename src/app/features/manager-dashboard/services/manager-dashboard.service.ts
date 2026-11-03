@@ -27,6 +27,7 @@ export interface TodoVariation {
   type: VariationType;
   taskName: string;
   ref: string;
+  projectName: string;
 }
 
 export interface TodoDueTask {
@@ -205,12 +206,23 @@ export class ManagerDashboardService {
         return managerSubIds.has(task.subprojectId);
       })
       .sort((a, b) => compareIsoDateAsc(a.detectionDate, b.detectionDate))
-      .map((v) => ({
-        id: v.id,
-        type: v.type,
-        taskName: v.target?.label ?? "(sin tarea)",
-        ref: v.target?.ref ?? "",
-      }));
+      .map((v) => {
+        const subprojectId =
+          v.target?.kind === "subproject"
+            ? v.target.subprojectId
+            : v.target
+              ? this.tasksService.getById(v.target.taskId)?.subprojectId
+              : undefined;
+        const sub = allSubprojects.find((s) => s.id === subprojectId);
+        const project = projects.find((p) => p.id === sub?.projectId);
+        return {
+          id: v.id,
+          type: v.type,
+          taskName: v.target?.label ?? "(sin tarea)",
+          ref: v.target?.ref ?? "",
+          projectName: project?.name ?? "",
+        };
+      });
 
     const today = todayUtc();
     const soonMs = SOON_DAYS * 86_400_000;

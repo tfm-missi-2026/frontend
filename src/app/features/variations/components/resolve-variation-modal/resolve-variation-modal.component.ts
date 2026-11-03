@@ -17,7 +17,6 @@ import { UiGridComponent } from "@shared/ui/grid";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
 import { UiRadioComponent } from "@shared/ui/radio";
-import { UiSurfaceComponent } from "@shared/ui/surface";
 import { UiTextAreaComponent } from "@shared/ui/text-area";
 
 import {
@@ -43,7 +42,6 @@ export type ResolveMode = "resolve" | "view";
     UiLabelComponent,
     UiModalComponent,
     UiRadioComponent,
-    UiSurfaceComponent,
     UiTextAreaComponent,
     VariationReadOnlyBlockComponent,
   ],
@@ -61,9 +59,15 @@ export class ResolveVariationModalComponent {
 
   protected readonly form = signal<ResolveVariationFormData>(emptyResolveForm());
 
-  protected readonly canSubmit = computed<boolean>(
-    () => this.form().decision !== null,
+  protected readonly isRejecting = computed<boolean>(
+    () => this.form().decision === "Rechazada",
   );
+
+  protected readonly canSubmit = computed<boolean>(() => {
+    const f = this.form();
+    if (f.decision === null) return false;
+    return f.decision !== "Rechazada" || f.observation.trim().length > 0;
+  });
 
   constructor() {
     effect(() => {

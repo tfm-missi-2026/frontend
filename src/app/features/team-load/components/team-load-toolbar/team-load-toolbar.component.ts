@@ -10,7 +10,6 @@ import { UiButtonComponent } from "@shared/ui/button";
 import { UiDatePickerComponent } from "@shared/ui/date-picker";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiFormLabelComponent } from "@shared/ui/form-label";
-import { UiLabelComponent } from "@shared/ui/label";
 import { UiSelectComponent } from "@shared/ui/select";
 import { UiSurfaceComponent } from "@shared/ui/surface";
 import type { SelectOption } from "@shared/ui/select";
@@ -37,7 +36,6 @@ const MES = mesActual();
     UiDatePickerComponent,
     UiFlexComponent,
     UiFormLabelComponent,
-    UiLabelComponent,
     UiSelectComponent,
     UiSurfaceComponent,
   ],

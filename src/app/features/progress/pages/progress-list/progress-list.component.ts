@@ -93,17 +93,6 @@ export class ProgressListComponent {
     });
   }
 
-  protected readonly totalDeviationHours = computed<number>(() =>
-    this.progress().rows.reduce((acc, r) => acc + r.deviationHours, 0),
-  );
-
-  protected readonly totalLabel = computed<string>(() => {
-    const p = this.progress();
-    const dev = this.totalDeviationHours();
-    const sign = dev > 0 ? "+" : "";
-    return `${p.loggedHours} / ${p.estimatedHours} h · ${sign}${dev} h`;
-  });
-
   protected onProjectChange(value: string | null): void {
     if (value) this.selectedProjectId.set(value);
   }

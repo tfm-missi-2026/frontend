@@ -170,6 +170,25 @@
     }
   </div>
 
+  @if (selectedTaskSituation(); as situation) {
+    <div class="mb-4">
+      @if (situation === "Culminado") {
+        <UiLabel type="bodyS" color="textWeak" text="Tarea culminada." />
+      } @else {
+        <label
+          class="flex cursor-pointer items-center gap-2 text-sm text-gray-700 dark:text-gray-300"
+        >
+          <input
+            type="checkbox"
+            [checked]="finishTask()"
+            (change)="onFinishTaskChange($event)"
+          />
+          Con este bloque terminé la tarea
+        </label>
+      }
+    </div>
+  }
+
   @if (formError(); as msg) {
     <UiAlert variant="error" [message]="msg" className="mb-4" />
   }

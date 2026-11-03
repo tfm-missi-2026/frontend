@@ -13,7 +13,7 @@
     (selectedChange)="modeChange.emit($event)"
   />
 
-  <UiFlex direction="row" alignItems="center" [gap]="0">
+  <UiFlex direction="row" alignItems="center" [gap]="1" [noWrap]="true">
     <UiIconButton
       [Icon]="IconChevronLeftComponent"
       variant="tertiary"
@@ -21,20 +21,14 @@
       labelText="Día anterior"
       (click)="onPrev()"
     />
-    <UiFlex
-      direction="column"
-      alignItems="center"
-      justifyContent="center"
-      [gap]="0"
-      className="border-x border-gray-200 px-5 py-1 dark:border-gray-700 min-w-30"
-    >
-      <UiLabel type="bodyS" weight="semibold" color="textStrong">
-        {{ displayLabel() }}
-      </UiLabel>
-      <UiLabel type="bodyXs" color="textWeak">
-        {{ dowLabel() }}
-      </UiLabel>
-    </UiFlex>
+    <UiDatePicker
+      width="w-40! shrink-0"
+      dateFormat="d/m/Y"
+      placeholder="Elegir fecha"
+      [value]="date()"
+      [dayMark]="loggedDayMark()"
+      (valueChange)="onPickDate($event)"
+    />
     <UiIconButton
       [Icon]="IconChevronRightComponent"
       variant="tertiary"
@@ -42,6 +36,9 @@
       labelText="Día siguiente"
       (click)="onNext()"
     />
+    <UiLabel type="bodyS" color="textWeak" className="min-w-20">
+      {{ dowLabel() }}
+    </UiLabel>
   </UiFlex>
 
   <UiFlex direction="row" [gap]="0" className="flex-1" />
