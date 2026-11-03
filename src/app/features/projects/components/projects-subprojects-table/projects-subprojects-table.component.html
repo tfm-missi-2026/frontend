@@ -125,10 +125,10 @@
                     [Icon]="trashIcon"
                     variant="secondary"
                     styleType="danger"
-                    tooltip="Dar de baja"
+                    [tooltip]="frozenIds().has(s.id) ? 'Subproyecto congelado' : 'Dar de baja'"
                     tooltipSide="top"
                     labelText="Dar de baja"
-                    [disabled]="!s.active"
+                    [disabled]="!s.active || frozenIds().has(s.id)"
                     (click)="deactivate.emit(s)"
                   />
                 </UiFlex>

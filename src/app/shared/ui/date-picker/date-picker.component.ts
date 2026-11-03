@@ -31,7 +31,7 @@ import { IconCalendar24Component } from "@shared/icons";
 import { UiFormLabelComponent } from "@shared/ui/form-label/form-label.component";
 import { UiLabelComponent } from "@shared/ui/label/label.component";
 import { getFocusStyling } from "@utils/styling";
-import type { DatePickerMode } from "./date-picker.types";
+import type { DatePickerDayMark, DatePickerMode } from "./date-picker.types";
 
 /**
  * `UiDatePicker`
@@ -84,6 +84,12 @@ export class UiDatePickerComponent
   readonly width = input<string | undefined>(undefined);
   readonly legend = input<string | undefined>(undefined);
   readonly className = input<string>("");
+  readonly isDateDisabled = input<((iso: string) => boolean) | undefined>(
+    undefined,
+  );
+  readonly dayMark = input<
+    ((iso: string) => DatePickerDayMark | null) | undefined
+  >(undefined);
 
   /** Valor controlado (string en single/range start, string[] en multiple/range). */
   readonly value = input<string | string[] | undefined>(undefined);
@@ -116,6 +122,12 @@ export class UiDatePickerComponent
       if (!this.flatpickrInstance) return;
       if (valueKey(next) === valueKey(this.modelValue)) return;
       this.applyValue(next);
+    });
+
+    effect(() => {
+      this.isDateDisabled();
+      this.dayMark();
+      this.flatpickrInstance?.redraw();
     });
   }
 
@@ -162,6 +174,14 @@ export class UiDatePickerComponent
       minDate: this.min() ?? undefined,
       maxDate: this.max() ?? undefined,
       clickOpens: !this.disabled() && !this.readOnly(),
+      allowInvalidPreload: true,
+      disable: [(date) => this.isDateDisabled()?.(toIsoDate(date)) ?? false],
+      onDayCreate: (_dates, _str, _instance, dayElem) => {
+        const mark = this.dayMark()?.(toIsoDate(dayElem.dateObj));
+        if (!mark) return;
+        dayElem.classList.add(mark.className);
+        dayElem.title = mark.title;
+      },
       onChange: (selectedDates, dateStr) => {
         // `dateStr` viene formateado segun `dateFormat` (presentacion). Hacia
         // afuera siempre se emite ISO, que es el contrato documentado en

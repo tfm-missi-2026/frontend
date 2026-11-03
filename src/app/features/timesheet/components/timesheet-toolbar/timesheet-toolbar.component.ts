@@ -14,13 +14,12 @@ import {
   CommonTabGroupComponent,
   type CommonTabOption,
 } from "@shared/common/tab-group";
-import { UiDatePickerComponent } from "@shared/ui/date-picker";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiIconButtonComponent } from "@shared/ui/icon-button";
 import { UiLabelComponent } from "@shared/ui/label";
 import { parseIsoDate, toIsoDate } from "@utils/date";
 
-export type TimesheetViewMode = "day" | "range";
+export type TimesheetViewMode = "month" | "day";
 
 const DAY_NAMES_ES = [
   "domingo",
@@ -55,7 +54,7 @@ function formatLong(iso: string): string {
 
 const VIEW_TABS: CommonTabOption<TimesheetViewMode>[] = [
   { value: "day", label: "Por día" },
-  { value: "range", label: "Por rango" },
+  { value: "month", label: "Por mes" },
 ];
 
 @Component({
@@ -63,7 +62,6 @@ const VIEW_TABS: CommonTabOption<TimesheetViewMode>[] = [
   standalone: true,
   imports: [
     CommonTabGroupComponent,
-    UiDatePickerComponent,
     UiFlexComponent,
     UiIconButtonComponent,
     UiLabelComponent,
@@ -74,11 +72,9 @@ const VIEW_TABS: CommonTabOption<TimesheetViewMode>[] = [
 export class TimesheetToolbarComponent {
   readonly mode = input<TimesheetViewMode>("day");
   readonly date = input<string>("");
-  readonly range = input<string[]>([]);
 
   readonly modeChange = output<TimesheetViewMode>();
   readonly dateChange = output<string>();
-  readonly rangeChange = output<string[]>();
 
   protected readonly viewTabs = VIEW_TABS;
   protected readonly IconChevronLeftComponent = IconChevronLeftComponent;
@@ -102,52 +98,18 @@ export class TimesheetToolbarComponent {
     return DAY_NAMES_ES[d.getDay()];
   });
 
-  protected readonly rangeLabel = computed<string>(() => {
-    const r = this.range();
-    if (!r || r.length === 0) return "Selecciona un rango";
-    if (r.length === 1) return formatLong(r[0]);
-    return `${formatLong(r[0])} – ${formatLong(r[r.length - 1])}`;
-  });
-
   protected onPrev(): void {
-    if (this.mode() === "day") {
-      const d = parseIsoDate(this.date());
-      if (!d) return;
-      d.setDate(d.getDate() - 1);
-      this.dateChange.emit(toIsoDate(d));
-    } else {
-      const r = this.range();
-      if (!r.length) return;
-      const start = parseIsoDate(r[0]);
-      if (!start) return;
-      start.setDate(start.getDate() - 7);
-      const end = parseIsoDate(r[r.length - 1] ?? r[0]);
-      if (end) end.setDate(end.getDate() - 7);
-      this.rangeChange.emit([toIsoDate(start), toIsoDate(end ?? start)]);
-    }
+    const d = parseIsoDate(this.date());
+    if (!d) return;
+    d.setDate(d.getDate() - 1);
+    this.dateChange.emit(toIsoDate(d));
   }
 
   protected onNext(): void {
-    if (this.mode() === "day") {
-      const d = parseIsoDate(this.date());
-      if (!d) return;
-      d.setDate(d.getDate() + 1);
-      this.dateChange.emit(toIsoDate(d));
-    } else {
-      const r = this.range();
-      if (!r.length) return;
-      const start = parseIsoDate(r[0]);
-      if (!start) return;
-      start.setDate(start.getDate() + 7);
-      const end = parseIsoDate(r[r.length - 1] ?? r[0]);
-      if (end) end.setDate(end.getDate() + 7);
-      this.rangeChange.emit([toIsoDate(start), toIsoDate(end ?? start)]);
-    }
-  }
-
-  protected asStringArray(value: string | string[]): string[] {
-    if (Array.isArray(value)) return value;
-    return value ? [value] : [];
+    const d = parseIsoDate(this.date());
+    if (!d) return;
+    d.setDate(d.getDate() + 1);
+    this.dateChange.emit(toIsoDate(d));
   }
 }
 

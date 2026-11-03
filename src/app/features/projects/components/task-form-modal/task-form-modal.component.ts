@@ -8,7 +8,6 @@ import {
   output,
   signal,
 } from "@angular/core";
-import { FormsModule } from "@angular/forms";
 
 import { UiAlertComponent } from "@shared/ui/alert";
 import { UiButtonComponent } from "@shared/ui/button";
@@ -19,10 +18,8 @@ import { UiGridComponent } from "@shared/ui/grid";
 import { UiInputComponent } from "@shared/ui/input";
 import { UiLabelComponent } from "@shared/ui/label";
 import { UiModalComponent } from "@shared/ui/modal";
-import { UiSelectComponent } from "@shared/ui/select";
 import { UiTextAreaComponent } from "@shared/ui/text-area";
 
-import { CatalogService } from "@features/catalog/services/catalog.service";
 import { ToastService } from "@core/http/toast.service";
 
 import {
@@ -40,7 +37,6 @@ const WORKDAY_HOURS = 8;
   selector: "TaskFormModal",
   standalone: true,
   imports: [
-    FormsModule,
     UiAlertComponent,
     UiButtonComponent,
     UiFieldErrorComponent,
@@ -50,26 +46,13 @@ const WORKDAY_HOURS = 8;
     UiInputComponent,
     UiLabelComponent,
     UiModalComponent,
-    UiSelectComponent,
     UiTextAreaComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./task-form-modal.component.html",
 })
 export class TaskFormModalComponent {
-  private readonly catalogService = inject(CatalogService);
   private readonly toastService = inject(ToastService);
-
-  // Transiciones validas de situacion (mismo esquema que Subproyectos).
-  // Nombres tal cual el catalogo backend (sin acentos, "En atencion").
-  private static readonly SITUATION_TRANSITIONS: Readonly<
-    Record<string, readonly string[]>
-  > = {
-    Pendiente: ["En atencion", "Rechazado"],
-    "En atencion": ["Culminado", "Rechazado"],
-    Culminado: [],
-    Rechazado: [],
-  };
 
   readonly isOpen = input<boolean>(false);
   readonly mode = input<TaskFormMode>("create");
@@ -86,36 +69,6 @@ export class TaskFormModalComponent {
   protected readonly nameError = signal<string | null>(null);
   protected readonly daysError = signal<string | null>(null);
   protected readonly hoursError = signal<string | null>(null);
-  protected readonly situationError = signal<string | null>(null);
-
-  private readonly situationCatalogItems = computed(() =>
-    this.catalogService.byGroup("SIT"),
-  );
-
-  private situationName(id: string): string | undefined {
-    return this.situationCatalogItems().find((i) => i.id === id)?.name;
-  }
-
-  protected readonly situationOptions = computed(() => {
-    const current = this.task()?.situationId ?? "";
-    const currentName = this.situationName(current);
-    const allowedNames = new Set<string>(
-      currentName
-        ? TaskFormModalComponent.SITUATION_TRANSITIONS[currentName] ?? []
-        : [],
-    );
-    return this.situationCatalogItems()
-      .filter((i) => i.id === current || allowedNames.has(i.name))
-      .map((i) => ({ value: i.id, label: i.name }));
-  });
-
-  protected readonly isSituationTerminal = computed<boolean>(() => {
-    const currentName = this.situationName(this.task()?.situationId ?? "");
-    return (
-      !!currentName &&
-      (TaskFormModalComponent.SITUATION_TRANSITIONS[currentName]?.length ?? 0) === 0
-    );
-  });
 
   protected readonly heading = computed<string>(() => {
     if (this.mode() === "create") return "Nueva tarea";
@@ -153,12 +106,6 @@ export class TaskFormModalComponent {
     this.nameError.set(null);
     this.daysError.set(null);
     this.hoursError.set(null);
-    this.situationError.set(null);
-  }
-
-  protected onSituationChange(value: unknown): void {
-    this.patch({ situationId: value == null ? "" : String(value) });
-    this.situationError.set(null);
   }
 
   protected onNameChange(value: string): void {
@@ -231,9 +178,8 @@ export class TaskFormModalComponent {
     this.nameError.set(errors.name);
     this.daysError.set(errors.days);
     this.hoursError.set(errors.hours);
-    this.situationError.set(errors.situation);
 
-    if (errors.name || errors.days || errors.hours || errors.situation) {
+    if (errors.name || errors.days || errors.hours) {
       this.validationMessage.set(
         "Revisa los campos marcados antes de guardar.",
       );
@@ -262,18 +208,15 @@ export class TaskFormModalComponent {
     name: string | null;
     days: string | null;
     hours: string | null;
-    situation: string | null;
   } {
     const errors = {
       name: null,
       days: null,
       hours: null,
-      situation: null,
     } as {
       name: string | null;
       days: string | null;
       hours: string | null;
-      situation: string | null;
     };
     if (!form.name.trim()) errors.name = "El nombre es obligatorio.";
     if (!form.estimatedDays) {
@@ -288,9 +231,6 @@ export class TaskFormModalComponent {
         form.estimatedHours,
         form.estimatedDays,
       );
-    }
-    if (this.mode() === "edit" && !form.situationId) {
-      errors.situation = "Selecciona una situación.";
     }
     return errors;
   }

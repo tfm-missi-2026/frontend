@@ -19,13 +19,17 @@ import { UiButtonComponent } from "@shared/ui/button";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
-import { UiSurfaceComponent } from "@shared/ui/surface";
+import { UiModalComponent } from "@shared/ui/modal";
 
 import {
   EntryFormModalComponent,
   type EntryFormPayload,
 } from "../../components/entry-form-modal/entry-form-modal.component";
 import { TimesheetTimelineComponent } from "../../components/timesheet-timeline/timesheet-timeline.component";
+import {
+  TimesheetMonthCalendarComponent,
+  type TimesheetPlannedTask,
+} from "../../components/timesheet-month-calendar/timesheet-month-calendar.component";
 import {
   TimesheetToolbarComponent,
   type TimesheetViewMode,
@@ -44,6 +48,7 @@ import { TIMESHEET_INITIAL_DATE, TimesheetService } from "../../services/timeshe
   imports: [
     CommonBreadcrumbComponent,
     EntryFormModalComponent,
+    TimesheetMonthCalendarComponent,
     TimesheetTimelineComponent,
     TimesheetToolbarComponent,
     UiAlertComponent,
@@ -51,7 +56,7 @@ import { TIMESHEET_INITIAL_DATE, TimesheetService } from "../../services/timeshe
     UiFlexComponent,
     UiHeaderComponent,
     UiLabelComponent,
-    UiSurfaceComponent,
+    UiModalComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./my-timesheet.component.html",
@@ -111,41 +116,37 @@ export class MyTimesheetComponent implements OnInit {
 
   protected readonly mode = signal<TimesheetViewMode>("day");
   protected readonly date = signal<string>(TIMESHEET_INITIAL_DATE);
-  protected readonly range = signal<string[]>([]);
 
   protected readonly entries = this.timesheetService.entries;
 
+  protected readonly plannedTasks = computed<TimesheetPlannedTask[]>(() => {
+    const usuarioId = this.auth.usuario()?.id;
+    const tasks = this.tasksService.tasks();
+    return this.assignmentsService
+      .assignments()
+      .filter((a) => a.active && a.resourceId === usuarioId)
+      .map((a) => ({
+        id: a.id,
+        name: tasks.find((t) => t.id === a.taskId)?.name ?? "Tarea",
+        startDate: a.startDate,
+        endDate: a.endDate,
+      }));
+  });
+
   protected readonly visibleEntries = computed<TimesheetEntry[]>(() => {
-    const all = this.entries();
-    if (this.mode() === "day") {
-      const d = this.date();
-      return all.filter((e) => e.date === d);
-    }
-    const r = this.range();
-    if (r.length < 2) return all;
-    const [from, to] = [r[0], r[r.length - 1]];
-    return all.filter((e) => e.date >= from && e.date <= to);
+    const d = this.date();
+    return this.entries().filter((e) => e.date === d);
   });
 
   protected readonly timelineHeading = computed<string>(() => {
-    if (this.mode() === "day") {
-      const d = parseTimesheetIsoDate(this.date());
-      const day = d ? TIMESHEET_DAY_NAMES[d.getDay()] : "";
-      const iso = this.date();
-      const [y, m, dd] = iso.split("-");
-      const pretty = dd && m && y ? `${dd}/${m}/${y}` : iso;
-      return day
-        ? `Bloques del día · ${pretty} · ${day}`
-        : `Bloques del día · ${pretty}`;
-    }
-    const r = this.range();
-    if (!r || r.length === 0) return "Bloques del rango";
-    const [from, to] = [r[0], r[r.length - 1]];
-    const pretty = (iso: string): string => {
-      const [y, m, dd] = iso.split("-");
-      return dd && m && y ? `${dd}/${m}/${y}` : iso;
-    };
-    return `Bloques del rango · ${pretty(from)} – ${pretty(to)}`;
+    const d = parseTimesheetIsoDate(this.date());
+    const day = d ? TIMESHEET_DAY_NAMES[d.getDay()] : "";
+    const iso = this.date();
+    const [y, m, dd] = iso.split("-");
+    const pretty = dd && m && y ? `${dd}/${m}/${y}` : iso;
+    return day
+      ? `Bloques del día · ${pretty} · ${day}`
+      : `Bloques del día · ${pretty}`;
   });
 
   protected readonly formOpen = signal<boolean>(false);
@@ -155,10 +156,6 @@ export class MyTimesheetComponent implements OnInit {
   protected readonly showAlert = signal<string | null>(null);
 
   protected onModeChange(m: TimesheetViewMode): void {
-    if (m === "range" && this.range().length === 0) {
-      const d = this.date();
-      this.range.set([d, d]);
-    }
     this.mode.set(m);
   }
 
@@ -166,8 +163,16 @@ export class MyTimesheetComponent implements OnInit {
     if (iso) this.date.set(iso);
   }
 
-  protected onRangeChange(r: string[]): void {
-    this.range.set(r);
+  protected onCalendarDayClick(iso: string): void {
+    this.mode.set("day");
+    this.date.set(iso);
+    this.openCreate();
+  }
+
+  protected onCalendarEntryClick(entry: TimesheetEntry): void {
+    this.mode.set("day");
+    this.date.set(entry.date);
+    this.openEdit(entry);
   }
 
   protected openCreate(): void {
@@ -195,20 +200,32 @@ export class MyTimesheetComponent implements OnInit {
   }
 
   private async guardarEntrada(payload: EntryFormPayload): Promise<void> {
-    const data = await this.resolverActividad(payload.data);
+    const previousActivityId = payload.id
+      ? this.entries().find((e) => e.id === payload.id)?.activityId
+      : undefined;
+    const data = await this.resolverActividad(payload.data, previousActivityId);
     if (!data) return;
     if (payload.mode === "create") {
       const created = await this.timesheetService.create(data);
       if (created) this.flashAlert("Bloque registrado correctamente.");
     } else if (payload.id) {
       const updated = await this.timesheetService.update(payload.id, data);
-      if (updated) this.flashAlert("Bloque actualizado correctamente.");
+      if (updated) {
+        this.flashAlert("Bloque actualizado correctamente.");
+        if (previousActivityId && data.kind === "task") {
+          await this.actividadesService.eliminar(
+            previousActivityId,
+            "El bloque de bitacora paso a ser de tarea",
+          );
+        }
+      }
     }
     this.formOpen.set(false);
   }
 
   private async resolverActividad(
     data: EntryFormPayload["data"],
+    previousActivityId?: string,
   ): Promise<EntryFormPayload["data"] | null> {
     if (data.kind !== "activity") return data;
 
@@ -222,18 +239,24 @@ export class MyTimesheetComponent implements OnInit {
     if (!tipo || !organizadorId || !modalidad) return null;
 
     const titulo = data.description.trim() || tipo.name;
-    const creada = await this.actividadesService.crear({
+    const previa = previousActivityId
+      ? this.actividadesService.buscarPorId(previousActivityId)
+      : undefined;
+    const body = {
       tipoActividadId: tipo.id,
-      modalidadId: modalidad.id,
+      modalidadId: previa?.modalidadId ?? modalidad.id,
       titulo: titulo.slice(0, 200),
       descripcion: data.description.trim() || null,
       fecha: data.date,
       horaInicio: data.startTime,
       horaFin: data.endTime,
-      organizadorId,
-    });
-    if (!creada) return null;
-    return { ...data, activity: creada.id };
+      organizadorId: previa?.organizadorId ?? organizadorId,
+    };
+    const guardada = previa
+      ? await this.actividadesService.actualizar(previa.id, body)
+      : await this.actividadesService.crear(body);
+    if (!guardada) return null;
+    return { ...data, activity: guardada.titulo, activityId: guardada.id };
   }
 
   protected async onDeleteEntry(entry: TimesheetEntry): Promise<void> {

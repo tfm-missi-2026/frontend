@@ -26,7 +26,9 @@
     [rows]="rows()"
     emptyText="No hay variaciones con esos filtros. Ajusta los filtros o reporta una nueva variación."
     (view)="onView($event)"
+    [canDelete]="canDelete()"
     (resolve)="onResolve($event)"
+    (remove)="deleteTarget.set($event)"
   />
 
   @if (rows().length > 0) {
@@ -58,7 +60,7 @@
           </UiBadge>
         </UiFlex>
         <UiLabel type="bodyXs" color="textWeak">
-          "Resolver" solo activo en variaciones Pendientes.
+          "Resolver" y "Eliminar" solo activos en variaciones Pendientes.
         </UiLabel>
       </UiFlex>
     </UiSurface>
@@ -76,9 +78,20 @@
   </UiSurface>
 </UiFlex>
 
+@if (deleteTarget(); as v) {
+  <DeleteVariationDialog
+    [variation]="v"
+    [saving]="deleteSaving()"
+    (confirm)="onDeleteConfirm(v, $event)"
+    (cancel)="deleteTarget.set(null)"
+  />
+}
+
 <ReportVariationModal
   [isOpen]="reportOpen()"
-  [targetOptions]="targetOptions()"
+  [projects]="projectOptions()"
+  [subprojects]="subprojectOptions()"
+  [tasks]="taskOptions()"
   [reportedBy]="currentReporter()"
   (save)="onReportSubmit($event)"
   (close)="closeReport()"

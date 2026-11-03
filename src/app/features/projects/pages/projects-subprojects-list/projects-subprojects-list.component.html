@@ -91,6 +91,7 @@
     } @else {
       <ProjectsSubprojectsTable
         [subprojects]="visibleSubprojects()"
+        [frozenIds]="frozenSubprojectIds()"
         (view)="onView($event)"
         (edit)="onEdit($event)"
         (deactivate)="onDeactivate($event)"

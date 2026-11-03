@@ -8,3 +8,8 @@ export type DatePickerMode = "single" | "multiple" | "range";
  * `multiple`/`range`).
  */
 export type DatePickerValue = string | string[];
+
+export interface DatePickerDayMark {
+  className: string;
+  title: string;
+}

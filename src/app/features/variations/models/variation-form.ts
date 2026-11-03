@@ -1,3 +1,4 @@
+import { todayIso } from "@utils/date";
 import type {
   VariationStatus,
   VariationTarget,
@@ -27,7 +28,7 @@ export function emptyVariationForm(): VariationFormData {
     justification: "",
     previousValue: "",
     newValue: "",
-    detectionDate: "",
+    detectionDate: todayIso(),
   };
 }
 

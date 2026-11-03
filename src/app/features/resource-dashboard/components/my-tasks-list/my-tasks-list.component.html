@@ -20,27 +20,31 @@
         <UiFlex
           direction="row"
           alignItems="center"
-          [gap]="12"
+          [gap]="8"
+          [noWrap]="true"
           [className]="
             last
               ? 'w-full'
               : 'w-full pb-2 border-b border-dashed border-gray-200 dark:border-gray-800'
           "
         >
-          <UiLabel
-            type="bodyS"
-            weight="bold"
-            color="textStrong"
-            className="flex-1 min-w-0 truncate"
-            [text]="t.taskName"
-          />
-          <UiLabel
-            type="bodyXs"
-            weight="medium"
-            color="textWeak"
-            className="font-mono whitespace-nowrap"
-            [text]="t.ref"
-          />
+          <UiFlex direction="column" [gap]="0" [noWrap]="true" className="flex-1 min-w-0">
+            <UiLabel
+              type="bodyS"
+              weight="bold"
+              color="textStrong"
+              [text]="t.taskName"
+            />
+            @if (t.ref) {
+              <UiLabel
+                type="bodyXs"
+                weight="medium"
+                color="textWeak"
+                className="font-mono"
+                [text]="t.ref"
+              />
+            }
+          </UiFlex>
           <UiBadge
             variant="light"
             [color]="situationColor(t.situation)"
@@ -52,10 +56,20 @@
             type="bodyS"
             weight="bold"
             color="textStrong"
-            className="min-w-16 text-right font-mono whitespace-nowrap"
+            className="text-right font-mono whitespace-nowrap"
           >
             {{ t.loggedHours }}/{{ t.plannedHours }}
           </UiLabel>
+          @if (nextAction(t.situation); as action) {
+            <UiButton
+              variant="secondary"
+              size="sm"
+              [label]="action.label"
+              [labelText]="action.label + ' tarea'"
+              [disabled]="saving()"
+              (click)="advance.emit({ task: t, situation: action.situation })"
+            />
+          }
         </UiFlex>
       }
     }

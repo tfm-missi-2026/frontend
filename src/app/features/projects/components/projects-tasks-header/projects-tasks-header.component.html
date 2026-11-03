@@ -5,11 +5,13 @@
         {{ subproject().type }}
       </UiBadge>
 
-      <UiLabel
-        className="font-mono font-bold tracking-wide px-3 py-1 rounded-md border border-gray-300 bg-gray-50 text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 text-xs"
-      >
-        #{{ subproject().ticket ?? "—" }}
-      </UiLabel>
+      @if (subproject().ticket; as ticket) {
+        <UiLabel
+          className="font-mono font-bold tracking-wide px-3 py-1 rounded-md border border-gray-300 bg-gray-50 text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 text-xs"
+        >
+          #{{ ticket }}
+        </UiLabel>
+      }
 
       <UiBadge variant="light" [color]="priorityColor()" size="sm">
         <span class="mr-1">{{ priorityArrow() }}</span>
@@ -24,11 +26,17 @@
     <UiHeader [level]="3" [text]="subproject().description" className="text-xl" />
 
     <UiLabel type="bodyS" color="textWeak">
-      Solicitante:
-      <strong class="font-semibold text-gray-800 dark:text-white/90">{{ subproject().requester || "—" }}</strong>
-      · Fecha de solicitud:
-      <strong class="font-semibold text-gray-800 dark:text-white/90">{{ formatRequestDate() }}</strong>
-      · Proyecto:
+      @if (subproject().requester) {
+        Solicitante:
+        <strong class="font-semibold text-gray-800 dark:text-white/90">{{ subproject().requester }}</strong>
+        ·
+      }
+      @if (subproject().requestDate) {
+        Fecha de solicitud:
+        <strong class="font-semibold text-gray-800 dark:text-white/90">{{ formatRequestDate() }}</strong>
+        ·
+      }
+      Proyecto:
       <strong class="font-semibold text-gray-800 dark:text-white/90">{{ projectName() || "—" }}</strong>
     </UiLabel>
   </UiFlex>

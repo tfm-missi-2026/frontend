@@ -1,6 +1,9 @@
 import { Injectable, inject, signal } from "@angular/core";
+import { firstValueFrom } from "rxjs";
 
 import { type ManagerPeriod } from "@shared/common";
+import { CatalogService } from "@features/catalog/services/catalog.service";
+import { AssignmentsApiService } from "@features/planning/services/assignments-api.service";
 import { AssignmentsService } from "@features/planning/services/assignments.service";
 import { SubprojectsService } from "@features/projects/services/subprojects.service";
 import { TasksService } from "@features/projects/services/tasks.service";
@@ -16,6 +19,8 @@ import { extractProblemMessage } from "@utils/problem-detail";
 import { compareIsoDateAsc } from "@utils/collections";
 import { matchesSearch } from "@utils/strings";
 import { todayIso } from "@utils/date";
+
+export type ResourceTaskNextSituation = "En atencion" | "Culminado";
 
 export interface ResourceMyTask {
   assignmentId: string;
@@ -72,6 +77,8 @@ export class ResourceDashboardService {
   private readonly subprojectsService = inject(SubprojectsService);
   private readonly variationsService = inject(VariationsService);
   private readonly timesheetService = inject(TimesheetService);
+  private readonly assignmentsApi = inject(AssignmentsApiService);
+  private readonly catalogService = inject(CatalogService);
 
   private readonly _loading = signal<boolean>(false);
   private readonly _error = signal<string | null>(null);
@@ -111,6 +118,29 @@ export class ResourceDashboardService {
   }
 
 
+  async cambiarSituacion(
+    assignmentId: string,
+    situacion: ResourceTaskNextSituation,
+  ): Promise<boolean> {
+    const situacionId = this.catalogService
+      .byGroup("SIT")
+      .find((i) => i.name === situacion)?.id;
+    if (!situacionId) {
+      this._error.set("No se encontró la situación en el catálogo.");
+      return false;
+    }
+    try {
+      await firstValueFrom(
+        this.assignmentsApi.actualizarSituacion(assignmentId, situacionId),
+      );
+      await this.tasksService.cargar();
+      return true;
+    } catch (err) {
+      this._error.set(extractProblemMessage(err));
+      return false;
+    }
+  }
+
   computeDashboard(
     resourceId: string,
     period: ManagerPeriod,
@@ -132,9 +162,7 @@ export class ResourceDashboardService {
       const sub = task
         ? allSubs.find((s) => s.id === task.subprojectId)
         : undefined;
-      const ref = sub?.ticket
-        ? `#REQ-${sub.ticket.replace(/^[A-Z]+-/, "")}`
-        : `#${task?.subprojectId ?? a.taskId}`;
+      const ref = sub?.ticket ? `#${sub.ticket}` : "";
       const loggedHours = this.timesheetService
         .entriesForResourceInRange(resourceId, a.startDate, a.endDate)
         .filter((e) => e.kind === "task" && e.task === a.id)

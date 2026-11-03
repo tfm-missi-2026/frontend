@@ -35,6 +35,12 @@
         label="Nueva tarea"
         labelText="Nueva tarea"
         [LeftIcon]="IconPlusSimpleComponent"
+        [disabled]="subprojectFrozen()"
+        [tooltip]="
+          subprojectFrozen()
+            ? 'Subproyecto congelado: el trabajo nuevo va en otro subproyecto.'
+            : undefined
+        "
         (click)="openCreate()"
       />
     </UiFlex>
@@ -73,13 +79,14 @@
           </UiFlex>
           <UiHeader [level]="4" text="Este subproyecto aún no tiene tareas." />
           <UiLabel type="bodyS" color="textWeak">
-            Crea la primera tarea con sus fechas planificadas y horas estimadas.
+            Crea la primera tarea con sus días y horas estimadas.
           </UiLabel>
           <UiButton
             variant="primary"
             label="Nueva tarea"
             labelText="Nueva tarea"
             [LeftIcon]="IconPlusSimpleComponent"
+            [disabled]="subprojectFrozen()"
             (click)="openCreate()"
           />
         </UiFlex>
@@ -87,8 +94,10 @@
     } @else {
       <ProjectsTasksTable
         [tasks]="visibleTasks()"
+        [frozen]="subprojectFrozen()"
         (edit)="onEdit($event)"
         (deactivate)="onDeactivate($event)"
+        (view)="detailTask.set($event)"
       />
 
       <UiSurface
@@ -137,6 +146,14 @@
     </UiSurface>
   }
 </UiFlex>
+
+@if (detailTask(); as task) {
+  <TaskDetailDialog
+    [task]="task"
+    [resourceName]="assignedResourceName(task.id)"
+    (close)="detailTask.set(null)"
+  />
+}
 
 <TaskFormModal
   [isOpen]="formOpen()"

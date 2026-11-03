@@ -13,21 +13,12 @@
     <UiAlert variant="success" [message]="msg" />
   }
 
-  @if (sinLineaBase()) {
-    <UiAlert
-      variant="info"
-      message="Este proyecto todavía no tiene una línea base congelada. Congélala para poder seguir el avance."
-    />
-  }
-
   <FreezeBaselineDialog
     [isOpen]="freezeOpen()"
     [projectLabel]="selectedProject()?.name ?? ''"
-    [assignmentCount]="assignments().length"
-    [resourceCount]="distinctResourceCount()"
-    [totalHours]="totalHours()"
-    [currentVersion]="currentBaseline()?.version ?? null"
-    [unchanged]="baselineUnchanged()"
+    [assignmentCount]="freezeAssignmentCount()"
+    [resourceCount]="freezeResourceCount()"
+    [totalHours]="freezeHours()"
     [saving]="freezeSaving()"
     (confirm)="onFreezeConfirm()"
     (cancel)="onFreezeCancel()"
@@ -46,10 +37,18 @@
     />
   }
 
+  @if (detailRow(); as row) {
+    <AssignmentDetailDialog [row]="row" (close)="detailRow.set(null)" />
+  }
+
   <PlanningToolbar
     [projectOptions]="projectOptions()"
     [projectId]="selectedProjectId()"
     [canFreeze]="canFreeze()"
+    [freezeHint]="freezeHint()"
+    [assignedTaskCount]="assignedTaskCount()"
+    [activeTaskCount]="activeTaskCount()"
+    [allFrozen]="allFrozen()"
     (projectChange)="onProjectChange($event)"
     (freeze)="onFreeze()"
     (create)="openCreate()"
@@ -74,6 +73,7 @@
       emptyText="Este proyecto aún no tiene asignaciones."
       (edit)="onEdit($event)"
       (remove)="onRemove($event)"
+      (view)="detailRow.set($event)"
     />
   }
 
@@ -112,8 +112,8 @@
   [mode]="formMode()"
   [projectId]="selectedProjectId() ?? ''"
   [assignment]="selectedAssignment()"
-  [taskOptions]="taskOptions()"
-  [tasks]="tasksInProject()"
+  [subprojectOptions]="assignableSubprojectOptions()"
+  [tasks]="assignableTasks()"
   [resourceOptions]="resourceOptions()"
   [resourceNames]="resourceNames()"
   [saving]="formSaving()"
@@ -132,7 +132,6 @@
     [periodStart]="req.periodStart"
     [periodEnd]="req.periodEnd"
     [businessDays]="req.businessDays"
-    (confirm)="onOverloadConfirm()"
     (cancel)="onOverloadCancel()"
   />
 }

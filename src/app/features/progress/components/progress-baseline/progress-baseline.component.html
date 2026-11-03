@@ -28,13 +28,14 @@
       </UiFlex>
       <UiFlex direction="column" [gap]="2">
         <UiHeader [level]="3" [text]="baselineLabel()" />
-        <UiLabel type="bodyXs" color="textWeak">
-          Congelada el
-          <strong class="font-semibold text-gray-800 dark:text-white/90">
-            {{ baselineDate() }}
-          </strong>
-          · vigente
-        </UiLabel>
+        @if (baselineDate()) {
+          <UiLabel type="bodyXs" color="textWeak">
+            Congelada el
+            <strong class="font-semibold text-gray-800 dark:text-white/90">
+              {{ baselineDate() }}
+            </strong>
+          </UiLabel>
+        }
       </UiFlex>
     </UiFlex>
 

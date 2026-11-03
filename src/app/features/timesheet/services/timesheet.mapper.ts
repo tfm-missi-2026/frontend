@@ -25,9 +25,9 @@ export function bitacoraApiToEntry(
   const minutos = timeToMinutes(api.horaFin) - timeToMinutes(api.horaInicio);
   const hours = Math.max(0, minutos / 60);
   const isTask = api.asignacionId !== null;
-  const actividadTitulo =
+  const actividad =
     api.actividadId && actividadesById
-      ? actividadesById.get(api.actividadId)?.titulo
+      ? actividadesById.get(api.actividadId)
       : undefined;
   return {
     id: api.id,
@@ -40,7 +40,9 @@ export function bitacoraApiToEntry(
     project: "",
     task: api.asignacionId ?? "",
     taskCode: undefined,
-    activity: actividadTitulo ?? api.actividadId ?? "",
+    activity: actividad?.titulo ?? api.actividadId ?? "",
+    activityId: api.actividadId ?? undefined,
+    activityTypeId: actividad?.tipoActividadId ?? "",
     description: api.descripcion ?? "",
     status: api.estado === 1 ? "approved" : "draft",
   };
@@ -55,9 +57,6 @@ export function entryToBitacoraCrearApi(
     horaFin: `${entry.endTime}:00`,
     descripcion: entry.description || null,
     asignacionId: entry.kind === "task" ? entry.task || null : null,
-    // Para kind="activity", el FE guarda el titulo en `activity`. El backend
-    // requiere el UUID; el caller debe resolver titulo->actividadId antes
-    // de llamar a TimesheetService.create (workaround documentado).
-    actividadId: entry.kind === "activity" ? entry.activity || null : null,
+    actividadId: entry.kind === "activity" ? entry.activityId || null : null,
   };
 }

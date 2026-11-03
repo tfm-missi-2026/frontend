@@ -95,12 +95,8 @@ export class AssignmentsService {
   async create(
     projectId: string,
     data: AssignmentFormData,
-    confirmarSobrecarga = false,
   ): Promise<Assignment | null> {
-    const body: AsignacionCrearApi = formDataToCrearApi(
-      data,
-      confirmarSobrecarga,
-    );
+    const body: AsignacionCrearApi = formDataToCrearApi(data);
     try {
       const creada = await firstValueFrom(this.api.crear(body));
       const assignment = asignacionApiToAssignment(creada, this.context());
@@ -114,16 +110,14 @@ export class AssignmentsService {
   }
 
   // El backend no tiene PUT. Esta implementacion hace delete + create.
-  // El caller debe pedir confirmacion de sobrecarga si aplica.
   async update(
     projectId: string,
     id: string,
     data: AssignmentFormData,
-    confirmarSobrecarga = false,
   ): Promise<Assignment | null> {
     const ok = await this.deactivate(projectId, id);
     if (!ok) return null;
-    return this.create(projectId, data, confirmarSobrecarga);
+    return this.create(projectId, data);
   }
 
   async deactivate(

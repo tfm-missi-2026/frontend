@@ -25,6 +25,7 @@
       />
       <UiDatePicker
         id="entry-date"
+        dateFormat="d/m/Y"
         [value]="form().date"
         placeholder="dd/mm/aaaa"
         (valueChange)="patch({ date: asString($event) })"

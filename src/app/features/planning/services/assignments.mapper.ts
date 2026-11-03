@@ -49,12 +49,10 @@ export function asignacionApiToAssignment(
 
 export function formDataToCrearApi(
   data: AssignmentFormData,
-  confirmarSobrecarga = false,
 ): AsignacionCrearApi {
   return {
     tareaId: data.taskId,
     usuarioId: data.resourceId,
     fechaInicioPlanificada: data.startDate,
-    confirmarSobrecarga,
   };
 }

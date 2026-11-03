@@ -57,6 +57,19 @@ export class ActividadesService {
     }
   }
 
+  async actualizar(id: string, body: ActividadCrearApi): Promise<ActividadApi | null> {
+    try {
+      const actualizada = await firstValueFrom(this.api.actualizar(id, body));
+      this._items.update((arr) =>
+        arr.map((a) => (a.id === id ? actualizada : a)),
+      );
+      return actualizada;
+    } catch (err) {
+      this._error.set(extractProblemMessage(err));
+      return null;
+    }
+  }
+
   async eliminar(id: string, motivo: string): Promise<boolean> {
     try {
       await firstValueFrom(this.api.eliminar(id, motivo));

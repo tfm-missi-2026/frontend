@@ -26,12 +26,31 @@
     />
   </UiFlex>
 
-  <UiButton
-    variant="secondary"
-    label="Congelar línea base"
-    labelText="Congelar línea base"
-    [disabled]="!canFreeze()"
-    tooltip="Fija una foto del plan actual"
-    (click)="freeze.emit()"
-  />
+  <UiFlex direction="row" alignItems="center" [gap]="3" className="flex-wrap">
+    @if (allFrozen()) {
+      <UiBadge variant="light" color="success" size="md">
+        Subproyectos congelados
+      </UiBadge>
+    } @else if (projectId()) {
+      <UiBadge
+        variant="light"
+        [color]="
+          activeTaskCount() > 0 && assignedTaskCount() === activeTaskCount()
+            ? 'success'
+            : 'warning'
+        "
+        size="md"
+      >
+        Tareas asignadas: {{ assignedTaskCount() }}/{{ activeTaskCount() }}
+      </UiBadge>
+    }
+    <UiButton
+      variant="secondary"
+      label="Congelar línea base"
+      labelText="Congelar línea base"
+      [disabled]="!canFreeze()"
+      [tooltip]="freezeHint()"
+      (click)="freeze.emit()"
+    />
+  </UiFlex>
 </UiFlex>

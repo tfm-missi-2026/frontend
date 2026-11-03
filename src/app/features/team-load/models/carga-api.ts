@@ -5,6 +5,8 @@ export interface CargaRecursoApi {
   usuarioId: string;
   horasPlanificadas: number;
   horasRegistradas: number;
+  horasTareas: number;
+  horasActividades: number;
   numeroTareasActivas: number;
   porcentajeUtilizacion: number;
   sobrecarga: boolean;

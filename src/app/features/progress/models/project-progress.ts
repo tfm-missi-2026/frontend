@@ -2,6 +2,10 @@ export interface TaskProgressRow {
   taskId: string;
   taskName: string;
   taskRef: string;
+  plannedStart: string;
+  plannedEnd: string;
+  firstLogged: string | null;
+  lastLogged: string | null;
   estimatedHours: number;
   loggedHours: number;
   progressPct: number;
