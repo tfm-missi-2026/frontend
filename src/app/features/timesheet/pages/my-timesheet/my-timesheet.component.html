@@ -19,6 +19,7 @@
     <TimesheetToolbar
       [mode]="mode()"
       [date]="date()"
+      [loggedDays]="loggedDays()"
       (modeChange)="onModeChange($event)"
       (dateChange)="onDateChange($event)"
     />
@@ -71,6 +72,7 @@
   [defaultDate]="date()"
   [taskOptions]="taskOptions()"
   [activityTypeOptions]="activityTypeOptions()"
+  [taskSituations]="taskSituations()"
   [saving]="formSaving()"
   (save)="onSaveEntry($event)"
   (close)="formOpen.set(false)"

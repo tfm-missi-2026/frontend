@@ -42,24 +42,14 @@
     @if (showProgressBar() || linkLabel()) {
       <UiFlex direction="column" [gap]="2" className="mt-auto w-full">
         @if (showProgressBar()) {
-          <UiFlex
-            direction="row"
-            alignItems="center"
-            [gap]="0"
-            className="relative h-4 w-full overflow-hidden rounded border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900"
+          <div
+            class="relative h-4 w-full overflow-hidden rounded border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900"
           >
-            <UiFlex
-              direction="row"
-              alignItems="center"
-              className="absolute top-0 bottom-0 left-0 bg-gray-400 dark:bg-gray-600"
+            <div
+              class="absolute top-0 bottom-0 left-0 bg-gray-400 dark:bg-gray-600"
               [style.width.%]="minibarFillPct()"
-            />
-            <UiFlex
-              direction="column"
-              className="absolute -top-1 -bottom-1 w-0 border-l border-dashed border-gray-500"
-              [style.left.%]="100"
-            />
-          </UiFlex>
+            ></div>
+          </div>
         }
 
         @if (linkTo() && linkLabel()) {

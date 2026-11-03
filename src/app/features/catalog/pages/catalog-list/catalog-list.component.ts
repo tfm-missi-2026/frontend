@@ -22,6 +22,7 @@ import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiButtonComponent } from "@shared/ui/button";
 import { UiCardComponent } from "@shared/ui/card";
 import { UiFlexComponent } from "@shared/ui/flex";
+import { UiFormLabelComponent } from "@shared/ui/form-label";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiIconButtonComponent } from "@shared/ui/icon-button";
 import { UiLabelComponent } from "@shared/ui/label";
@@ -56,6 +57,7 @@ import { CatalogService } from "../../services/catalog.service";
     UiButtonComponent,
     UiCardComponent,
     UiFlexComponent,
+    UiFormLabelComponent,
     UiHeaderComponent,
     UiIconButtonComponent,
     UiLabelComponent,
@@ -241,7 +243,11 @@ export class CatalogListComponent implements OnInit {
     }
   }
 
-  protected onNewGroup(): void {
-    // Pendiente: alta de grupos paramétricos.
+  protected groupClasses(code: string): string {
+    const base =
+      "flex w-full items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-left transition-colors dark:border-gray-800 dark:bg-white/[0.03]";
+    return code === this.selectedGroup()
+      ? `${base} border-brand-500 bg-brand-50 ring-1 ring-brand-500/30 dark:border-brand-500/50 dark:bg-brand-500/10`
+      : `${base} hover:bg-gray-50 dark:hover:bg-white/5`;
   }
 }

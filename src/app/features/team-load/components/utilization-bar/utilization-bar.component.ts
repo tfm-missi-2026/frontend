@@ -5,7 +5,6 @@ import {
   input,
 } from "@angular/core";
 
-import { UiFlexComponent } from "@shared/ui/flex";
 import { UiLabelComponent } from "@shared/ui/label";
 
 const MARK_POS = 70;
@@ -14,7 +13,7 @@ const MAX_FILL = 99;
 @Component({
   selector: "UtilizationBar",
   standalone: true,
-  imports: [UiFlexComponent, UiLabelComponent],
+  imports: [UiLabelComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./utilization-bar.component.html",
 })

@@ -48,7 +48,7 @@ type Cell = TemplateRef<TableCellContext<VariationRowViewModel>>;
 export class VariationsTableComponent {
   readonly rows = input<VariationRowViewModel[]>([]);
   readonly emptyText = input<string>("No hay variaciones.");
-  readonly canDelete = input<boolean>(false);
+  readonly canManage = input<boolean>(false);
 
   readonly view = output<Variation>();
   readonly resolve = output<Variation>();

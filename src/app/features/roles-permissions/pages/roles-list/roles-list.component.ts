@@ -29,6 +29,7 @@ import { RoleFormModalComponent } from "../../components/role-form-modal/role-fo
 import { RoleListPanelComponent } from "../../components/role-list-panel/role-list-panel.component";
 import type { Role, RoleFormData } from "../../models/role";
 import { RolesService } from "../../services/roles.service";
+import { UsersService } from "@features/users/services/users.service";
 
 @Component({
   selector: "RolesListPage",
@@ -54,18 +55,22 @@ import { RolesService } from "../../services/roles.service";
 })
 export class RolesListComponent implements OnInit {
   private readonly rolesService = inject(RolesService);
+  private readonly usersService = inject(UsersService);
 
   ngOnInit(): void {
     void this.bootstrap();
   }
 
   private async bootstrap(): Promise<void> {
+    void this.usersService.cargar();
     await this.rolesService.load();
     const roles = this.roles();
     if (this.selectedId() === null && roles.length > 0) {
       this.selectedId.set(roles[0].id);
-      void this.rolesService.loadPermissionsForRole(roles[0].id);
     }
+    await Promise.all(
+      roles.map((r) => this.rolesService.loadPermissionsForRole(r.id)),
+    );
   }
 
   protected readonly plusIcon = IconPlusSimpleComponent;
@@ -77,7 +82,13 @@ export class RolesListComponent implements OnInit {
     { label: "Roles" },
   ];
 
-  protected readonly roles = this.rolesService.roles;
+  protected readonly roles = computed<Role[]>(() => {
+    const users = this.usersService.users();
+    return this.rolesService.roles().map((r) => {
+      const roleKey = r.code === "ADMIN" ? "administrador" : r.code.toLowerCase();
+      return { ...r, users: users.filter((u) => u.role === roleKey && u.status === "active").length };
+    });
+  });
   protected readonly modulosRaiz = this.rolesService.modulosRaiz;
   protected readonly loading = this.rolesService.loading;
   protected readonly error = this.rolesService.error;
@@ -108,7 +119,8 @@ export class RolesListComponent implements OnInit {
   });
 
   protected readonly canEditPermisosSelected = computed<boolean>(() => {
-    return !!this.selectedRole();
+    const r = this.selectedRole();
+    return !!r && r.code !== "ADMIN";
   });
 
   protected readonly createOpen = signal<boolean>(false);

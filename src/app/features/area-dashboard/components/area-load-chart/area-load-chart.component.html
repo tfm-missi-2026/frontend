@@ -3,8 +3,8 @@
   padding="md"
   className="border-2 border-gray-300 dark:border-gray-700"
 >
-  <UiFlex direction="column" [gap]="16">
-    <UiFlex direction="column" [gap]="4">
+  <UiFlex direction="column" [gap]="4" [noWrap]="true">
+    <UiFlex direction="column" [gap]="1" [noWrap]="true">
       <UiHeader [level]="4" text="Carga del equipo" />
       <UiLabel type="bodyS" color="textWeak">
         % de utilización por recurso · ordenado de mayor a menor · línea = 100%
@@ -17,45 +17,44 @@
         Sin datos de carga para este período.
       </UiLabel>
     } @else {
-      @for (w of workloads(); track w.resourceId; let last = $last) {
-        <UiFlex
-          direction="row"
-          alignItems="center"
-          [gap]="12"
-          [className]="
-            last
-              ? 'w-full'
-              : 'w-full pb-2 border-b border-dashed border-gray-200 dark:border-gray-800'
-          "
-        >
-          <UiLabel
-            type="bodyS"
-            weight="bold"
-            color="textStrong"
-            className="w-35 shrink-0 truncate whitespace-nowrap"
-            [text]="w.resourceName"
-          />
-          <UiFlex direction="row" alignItems="center" [gap]="8" className="flex-1">
-            <CommonProgressBar
-              [progressPct]="w.utilizationPct"
-              [isOver]="w.utilizationPct > 100"
-              className="flex-1"
-            />
+      <UiFlex direction="column" [gap]="0" [noWrap]="true">
+        @for (w of workloads(); track w.resourceId; let last = $last) {
+          <UiFlex
+            direction="row"
+            alignItems="center"
+            [gap]="3"
+            [noWrap]="true"
+            [className]="
+              last
+                ? 'w-full py-2.5'
+                : 'w-full py-2.5 border-b border-dashed border-gray-200 dark:border-gray-800'
+            "
+          >
+            <div class="w-44 shrink-0 min-w-0 truncate">
+              <UiLabel
+                type="bodyS"
+                weight="semibold"
+                color="textStrong"
+                [text]="w.resourceName"
+              />
+            </div>
+            <div class="flex-1 min-w-0">
+              <CommonProgressBar
+                [progressPct]="w.utilizationPct"
+                [isOver]="w.utilizationPct > 100"
+              />
+            </div>
             <UiLabel
               type="HeadingS"
               weight="bold"
               color="textStrong"
-              className="min-w-14 text-right font-mono whitespace-nowrap"
+              className="w-16 shrink-0 text-right font-mono whitespace-nowrap"
             >
               {{ w.utilizationPct }}%
             </UiLabel>
           </UiFlex>
-        </UiFlex>
-      }
+        }
+      </UiFlex>
     }
-
-    <UiLabel type="bodyXs" color="textWeak">
-      La trama diagonal marca a quienes superan su capacidad planificada.
-    </UiLabel>
   </UiFlex>
 </UiSurface>

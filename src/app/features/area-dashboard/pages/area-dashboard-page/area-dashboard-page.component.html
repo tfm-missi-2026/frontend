@@ -45,54 +45,14 @@
       sub="línea = 100% capacidad"
       [progressPct]="dashboard().teamAverageUtilizationPct"
     />
-    <UiSurface
-      variant="neutral"
-      padding="md"
-      className="border-2 border-gray-300 dark:border-gray-700 min-h-37"
-    >
-      <UiFlex direction="column" [gap]="6" className="h-full">
-        <UiLabel
-          type="bodyS"
-          weight="medium"
-          color="textWeak"
-          className="uppercase leading-tight"
-        >
-          Proyectos del área
-        </UiLabel>
-        <UiFlex direction="row" alignItems="baseline" [gap]="2">
-          <UiLabel
-            type="HeadingTV"
-            weight="bold"
-            color="textStrong"
-            className="text-5xl leading-none font-mono whitespace-nowrap"
-          >
-            {{ dashboard().projectsTotal }}
-          </UiLabel>
-          <UiLabel type="HeadingS" weight="bold" color="textStrong">
-            activos
-          </UiLabel>
-        </UiFlex>
-        <UiFlex
-          direction="row"
-          alignItems="center"
-          [gap]="6"
-          className="flex-wrap"
-        >
-          <UiBadge variant="light" color="success" size="sm">
-            {{ dashboard().enPlazoCount }} en plazo
-          </UiBadge>
-          <UiBadge variant="light" color="warning" size="sm">
-            {{ dashboard().enRiesgoCount }} en riesgo
-          </UiBadge>
-          <UiBadge variant="solid" color="dark" size="sm">
-            {{ dashboard().retrasadoCount }} retrasado
-          </UiBadge>
-        </UiFlex>
-        <UiLabel type="bodyXs" color="textWeak" className="mt-auto">
-          indicador — dato de Proyectos.
-        </UiLabel>
-      </UiFlex>
-    </UiSurface>
+    <CommonKpiCard
+      label="Proyectos del área"
+      [value]="dashboard().projectsTotal"
+      valueSuffix=" activos"
+      sub="proyectos en curso"
+      linkLabel="Ver proyectos →"
+      [linkTo]="'/app/operacion/proyectos'"
+    />
     <CommonKpiCard
       label="Variaciones pendientes"
       [value]="dashboard().variationsTotal"
@@ -109,17 +69,4 @@
       [variations]="dashboard().pendingVariations"
     />
   </UiGrid>
-
-  <UiSurface
-    variant="neutral"
-    padding="md"
-    className="border-dashed max-w-160"
-  >
-    <UiLabel type="bodyS" color="textWeak">
-      El dashboard
-      solo agrega y enlaza
-      : muestra indicadores tomados de Carga del equipo, Avance, Proyectos y
-      Variaciones. La captura y edición ocurre en cada módulo.
-    </UiLabel>
-  </UiSurface>
 </UiFlex>

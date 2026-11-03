@@ -164,8 +164,11 @@ export class ResourceDashboardService {
         : undefined;
       const ref = sub?.ticket ? `#${sub.ticket}` : "";
       const loggedHours = this.timesheetService
-        .entriesForResourceInRange(resourceId, a.startDate, a.endDate)
-        .filter((e) => e.kind === "task" && e.task === a.id)
+        .entries()
+        .filter(
+          (e) =>
+            e.resourceId === resourceId && e.kind === "task" && e.task === a.id,
+        )
         .reduce((acc, e) => acc + e.hours, 0);
       return {
         assignmentId: a.id,

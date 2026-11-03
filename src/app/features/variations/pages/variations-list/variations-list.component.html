@@ -4,9 +4,7 @@
   <UiFlex direction="column" [gap]="1">
     <UiHeader [level]="1" text="Variaciones" />
     <UiLabel type="bodyS" color="textWeak">
-      Una variación es un cambio formal sobre el plan (alcance, plazo o
-      recursos) con justificación obligatoria. La reporta el Gestor o el Recurso
-      Técnico; la resuelve el Gestor o el Jefe de Área.
+      Cambios de alcance, plazo o recursos sobre la línea base congelada.
     </UiLabel>
   </UiFlex>
 
@@ -26,7 +24,7 @@
     [rows]="rows()"
     emptyText="No hay variaciones con esos filtros. Ajusta los filtros o reporta una nueva variación."
     (view)="onView($event)"
-    [canDelete]="canDelete()"
+    [canManage]="canManage()"
     (resolve)="onResolve($event)"
     (remove)="deleteTarget.set($event)"
   />
@@ -59,23 +57,9 @@
             {{ rejectedCount() }} rechazadas
           </UiBadge>
         </UiFlex>
-        <UiLabel type="bodyXs" color="textWeak">
-          "Resolver" y "Eliminar" solo activos en variaciones Pendientes.
-        </UiLabel>
       </UiFlex>
     </UiSurface>
   }
-
-  <UiSurface
-    variant="neutral"
-    padding="md"
-    className="border-dashed max-w-160"
-  >
-    <UiLabel type="bodyS" color="textWeak">
-      Las variaciones conservan su histórico y trazabilidad respecto a
-      la línea base; resolverlas registra quién y cuándo.
-    </UiLabel>
-  </UiSurface>
 </UiFlex>
 
 @if (deleteTarget(); as v) {

@@ -14,10 +14,17 @@ import {
   CommonTabGroupComponent,
   type CommonTabOption,
 } from "@shared/common/tab-group";
+import { UiDatePickerComponent } from "@shared/ui/date-picker";
+import type { DatePickerDayMark } from "@shared/ui/date-picker/date-picker.types";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiIconButtonComponent } from "@shared/ui/icon-button";
 import { UiLabelComponent } from "@shared/ui/label";
 import { parseIsoDate, toIsoDate } from "@utils/date";
+
+export interface TimesheetLoggedDay {
+  blocks: number;
+  hours: number;
+}
 
 export type TimesheetViewMode = "month" | "day";
 
@@ -46,12 +53,6 @@ const MONTH_NAMES_ES = [
   "diciembre",
 ];
 
-function formatLong(iso: string): string {
-  const d = parseIsoDate(iso);
-  if (!d) return iso;
-  return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
-}
-
 const VIEW_TABS: CommonTabOption<TimesheetViewMode>[] = [
   { value: "day", label: "Por día" },
   { value: "month", label: "Por mes" },
@@ -62,6 +63,7 @@ const VIEW_TABS: CommonTabOption<TimesheetViewMode>[] = [
   standalone: true,
   imports: [
     CommonTabGroupComponent,
+    UiDatePickerComponent,
     UiFlexComponent,
     UiIconButtonComponent,
     UiLabelComponent,
@@ -72,6 +74,9 @@ const VIEW_TABS: CommonTabOption<TimesheetViewMode>[] = [
 export class TimesheetToolbarComponent {
   readonly mode = input<TimesheetViewMode>("day");
   readonly date = input<string>("");
+  readonly loggedDays = input<ReadonlyMap<string, TimesheetLoggedDay>>(
+    new Map(),
+  );
 
   readonly modeChange = output<TimesheetViewMode>();
   readonly dateChange = output<string>();
@@ -88,15 +93,26 @@ export class TimesheetToolbarComponent {
     return `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
   });
 
-  protected readonly displayLabel = computed<string>(() =>
-    formatLong(this.date()),
-  );
-
   protected readonly dowLabel = computed<string>(() => {
     const d = parseIsoDate(this.date());
     if (!d) return "";
     return DAY_NAMES_ES[d.getDay()];
   });
+
+  protected readonly loggedDayMark = computed(() => {
+    const days = this.loggedDays();
+    return (iso: string): DatePickerDayMark | null => {
+      const day = days.get(iso);
+      if (!day) return null;
+      const blocks = day.blocks === 1 ? "1 bloque" : `${day.blocks} bloques`;
+      return { className: "ui-day-logged", title: `${blocks} · ${day.hours} h` };
+    };
+  });
+
+  protected onPickDate(value: string | string[]): void {
+    const iso = Array.isArray(value) ? value[0] : value;
+    if (iso && iso !== this.date()) this.dateChange.emit(iso);
+  }
 
   protected onPrev(): void {
     const d = parseIsoDate(this.date());

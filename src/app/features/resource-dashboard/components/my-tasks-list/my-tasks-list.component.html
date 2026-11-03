@@ -3,8 +3,8 @@
   padding="md"
   className="border-2 border-gray-300 dark:border-gray-700"
 >
-  <UiFlex direction="column" [gap]="12">
-    <UiFlex direction="column" [gap]="4">
+  <UiFlex direction="column" [gap]="4" [noWrap]="true">
+    <UiFlex direction="column" [gap]="1" [noWrap]="true">
       <UiHeader [level]="4" text="Mis tareas" />
       <UiLabel type="bodyS" color="textWeak">
         Tareas asignadas en el período · horas registradas ÷ planificadas.
@@ -16,16 +16,17 @@
         Sin tareas asignadas en este período.
       </UiLabel>
     } @else {
+      <UiFlex direction="column" [gap]="0" [noWrap]="true">
       @for (t of tasks(); track t.assignmentId; let last = $last) {
         <UiFlex
           direction="row"
           alignItems="center"
-          [gap]="8"
+          [gap]="3"
           [noWrap]="true"
           [className]="
             last
-              ? 'w-full'
-              : 'w-full pb-2 border-b border-dashed border-gray-200 dark:border-gray-800'
+              ? 'w-full py-2.5'
+              : 'w-full py-2.5 border-b border-dashed border-gray-200 dark:border-gray-800'
           "
         >
           <UiFlex direction="column" [gap]="0" [noWrap]="true" className="flex-1 min-w-0">
@@ -45,33 +46,26 @@
               />
             }
           </UiFlex>
-          <UiBadge
-            variant="light"
-            [color]="situationColor(t.situation)"
-            size="sm"
-          >
-            {{ t.situation }}
-          </UiBadge>
+          <div class="flex w-24 shrink-0 justify-end">
+            <UiBadge
+              variant="light"
+              [color]="situationColor(t.situation)"
+              size="sm"
+            >
+              {{ t.situation }}
+            </UiBadge>
+          </div>
           <UiLabel
             type="bodyS"
             weight="bold"
             color="textStrong"
-            className="text-right font-mono whitespace-nowrap"
+            className="w-14 shrink-0 text-right font-mono whitespace-nowrap"
           >
             {{ t.loggedHours }}/{{ t.plannedHours }}
           </UiLabel>
-          @if (nextAction(t.situation); as action) {
-            <UiButton
-              variant="secondary"
-              size="sm"
-              [label]="action.label"
-              [labelText]="action.label + ' tarea'"
-              [disabled]="saving()"
-              (click)="advance.emit({ task: t, situation: action.situation })"
-            />
-          }
         </UiFlex>
       }
+      </UiFlex>
     }
   </UiFlex>
 </UiSurface>

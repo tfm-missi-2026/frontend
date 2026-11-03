@@ -21,6 +21,8 @@ import { UiSelectComponent } from "@shared/ui/select";
 import type { SelectOption } from "@shared/ui/select";
 import { UiTextAreaComponent } from "@shared/ui/text-area";
 
+import type { TaskSituation } from "@features/projects/models/task";
+
 import type {
   TimesheetEntry,
   TimesheetEntryKind,
@@ -33,6 +35,7 @@ export interface EntryFormPayload {
   mode: EntryFormMode;
   id?: string;
   data: Omit<TimesheetEntry, "id">;
+  finishTask: boolean;
 }
 
 const TIME_REGEX = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -91,7 +94,16 @@ export class EntryFormModalComponent {
   readonly defaultDate = input<string>("");
   readonly taskOptions = input<SelectOption[]>([]);
   readonly activityTypeOptions = input<SelectOption[]>([]);
+  readonly taskSituations = input<ReadonlyMap<string, TaskSituation>>(new Map());
   readonly saving = input<boolean>(false);
+
+  protected readonly finishTask = signal<boolean>(false);
+
+  protected readonly selectedTaskSituation = computed<TaskSituation | null>(() => {
+    const f = this.form();
+    if (f.kind !== "task" || !f.task) return null;
+    return this.taskSituations().get(f.task) ?? null;
+  });
 
   protected readonly timeOptions = TIME_SLOTS;
 
@@ -157,6 +169,7 @@ export class EntryFormModalComponent {
       const open = this.isOpen();
       if (!open) return;
       this.intentoGuardar.set(false);
+      this.finishTask.set(false);
       const m = this.mode();
       const e = this.entry();
       if (m === "edit" && e) {
@@ -185,6 +198,11 @@ export class EntryFormModalComponent {
 
   protected onTaskChange(value: unknown): void {
     this.patch({ task: String(value ?? "") });
+    this.finishTask.set(false);
+  }
+
+  protected onFinishTaskChange(event: Event): void {
+    this.finishTask.set((event.target as HTMLInputElement).checked);
   }
 
   protected onActivityTypeChange(value: unknown): void {
@@ -226,6 +244,10 @@ export class EntryFormModalComponent {
       data.taskCode = undefined;
       data.project = "";
     }
-    this.save.emit({ mode: m, id: e?.id, data });
+    const finishTask =
+      data.kind === "task" &&
+      this.finishTask() &&
+      this.selectedTaskSituation() !== "Culminado";
+    this.save.emit({ mode: m, id: e?.id, data, finishTask });
   }
 }

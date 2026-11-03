@@ -40,9 +40,20 @@ const HEADER_LABELS = [
 })
 export class ProgressTableComponent {
   readonly rows = input<TaskProgressRow[]>([]);
+  readonly totalEstimatedHours = input<number>(0);
+  readonly totalLoggedHours = input<number>(0);
+  readonly totalProgressPct = input<number>(0);
+
+  protected readonly totalDeviationHours = computed<number>(
+    () =>
+      Math.round((this.totalLoggedHours() - this.totalEstimatedHours()) * 100) /
+      100,
+  );
 
   protected readonly columnClasses = COLUMN_CLASSES;
   protected readonly headerLabels = HEADER_LABELS;
+  protected readonly progressFormula =
+    "Registradas ÷ estimadas. Desviación = registradas − estimadas.";
 
   protected readonly fillWidthPct = (pct: number, isOver: boolean): number => {
     if (!isOver && pct < 100) {

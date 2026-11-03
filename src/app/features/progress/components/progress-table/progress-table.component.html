@@ -16,7 +16,9 @@
         alignItems="center"
         [className]="columnClasses[i]"
       >
-        <UiLabel type="bodyXs" weight="medium">{{ label }}</UiLabel>
+        <span [attr.title]="label === '% Avance' ? progressFormula : null">
+          <UiLabel type="bodyXs" weight="medium">{{ label }}</UiLabel>
+        </span>
       </UiFlex>
     }
   </UiFlex>
@@ -110,23 +112,18 @@
         [gap]="8"
         [className]="columnClasses[5] + ' pr-3'"
       >
-        <UiFlex
-          direction="row"
-          alignItems="center"
-          [gap]="0"
-          className="relative h-5 flex-1 min-w-0 overflow-hidden rounded border-2 border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900"
+        <div
+          class="relative h-5 flex-1 min-w-0 overflow-hidden rounded border-2 border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900"
         >
-          <UiFlex
-            direction="row"
-            [className]="fillClasses(row.isOverExecuted)"
+          <div
+            [class]="fillClasses(row.isOverExecuted)"
             [style.width.%]="fillWidthPct(row.progressPct, row.isOverExecuted)"
-          />
-          <UiFlex
-            direction="column"
-            className="absolute -top-1 -bottom-1 w-0 border-l-2 border-dashed border-gray-500"
+          ></div>
+          <div
+            class="absolute -top-1 -bottom-1 w-0 border-l-2 border-dashed border-gray-500"
             [style.left.%]="70"
-          />
-        </UiFlex>
+          ></div>
+        </div>
         <UiLabel
           type="bodyS"
           weight="semibold"
@@ -161,6 +158,41 @@
             {{ formatDeviation(row.deviationHours, false) }}
           </UiBadge>
         }
+      </UiFlex>
+    </UiFlex>
+  }
+
+  @if (rows().length > 0) {
+    <UiFlex
+      direction="row"
+      alignItems="center"
+      [gap]="0"
+      className="border-t-2 border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-700 dark:bg-white/3"
+    >
+      <UiFlex direction="row" alignItems="center" [className]="columnClasses[0] + ' pr-3'">
+        <UiLabel type="bodyS" weight="bold" color="textStrong" text="Total del proyecto" />
+      </UiFlex>
+      <UiFlex direction="row" [className]="columnClasses[1]" />
+      <UiFlex direction="row" [className]="columnClasses[2]" />
+      <UiFlex direction="row" justifyContent="center" alignItems="center" [className]="columnClasses[3]">
+        <UiLabel type="bodyS" weight="bold" color="textStrong" className="font-mono whitespace-nowrap">
+          {{ totalEstimatedHours() }} h
+        </UiLabel>
+      </UiFlex>
+      <UiFlex direction="row" justifyContent="center" alignItems="center" [className]="columnClasses[4]">
+        <UiLabel type="bodyS" weight="bold" color="textStrong" className="font-mono whitespace-nowrap">
+          {{ totalLoggedHours() }} h
+        </UiLabel>
+      </UiFlex>
+      <UiFlex direction="row" alignItems="center" [className]="columnClasses[5] + ' pr-3'">
+        <UiLabel type="bodyS" weight="bold" color="textStrong" className="font-mono whitespace-nowrap">
+          {{ totalProgressPct() }}%
+        </UiLabel>
+      </UiFlex>
+      <UiFlex direction="row" justifyContent="center" alignItems="center" [className]="columnClasses[6]">
+        <UiLabel type="bodyS" weight="bold" color="textStrong" className="font-mono whitespace-nowrap">
+          {{ formatDeviation(totalDeviationHours(), totalDeviationHours() > 0) }}
+        </UiLabel>
       </UiFlex>
     </UiFlex>
   }

@@ -4,15 +4,13 @@ import {
   input,
 } from "@angular/core";
 
-import { UiFlexComponent } from "@shared/ui/flex";
+import { CommonKpiCardComponent } from "@shared/common";
 import { UiGridComponent } from "@shared/ui/grid";
-import { UiLabelComponent } from "@shared/ui/label";
-import { UiSurfaceComponent } from "@shared/ui/surface";
 
 @Component({
   selector: "TeamLoadSummary",
   standalone: true,
-  imports: [UiFlexComponent, UiGridComponent, UiLabelComponent, UiSurfaceComponent],
+  imports: [CommonKpiCardComponent, UiGridComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./team-load-summary.component.html",
 })

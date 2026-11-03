@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from "@angular/core";
+import { RouterLink } from "@angular/router";
 
 import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiFlexComponent } from "@shared/ui/flex";
@@ -16,6 +17,7 @@ import type {
   selector: "ManagerTodo",
   standalone: true,
   imports: [
+    RouterLink,
     UiBadgeComponent,
     UiFlexComponent,
     UiHeaderComponent,

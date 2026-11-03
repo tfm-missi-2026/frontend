@@ -213,20 +213,7 @@ export class HeaderNotificationsService {
         }),
       );
 
-    const retrasados: HeaderNotificationItem[] = data.projectsBreakdown
-      .filter((p) => p.statusTag === "Retrasado")
-      .map((p) =>
-        this.buildItem({
-          action: "proyecto retrasado:",
-          target: `${p.code} · ${p.name}`,
-          category: "Avance",
-          time: "revisa",
-          status: "busy",
-          to: "/app/operacion/avance",
-        }),
-      );
-
-    return [...variaciones, ...sobrecargas, ...retrasados].slice(0, 6);
+    return [...variaciones, ...sobrecargas].slice(0, 6);
   }
 
   // ------------------------------------------------------------------

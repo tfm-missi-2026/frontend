@@ -32,6 +32,16 @@
             <UiFlex direction="row" alignItems="center" [gap]="2">
               <span class="ts-legend" [style.background-color]="task.color"></span>
               <UiLabel type="bodyXs" color="textWeak" [text]="task.name" />
+              <span
+                class="font-mono text-xs font-semibold"
+                [class]="
+                  task.overPlanned
+                    ? 'text-error-500'
+                    : 'text-gray-700 dark:text-gray-200'
+                "
+              >
+                {{ task.hoursText }}
+              </span>
             </UiFlex>
           }
           <UiFlex direction="row" alignItems="center" [gap]="2">

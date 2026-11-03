@@ -509,6 +509,9 @@
 .flatpickr-day.ui-day-full {
   background: rgba(239, 68, 68, 0.3);
 }
+.flatpickr-day.ui-day-logged:not(.selected) {
+  @apply rounded-full! bg-brand-100! font-semibold text-brand-700! dark:bg-brand-500/25! dark:text-brand-300!;
+}
 .flatpickr-calendar {
   @apply mt-2 z-[100000]! bg-white! rounded-xl! p-5! border! border-gray-200! dark:border-white/5! text-gray-500! dark:bg-gray-dark! dark:text-gray-400! dark:shadow-theme-xl!;
 }

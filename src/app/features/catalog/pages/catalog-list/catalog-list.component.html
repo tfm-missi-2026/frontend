@@ -1,14 +1,14 @@
-<UiFlex direction="column" [gap]="16">
+<UiFlex direction="column" [gap]="5">
   <CommonBreadcrumb [items]="breadcrumbItems" />
 
   <UiFlex
     direction="row"
     alignItems="center"
     justifyContent="between"
-    [gap]="12"
+    [gap]="3"
     className="flex-wrap"
   >
-    <UiFlex direction="column" [gap]="2">
+    <UiFlex direction="column" [gap]="1">
       <UiHeader [level]="1" text="Catálogo" />
       <UiLabel type="bodyS" color="textWeak">
         Tabla paramétrica unificada. Cada grupo alimenta los desplegables
@@ -28,53 +28,38 @@
   }
 
   <UiFlex className="grid gap-4 lg:grid-cols-[300px_1fr]" alignItems="start">
-    <UiFlex direction="column" [gap]="8">
+    <UiFlex direction="column" [gap]="2.5" [noWrap]="true">
       <UiLabel
         type="bodyXs"
-        color="textStrong"
-        weight="semibold"
-        className="uppercase"
-      >
-        Grupos del catálogo
-      </UiLabel>
+        color="textWeak"
+        weight="medium"
+        className="mb-1 uppercase tracking-wider"
+        text="Grupos del catálogo"
+      />
       @for (g of groups; track g.code) {
-        <UiButton
-          [variant]="g.code === selectedGroup() ? 'secondary' : 'tertiary'"
-          [fullWidth]="true"
-          [labelText]="g.code"
+        <button
+          type="button"
+          [class]="groupClasses(g.code)"
+          [attr.aria-pressed]="g.code === selectedGroup()"
           (click)="selectGroup(g.code)"
         >
-          <UiBadge
-            [variant]="g.code === selectedGroup() ? 'solid' : 'light'"
-            color="dark"
-            size="sm"
-          >
-            {{ g.code }}
-          </UiBadge>
-          <UiFlex direction="column" [gap]="2" className="flex-1 min-w-0">
-            <UiLabel
-              type="bodyS"
-              weight="semibold"
-              color="textStrong"
-              [text]="g.name"
-            />
+          <div class="flex w-full min-w-0 flex-col gap-1 text-left">
+            <div class="flex w-full items-start justify-between gap-2">
+              <UiLabel type="bodyS" weight="semibold" color="textStrong" [text]="g.name" />
+              <UiBadge
+                [variant]="g.code === selectedGroup() ? 'solid' : 'light'"
+                [color]="g.code === selectedGroup() ? 'primary' : 'light'"
+                size="sm"
+              >
+                {{ g.code }}
+              </UiBadge>
+            </div>
             <UiLabel type="bodyXs" color="textWeak">
               {{ countByGroup(g.code) }} ítems
             </UiLabel>
-          </UiFlex>
-          @if (g.code === selectedGroup()) {
-            <UiLabel type="bodyXs" color="textWeak">▸</UiLabel>
-          }
-        </UiButton>
+          </div>
+        </button>
       }
-      <UiButton
-        variant="secondary"
-        [compact]="true"
-        [fullWidth]="true"
-        label="+ Nuevo grupo"
-        className="border-dashed"
-        (click)="onNewGroup()"
-      />
     </UiFlex>
 
     <UiCard padding="lg" className="overflow-hidden">
@@ -82,37 +67,28 @@
         direction="row"
         alignItems="end"
         justifyContent="between"
-        [gap]="12"
+        [gap]="4"
         className="mb-4 flex-wrap"
       >
-        <UiFlex direction="column" [gap]="2">
+        <UiFlex direction="column" [gap]="1">
           <UiHeader [level]="3" [text]="currentGroup().name" />
           <UiLabel type="bodyXs" color="textWeak">
             Grupo {{ currentGroup().code }} · {{ currentGroup().description }}
           </UiLabel>
+          <UiLabel type="bodyXs" color="textWeak">
+            {{ groupCount() }} ítems · {{ activeCount() }} activos
+          </UiLabel>
         </UiFlex>
-        <UiBadge variant="light" color="dark" size="md">
-          {{ currentGroup().code }}
-        </UiBadge>
-      </UiFlex>
-
-      <UiFlex
-        direction="row"
-        alignItems="center"
-        justifyContent="between"
-        [gap]="8"
-        className="mb-3 flex-wrap"
-      >
-        <UiLabel type="bodyXs" color="textWeak">
-          {{ groupCount() }} ítems en el grupo · {{ activeCount() }} activos
-        </UiLabel>
-        <UiSelect
+        <UiFlex direction="column" [gap]="1" className="w-40">
+          <UiFormLabel labelText="Estado" labelFor="catalogo-filtro-estado" />
+          <UiSelect
           inputId="catalogo-filtro-estado"
           [options]="estadoFiltroOpciones"
           [searchable]="false"
           [ngModel]="estadoFiltro()"
           (ngModelChange)="onEstadoFiltroChange($event)"
-        />
+          />
+        </UiFlex>
       </UiFlex>
 
       <UiTable
@@ -126,21 +102,6 @@
         emptyText="Sin ítems para los filtros aplicados."
         (queryChange)="onQueryChange($event)"
       ></UiTable>
-
-      <UiFlex
-        direction="row"
-        alignItems="center"
-        justifyContent="between"
-        [gap]="8"
-        className="mt-4 border-t border-dashed border-gray-200 pt-3 dark:border-gray-800"
-      >
-        <UiLabel type="bodyXs" color="textWeak">
-          El Orden define la posición en el desplegable.
-        </UiLabel>
-        <UiLabel type="bodyXs" color="textWeak">
-          Arrastra las filas para reordenar.
-        </UiLabel>
-      </UiFlex>
     </UiCard>
   </UiFlex>
 </UiFlex>

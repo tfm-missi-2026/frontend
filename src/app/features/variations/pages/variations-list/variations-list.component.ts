@@ -276,7 +276,7 @@ export class VariationsListComponent implements OnInit {
 
   protected readonly currentResolver = computed(() => nombreActual(this.auth));
 
-  protected readonly canDelete = computed<boolean>(
+  protected readonly canManage = computed<boolean>(
     () => this.auth.usuario()?.rol?.codigo !== "RECURSO_TECNICO",
   );
 

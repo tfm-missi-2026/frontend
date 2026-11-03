@@ -6,28 +6,22 @@
   <UiFlex
     direction="row"
     alignItems="center"
-    [gap]="24"
+    [gap]="6"
     className="flex-wrap"
   >
     <UiFlex
       direction="row"
       alignItems="center"
-      [gap]="12"
+      [gap]="3"
       className="flex-1 min-w-60"
     >
-      <UiFlex
-        direction="row"
-        alignItems="center"
-        justifyContent="center"
-        [gap]="0"
-        className="h-12 w-12 shrink-0 rounded-lg border-2 border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900"
+      <div
+        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
       >
-        <UiLabel type="HeadingL" weight="bold" color="textStrong">
-          ❄
-        </UiLabel>
-      </UiFlex>
-      <UiFlex direction="column" [gap]="2">
-        <UiHeader [level]="3" [text]="baselineLabel()" />
+        <IconCalendar24 [size]="24" />
+      </div>
+      <UiFlex direction="column" [gap]="1">
+        <UiHeader [level]="3" text="Línea base congelada" />
         @if (baselineDate()) {
           <UiLabel type="bodyXs" color="textWeak">
             Congelada el
@@ -43,7 +37,7 @@
       <UiFlex
         direction="column"
         [gap]="2"
-        className="px-22 text-center border-l-2 border-dashed border-gray-300 dark:border-gray-700 first:border-l-0 first:pl-0"
+        className="px-10 text-center first:pl-0"
       >
         <UiLabel
           type="bodyS"
@@ -57,7 +51,7 @@
           type="HeadingTV"
           weight="bold"
           color="textStrong"
-          className="text-5xl leading-none font-mono whitespace-nowrap"
+          className="text-4xl leading-none font-mono whitespace-nowrap"
         >
           {{ estimatedHours() }} h
         </UiLabel>
@@ -65,7 +59,7 @@
       <UiFlex
         direction="column"
         [gap]="2"
-        className="px-22 text-center border-l-2 border-dashed border-gray-300 dark:border-gray-700"
+        className="px-10 text-center border-l-2 border-dashed border-gray-300 dark:border-gray-700"
       >
         <UiLabel
           type="bodyS"
@@ -79,7 +73,7 @@
           type="HeadingTV"
           weight="bold"
           color="textStrong"
-          className="text-5xl leading-none font-mono whitespace-nowrap"
+          className="text-4xl leading-none font-mono whitespace-nowrap"
         >
           {{ loggedHours() }} h
         </UiLabel>
@@ -87,7 +81,7 @@
       <UiFlex
         direction="column"
         [gap]="2"
-        className="px-22 text-center border-l-2 border-dashed border-gray-300 dark:border-gray-700"
+        className="px-10 text-center border-l-2 border-dashed border-gray-300 dark:border-gray-700"
       >
         <UiLabel
           type="bodyS"
@@ -102,7 +96,7 @@
             type="HeadingTV"
             weight="bold"
             color="textStrong"
-            className="text-5xl leading-none font-mono whitespace-nowrap"
+            className="text-4xl leading-none font-mono whitespace-nowrap"
           >
             {{ progressPct() }}
           </UiLabel>

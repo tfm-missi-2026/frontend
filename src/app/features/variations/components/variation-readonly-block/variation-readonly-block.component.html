@@ -1,74 +1,70 @@
-<UiSurface variant="neutral" padding="md" className="border-2 border-gray-300 dark:border-gray-700">
-  <UiFlex direction="column" [gap]="10">
-    <UiGrid [columns]="2" gap="gap-3">
-      <UiFlex direction="column" [gap]="2" className="min-w-0">
-        <UiLabel type="bodyXs" weight="medium" color="textWeak" className="uppercase">
-          Tarea afectada
-        </UiLabel>
-        <UiLabel type="bodyS" weight="semibold" color="textStrong">
-          {{ targetLabel() }}{{ targetRef() ? ' · ' + targetRef() : '' }}
-        </UiLabel>
-      </UiFlex>
-      <UiFlex direction="column" [gap]="2" className="min-w-0">
-        <UiLabel type="bodyXs" weight="medium" color="textWeak" className="uppercase">
-          Tipo
-        </UiLabel>
-        <UiLabel type="bodyS" color="textStrong">
-          {{ variation().type }}
-        </UiLabel>
-      </UiFlex>
-    </UiGrid>
-
-    <UiFlex direction="column" [gap]="2" className="min-w-0">
-      <UiLabel type="bodyXs" weight="medium" color="textWeak" className="uppercase">
-        Descripción
+<UiFlex direction="column" [gap]="4" [noWrap]="true">
+  <UiFlex direction="row" alignItems="start" justifyContent="between" [gap]="3" [noWrap]="true">
+    <UiFlex direction="column" [gap]="1" [noWrap]="true" className="min-w-0 flex-1">
+      <UiLabel type="HeadingM" weight="semibold" color="textStrong">
+        {{ targetLabel() }}{{ targetRef() ? ' · ' + targetRef() : '' }}
       </UiLabel>
-      <UiLabel type="bodyS" color="textStrong">
-        {{ variation().description }}
-      </UiLabel>
+      @if (contextLabel()) {
+        <UiLabel type="bodyXs" color="textWeak" [text]="contextLabel()" />
+      }
     </UiFlex>
-
-    <UiFlex direction="column" [gap]="2" className="min-w-0">
-      <UiLabel type="bodyXs" weight="medium" color="textWeak" className="uppercase">
-        Justificación
-      </UiLabel>
-      <UiLabel type="bodyS" color="textStrong">
-        {{ variation().justification }}
-      </UiLabel>
-    </UiFlex>
-
-    @if (hasChange()) {
-    <UiFlex direction="column" [gap]="2" className="min-w-0">
-      <UiLabel type="bodyXs" weight="medium" color="textWeak" className="uppercase">
-        Cambio
-      </UiLabel>
-      <UiFlex direction="row" alignItems="center" [gap]="8" className="flex-wrap">
-        @if (previousLabel()) {
-        <UiLabel type="bodyS" weight="semibold" color="textWeak" className="font-mono line-through">
-          {{ previousLabel() }}
-        </UiLabel>
-        <UiLabel type="HeadingXs" weight="bold" color="textStrong">
-          →
-        </UiLabel>
-        }
-        @if (newLabel()) {
-        <UiLabel type="bodyS" weight="semibold" color="textStrong" className="font-mono">
-          {{ newLabel() }}
-        </UiLabel>
-        }
-      </UiFlex>
-    </UiFlex>
-    }
-
-    <UiLabel type="bodyXs" color="textWeak">
-      Reportada por
-      <strong class="font-semibold text-gray-800 dark:text-white/90">
-        {{ variation().reportedBy }}
-      </strong>
-      · detección
-      <strong class="font-semibold text-gray-800 dark:text-white/90">
-        {{ detectionLabel() }}
-      </strong>
-    </UiLabel>
+    <UiBadge variant="solid" color="dark" size="md">
+      {{ variation().type }}
+    </UiBadge>
   </UiFlex>
-</UiSurface>
+
+  <UiGrid [columns]="2" gap="gap-4">
+    <div class="min-w-0">
+      <div class="mb-1">
+        <UiLabel type="bodyXs" weight="medium" color="textWeak" className="uppercase" text="Descripción" />
+      </div>
+      <UiLabel type="bodyS" color="textStrong" [text]="variation().description" />
+    </div>
+    <div class="min-w-0">
+      <div class="mb-1">
+        <UiLabel type="bodyXs" weight="medium" color="textWeak" className="uppercase" text="Justificación" />
+      </div>
+      <UiLabel type="bodyS" color="textStrong" [text]="variation().justification" />
+    </div>
+  </UiGrid>
+
+  @if (hasChange()) {
+    <UiGrid [columns]="2" gap="gap-4">
+      <div class="min-w-0 rounded-lg border border-gray-300 p-3 dark:border-gray-700">
+        <div class="mb-1">
+          <UiLabel type="bodyXs" weight="medium" color="textWeak" className="uppercase" text="Antes" />
+        </div>
+        @for (line of previousLines(); track $index) {
+          <div>
+            <UiLabel type="bodyS" color="textWeak" className="font-mono" [text]="line" />
+          </div>
+        } @empty {
+          <UiLabel type="bodyS" color="textWeak" text="—" />
+        }
+      </div>
+      <div class="min-w-0 rounded-lg border-2 border-brand-500 p-3 dark:border-brand-400">
+        <div class="mb-1">
+          <UiLabel type="bodyXs" weight="medium" color="textWeak" className="uppercase" text="Ahora" />
+        </div>
+        @for (line of newLines(); track $index) {
+          <div>
+            <UiLabel type="bodyS" weight="semibold" color="textStrong" className="font-mono" [text]="line" />
+          </div>
+        } @empty {
+          <UiLabel type="bodyS" color="textWeak" text="—" />
+        }
+      </div>
+    </UiGrid>
+  }
+
+  <UiLabel type="bodyXs" color="textWeak">
+    Reportada por
+    <strong class="font-semibold text-gray-800 dark:text-white/90">
+      {{ variation().reportedBy }}
+    </strong>
+    · Detección
+    <strong class="font-semibold text-gray-800 dark:text-white/90">
+      {{ detectionLabel() }}
+    </strong>
+  </UiLabel>
+</UiFlex>

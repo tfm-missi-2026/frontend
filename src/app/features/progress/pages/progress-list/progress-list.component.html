@@ -4,8 +4,8 @@
   <UiFlex direction="column" [gap]="1">
     <UiHeader [level]="1" text="Avance del proyecto" />
     <UiLabel type="bodyS" color="textWeak">
-      Compara lo planificado, que son las horas estimadas de la línea base
-      congelada, con lo ejecutado, que son las horas registradas en bitácora.
+      Horas estimadas en la línea base frente a horas registradas en la
+      bitácora.
     </UiLabel>
   </UiFlex>
 
@@ -58,41 +58,11 @@
       [progressPct]="progress().progressPct"
     />
 
-    <ProgressTable [rows]="progress().rows" />
-
-    @if (progress().rows.length > 0) {
-      <UiSurface variant="neutral" padding="md">
-        <UiFlex
-          direction="row"
-          alignItems="center"
-          justifyContent="between"
-          [gap]="3"
-          className="flex-wrap"
-        >
-          <UiLabel type="bodyXs" color="textWeak">
-            Registradas ÷ estimadas = % de avance · desviación = registradas −
-            estimadas.
-          </UiLabel>
-          <UiFlex direction="row" alignItems="center" [gap]="2">
-            <UiLabel type="bodyXs" color="textWeak" text="Total del proyecto:" />
-            <UiLabel
-              type="bodyXs"
-              weight="semibold"
-              color="textStrong"
-              className="font-mono"
-              [text]="totalLabel()"
-            />
-          </UiFlex>
-        </UiFlex>
-      </UiSurface>
-    }
+    <ProgressTable
+      [rows]="progress().rows"
+      [totalEstimatedHours]="progress().estimatedHours"
+      [totalLoggedHours]="progress().loggedHours"
+      [totalProgressPct]="progress().progressPct"
+    />
   }
-
-  <UiSurface variant="neutral" padding="md">
-    <UiLabel type="bodyS" color="textWeak">
-      Una desviación positiva, con más horas registradas que estimadas, señala
-      posible sobreesfuerzo; una negativa indica que aún falta ejecutar frente
-      al plan. La línea base se congela en Planificación.
-    </UiLabel>
-  </UiSurface>
 </UiFlex>

@@ -61,11 +61,7 @@
   </UiGrid>
 
   <UiGrid [columns]="2" gap="gap-5">
-    <MyTasksList
-      [tasks]="dashboard().myTasks"
-      [saving]="situationSaving()"
-      (advance)="onAdvanceTask($event.task, $event.situation)"
-    />
+    <MyTasksList [tasks]="dashboard().myTasks" />
     <MyBitacora
       [todayLabel]="dashboard().todayLabel"
       [entries]="dashboard().todayEntries"
@@ -73,17 +69,4 @@
       (registerBlock)="onRegisterBlock()"
     />
   </UiGrid>
-
-  <UiSurface
-    variant="neutral"
-    padding="md"
-    className="border-dashed max-w-160"
-  >
-    <UiLabel type="bodyS" color="textWeak">
-      El dashboard
-      solo agrega y enlaza
-      : muestra indicadores tomados de Planificación, Bitácora y Variaciones.
-      La captura y edición ocurre en cada módulo.
-    </UiLabel>
-  </UiSurface>
 </UiFlex>

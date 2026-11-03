@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from "@angular/core";
 
+import { IconCalendar24Component } from "@shared/icons";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
 import { UiLabelComponent } from "@shared/ui/label";
@@ -8,7 +9,13 @@ import { UiSurfaceComponent } from "@shared/ui/surface";
 @Component({
   selector: "ProgressBaseline",
   standalone: true,
-  imports: [UiFlexComponent, UiHeaderComponent, UiLabelComponent, UiSurfaceComponent],
+  imports: [
+    IconCalendar24Component,
+    UiFlexComponent,
+    UiHeaderComponent,
+    UiLabelComponent,
+    UiSurfaceComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./progress-baseline.component.html",
 })
