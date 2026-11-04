@@ -171,8 +171,8 @@ export class UiDatePickerComponent
       monthSelectorType: "static",
       dateFormat: this.dateFormat(),
       defaultDate: this.defaultDate() ?? this.value() ?? undefined,
-      minDate: this.min() ?? undefined,
-      maxDate: this.max() ?? undefined,
+      minDate: this.toWireDate(this.min()),
+      maxDate: this.toWireDate(this.max()),
       clickOpens: !this.disabled() && !this.readOnly(),
       allowInvalidPreload: true,
       disable: [(date) => this.isDateDisabled()?.(toIsoDate(date)) ?? false],
@@ -199,6 +199,13 @@ export class UiDatePickerComponent
 
     const initial = this.value();
     if (initial !== undefined) this.applyValue(initial);
+  }
+
+  private toWireDate(value: string | Date | undefined): Date | undefined {
+    if (!value) return undefined;
+    return typeof value === "string"
+      ? flatpickr.parseDate(value, WIRE_DATE_FORMAT)
+      : value;
   }
 
   ngOnDestroy(): void {

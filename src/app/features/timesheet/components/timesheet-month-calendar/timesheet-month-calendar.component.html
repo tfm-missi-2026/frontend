@@ -20,20 +20,21 @@
 <div [class.hidden]="detail()">
   <UiSurface variant="neutral" padding="md">
     <UiFlex direction="column" [gap]="3" [noWrap]="true">
-      <UiFlex
-        direction="row"
-        alignItems="center"
-        justifyContent="between"
-        [gap]="4"
-        className="flex-wrap"
-      >
-        <UiFlex direction="row" alignItems="center" [gap]="4" className="flex-wrap">
-          @for (task of legendTasks(); track task.id) {
-            <UiFlex direction="row" alignItems="center" [gap]="2">
+      @if (legendTasks().length > 0) {
+        <UiFlex direction="column" [gap]="1.5" [noWrap]="true">
+          <UiLabel
+            type="bodyXs"
+            weight="medium"
+            color="textWeak"
+            className="uppercase tracking-wider"
+            text="Tareas"
+          />
+          <div class="grid w-fit grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-x-3 gap-y-1.5">
+            @for (task of legendTasks(); track task.id) {
               <span class="ts-legend" [style.background-color]="task.color"></span>
-              <UiLabel type="bodyXs" color="textWeak" [text]="task.name" />
+              <UiLabel type="bodyXs" color="textStrong" [text]="task.name" />
               <span
-                class="font-mono text-xs font-semibold"
+                class="text-right font-mono text-xs font-semibold"
                 [class]="
                   task.overPlanned
                     ? 'text-error-500'
@@ -42,15 +43,31 @@
               >
                 {{ task.hoursText }}
               </span>
-            </UiFlex>
-          }
+              <span>
+                @if (task.culminated) {
+                  <UiBadge variant="light" color="success" size="sm">Culminada</UiBadge>
+                }
+              </span>
+            }
+          </div>
+        </UiFlex>
+      }
+
+      <UiFlex
+        direction="row"
+        alignItems="center"
+        justifyContent="between"
+        [gap]="4"
+        className="flex-wrap border-t border-gray-200 pt-3 dark:border-gray-800"
+      >
+        <UiFlex direction="row" alignItems="center" [gap]="4" className="flex-wrap">
           <UiFlex direction="row" alignItems="center" [gap]="2">
             <span class="ts-legend ts-event-activity"></span>
             <UiLabel type="bodyXs" color="textWeak" text="Actividad" />
           </UiFlex>
           <UiFlex direction="row" alignItems="center" [gap]="2">
             <span class="ts-legend ts-event-planned"></span>
-            <UiLabel type="bodyXs" color="textWeak" text="Barra punteada: programado" />
+            <UiLabel type="bodyXs" color="textWeak" text="Programado (barra punteada)" />
           </UiFlex>
         </UiFlex>
         <label class="flex cursor-pointer items-center gap-2 text-xs text-gray-600 dark:text-gray-300">

@@ -143,6 +143,7 @@ export class MyTimesheetComponent implements OnInit {
   protected readonly plannedTasks = computed<TimesheetPlannedTask[]>(() => {
     const usuarioId = this.auth.usuario()?.id;
     const tasks = this.tasksService.tasks();
+    const situations = this.taskSituations();
     return this.assignmentsService
       .assignments()
       .filter((a) => a.active && a.resourceId === usuarioId)
@@ -152,6 +153,7 @@ export class MyTimesheetComponent implements OnInit {
         startDate: a.startDate,
         endDate: a.endDate,
         plannedHours: a.plannedHours,
+        culminated: situations.get(a.id) === "Culminado",
       }));
   });
 

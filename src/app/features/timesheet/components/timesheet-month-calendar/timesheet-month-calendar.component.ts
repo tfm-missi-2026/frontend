@@ -20,6 +20,7 @@ import esLocale from "@fullcalendar/core/locales/es";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin, { type DateClickArg } from "@fullcalendar/interaction";
 
+import { UiBadgeComponent } from "@shared/ui/badge";
 import { UiButtonComponent } from "@shared/ui/button";
 import { UiFlexComponent } from "@shared/ui/flex";
 import { UiHeaderComponent } from "@shared/ui/header";
@@ -35,6 +36,7 @@ export interface TimesheetPlannedTask {
   startDate: string;
   endDate: string;
   plannedHours: number;
+  culminated: boolean;
 }
 
 function roundHours(value: number): number {
@@ -86,6 +88,7 @@ function entryTooltip(
   standalone: true,
   imports: [
     FullCalendarModule,
+    UiBadgeComponent,
     UiButtonComponent,
     UiFlexComponent,
     UiHeaderComponent,
@@ -122,7 +125,9 @@ export class TimesheetMonthCalendarComponent {
   });
 
   protected readonly legendTasks = computed(() =>
-    this.plannedTasks().map((t, i) => {
+    [...this.plannedTasks()]
+      .sort((a, b) => a.startDate.localeCompare(b.startDate))
+      .map((t, i) => {
       const loggedHours = roundHours(this.loggedHoursByTask().get(t.id) ?? 0);
       const plannedHours = roundHours(t.plannedHours);
       return {
@@ -131,6 +136,7 @@ export class TimesheetMonthCalendarComponent {
         color: TASK_COLORS[i % TASK_COLORS.length],
         hoursText: `${loggedHours}/${plannedHours} h`,
         overPlanned: loggedHours > plannedHours,
+        culminated: t.culminated,
         loggedHours,
         plannedHours,
       };
@@ -168,9 +174,10 @@ export class TimesheetMonthCalendarComponent {
     this.plannedTasks().map((t) => {
       const legend = this.taskById().get(t.id);
       const color = legend?.color ?? TASK_COLORS[0];
+      const name = t.culminated ? `✓ ${t.name}` : t.name;
       return {
         id: `planned-${t.id}`,
-        title: legend ? `${t.name} · ${legend.hoursText}` : t.name,
+        title: legend ? `${name} · ${legend.hoursText}` : name,
         start: t.startDate,
         end: nextDay(t.endDate),
         allDay: true,
@@ -180,7 +187,7 @@ export class TimesheetMonthCalendarComponent {
         classNames: ["ts-event-planned"],
         extendedProps: {
           plannedTooltip: legend
-            ? `Programado: ${formatShortDate(t.startDate)} – ${formatShortDate(t.endDate)} · ${legend.plannedHours} h · Registrado: ${legend.loggedHours} h`
+            ? `Programado: ${formatShortDate(t.startDate)} – ${formatShortDate(t.endDate)} · ${legend.plannedHours} h · Registrado: ${legend.loggedHours} h${t.culminated ? " · Culminada" : ""}`
             : `Programado: ${t.name}`,
         },
       };
